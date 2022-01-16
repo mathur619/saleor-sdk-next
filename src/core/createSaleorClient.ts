@@ -27,6 +27,7 @@ export const createSaleorClient = ({
   const authSDK = auth(coreInternals);
   const userSDK = user(coreInternals);
   const cartSDK: CartSDK = {};
+  const checkoutSDK = {};
   if (autologin) {
     const csrfToken = storage.getCSRFToken();
     const authPluginId = storage.getAuthPluginId();
@@ -42,6 +43,7 @@ export const createSaleorClient = ({
     auth: authSDK,
     user: userSDK,
     cart: cartSDK,
+    checkout: checkoutSDK,
     config: { channel: _channel, setChannel, autologin },
     _internal: { apolloClient },
     getState: (): State => getState(apolloClient),
