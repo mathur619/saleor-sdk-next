@@ -46,6 +46,7 @@ import { AuthSDK } from "./auth";
 import { UserSDK } from "./user";
 import { State } from "./state";
 import { FetchConfig } from "../apollo";
+import { CartSDK } from "./cart";
 
 export interface SaleorClientInternals {
   apolloClient: ApolloClient<NormalizedCacheObject>;
@@ -61,6 +62,7 @@ export interface SaleorClient {
   config: SaleorClientConfig;
   _internal: SaleorClientInternals;
   getState(): State;
+  cart: CartSDK;
 }
 
 interface SaleorClientFetchOpts {

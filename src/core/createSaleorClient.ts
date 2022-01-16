@@ -6,6 +6,7 @@ import { SaleorClient, SaleorClientOpts } from "./types";
 
 import { createStorage, storage } from "./storage";
 import { DEVELOPMENT_MODE, WINDOW_EXISTS } from "../constants";
+import { CartSDK } from "./cart";
 
 export const createSaleorClient = ({
   apiUrl,
@@ -25,7 +26,7 @@ export const createSaleorClient = ({
   const coreInternals = { apolloClient, channel: _channel };
   const authSDK = auth(coreInternals);
   const userSDK = user(coreInternals);
-
+  const cartSDK: CartSDK = {};
   if (autologin) {
     const csrfToken = storage.getCSRFToken();
     const authPluginId = storage.getAuthPluginId();
@@ -40,6 +41,7 @@ export const createSaleorClient = ({
   const client = {
     auth: authSDK,
     user: userSDK,
+    cart: cartSDK,
     config: { channel: _channel, setChannel, autologin },
     _internal: { apolloClient },
     getState: (): State => getState(apolloClient),
