@@ -81,7 +81,19 @@ export const cart = ({
         variables: {
           checkoutInput: {
             lines: [{ quantity: quantity, variantId: variantId }],
-            email: "dummy@email.com",
+            email: "dummy@dummy.com",
+            shippingAddress: {
+              city: "delhi",
+              companyName: "dummy",
+              country: "IN",
+              countryArea: "Delhi",
+              firstName: "dummy",
+              lastName: "dummy",
+              phone: "7894561230",
+              postalCode: "110006",
+              streetAddress1: "dummy",
+              streetAddress2: "dummy",
+            },
           },
         },
         update: (_, { data }) => {
