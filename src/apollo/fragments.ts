@@ -95,7 +95,7 @@ export const checkoutProductVariantFragment = gql`
     name
     sku
     quantityAvailable
-    isAvailable
+
     images {
       id
       sortOrder
