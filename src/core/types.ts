@@ -48,6 +48,7 @@ import { State } from "./state";
 import { FetchConfig } from "../apollo";
 import { CartSDK } from "./cart";
 import { CheckoutSDK } from "./checkout";
+import { WishlistSDK } from "./wishlist";
 
 export interface SaleorClientInternals {
   apolloClient: ApolloClient<NormalizedCacheObject>;
@@ -65,6 +66,7 @@ export interface SaleorClient {
   getState(): State;
   cart: CartSDK;
   checkout: CheckoutSDK;
+  wishlist: WishlistSDK;
 }
 
 interface SaleorClientFetchOpts {
