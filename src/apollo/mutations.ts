@@ -3,6 +3,8 @@ import { gql } from "@apollo/client";
 import {
   accountErrorFragment,
   addressFragment,
+  checkoutErrorFragment,
+  checkoutFragment,
   userFragment,
 } from "./fragments";
 
@@ -398,6 +400,36 @@ export const CONFIRM_ACCOUNT = gql`
       }
       errors {
         ...AccountErrorFragment
+      }
+    }
+  }
+`;
+
+export const UPDATE_CHECKOUT_LINE_MUTATION = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation UpdateCheckoutLine($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
+    checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
+      checkout {
+        ...Checkout
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const CREATE_CHECKOUT_MUTATION = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation CreateCheckout($checkoutInput: CheckoutCreateInput!) {
+    checkoutCreate(input: $checkoutInput) {
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+      checkout {
+        ...Checkout
       }
     }
   }

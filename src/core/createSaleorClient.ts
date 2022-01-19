@@ -6,7 +6,7 @@ import { SaleorClient, SaleorClientOpts } from "./types";
 
 import { createStorage, storage } from "./storage";
 import { DEVELOPMENT_MODE, WINDOW_EXISTS } from "../constants";
-import { CartSDK } from "./cart";
+import { cart } from "./cart";
 
 export const createSaleorClient = ({
   apiUrl,
@@ -26,7 +26,7 @@ export const createSaleorClient = ({
   const coreInternals = { apolloClient, channel: _channel };
   const authSDK = auth(coreInternals);
   const userSDK = user(coreInternals);
-  const cartSDK: CartSDK = {};
+  const cartSDK = cart(coreInternals);
   const checkoutSDK = {};
   const wishlistSDK = {};
   if (autologin) {

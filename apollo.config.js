@@ -3,7 +3,7 @@ module.exports = {
     includes: ["src/**/*.ts"],
     name: "sdk",
     service: {
-      localSchemaFile: "schema.graphql",
+      url: "https://devapi.farziengineer.co/graphql/",
       name: "saleor",
     },
   },

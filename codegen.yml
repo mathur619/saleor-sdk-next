@@ -1,11 +1,11 @@
 overwrite: true
 schema:
-  - introspection.json
+  - https://devapi.farziengineer.co/graphql/
   - local-schema.graphql
 documents: src/apollo/*.ts
 generates:
   src/apollo/types.ts:
-    schema: introspection.json
+    schema: https://devapi.farziengineer.co/graphql/
     plugins:
       - typescript
       - typescript-operations
