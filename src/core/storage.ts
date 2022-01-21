@@ -77,11 +77,16 @@ export const createStorage = (autologinEnabled: boolean): void => {
   };
 
   const setCheckout = (checkout: any) => {
+    console.log("in setCheckout ", checkout);
     checkoutStorage = checkout;
     localStorage.setItem(SALEOR_CHECKOUT, checkout);
   };
 
-  const getCheckout = (): any | null => checkoutStorage;
+  const getCheckout = (): any | null => {
+    console.log("in getCheckout ", checkoutStorage);
+
+    return checkoutStorage;
+  };
 
   const clear = (): void => {
     setAuthPluginId(null);

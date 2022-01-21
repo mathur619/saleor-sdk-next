@@ -48,6 +48,7 @@ export const cart = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CartSDK => {
   const checkout = storage.getCheckout();
+  console.log("in cart sdk ", checkout);
 
   const items = checkout?.lines || [];
 
@@ -97,7 +98,15 @@ export const cart = ({
           },
         },
         update: (_, { data }) => {
+          console.log("in update CreateCheckout", data);
+
           if (data?.checkoutCreate?.checkout?.id) {
+            console.log(
+              "in update CreateCheckout if",
+              data,
+              data?.checkoutCreate?.checkout
+            );
+
             storage.setCheckout(data?.checkoutCreate?.checkout);
           }
         },
