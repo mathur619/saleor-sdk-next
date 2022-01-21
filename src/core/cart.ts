@@ -47,7 +47,8 @@ export interface CartSDK {
 export const cart = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CartSDK => {
-  const checkout = storage.getCheckout();
+  const checkoutString = storage.getCheckout();
+  const checkout = JSON.parse(checkoutString);
   console.log("in cart sdk ", checkout);
 
   const items = checkout?.lines || [];
