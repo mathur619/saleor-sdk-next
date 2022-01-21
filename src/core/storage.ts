@@ -79,7 +79,7 @@ export const createStorage = (autologinEnabled: boolean): void => {
   const setCheckout = (checkout: any) => {
     console.log("in setCheckout ", checkout);
     checkoutStorage = checkout;
-    localStorage.setItem(SALEOR_CHECKOUT, checkout);
+    localStorage.setItem(SALEOR_CHECKOUT, JSON.stringify(checkout));
   };
 
   const getCheckout = (): any | null => {
