@@ -11322,6 +11322,12 @@ export type UserDetailsQuery = Pick<
   "authenticated" | "authenticating"
 > & { user: Maybe<UserFragment> };
 
+export type UserCheckoutDetailsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type UserCheckoutDetailsQuery = {
+  checkout: Maybe<Pick<User, "id"> & { checkout: Maybe<CheckoutFragment> }>;
+};
+
 export const AccountErrorFragmentDoc = gql`
   fragment AccountErrorFragment on AccountError {
     code
@@ -13156,4 +13162,65 @@ export type UserDetailsLazyQueryHookResult = ReturnType<
 export type UserDetailsQueryResult = Apollo.QueryResult<
   UserDetailsQuery,
   UserDetailsQueryVariables
+>;
+export const UserCheckoutDetailsDocument = gql`
+  query UserCheckoutDetails {
+    checkout: me {
+      id
+      checkout {
+        ...Checkout
+      }
+    }
+  }
+  ${CheckoutFragmentDoc}
+`;
+
+/**
+ * __useUserCheckoutDetailsQuery__
+ *
+ * To run a query within a React component, call `useUserCheckoutDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserCheckoutDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserCheckoutDetailsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUserCheckoutDetailsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    UserCheckoutDetailsQuery,
+    UserCheckoutDetailsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    UserCheckoutDetailsQuery,
+    UserCheckoutDetailsQueryVariables
+  >(UserCheckoutDetailsDocument, options);
+}
+export function useUserCheckoutDetailsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UserCheckoutDetailsQuery,
+    UserCheckoutDetailsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    UserCheckoutDetailsQuery,
+    UserCheckoutDetailsQueryVariables
+  >(UserCheckoutDetailsDocument, options);
+}
+export type UserCheckoutDetailsQueryHookResult = ReturnType<
+  typeof useUserCheckoutDetailsQuery
+>;
+export type UserCheckoutDetailsLazyQueryHookResult = ReturnType<
+  typeof useUserCheckoutDetailsLazyQuery
+>;
+export type UserCheckoutDetailsQueryResult = Apollo.QueryResult<
+  UserCheckoutDetailsQuery,
+  UserCheckoutDetailsQueryVariables
 >;

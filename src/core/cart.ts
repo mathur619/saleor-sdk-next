@@ -9,6 +9,7 @@ import {
   CREATE_CHECKOUT_MUTATION,
   UPDATE_CHECKOUT_LINE_MUTATION,
 } from "../apollo/mutations";
+import { USER_CHECKOUT } from "../apollo/queries";
 import { storage } from "./storage";
 
 export interface CartSDK {
@@ -75,6 +76,12 @@ export const cart = ({
           if (data?.checkoutLinesUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
           }
+          client.writeQuery({
+            query: USER_CHECKOUT,
+            data: {
+              checkout: data?.checkoutLinesUpdate?.checkout,
+            },
+          });
         },
       });
     } else {
@@ -107,6 +114,13 @@ export const cart = ({
               data,
               data?.checkoutCreate?.checkout
             );
+
+            client.writeQuery({
+              query: USER_CHECKOUT,
+              data: {
+                checkout: data?.checkoutCreate?.checkout,
+              },
+            });
 
             storage.setCheckout(data?.checkoutCreate?.checkout);
           }

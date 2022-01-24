@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { userFragment } from "./fragments";
+import { checkoutFragment, userFragment } from "./fragments";
 
 export const USER = gql`
   ${userFragment}
@@ -9,5 +9,17 @@ export const USER = gql`
     }
     authenticated @client
     authenticating @client
+  }
+`;
+
+export const USER_CHECKOUT = gql`
+  ${checkoutFragment}
+  query UserCheckoutDetails {
+    checkout: me {
+      id
+      checkout {
+        ...Checkout
+      }
+    }
   }
 `;
