@@ -4,7 +4,7 @@ import {
   InMemoryCache,
   NormalizedCacheObject,
   Reference,
-  FetchResult,
+  // FetchResult,
   makeVar,
 } from "@apollo/client";
 import fetch from "cross-fetch";
@@ -16,9 +16,9 @@ import { AuthSDK, auth } from "../core/auth";
 import { storage } from "../core/storage";
 import {
   CheckoutLineFragment,
-  ExternalRefreshMutation,
+  // ExternalRefreshMutation,
   Maybe,
-  RefreshTokenMutation,
+  // RefreshTokenMutation,
 } from "./types";
 // import { UpdateCheckoutLine_checkoutLinesUpdate_checkout_lines } from "./cartTypes";
 
@@ -28,9 +28,9 @@ let refreshPromise:
   | ReturnType<AuthSDK["refreshToken"]>
   | ReturnType<AuthSDK["refreshExternalToken"]>
   | null = null;
-const isTokenRefreshExternal = (
-  result: RefreshTokenMutation | ExternalRefreshMutation
-): result is ExternalRefreshMutation => "externalRefresh" in result;
+// const isTokenRefreshExternal = (
+//   result: RefreshTokenMutation | ExternalRefreshMutation
+// ): result is ExternalRefreshMutation => "externalRefresh" in result;
 
 export type FetchConfig = Partial<{
   /**
@@ -52,8 +52,8 @@ export type FetchConfig = Partial<{
 export const createFetch = ({
   autoTokenRefresh = true,
   tokenRefreshTimeSkew = 120,
-  refreshOnUnauthorized = true,
-}: FetchConfig = {}) => async (
+}: // refreshOnUnauthorized = true,
+FetchConfig = {}) => async (
   input: RequestInfo,
   init: RequestInit = {}
 ): Promise<Response> => {
@@ -107,53 +107,53 @@ export const createFetch = ({
     };
   }
 
-  if (refreshOnUnauthorized && token) {
-    const response = await fetch(input, init);
-    const data: FetchResult = await response.clone().json();
-    const isUnauthenticated = data?.errors?.some(
-      error => error.extensions?.exception.code === "ExpiredSignatureError"
-    );
-    let refreshTokenResponse: FetchResult<
-      RefreshTokenMutation | ExternalRefreshMutation,
-      Record<string, unknown>,
-      Record<string, unknown>
-    > | null = null;
+  // if (refreshOnUnauthorized && token) {
+  //   const response = await fetch(input, init);
+  //   const data: FetchResult = await response.clone().json();
+  //   const isUnauthenticated = data?.errors?.some(
+  //     error => error.extensions?.exception.code === "ExpiredSignatureError"
+  //   );
+  //   let refreshTokenResponse: FetchResult<
+  //     RefreshTokenMutation | ExternalRefreshMutation,
+  //     Record<string, unknown>,
+  //     Record<string, unknown>
+  //   > | null = null;
 
-    if (isUnauthenticated) {
-      try {
-        if (refreshPromise) {
-          refreshTokenResponse = await refreshPromise;
-        } else {
-          refreshPromise = authPluginId
-            ? authClient.refreshExternalToken()
-            : authClient.refreshToken();
-          refreshTokenResponse = await refreshPromise;
-        }
+  //   if (isUnauthenticated) {
+  //     try {
+  //       if (refreshPromise) {
+  //         refreshTokenResponse = await refreshPromise;
+  //       } else {
+  //         refreshPromise = authPluginId
+  //           ? authClient.refreshExternalToken()
+  //           : authClient.refreshToken();
+  //         refreshTokenResponse = await refreshPromise;
+  //       }
 
-        if (
-          refreshTokenResponse.data &&
-          isTokenRefreshExternal(refreshTokenResponse.data)
-            ? refreshTokenResponse.data.externalRefresh?.token
-            : refreshTokenResponse.data?.tokenRefresh?.token
-        ) {
-          // check if mutation returns a valid token after refresh and retry the request
-          return createFetch({
-            autoTokenRefresh: false,
-            refreshOnUnauthorized: false,
-          })(input, init);
-        } else {
-          // after Saleor returns ExpiredSignatureError status and token refresh fails
-          // we log out the user and return the failed response
-          authClient.logout();
-        }
-      } catch (e) {
-      } finally {
-        refreshPromise = null;
-      }
-    }
+  //       if (
+  //         refreshTokenResponse.data &&
+  //         isTokenRefreshExternal(refreshTokenResponse.data)
+  //           ? refreshTokenResponse.data.externalRefresh?.token
+  //           : refreshTokenResponse.data?.tokenRefresh?.token
+  //       ) {
+  //         // check if mutation returns a valid token after refresh and retry the request
+  //         return createFetch({
+  //           autoTokenRefresh: false,
+  //           refreshOnUnauthorized: false,
+  //         })(input, init);
+  //       } else {
+  //         // after Saleor returns ExpiredSignatureError status and token refresh fails
+  //         // we log out the user and return the failed response
+  //         authClient.logout();
+  //       }
+  //     } catch (e) {
+  //     } finally {
+  //       refreshPromise = null;
+  //     }
+  //   }
 
-    return response;
-  }
+  //   return response;
+  // }
 
   return fetch(input, init);
 };
@@ -220,8 +220,32 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       },
       localCheckout: {
         read(existing) {
-          console.log("existing", existing);
+          console.log("existing localCheckout", existing);
           return existing || {};
+        },
+      },
+
+      localCheckoutDiscounts: {
+        read(existing) {
+          console.log("existing localCheckoutDiscounts", existing);
+          return (
+            existing || {
+              prepaidDiscount: "0",
+              couponDiscount: "0",
+              cashbackDiscount: "0",
+            }
+          );
+        },
+      },
+      localCashback: {
+        read(existing) {
+          console.log("existing localCashback", existing);
+          return (
+            existing || {
+              amount: "0",
+              willAddOn: null,
+            }
+          );
         },
       },
     },

@@ -8,7 +8,7 @@ import {
   CheckoutErrorCode,
   CheckoutLineInput,
   WeightUnitsEnum,
-} from "./types";
+} from "../types";
 
 // import { CheckoutLineInput, WeightUnitsEnum, CheckoutErrorCode } from "./../../gqlTypes/globalTypes";
 

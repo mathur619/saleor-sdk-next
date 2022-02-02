@@ -15,7 +15,7 @@ export const LOGIN = gql`
     tokenCreate(email: $email, password: $password) {
       csrfToken
       token
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       user {
@@ -29,7 +29,7 @@ export const REGISTER = gql`
   ${accountErrorFragment}
   mutation register($input: AccountRegisterInput!) {
     accountRegister(input: $input) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       requiresConfirmation
@@ -42,7 +42,7 @@ export const REFRESH_TOKEN = gql`
   mutation refreshToken($csrfToken: String!) {
     tokenRefresh(csrfToken: $csrfToken) {
       token
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -60,7 +60,7 @@ export const REFRESH_TOKEN_WITH_USER = gql`
       user {
         ...UserFragment
       }
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -77,7 +77,7 @@ export const VERIFY_TOKEN = gql`
       user {
         ...UserFragment
       }
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -92,7 +92,7 @@ export const EXTERNAL_AUTHENTICATION_URL = gql`
   ) {
     externalAuthenticationUrl(pluginId: $pluginId, input: $input) {
       authenticationData
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -112,7 +112,7 @@ export const OBTAIN_EXTERNAL_ACCESS_TOKEN = gql`
       user {
         ...UserFragment
       }
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -128,7 +128,7 @@ export const EXTERNAL_REFRESH = gql`
     externalRefresh(pluginId: $pluginId, input: $input) {
       token
       csrfToken
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -148,7 +148,7 @@ export const EXTERNAL_REFRESH_WITH_USER = gql`
       user {
         ...UserFragment
       }
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -172,7 +172,7 @@ export const EXTERNAL_VERIFY_TOKEN = gql`
           name
         }
       }
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -187,7 +187,7 @@ export const EXTERNAL_LOGOUT = gql`
   ) {
     externalLogout(pluginId: $pluginId, input: $input) {
       logoutData
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -198,7 +198,7 @@ export const CHANGE_USER_PASSWORD = gql`
   ${accountErrorFragment}
   mutation passwordChange($newPassword: String!, $oldPassword: String!) {
     passwordChange(newPassword: $newPassword, oldPassword: $oldPassword) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -217,7 +217,7 @@ export const REQUEST_PASSWORD_RESET = gql`
       redirectUrl: $redirectUrl
       channel: $channel
     ) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -229,7 +229,7 @@ export const SET_PASSWORD = gql`
   ${accountErrorFragment}
   mutation setPassword($token: String!, $email: String!, $password: String!) {
     setPassword(token: $token, email: $email, password: $password) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       token
@@ -256,7 +256,7 @@ export const REQUEST_EMAIL_CHANGE = gql`
       password: $password
       redirectUrl: $redirectUrl
     ) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       user {
@@ -271,7 +271,7 @@ export const CONFIRM_EMAIL_CHANGE = gql`
   ${accountErrorFragment}
   mutation confirmEmailChange($channel: String!, $token: String!) {
     confirmEmailChange(channel: $channel, token: $token) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       user {
@@ -285,7 +285,7 @@ export const REQUEST_DELETE_ACCOUNT = gql`
   ${accountErrorFragment}
   mutation accountRequestDeletion($channel: String!, $redirectUrl: String!) {
     accountRequestDeletion(channel: $channel, redirectUrl: $redirectUrl) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -297,7 +297,7 @@ export const DELETE_ACCOUNT = gql`
   ${accountErrorFragment}
   mutation accountDelete($token: String!) {
     accountDelete(token: $token) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       user {
@@ -312,7 +312,7 @@ export const UPDATE_ACCOUNT = gql`
   ${accountErrorFragment}
   mutation accountUpdate($input: AccountInput!) {
     accountUpdate(input: $input) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       user {
@@ -327,7 +327,7 @@ export const SET_ACCOUNT_DEFAULT_ADDRESS = gql`
   ${accountErrorFragment}
   mutation setAccountDefaultAddress($id: ID!, $type: AddressTypeEnum!) {
     accountSetDefaultAddress(id: $id, type: $type) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       user {
@@ -342,7 +342,7 @@ export const DELETE_ACCOUNT_ADDRESS = gql`
   ${accountErrorFragment}
   mutation deleteAccountAddress($addressId: ID!) {
     accountAddressDelete(id: $addressId) {
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       user {
@@ -361,7 +361,7 @@ export const CREATE_ACCOUNT_ADDRESS = gql`
       address {
         ...AddressFragment
       }
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       user {
@@ -380,7 +380,7 @@ export const UPDATE_ACCOUNT_ADDRESS = gql`
       address {
         ...AddressFragment
       }
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
       user {
@@ -398,7 +398,7 @@ export const CONFIRM_ACCOUNT = gql`
       user {
         ...UserFragment
       }
-      errors {
+      accountErrors {
         ...AccountErrorFragment
       }
     }
@@ -430,6 +430,21 @@ export const CREATE_CHECKOUT_MUTATION = gql`
       }
       checkout {
         ...Checkout
+      }
+    }
+  }
+`;
+
+export const ADD_CHECKOUT_LINE_MUTATION = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation AddCheckoutLine($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
+    checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
+      checkout {
+        ...Checkout
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
       }
     }
   }

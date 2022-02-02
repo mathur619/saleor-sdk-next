@@ -40,10 +40,10 @@ export const useCartState = () => {
     );
   }
   const cartState = {
-    items: data.localCheckout?.lines,
-    totalPrice: data.localCheckout?.totalPrice,
-    subtotalPrice: data.localCheckout?.subtotalPrice,
-    shippingPrice: data.localCheckout?.shippingPrice,
+    items: data?.localCheckout?.lines,
+    totalPrice: data?.localCheckout?.totalPrice,
+    subtotalPrice: data?.localCheckout?.subtotalPrice,
+    shippingPrice: data?.localCheckout?.shippingPrice,
   };
   return cartState;
 };

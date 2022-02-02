@@ -40,6 +40,16 @@ export const GET_LOCAL_CHECKOUT = gql`
     localCheckout @client {
       ...Checkout
     }
+
+    localCheckoutDiscounts @client {
+      prepaidDiscount
+      couponDiscount
+      cashbackDiscount
+    }
+    localCashback @client {
+      amount
+      willAddOn
+    }
   }
 `;
 

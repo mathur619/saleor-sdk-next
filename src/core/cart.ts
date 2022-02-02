@@ -2,16 +2,21 @@ import { SaleorClientMethodsProps } from ".";
 import {
   CreateCheckout,
   CreateCheckoutVariables,
-  UpdateCheckoutLine,
-  UpdateCheckoutLineVariables,
-} from "../apollo/cartTypes";
+  // UpdateCheckoutLine,
+  // UpdateCheckoutLineVariables,
+} from "../apollo/types/cartTypes";
 import { cartItemsVar } from "../apollo/client";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
+  ADD_CHECKOUT_LINE_MUTATION,
   CREATE_CHECKOUT_MUTATION,
-  UPDATE_CHECKOUT_LINE_MUTATION,
+  // UPDATE_CHECKOUT_LINE_MUTATION,
 } from "../apollo/mutations";
 import { storage } from "./storage";
+import {
+  AddCheckoutLineMutation,
+  AddCheckoutLineMutationVariables,
+} from "../apollo/types";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -80,17 +85,39 @@ export const cart = ({
     if (checkout && checkout?.token) {
       console.log("in if");
 
-      await client.mutate<UpdateCheckoutLine, UpdateCheckoutLineVariables>({
-        mutation: UPDATE_CHECKOUT_LINE_MUTATION,
+      // await client.mutate<UpdateCheckoutLine, UpdateCheckoutLineVariables>({
+      //   mutation: UPDATE_CHECKOUT_LINE_MUTATION,
+      //   variables: {
+      //     checkoutId: checkout?.id,
+      //     lines: alteredLines,
+      //   },
+      //   update: async (_, { data }) => {
+      //     if (data?.checkoutLinesUpdate?.checkout?.id) {
+      //       storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
+      //     }
+      //     await setLocalCheckoutInCache(
+      //       client,
+      //       data?.checkoutLinesUpdate?.checkout
+      //     );
+      //   },
+      // });
+      await client.mutate<
+        AddCheckoutLineMutation,
+        AddCheckoutLineMutationVariables
+      >({
+        mutation: ADD_CHECKOUT_LINE_MUTATION,
         variables: {
           checkoutId: checkout?.id,
-          lines: alteredLines,
+          lines: [{ quantity: quantity, variantId: variantId }],
         },
-        update: (_, { data }) => {
-          if (data?.checkoutLinesUpdate?.checkout?.id) {
-            storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
+        update: async (_, { data }) => {
+          if (data?.checkoutLinesAdd?.checkout?.id) {
+            storage.setCheckout(data?.checkoutLinesAdd?.checkout);
           }
-          setLocalCheckoutInCache(client, data?.checkoutLinesUpdate?.checkout);
+          await setLocalCheckoutInCache(
+            client,
+            data?.checkoutLinesAdd?.checkout
+          );
         },
       });
     } else {
