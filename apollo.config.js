@@ -3,7 +3,7 @@ module.exports = {
     includes: ["src/**/*.ts"],
     name: "sdk",
     service: {
-      url: "https://devapi.farziengineer.co/graphql/",
+      url: "https://plixlifefcstageapi.farziengineer.co/graphql/",
       name: "saleor",
     },
   },
