@@ -1,5 +1,9 @@
 import { gql } from "@apollo/client";
-import { checkoutFragment, userFragment } from "./fragments";
+import {
+  checkoutFragment,
+  checkoutLineFragment,
+  userFragment,
+} from "./fragments";
 
 export const USER = gql`
   ${userFragment}
@@ -12,14 +16,43 @@ export const USER = gql`
   }
 `;
 
-export const USER_CHECKOUT = gql`
+export const CHECKOUT_DETAILS = gql`
   ${checkoutFragment}
-  query UserCheckoutDetails {
-    checkout: me {
-      id
-      checkout {
-        ...Checkout
-      }
+  query CheckoutDetails($token: UUID) {
+    checkout(token: $token) {
+      ...Checkout
+    }
+    checkoutUpdated @client
+  }
+`;
+
+export const GET_CART_ITEMS = gql`
+  ${checkoutLineFragment}
+  query GetCartItems {
+    cartItems @client {
+      ...CheckoutLine
+    }
+  }
+`;
+export const GET_LOCAL_CHECKOUT = gql`
+  ${checkoutFragment}
+  query GetLocalCheckout {
+    localCheckout @client {
+      ...Checkout
+    }
+  }
+`;
+
+export const GET_DISCOUNT_CASHBACK_QUERY = gql`
+  query DiscountsAndCashbackQuery($token: UUID!) {
+    checkoutDiscounts(token: $token) {
+      prepaidDiscount
+      couponDiscount
+      cashbackDiscount
+    }
+    cashback(checkoutToken: $token) {
+      amount
+      willAddOn
     }
   }
 `;

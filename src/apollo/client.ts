@@ -5,6 +5,7 @@ import {
   NormalizedCacheObject,
   Reference,
   FetchResult,
+  makeVar,
 } from "@apollo/client";
 import fetch from "cross-fetch";
 import jwtDecode from "jwt-decode";
@@ -13,7 +14,13 @@ import { TypedTypePolicies } from "./apollo-helpers";
 import { JWTToken } from "../core";
 import { AuthSDK, auth } from "../core/auth";
 import { storage } from "../core/storage";
-import { ExternalRefreshMutation, RefreshTokenMutation } from "./types";
+import {
+  CheckoutLineFragment,
+  ExternalRefreshMutation,
+  Maybe,
+  RefreshTokenMutation,
+} from "./types";
+// import { UpdateCheckoutLine_checkoutLinesUpdate_checkout_lines } from "./cartTypes";
 
 let client: ApolloClient<NormalizedCacheObject>;
 let authClient: AuthSDK;
@@ -151,6 +158,8 @@ export const createFetch = ({
   return fetch(input, init);
 };
 
+export const cartItemsVar = makeVar<Maybe<CheckoutLineFragment>[]>([]);
+
 const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
   Query: {
     fields: {
@@ -169,7 +178,6 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
           const ref = toReference({
             __typename: "User",
           });
-
           return canRead(ref) ? ref : null;
         },
       },
@@ -183,6 +191,37 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
           }
 
           return read;
+        },
+      },
+      checkout: {
+        read(
+          _,
+          { toReference, canRead, cache, field, fieldName, variables }
+        ): Reference | undefined | null {
+          console.log("cache checkout", cache, field, fieldName, variables);
+          const ref = toReference({
+            __typename: "CheckoutLinesUpdate",
+          });
+          console.log("ref Checkout", ref);
+          return canRead(ref) ? ref : null;
+        },
+      },
+      checkoutUpdated: {
+        read(): boolean {
+          return true;
+        },
+      },
+      cartItems: {
+        read() {
+          const cartItems = cartItemsVar();
+          console.log("cartItems cache", cartItems);
+          return cartItems;
+        },
+      },
+      localCheckout: {
+        read(existing) {
+          console.log("existing", existing);
+          return existing || {};
         },
       },
     },
@@ -217,7 +256,7 @@ export const createApolloClient = (
   const cache = new InMemoryCache({
     typePolicies: getTypePolicies(autologin),
   });
-
+  console.log("cache", cache);
   client = new ApolloClient({
     cache,
     link: httpLink,

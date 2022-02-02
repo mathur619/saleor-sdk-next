@@ -5,11 +5,12 @@ import {
   UpdateCheckoutLine,
   UpdateCheckoutLineVariables,
 } from "../apollo/cartTypes";
+import { cartItemsVar } from "../apollo/client";
+import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   CREATE_CHECKOUT_MUTATION,
   UPDATE_CHECKOUT_LINE_MUTATION,
 } from "../apollo/mutations";
-import { USER_CHECKOUT } from "../apollo/queries";
 import { storage } from "./storage";
 
 export interface CartSDK {
@@ -52,20 +53,33 @@ export const cart = ({
   const checkout = JSON.parse(checkoutString);
   console.log("in cart sdk ", checkout);
 
-  const items = checkout?.lines || [];
+  let items = cartItemsVar();
 
+  console.log("items", items);
   const addItem: CartSDK["addItem"] = async (
     variantId: string,
     quantity: number
   ) => {
-    const checkout = storage.getCheckout();
-    const alteredLines = checkout?.lines
-      .map((line: any) => ({
+    const checkoutString = storage.getCheckout();
+    console.log("checkoutString", checkoutString);
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    console.log("addItem checkout 1", checkout?.lines);
+    const alteredLines =
+      checkout &&
+      checkout?.lines.map((line: any) => ({
         quantity: line.quantity,
         variantId: line.variant.id,
-      }))
-      .push({ quantity: quantity, variantId: variantId });
-    if (checkout?.id) {
+      }));
+    if (alteredLines && alteredLines.length) {
+      alteredLines.push({ quantity: quantity, variantId: variantId });
+    }
+    console.log("addItem checkout ", alteredLines);
+    if (checkout && checkout?.token) {
+      console.log("in if");
+
       await client.mutate<UpdateCheckoutLine, UpdateCheckoutLineVariables>({
         mutation: UPDATE_CHECKOUT_LINE_MUTATION,
         variables: {
@@ -76,15 +90,11 @@ export const cart = ({
           if (data?.checkoutLinesUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
           }
-          client.writeQuery({
-            query: USER_CHECKOUT,
-            data: {
-              checkout: data?.checkoutLinesUpdate?.checkout,
-            },
-          });
+          setLocalCheckoutInCache(client, data?.checkoutLinesUpdate?.checkout);
         },
       });
     } else {
+      console.log("in else");
       await client.mutate<CreateCheckout, CreateCheckoutVariables>({
         mutation: CREATE_CHECKOUT_MUTATION,
         variables: {
@@ -107,20 +117,10 @@ export const cart = ({
         },
         update: (_, { data }) => {
           console.log("in update CreateCheckout", data);
-
+          setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout);
           if (data?.checkoutCreate?.checkout?.id) {
-            console.log(
-              "in update CreateCheckout if",
-              data,
-              data?.checkoutCreate?.checkout
-            );
-
-            client.writeQuery({
-              query: USER_CHECKOUT,
-              data: {
-                checkout: data?.checkoutCreate?.checkout,
-              },
-            });
+            // items = data?.checkoutCreate?.checkout?.lines;
+            // cartItemsVar(data?.checkoutCreate?.checkout?.lines);
 
             storage.setCheckout(data?.checkoutCreate?.checkout);
           }

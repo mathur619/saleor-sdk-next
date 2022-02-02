@@ -143,9 +143,7 @@ export const checkoutProductVariantFragment = gql`
         url
         alt
       }
-      thumbnail2x: thumbnail(size: 510) {
-        url
-      }
+
       productType {
         id
         isShippingRequired

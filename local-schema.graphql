@@ -1,4 +1,7 @@
 type Query {
   authenticated: Boolean!
   authenticating: Boolean!
+  checkoutUpdated: Boolean!
+  cartItems: CheckoutLine
+  localCheckout: Checkout
 }

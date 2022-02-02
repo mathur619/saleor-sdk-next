@@ -8204,6 +8204,7 @@ export type Query = {
   attributes: Maybe<AttributeCountableConnection>;
   authenticated: Scalars["Boolean"];
   authenticating: Scalars["Boolean"];
+  cartItems: Maybe<CheckoutLine>;
   /** List of the shop's categories. */
   categories: Maybe<CategoryCountableConnection>;
   /** Look up a category by ID or slug. */
@@ -8216,6 +8217,7 @@ export type Query = {
   checkout: Maybe<Checkout>;
   /** List of checkout lines. */
   checkoutLines: Maybe<CheckoutLineCountableConnection>;
+  checkoutUpdated: Scalars["Boolean"];
   /** List of checkouts. */
   checkouts: Maybe<CheckoutCountableConnection>;
   /** Look up a collection by ID. */
@@ -8240,6 +8242,7 @@ export type Query = {
   giftCards: Maybe<GiftCardCountableConnection>;
   /** List of activity events to display on homepage (at the moment it only contains order-events). */
   homepageEvents: Maybe<OrderEventCountableConnection>;
+  localCheckout: Maybe<Checkout>;
   /** Return the currently authenticated user. */
   me: Maybe<User>;
   /** Look up a navigation menu by ID or name. */
@@ -10947,7 +10950,6 @@ export type ProductVariantFragment = Pick<
     weight: Maybe<Pick<Weight, "unit" | "value">>;
     category: Maybe<Pick<Category, "id" | "name" | "slug">>;
     thumbnail: Maybe<Pick<Image, "url" | "alt">>;
-    thumbnail2x: Maybe<Pick<Image, "url">>;
     productType: Pick<ProductType, "id" | "isShippingRequired">;
     metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
   };
@@ -11322,11 +11324,21 @@ export type UserDetailsQuery = Pick<
   "authenticated" | "authenticating"
 > & { user: Maybe<UserFragment> };
 
-export type UserCheckoutDetailsQueryVariables = Exact<{ [key: string]: never }>;
+export type CheckoutDetailsQueryVariables = Exact<{
+  token?: Maybe<Scalars["UUID"]>;
+}>;
 
-export type UserCheckoutDetailsQuery = {
-  checkout: Maybe<Pick<User, "id"> & { checkout: Maybe<CheckoutFragment> }>;
+export type CheckoutDetailsQuery = Pick<Query, "checkoutUpdated"> & {
+  checkout: Maybe<CheckoutFragment>;
 };
+
+export type GetCartItemsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetCartItemsQuery = { cartItems: Maybe<CheckoutLineFragment> };
+
+export type GetLocalCheckoutQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetLocalCheckoutQuery = { localCheckout: Maybe<CheckoutFragment> };
 
 export const AccountErrorFragmentDoc = gql`
   fragment AccountErrorFragment on AccountError {
@@ -11454,9 +11466,6 @@ export const ProductVariantFragmentDoc = gql`
       thumbnail {
         url
         alt
-      }
-      thumbnail2x: thumbnail(size: 510) {
-        url
       }
       productType {
         id
@@ -13163,64 +13172,179 @@ export type UserDetailsQueryResult = Apollo.QueryResult<
   UserDetailsQuery,
   UserDetailsQueryVariables
 >;
-export const UserCheckoutDetailsDocument = gql`
-  query UserCheckoutDetails {
-    checkout: me {
-      id
-      checkout {
-        ...Checkout
-      }
+export const CheckoutDetailsDocument = gql`
+  query CheckoutDetails($token: UUID) {
+    checkout(token: $token) {
+      ...Checkout
+    }
+    checkoutUpdated @client
+  }
+  ${CheckoutFragmentDoc}
+`;
+
+/**
+ * __useCheckoutDetailsQuery__
+ *
+ * To run a query within a React component, call `useCheckoutDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckoutDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckoutDetailsQuery({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useCheckoutDetailsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    CheckoutDetailsQuery,
+    CheckoutDetailsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CheckoutDetailsQuery, CheckoutDetailsQueryVariables>(
+    CheckoutDetailsDocument,
+    options
+  );
+}
+export function useCheckoutDetailsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CheckoutDetailsQuery,
+    CheckoutDetailsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    CheckoutDetailsQuery,
+    CheckoutDetailsQueryVariables
+  >(CheckoutDetailsDocument, options);
+}
+export type CheckoutDetailsQueryHookResult = ReturnType<
+  typeof useCheckoutDetailsQuery
+>;
+export type CheckoutDetailsLazyQueryHookResult = ReturnType<
+  typeof useCheckoutDetailsLazyQuery
+>;
+export type CheckoutDetailsQueryResult = Apollo.QueryResult<
+  CheckoutDetailsQuery,
+  CheckoutDetailsQueryVariables
+>;
+export const GetCartItemsDocument = gql`
+  query GetCartItems {
+    cartItems @client {
+      ...CheckoutLine
+    }
+  }
+  ${CheckoutLineFragmentDoc}
+`;
+
+/**
+ * __useGetCartItemsQuery__
+ *
+ * To run a query within a React component, call `useGetCartItemsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCartItemsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCartItemsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCartItemsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetCartItemsQuery,
+    GetCartItemsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetCartItemsQuery, GetCartItemsQueryVariables>(
+    GetCartItemsDocument,
+    options
+  );
+}
+export function useGetCartItemsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCartItemsQuery,
+    GetCartItemsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetCartItemsQuery, GetCartItemsQueryVariables>(
+    GetCartItemsDocument,
+    options
+  );
+}
+export type GetCartItemsQueryHookResult = ReturnType<
+  typeof useGetCartItemsQuery
+>;
+export type GetCartItemsLazyQueryHookResult = ReturnType<
+  typeof useGetCartItemsLazyQuery
+>;
+export type GetCartItemsQueryResult = Apollo.QueryResult<
+  GetCartItemsQuery,
+  GetCartItemsQueryVariables
+>;
+export const GetLocalCheckoutDocument = gql`
+  query GetLocalCheckout {
+    localCheckout @client {
+      ...Checkout
     }
   }
   ${CheckoutFragmentDoc}
 `;
 
 /**
- * __useUserCheckoutDetailsQuery__
+ * __useGetLocalCheckoutQuery__
  *
- * To run a query within a React component, call `useUserCheckoutDetailsQuery` and pass it any options that fit your needs.
- * When your component renders, `useUserCheckoutDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetLocalCheckoutQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLocalCheckoutQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useUserCheckoutDetailsQuery({
+ * const { data, loading, error } = useGetLocalCheckoutQuery({
  *   variables: {
  *   },
  * });
  */
-export function useUserCheckoutDetailsQuery(
+export function useGetLocalCheckoutQuery(
   baseOptions?: Apollo.QueryHookOptions<
-    UserCheckoutDetailsQuery,
-    UserCheckoutDetailsQueryVariables
+    GetLocalCheckoutQuery,
+    GetLocalCheckoutQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    UserCheckoutDetailsQuery,
-    UserCheckoutDetailsQueryVariables
-  >(UserCheckoutDetailsDocument, options);
+  return Apollo.useQuery<GetLocalCheckoutQuery, GetLocalCheckoutQueryVariables>(
+    GetLocalCheckoutDocument,
+    options
+  );
 }
-export function useUserCheckoutDetailsLazyQuery(
+export function useGetLocalCheckoutLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    UserCheckoutDetailsQuery,
-    UserCheckoutDetailsQueryVariables
+    GetLocalCheckoutQuery,
+    GetLocalCheckoutQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    UserCheckoutDetailsQuery,
-    UserCheckoutDetailsQueryVariables
-  >(UserCheckoutDetailsDocument, options);
+    GetLocalCheckoutQuery,
+    GetLocalCheckoutQueryVariables
+  >(GetLocalCheckoutDocument, options);
 }
-export type UserCheckoutDetailsQueryHookResult = ReturnType<
-  typeof useUserCheckoutDetailsQuery
+export type GetLocalCheckoutQueryHookResult = ReturnType<
+  typeof useGetLocalCheckoutQuery
 >;
-export type UserCheckoutDetailsLazyQueryHookResult = ReturnType<
-  typeof useUserCheckoutDetailsLazyQuery
+export type GetLocalCheckoutLazyQueryHookResult = ReturnType<
+  typeof useGetLocalCheckoutLazyQuery
 >;
-export type UserCheckoutDetailsQueryResult = Apollo.QueryResult<
-  UserCheckoutDetailsQuery,
-  UserCheckoutDetailsQueryVariables
+export type GetLocalCheckoutQueryResult = Apollo.QueryResult<
+  GetLocalCheckoutQuery,
+  GetLocalCheckoutQueryVariables
 >;
