@@ -1,8 +1,3 @@
-// import { GET_CART_ITEMS } from "../../apollo/queries";
-// import {
-//   GetCartItemsQuery,
-//   GetCartItemsQueryVariables,
-// } from "../../apollo/types";
 import { GET_LOCAL_CHECKOUT } from "../../apollo/queries";
 import {
   GetLocalCheckoutQuery,
@@ -13,27 +8,12 @@ import { hookStateFactory } from "../helpers/hookStateFactory";
 
 export const useCart = hookFactory("cart");
 
-// export const useCartState = (): GetCartItemsQuery => {
-//   const { data } = hookStateFactory<
-//     GetCartItemsQuery,
-//     GetCartItemsQueryVariables
-//   >(GET_CART_ITEMS);
-//   console.log("useCartState sdk 1", data);
-//   if (!data) {
-//     throw new Error(
-//       "Cache query result is undefined. Invalid cache configuration."
-//     );
-//   }
-
-//   return data;
-// };
-
 export const useCartState = () => {
   const { data } = hookStateFactory<
     GetLocalCheckoutQuery,
     GetLocalCheckoutQueryVariables
   >(GET_LOCAL_CHECKOUT);
-  console.log("useCartState sdk 1", data);
+  console.log("useCartState sdk 1000", data);
   if (!data) {
     throw new Error(
       "Cache query result is undefined. Invalid cache configuration."
