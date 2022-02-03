@@ -4,7 +4,7 @@ import { CheckoutState, getCheckout, getState, State } from "./state";
 import { createApolloClient } from "../apollo";
 import { SaleorClient, SaleorClientOpts } from "./types";
 
-import { createStorage, storage } from "./storage";
+import { createStorage } from "./storage";
 import { DEVELOPMENT_MODE, WINDOW_EXISTS } from "../constants";
 import { cart } from "./cart";
 
@@ -30,14 +30,13 @@ export const createSaleorClient = ({
   const checkoutSDK = {};
   const wishlistSDK = {};
   if (autologin) {
-    const csrfToken = storage.getCSRFToken();
-    const authPluginId = storage.getAuthPluginId();
-
-    if (csrfToken && authPluginId) {
-      authSDK.refreshExternalToken(true);
-    } else if (csrfToken) {
-      authSDK.refreshToken(true);
-    }
+    // const csrfToken = storage.getCSRFToken();
+    // const authPluginId = storage.getAuthPluginId();
+    // if (csrfToken && authPluginId) {
+    //   authSDK.refreshExternalToken(true);
+    // } else if (csrfToken) {
+    //   authSDK.refreshToken(true);
+    // }
   }
 
   const client = {
