@@ -15925,6 +15925,18 @@ export type AddCheckoutLineMutation = {
   }>;
 };
 
+export type RemoveCheckoutLineMutationVariables = Exact<{
+  checkoutId: Scalars["ID"];
+  lineId?: Maybe<Scalars["ID"]>;
+}>;
+
+export type RemoveCheckoutLineMutation = {
+  checkoutLineDelete: Maybe<{
+    checkout: Maybe<CheckoutFragment>;
+    errors: Array<CheckoutErrorFragment>;
+  }>;
+};
+
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type UserDetailsQuery = Pick<
@@ -16364,6 +16376,65 @@ export type AddCheckoutLineMutationResult = Apollo.MutationResult<
 export type AddCheckoutLineMutationOptions = Apollo.BaseMutationOptions<
   AddCheckoutLineMutation,
   AddCheckoutLineMutationVariables
+>;
+export const RemoveCheckoutLineDocument = gql`
+  mutation RemoveCheckoutLine($checkoutId: ID!, $lineId: ID) {
+    checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
+      checkout {
+        ...Checkout
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+  ${CheckoutFragmentDoc}
+  ${CheckoutErrorFragmentDoc}
+`;
+export type RemoveCheckoutLineMutationFn = Apollo.MutationFunction<
+  RemoveCheckoutLineMutation,
+  RemoveCheckoutLineMutationVariables
+>;
+
+/**
+ * __useRemoveCheckoutLineMutation__
+ *
+ * To run a mutation, you first call `useRemoveCheckoutLineMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveCheckoutLineMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeCheckoutLineMutation, { data, loading, error }] = useRemoveCheckoutLineMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      lineId: // value for 'lineId'
+ *   },
+ * });
+ */
+export function useRemoveCheckoutLineMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RemoveCheckoutLineMutation,
+    RemoveCheckoutLineMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RemoveCheckoutLineMutation,
+    RemoveCheckoutLineMutationVariables
+  >(RemoveCheckoutLineDocument, options);
+}
+export type RemoveCheckoutLineMutationHookResult = ReturnType<
+  typeof useRemoveCheckoutLineMutation
+>;
+export type RemoveCheckoutLineMutationResult = Apollo.MutationResult<
+  RemoveCheckoutLineMutation
+>;
+export type RemoveCheckoutLineMutationOptions = Apollo.BaseMutationOptions<
+  RemoveCheckoutLineMutation,
+  RemoveCheckoutLineMutationVariables
 >;
 export const UserDetailsDocument = gql`
   query UserDetails {

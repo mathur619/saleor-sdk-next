@@ -449,3 +449,18 @@ export const ADD_CHECKOUT_LINE_MUTATION = gql`
     }
   }
 `;
+
+export const REMOVE_CHECKOUT_LINE_MUTATION = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation RemoveCheckoutLine($checkoutId: ID!, $lineId: ID) {
+    checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
+      checkout {
+        ...Checkout
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;
