@@ -464,3 +464,76 @@ export const REMOVE_CHECKOUT_LINE_MUTATION = gql`
     }
   }
 `;
+
+export const UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation UpdateCheckoutShippingAddress(
+    $checkoutId: ID!
+    $shippingAddress: AddressInput!
+    $email: String!
+  ) {
+    checkoutShippingAddressUpdate(
+      checkoutId: $checkoutId
+      shippingAddress: $shippingAddress
+    ) {
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+      checkout {
+        ...Checkout
+      }
+    }
+    checkoutEmailUpdate(checkoutId: $checkoutId, email: $email) {
+      checkout {
+        ...Checkout
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation UpdateCheckoutBillingAddress(
+    $checkoutId: ID!
+    $billingAddress: AddressInput!
+  ) {
+    checkoutBillingAddressUpdate(
+      checkoutId: $checkoutId
+      billingAddress: $billingAddress
+    ) {
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+      checkout {
+        ...Checkout
+      }
+    }
+  }
+`;
+
+export const UPDATE_CHECKOUT_ADDRESS_TYPE = gql`
+  mutation UpdateCheckoutAddressType($addressId: ID!, $type: AddressTypes!) {
+    addressTypeUpdate(addressId: $addressId, type: $type) {
+      addressLink {
+        id
+        address {
+          id
+          firstName
+          lastName
+          streetAddress1
+          streetAddress2
+          city
+          cityArea
+          postalCode
+          phone
+        }
+        type
+      }
+    }
+  }
+`;

@@ -90,7 +90,8 @@ export const cart = ({
           }
           await setLocalCheckoutInCache(
             client,
-            data?.checkoutLinesAdd?.checkout
+            data?.checkoutLinesAdd?.checkout,
+            true
           );
         },
       });
@@ -152,7 +153,8 @@ export const cart = ({
           }
           await setLocalCheckoutInCache(
             client,
-            data?.checkoutLineDelete?.checkout
+            data?.checkoutLineDelete?.checkout,
+            true
           );
         },
       });
@@ -192,7 +194,8 @@ export const cart = ({
           }
           await setLocalCheckoutInCache(
             client,
-            data?.checkoutLinesUpdate?.checkout
+            data?.checkoutLinesUpdate?.checkout,
+            true
           );
         },
       });
