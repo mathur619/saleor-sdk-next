@@ -8,17 +8,30 @@ import { hookStateFactory } from "../helpers/hookStateFactory";
 
 export const useCheckout = hookFactory("checkout");
 
-export const useCheckoutState = (): GetLocalCheckoutQuery => {
+export const useCheckoutState = () => {
   const { data } = hookStateFactory<
     GetLocalCheckoutQuery,
     GetLocalCheckoutQueryVariables
   >(GET_LOCAL_CHECKOUT);
-  console.log("useCheckoutState sdk 1", data);
+  console.log("useCheckoutState sdk 10", data);
   if (!data) {
     throw new Error(
       "Cache query result is undefined. Invalid cache configuration."
     );
   }
 
-  return data;
+  return {
+    checkout: data.localCheckout,
+    loaded: true,
+
+    promoCodeDiscount: {
+      voucherCode: data.localCheckout?.voucherCode,
+      discount: data.localCheckout?.discount,
+      discountName: data.localCheckout?.discountName,
+    },
+
+    availableShippingMethods: data.localCheckout?.availableShippingMethods,
+
+    availablePaymentGateways: data.localCheckout?.availablePaymentGateways,
+  };
 };

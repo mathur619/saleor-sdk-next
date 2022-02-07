@@ -5,6 +5,9 @@ import {
   // addressFragment,
   checkoutErrorFragment,
   checkoutFragment,
+  orderDetailFragment,
+  paymentErrorFragment,
+  paymentFragment,
   // userFragment,
 } from "./fragments";
 
@@ -533,6 +536,131 @@ export const UPDATE_CHECKOUT_ADDRESS_TYPE = gql`
           phone
         }
         type
+      }
+    }
+  }
+`;
+
+export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation UpdateCheckoutShippingMethod(
+    $checkoutId: ID!
+    $shippingMethodId: ID!
+  ) {
+    checkoutShippingMethodUpdate(
+      checkoutId: $checkoutId
+      shippingMethodId: $shippingMethodId
+    ) {
+      checkout {
+        ...Checkout
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const ADD_CHECKOUT_PROMO_CODE = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation AddCheckoutPromoCode($checkoutId: ID!, $promoCode: String!) {
+    checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
+      checkout {
+        ...Checkout
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const REMOVE_CHECKOUT_PROMO_CODE = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation RemoveCheckoutPromoCode($checkoutId: ID!, $promoCode: String!) {
+    checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
+      checkout {
+        ...Checkout
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const CREATE_CHECKOUT_PAYMENT = gql`
+  ${checkoutFragment}
+  ${paymentFragment}
+  ${paymentErrorFragment}
+  mutation CreateCheckoutPayment(
+    $checkoutId: ID!
+    $paymentInput: PaymentInput!
+  ) {
+    checkoutPaymentCreate(checkoutId: $checkoutId, input: $paymentInput) {
+      checkout {
+        ...Checkout
+      }
+      payment {
+        ...Payment
+      }
+      errors: paymentErrors {
+        ...PaymentError
+      }
+    }
+  }
+`;
+
+export const COMPLETE_CHECKOUT = gql`
+  ${orderDetailFragment}
+  ${checkoutErrorFragment}
+  mutation CompleteCheckout(
+    $checkoutId: ID!
+    $paymentData: JSONString
+    $redirectUrl: String
+    $storeSource: Boolean
+  ) {
+    checkoutComplete(
+      checkoutId: $checkoutId
+      paymentData: $paymentData
+      redirectUrl: $redirectUrl
+      storeSource: $storeSource
+    ) {
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+      order {
+        ...OrderDetail
+      }
+      confirmationNeeded
+      confirmationData
+    }
+  }
+`;
+
+export const CHECKOUT_PAYMENT_METHOD_UPDATE = gql`
+  ${checkoutFragment}
+
+  mutation checkoutPaymentMethodUpdate(
+    $checkoutId: ID!
+    $gatewayId: String!
+    $useCashback: Boolean!
+  ) {
+    checkoutPaymentMethodUpdate(
+      checkoutId: $checkoutId
+      gatewayId: $gatewayId
+      useCashback: $useCashback
+    ) {
+      checkout {
+        ...Checkout
+      }
+      checkoutErrors {
+        field
+        message
+        code
       }
     }
   }

@@ -221,6 +221,16 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       localCheckout: {
         read(existing) {
           console.log("existing localCheckout", existing);
+          if (!existing) {
+            const checkoutString = storage.getCheckout();
+            const checkout =
+              checkoutString && typeof checkoutString === "string"
+                ? JSON.parse(checkoutString)
+                : checkoutString;
+            console.log("no exist 1", checkout);
+
+            return checkout;
+          }
           return existing || {};
         },
       },

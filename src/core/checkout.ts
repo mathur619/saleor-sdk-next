@@ -1,25 +1,50 @@
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
+  ADD_CHECKOUT_PROMO_CODE,
+  CHECKOUT_PAYMENT_METHOD_UPDATE,
+  COMPLETE_CHECKOUT,
   CREATE_CHECKOUT_MUTATION,
+  CREATE_CHECKOUT_PAYMENT,
+  REMOVE_CHECKOUT_PROMO_CODE,
   UPDATE_CHECKOUT_ADDRESS_TYPE,
   UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION,
   UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
+  UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
 } from "../apollo/mutations";
 import {
+  AddCheckoutPromoCodeMutation,
+  AddCheckoutPromoCodeMutationVariables,
   AddressTypes,
+  Checkout,
+  CheckoutPaymentMethodUpdateMutation,
+  CheckoutPaymentMethodUpdateMutationVariables,
+  CompleteCheckoutMutation,
+  CompleteCheckoutMutationVariables,
   CountryCode,
+  CreateCheckoutPaymentMutation,
+  CreateCheckoutPaymentMutationVariables,
+  PaymentInput,
+  RemoveCheckoutPromoCodeMutation,
+  RemoveCheckoutPromoCodeMutationVariables,
   UpdateCheckoutAddressTypeMutation,
   UpdateCheckoutAddressTypeMutationVariables,
   UpdateCheckoutBillingAddressMutation,
   UpdateCheckoutBillingAddressMutationVariables,
   UpdateCheckoutShippingAddressMutation,
   UpdateCheckoutShippingAddressMutationVariables,
+  UpdateCheckoutShippingMethodMutation,
+  UpdateCheckoutShippingMethodMutationVariables,
 } from "../apollo/types";
 import {
   CreateCheckout,
   CreateCheckoutVariables,
 } from "../apollo/types/cartTypes";
-import { IAddress } from "../apollo/types/checkout";
+import {
+  CompleteCheckoutInput,
+  CreatePaymentInput,
+  IAddress,
+  PaymentMethodUpdateInput,
+} from "../apollo/types/checkout";
 import { storage } from "./storage";
 import { SaleorClientMethodsProps } from "./types";
 
@@ -51,12 +76,12 @@ export interface CheckoutSDK {
   ) => {};
   setBillingAddress?: (billingAddress: IAddress) => any;
   setBillingAsShippingAddress?: () => {};
-  setShippingMethod?: () => {};
-  addPromoCode?: () => {};
-  removePromoCode?: () => {};
-  checkoutPaymentMethodUpdate?: () => {};
-  createPayment?: () => {};
-  completeCheckout?: () => {};
+  setShippingMethod?: (shippingMethodId: string) => any;
+  addPromoCode?: (promoCode: string) => any;
+  removePromoCode?: (promoCode: string) => {};
+  checkoutPaymentMethodUpdate?: (input: PaymentMethodUpdateInput) => any;
+  createPayment?: (input: CreatePaymentInput) => any;
+  completeCheckout?: (input?: CompleteCheckoutInput) => any;
 }
 
 export const checkout = ({
@@ -110,23 +135,24 @@ export const checkout = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     console.log("checkout setShippingAddress", checkout, checkout?.id);
-    const variables = {
-      checkoutId: checkout?.id,
-      email,
-      shippingAddress: {
-        city: shippingAddress.city,
-        companyName: shippingAddress.companyName,
-        country: shippingAddress?.country?.code as CountryCode,
-        countryArea: shippingAddress.countryArea,
-        firstName: shippingAddress.firstName,
-        lastName: shippingAddress.lastName,
-        phone: shippingAddress.phone,
-        postalCode: shippingAddress.postalCode,
-        streetAddress1: shippingAddress.streetAddress1,
-        streetAddress2: shippingAddress.streetAddress2,
-      },
-    };
+
     if (checkout && checkout?.id) {
+      const variables = {
+        checkoutId: checkout?.id,
+        email,
+        shippingAddress: {
+          city: shippingAddress.city,
+          companyName: shippingAddress.companyName,
+          country: shippingAddress?.country?.code as CountryCode,
+          countryArea: shippingAddress.countryArea,
+          firstName: shippingAddress.firstName,
+          lastName: shippingAddress.lastName,
+          phone: shippingAddress.phone,
+          postalCode: shippingAddress.postalCode,
+          streetAddress1: shippingAddress.streetAddress1,
+          streetAddress2: shippingAddress.streetAddress2,
+        },
+      };
       console.log("checkout setShippingAddress in if");
 
       const { data, errors } = await client.mutate<
@@ -166,22 +192,22 @@ export const checkout = ({
         : checkoutString;
     console.log("checkout setBillingAddress", checkout, checkout?.id);
 
-    const variables = {
-      checkoutId: checkout?.id,
-      billingAddress: {
-        city: billingAddress.city,
-        companyName: billingAddress.companyName,
-        country: billingAddress?.country?.code as CountryCode,
-        countryArea: billingAddress.countryArea,
-        firstName: billingAddress.firstName,
-        lastName: billingAddress.lastName,
-        phone: billingAddress.phone,
-        postalCode: billingAddress.postalCode,
-        streetAddress1: billingAddress.streetAddress1,
-        streetAddress2: billingAddress.streetAddress2,
-      },
-    };
     if (checkout && checkout?.id) {
+      const variables = {
+        checkoutId: checkout?.id,
+        billingAddress: {
+          city: billingAddress.city,
+          companyName: billingAddress.companyName,
+          country: billingAddress?.country?.code as CountryCode,
+          countryArea: billingAddress.countryArea,
+          firstName: billingAddress.firstName,
+          lastName: billingAddress.lastName,
+          phone: billingAddress.phone,
+          postalCode: billingAddress.postalCode,
+          streetAddress1: billingAddress.streetAddress1,
+          streetAddress2: billingAddress.streetAddress2,
+        },
+      };
       const { data, errors } = await client.mutate<
         UpdateCheckoutBillingAddressMutation,
         UpdateCheckoutBillingAddressMutationVariables
@@ -218,8 +244,8 @@ export const checkout = ({
     console.log("setShippingAndBillingAddress", resShipping, resBilling);
     return {
       data: {
-        billingData: resShipping.data,
-        shippingData: resBilling.data,
+        billingData: resBilling.data.checkoutBillingAddressUpdate.checkout,
+        shippingData: resShipping.data.checkoutShippingAddressUpdate.checkout,
       },
       dataError,
       pending: false,
@@ -250,11 +276,272 @@ export const checkout = ({
     }
   };
 
+  const setShippingMethod: CheckoutSDK["setShippingMethod"] = async (
+    shippingMethodId: string
+  ) => {
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    console.log("checkout setShippingMethod", checkout, checkout?.id);
+
+    if (checkout && checkout?.id) {
+      const variables: UpdateCheckoutShippingMethodMutationVariables = {
+        checkoutId: checkout?.id,
+        shippingMethodId,
+      };
+      console.log("checkout setShippingMethod in if");
+
+      const { data, errors } = await client.mutate<
+        UpdateCheckoutShippingMethodMutation,
+        UpdateCheckoutShippingMethodMutationVariables
+      >({
+        mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
+        variables,
+        update: (_, { data }) => {
+          console.log("in update setShippingMethod", data);
+          setLocalCheckoutInCache(
+            client,
+            data?.checkoutShippingMethodUpdate?.checkout
+          );
+          if (data?.checkoutShippingMethodUpdate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutShippingMethodUpdate?.checkout);
+          }
+        },
+      });
+
+      return {
+        data,
+        errors,
+      };
+    }
+
+    return { data: null };
+  };
+
+  const addPromoCode: CheckoutSDK["addPromoCode"] = async (
+    promoCode: string
+  ) => {
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    console.log("checkout addPromoCode", checkout, checkout?.id);
+
+    if (checkout && checkout?.id) {
+      const variables: AddCheckoutPromoCodeMutationVariables = {
+        checkoutId: checkout?.id,
+        promoCode,
+      };
+      console.log("checkout addPromoCode in if");
+
+      const { data, errors } = await client.mutate<
+        AddCheckoutPromoCodeMutation,
+        AddCheckoutPromoCodeMutationVariables
+      >({
+        mutation: ADD_CHECKOUT_PROMO_CODE,
+        variables,
+        update: (_, { data }) => {
+          console.log("in update addPromoCode", data);
+          setLocalCheckoutInCache(client, data?.checkoutAddPromoCode?.checkout);
+          if (data?.checkoutAddPromoCode?.checkout?.id) {
+            storage.setCheckout(data?.checkoutAddPromoCode?.checkout);
+          }
+        },
+      });
+
+      return {
+        data,
+        errors,
+      };
+    }
+
+    return { data: null };
+  };
+
+  const removePromoCode: CheckoutSDK["removePromoCode"] = async (
+    promoCode: string
+  ) => {
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    console.log("checkout removePromoCode", checkout, checkout?.id);
+
+    if (checkout && checkout?.id) {
+      const variables: RemoveCheckoutPromoCodeMutationVariables = {
+        checkoutId: checkout?.id,
+        promoCode,
+      };
+      console.log("checkout removePromoCode in if");
+
+      const { data, errors } = await client.mutate<
+        RemoveCheckoutPromoCodeMutation,
+        RemoveCheckoutPromoCodeMutationVariables
+      >({
+        mutation: REMOVE_CHECKOUT_PROMO_CODE,
+        variables,
+        update: (_, { data }) => {
+          console.log("in update removePromoCode", data);
+          setLocalCheckoutInCache(
+            client,
+            data?.checkoutRemovePromoCode?.checkout
+          );
+          if (data?.checkoutRemovePromoCode?.checkout?.id) {
+            storage.setCheckout(data?.checkoutRemovePromoCode?.checkout);
+          }
+        },
+      });
+
+      return {
+        data,
+        errors,
+      };
+    }
+
+    return { data: null };
+  };
+
+  const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] = async (
+    input: PaymentMethodUpdateInput
+  ) => {
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    console.log("checkout removePromoCode", checkout, checkout?.id);
+
+    if (checkout && checkout?.id) {
+      const variables: CheckoutPaymentMethodUpdateMutationVariables = {
+        checkoutId: checkout?.id,
+        gatewayId: input.gateway,
+        useCashback: input.useCashback,
+      };
+      console.log("checkout removePromoCode in if");
+
+      const { data, errors } = await client.mutate<
+        CheckoutPaymentMethodUpdateMutation,
+        CheckoutPaymentMethodUpdateMutationVariables
+      >({
+        mutation: CHECKOUT_PAYMENT_METHOD_UPDATE,
+        variables,
+        update: (_, { data }) => {
+          console.log("in update removePromoCode", data);
+          setLocalCheckoutInCache(
+            client,
+            data?.checkoutPaymentMethodUpdate?.checkout
+          );
+          if (data?.checkoutPaymentMethodUpdate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutPaymentMethodUpdate?.checkout);
+          }
+        },
+      });
+
+      return {
+        data,
+        errors,
+      };
+    }
+
+    return { data: null };
+  };
+
+  const createPayment: CheckoutSDK["createPayment"] = async (
+    input: PaymentInput
+  ) => {
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    console.log("checkout removePromoCode", checkout, checkout?.id);
+
+    if (checkout && checkout?.id) {
+      console.log("checkout removePromoCode in if");
+      const variables: CreateCheckoutPaymentMutationVariables = {
+        checkoutId: checkout?.id,
+        paymentInput: { ...input, amount: checkout?.totalPrice?.gross.amount },
+      };
+      const { data, errors } = await client.mutate<
+        CreateCheckoutPaymentMutation,
+        CreateCheckoutPaymentMutationVariables
+      >({
+        mutation: CREATE_CHECKOUT_PAYMENT,
+        variables,
+        update: (_, { data }) => {
+          console.log("in update removePromoCode", data);
+          setLocalCheckoutInCache(
+            client,
+            data?.checkoutPaymentCreate?.checkout
+          );
+          if (data?.checkoutPaymentCreate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutPaymentCreate?.checkout);
+          }
+        },
+      });
+
+      return {
+        data,
+        errors,
+      };
+    }
+
+    return { data: null };
+  };
+
+  const completeCheckout: CheckoutSDK["completeCheckout"] = async (
+    input: CompleteCheckoutInput | undefined
+  ) => {
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    console.log("checkout removePromoCode", checkout, checkout?.id);
+
+    if (checkout && checkout?.id) {
+      console.log("checkout removePromoCode in if");
+      const paymentDataString =
+        input?.paymentData && JSON.stringify(input?.paymentData);
+      console.log("paymentDataString", paymentDataString);
+      const variables: CompleteCheckoutMutationVariables = {
+        checkoutId: checkout?.id,
+        paymentData: paymentDataString,
+        redirectUrl: input?.redirectUrl,
+        storeSource: input?.storeSource,
+      };
+      const { data, errors } = await client.mutate<
+        CompleteCheckoutMutation,
+        CompleteCheckoutMutationVariables
+      >({
+        mutation: COMPLETE_CHECKOUT,
+        variables,
+      });
+
+      return {
+        data: data?.checkoutComplete,
+        errors,
+      };
+    }
+
+    return { data: null };
+  };
+
   return {
     createCheckout,
     setShippingAddress,
     setBillingAddress,
     setShippingAndBillingAddress,
     setAddressType,
+    setShippingMethod,
+    addPromoCode,
+    removePromoCode,
+    checkoutPaymentMethodUpdate,
+    createPayment,
+    completeCheckout,
   };
 };

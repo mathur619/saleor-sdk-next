@@ -14,3 +14,47 @@ export interface IAddress {
       country?: string;
     };
   }
+  export interface IPaymentCreditCard {
+    /**
+     * Card brand.
+     */
+    brand: string;
+    /**
+     * First 4 digits of the card number.
+     */
+    firstDigits?: string | null;
+    /**
+     * Last 4 digits of the card number.
+     */
+    lastDigits: string;
+    /**
+     * Two-digit number representing the card’s expiration month.
+     */
+    expMonth?: number | null;
+    /**
+     * Four-digit number representing the card’s expiration year.
+     */
+    expYear?: number | null;
+  }
+  
+export type ICreditCard = IPaymentCreditCard;
+
+
+  export interface CreatePaymentInput {
+    gateway: string;
+    token?: string;
+    creditCard?: ICreditCard;
+    returnUrl?: string;
+  }
+
+  export interface PaymentMethodUpdateInput {
+    gateway: string;
+    useCashback: boolean;
+  }
+  
+  export interface CompleteCheckoutInput {
+    paymentData?: object;
+    redirectUrl?: string;
+    storeSource?: boolean;
+  }
+  

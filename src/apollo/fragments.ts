@@ -250,3 +250,108 @@ export const checkoutErrorFragment = gql`
     message
   }
 `;
+
+export const orderPriceFragment = gql`
+  fragment OrderPrice on TaxedMoney {
+    gross {
+      amount
+      currency
+    }
+    net {
+      amount
+      currency
+    }
+  }
+`;
+
+export const orderDetailFragment = gql`
+  ${orderPriceFragment}
+  ${checkoutAddressFragment}
+  ${checkoutProductVariantFragment}
+  fragment OrderDetail on Order {
+    userEmail
+    paymentStatus
+    paymentStatusDisplay
+    status
+    statusDisplay
+    id
+    token
+    number
+
+    # invoices {
+    #   createdAt
+    #   id
+    #   message
+    #   externalUrl
+    #   number
+    #   status
+    #   updatedAt
+    #   url
+    #   metadata {
+    #     key
+    #     value
+    #   }
+    # }
+
+    metadata {
+      key
+      value
+    }
+    shippingAddress {
+      ...Address
+    }
+    lines {
+      id
+      productName
+      quantity
+
+      variant {
+        ...ProductVariant
+      }
+      unitPrice {
+        currency
+        ...OrderPrice
+      }
+      totalPrice {
+        currency
+        ...OrderPrice
+      }
+    }
+    subtotal {
+      ...OrderPrice
+    }
+    total {
+      ...OrderPrice
+    }
+    shippingPrice {
+      ...OrderPrice
+    }
+  }
+`;
+
+export const paymentFragment = gql`
+  fragment Payment on Payment {
+    id
+    gateway
+    token
+    creditCard {
+      brand
+      firstDigits
+      lastDigits
+      expMonth
+      expYear
+    }
+    total {
+      amount
+      currency
+    }
+  }
+`;
+
+export const paymentErrorFragment = gql`
+  fragment PaymentError on PaymentError {
+    code
+    field
+    message
+  }
+`;
