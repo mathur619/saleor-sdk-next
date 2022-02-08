@@ -238,6 +238,22 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       localCheckoutDiscounts: {
         read(existing) {
           console.log("existing localCheckoutDiscounts", existing);
+          if (!existing) {
+            const discountsString = storage.getDiscounts();
+            const discounts =
+              discountsString && typeof discountsString === "string"
+                ? JSON.parse(discountsString)
+                : discountsString;
+            console.log("no exist 1", discounts?.checkoutDiscounts);
+
+            return (
+              discounts?.checkoutDiscounts || {
+                prepaidDiscount: "0",
+                couponDiscount: "0",
+                cashbackDiscount: "0",
+              }
+            );
+          }
           return (
             existing || {
               prepaidDiscount: "0",
@@ -250,6 +266,21 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       localCashback: {
         read(existing) {
           console.log("existing localCashback", existing);
+          if (!existing) {
+            const discountsString = storage.getDiscounts();
+            const discounts =
+              discountsString && typeof discountsString === "string"
+                ? JSON.parse(discountsString)
+                : discountsString;
+            console.log("no exist 1", discounts?.cashback);
+
+            return (
+              discounts?.cashback || {
+                amount: "0",
+                willAddOn: null,
+              }
+            );
+          }
           return (
             existing || {
               amount: "0",

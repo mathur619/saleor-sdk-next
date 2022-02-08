@@ -2,6 +2,7 @@ import { LOCAL_STORAGE_EXISTS } from "../constants";
 import {
   SALEOR_AUTH_PLUGIN_ID,
   SALEOR_CHECKOUT,
+  SALEOR_CHECKOUT_DISCOUNTS,
   SALEOR_CSRF_TOKEN,
 } from "./constants";
 
@@ -19,6 +20,8 @@ export let storage: {
   clear: () => void;
   setCheckout: (checkout: any) => void;
   getCheckout: () => any | null;
+  setDiscounts: (discounts: any) => void;
+  getDiscounts: () => any | null;
 };
 
 export const createStorage = (autologinEnabled: boolean): void => {
@@ -32,6 +35,10 @@ export const createStorage = (autologinEnabled: boolean): void => {
       : null;
   let checkoutStorage: any = LOCAL_STORAGE_EXISTS
     ? localStorage.getItem(SALEOR_CHECKOUT)
+    : null;
+
+  let discountsStorage: any = LOCAL_STORAGE_EXISTS
+    ? localStorage.getItem(SALEOR_CHECKOUT_DISCOUNTS)
     : null;
 
   const setAuthPluginId = (pluginId: string | null): void => {
@@ -88,6 +95,18 @@ export const createStorage = (autologinEnabled: boolean): void => {
     return checkoutStorage;
   };
 
+  const setDiscounts = (discounts: any) => {
+    console.log("in setDiscounts ", discounts);
+    discountsStorage = discounts;
+    localStorage.setItem(SALEOR_CHECKOUT_DISCOUNTS, JSON.stringify(discounts));
+  };
+
+  const getDiscounts = (): any | null => {
+    console.log("in getDiscounts ", discountsStorage);
+
+    return discountsStorage;
+  };
+
   const clear = (): void => {
     setAuthPluginId(null);
     setAccessToken(null);
@@ -105,5 +124,7 @@ export const createStorage = (autologinEnabled: boolean): void => {
     clear,
     setCheckout,
     getCheckout,
+    setDiscounts,
+    getDiscounts,
   };
 };
