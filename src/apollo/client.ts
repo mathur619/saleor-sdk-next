@@ -24,6 +24,7 @@ import {
 
 let client: ApolloClient<NormalizedCacheObject>;
 let authClient: AuthSDK;
+
 let refreshPromise:
   | ReturnType<AuthSDK["refreshToken"]>
   | ReturnType<AuthSDK["refreshExternalToken"]>
@@ -220,7 +221,6 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       },
       localCheckout: {
         read(existing) {
-          console.log("existing localCheckout 10000", existing);
           if (!existing) {
             const checkoutString = storage.getCheckout();
             const checkout =

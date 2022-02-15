@@ -4,7 +4,7 @@ import { CheckoutState, getCheckout, getState, State } from "./state";
 import { createApolloClient } from "../apollo";
 import { SaleorClient, SaleorClientOpts } from "./types";
 
-import { createStorage } from "./storage";
+import { createStorage, storage } from "./storage";
 import { DEVELOPMENT_MODE, WINDOW_EXISTS } from "../constants";
 import { cart } from "./cart";
 import { checkout } from "./checkout";
@@ -56,6 +56,14 @@ export const createSaleorClient = ({
 
   if (DEVELOPMENT_MODE && WINDOW_EXISTS) {
     (window as any).__SALEOR_CLIENT__ = client;
+  }
+
+  if (
+    checkoutSDK &&
+    checkoutSDK.createCheckout &&
+    (!storage.getCheckout() || Object.keys(checkout).length === 0)
+  ) {
+    checkoutSDK?.createCheckout();
   }
 
   return client;

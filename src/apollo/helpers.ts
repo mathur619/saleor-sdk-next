@@ -17,16 +17,28 @@ export const setLocalCheckoutInCache = async (
     Object.getPrototypeOf(checkout) === Object.prototype
   ) {
     console.log(
-      "checkout empty",
+      "checkout empty yes",
       Object.getPrototypeOf(checkout),
       Object.prototype
     );
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
-        localCheckout: checkout,
-        localCheckoutDiscounts: 0,
-        localCashback: 0,
+        localCheckout: {
+          items: [],
+          totalPrice: 0,
+          subtotalPrice: 0,
+          shippingPrice: 0,
+        },
+        localCheckoutDiscounts: {
+          prepaidDiscount: "0",
+          couponDiscount: "0",
+          cashbackDiscount: "0",
+        },
+        localCashback: {
+          amount: "0",
+          willAddOn: null,
+        },
       },
     });
   } else if (fetchDiscount) {
