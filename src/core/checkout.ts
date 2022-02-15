@@ -520,6 +520,14 @@ export const checkout = ({
       >({
         mutation: COMPLETE_CHECKOUT,
         variables,
+        update: async (_, { data }) => {
+          if (data?.checkoutComplete?.order?.id) {
+            if (!data?.checkoutComplete.confirmationNeeded) {
+              storage.setCheckout({});
+            }
+          }
+          await setLocalCheckoutInCache(client, {}, false);
+        },
       });
 
       return {

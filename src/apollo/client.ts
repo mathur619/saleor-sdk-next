@@ -220,18 +220,41 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       },
       localCheckout: {
         read(existing) {
-          console.log("existing localCheckout", existing);
+          console.log("existing localCheckout 10000", existing);
           if (!existing) {
             const checkoutString = storage.getCheckout();
             const checkout =
               checkoutString && typeof checkoutString === "string"
                 ? JSON.parse(checkoutString)
                 : checkoutString;
-            console.log("no exist 1", checkout);
+            console.log("no exist checkout", checkout);
+            if (checkout) {
+              console.log("no exist in if checkout 2", checkout);
 
-            return checkout;
+              return checkout;
+            }
+            console.log("no exist 2000", checkout);
+
+            return {
+              items: [],
+              totalPrice: 0,
+              subtotalPrice: 0,
+              shippingPrice: 0,
+            };
           }
-          return existing || {};
+          if (existing !== null) {
+            console.log("no exist 2001", existing);
+
+            return existing;
+          }
+          console.log("no exist 2003", existing);
+
+          return {
+            items: [],
+            totalPrice: 0,
+            subtotalPrice: 0,
+            shippingPrice: 0,
+          };
         },
       },
 

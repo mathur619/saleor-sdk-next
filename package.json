@@ -26,7 +26,7 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "npm run build-types && tsdx watch",
+    "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
     "lint": "tsdx lint src test",

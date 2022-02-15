@@ -11,8 +11,25 @@ export const setLocalCheckoutInCache = async (
   checkout: any,
   fetchDiscount?: boolean
 ) => {
-  console.log("setLocalCheckoutInCache in helper");
-  if (fetchDiscount) {
+  if (
+    checkout &&
+    Object.keys(checkout).length === 0 &&
+    Object.getPrototypeOf(checkout) === Object.prototype
+  ) {
+    console.log(
+      "checkout empty",
+      Object.getPrototypeOf(checkout),
+      Object.prototype
+    );
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        localCheckout: checkout,
+        localCheckoutDiscounts: 0,
+        localCashback: 0,
+      },
+    });
+  } else if (fetchDiscount) {
     const res = await client.query<
       DiscountsAndCashbackQuery,
       DiscountsAndCashbackQueryVariables
@@ -33,11 +50,12 @@ export const setLocalCheckoutInCache = async (
         localCashback: res.data.cashback,
       },
     });
+  } else {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        localCheckout: checkout,
+      },
+    });
   }
-  client.writeQuery({
-    query: GET_LOCAL_CHECKOUT,
-    data: {
-      localCheckout: checkout,
-    },
-  });
 };

@@ -118,7 +118,7 @@ export const cart = ({
         },
         update: (_, { data }) => {
           console.log("in update CreateCheckout", data);
-          setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout);
+          setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout, true);
           if (data?.checkoutCreate?.checkout?.id) {
             storage.setCheckout(data?.checkoutCreate?.checkout);
           }
