@@ -184,9 +184,11 @@ export const cart = ({
             quantity: line.quantity,
             variantId: line.variant.id,
           }));
-      if (alteredLines && alteredLines.length) {
-        alteredLines.push({ quantity: quantity, variantId: variantId });
-      }
+
+      console.log("alteredLines", alteredLines);
+
+      alteredLines.push({ quantity: quantity, variantId: variantId });
+
       if (checkout && checkout?.token) {
         await client.mutate<UpdateCheckoutLine, UpdateCheckoutLineVariables>({
           mutation: UPDATE_CHECKOUT_LINE_MUTATION,
