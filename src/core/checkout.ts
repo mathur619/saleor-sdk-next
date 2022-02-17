@@ -301,13 +301,15 @@ export const checkout = ({
         variables,
         update: (_, { data }) => {
           console.log("in update setShippingMethod", data);
-          setLocalCheckoutInCache(
-            client,
-            data?.checkoutShippingMethodUpdate?.checkout
-          );
+
           if (data?.checkoutShippingMethodUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutShippingMethodUpdate?.checkout);
           }
+          setLocalCheckoutInCache(
+            client,
+            data?.checkoutShippingMethodUpdate?.checkout,
+            true
+          );
         },
       });
 
@@ -345,16 +347,20 @@ export const checkout = ({
         variables,
         update: (_, { data }) => {
           console.log("in update addPromoCode", data);
-          setLocalCheckoutInCache(client, data?.checkoutAddPromoCode?.checkout);
           if (data?.checkoutAddPromoCode?.checkout?.id) {
             storage.setCheckout(data?.checkoutAddPromoCode?.checkout);
           }
+          setLocalCheckoutInCache(
+            client,
+            data?.checkoutAddPromoCode?.checkout,
+            true
+          );
         },
       });
 
       return {
-        data,
-        errors,
+        data: data?.checkoutAddPromoCode?.checkout,
+        dataError: errors || data?.checkoutAddPromoCode?.errors,
       };
     }
 
@@ -386,13 +392,15 @@ export const checkout = ({
         variables,
         update: (_, { data }) => {
           console.log("in update removePromoCode", data);
-          setLocalCheckoutInCache(
-            client,
-            data?.checkoutRemovePromoCode?.checkout
-          );
+
           if (data?.checkoutRemovePromoCode?.checkout?.id) {
             storage.setCheckout(data?.checkoutRemovePromoCode?.checkout);
           }
+          setLocalCheckoutInCache(
+            client,
+            data?.checkoutRemovePromoCode?.checkout,
+            true
+          );
         },
       });
 
