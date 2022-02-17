@@ -166,39 +166,46 @@ export const cart = ({
     quantity: number,
     prevQuantity: number
   ) => {
-    const checkoutString = storage.getCheckout();
-    console.log("prevQuantity", prevQuantity);
-    const checkout =
-      checkoutString && typeof checkoutString === "string"
-        ? JSON.parse(checkoutString)
-        : checkoutString;
-    const alteredLines =
-      checkout &&
-      checkout?.lines.map((line: any) => ({
-        quantity: line.quantity,
-        variantId: line.variant.id,
-      }));
-    if (alteredLines && alteredLines.length) {
-      alteredLines.push({ quantity: quantity, variantId: variantId });
-    }
-    if (checkout && checkout?.token) {
-      await client.mutate<UpdateCheckoutLine, UpdateCheckoutLineVariables>({
-        mutation: UPDATE_CHECKOUT_LINE_MUTATION,
-        variables: {
-          checkoutId: checkout?.id,
-          lines: alteredLines,
-        },
-        update: async (_, { data }) => {
-          if (data?.checkoutLinesUpdate?.checkout?.id) {
-            storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
-          }
-          await setLocalCheckoutInCache(
-            client,
-            data?.checkoutLinesUpdate?.checkout,
-            true
-          );
-        },
-      });
+    const differenceQuantity = quantity - prevQuantity;
+    if (differenceQuantity > 0) {
+      addItem(variantId, differenceQuantity);
+    } else {
+      const checkoutString = storage.getCheckout();
+      console.log("prevQuantity", prevQuantity);
+      const checkout =
+        checkoutString && typeof checkoutString === "string"
+          ? JSON.parse(checkoutString)
+          : checkoutString;
+      const alteredLines =
+        checkout &&
+        checkout?.lines
+          .filter((line: any) => line.variant.id !== variantId)
+          .map((line: any) => ({
+            quantity: line.quantity,
+            variantId: line.variant.id,
+          }));
+      if (alteredLines && alteredLines.length) {
+        alteredLines.push({ quantity: quantity, variantId: variantId });
+      }
+      if (checkout && checkout?.token) {
+        await client.mutate<UpdateCheckoutLine, UpdateCheckoutLineVariables>({
+          mutation: UPDATE_CHECKOUT_LINE_MUTATION,
+          variables: {
+            checkoutId: checkout?.id,
+            lines: alteredLines,
+          },
+          update: async (_, { data }) => {
+            if (data?.checkoutLinesUpdate?.checkout?.id) {
+              storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
+            }
+            await setLocalCheckoutInCache(
+              client,
+              data?.checkoutLinesUpdate?.checkout,
+              true
+            );
+          },
+        });
+      }
     }
   };
 
