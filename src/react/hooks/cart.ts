@@ -52,6 +52,10 @@ export const useCartState = () => {
       createTaxedPriceFromAmount(
         data?.localCheckoutDiscounts?.cashbackDiscount
       ) || defaultPrice,
+    couponDiscount:
+      createTaxedPriceFromAmount(
+        data?.localCheckoutDiscounts?.couponDiscount
+      ) || defaultPrice,
     cashbackRecieve: data?.localCashback || { amount: 0, willAddOn: null },
   };
   console.log("cartState", cartState);
