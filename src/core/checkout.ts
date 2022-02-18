@@ -416,12 +416,13 @@ export const checkout = ({
   const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] = async (
     input: PaymentMethodUpdateInput
   ) => {
+    console.log("checkoutPaymentMethodUpdate", input);
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    console.log("checkout removePromoCode", checkout, checkout?.id);
+    console.log("checkout checkoutPaymentMethodUpdate", checkout, checkout?.id);
 
     if (checkout && checkout?.id) {
       const variables: CheckoutPaymentMethodUpdateMutationVariables = {
@@ -429,7 +430,7 @@ export const checkout = ({
         gatewayId: input.gateway,
         useCashback: input.useCashback,
       };
-      console.log("checkout removePromoCode in if");
+      console.log("checkout checkoutPaymentMethodUpdate in if");
 
       const { data, errors } = await client.mutate<
         CheckoutPaymentMethodUpdateMutation,
@@ -438,7 +439,8 @@ export const checkout = ({
         mutation: CHECKOUT_PAYMENT_METHOD_UPDATE,
         variables,
         update: (_, { data }) => {
-          console.log("in update removePromoCode", data);
+          console.log("checkoutPaymentMethodUpdate", data, errors);
+          console.log("in update checkoutPaymentMethodUpdate", data);
           setLocalCheckoutInCache(
             client,
             data?.checkoutPaymentMethodUpdate?.checkout

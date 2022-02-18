@@ -11,6 +11,13 @@ export const setLocalCheckoutInCache = async (
   checkout: any,
   fetchDiscount?: boolean
 ) => {
+  client.writeQuery({
+    query: GET_LOCAL_CHECKOUT,
+    data: {
+      localCheckout: checkout,
+    },
+  });
+
   if (
     checkout &&
     Object.keys(checkout).length === 0 &&
@@ -60,13 +67,6 @@ export const setLocalCheckoutInCache = async (
         localCheckout: checkout,
         localCheckoutDiscounts: res.data.checkoutDiscounts,
         localCashback: res.data.cashback,
-      },
-    });
-  } else {
-    client.writeQuery({
-      query: GET_LOCAL_CHECKOUT,
-      data: {
-        localCheckout: checkout,
       },
     });
   }
