@@ -8,6 +8,7 @@ import {
   orderDetailFragment,
   paymentErrorFragment,
   paymentFragment,
+  userFragment,
   // userFragment,
 } from "./fragments";
 
@@ -407,6 +408,91 @@ import {
 //     }
 //   }
 // `;
+
+export const REQUEST_OTP_MUTATION = gql`
+  mutation OTPRequest($phone: String!) {
+    RequestOTP: requestOtp(phone: $phone) {
+      message
+      otpErrors {
+        code
+        field
+        message
+      }
+    }
+  }
+`;
+
+export const CREATE_OTP_TOKEN_MUTATION = gql`
+  mutation OTPAuthentication($phone: String!, $otp: String!, $checkoutId: ID) {
+    CreateTokenOTP: otpTokenCreate(
+      otp: $otp
+      phone: $phone
+      checkoutId: $checkoutId
+    ) {
+      token
+      refreshToken
+      csrfToken
+      user {
+        id
+        email
+        firstName
+        lastName
+        metadata {
+          key
+          value
+        }
+      }
+      otpErrors {
+        code
+        field
+        message
+      }
+    }
+  }
+`;
+
+export const REGISTER_ACCOUNT = gql`
+  ${userFragment}
+  mutation AccountRegisterV2($input: AccountRegisterInputV2!) {
+    accountRegisterV2(input: $input) {
+      isNewUser
+      isActiveUser
+      user {
+        ...UserFragment
+      }
+      accountErrors {
+        field
+        message
+      }
+      errors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export const CONFIRM_ACCOUNT = gql`
+  ${userFragment}
+  mutation ConfirmAccountV2($otp: String!, $phone: String!, $checkoutId: ID) {
+    confirmAccountV2(otp: $otp, phone: $phone, checkoutId: $checkoutId) {
+      token
+      refreshToken
+      csrfToken
+      user {
+        ...UserFragment
+      }
+      accountErrors {
+        field
+        message
+      }
+      errors {
+        field
+        message
+      }
+    }
+  }
+`;
 
 export const UPDATE_CHECKOUT_LINE_MUTATION = gql`
   ${checkoutFragment}

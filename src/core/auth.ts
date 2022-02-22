@@ -45,6 +45,24 @@
 //   VerifyTokenMutationVariables,
 // } from "../apollo/types";
 import {
+  AccountRegisterV2Mutation,
+  AccountRegisterV2MutationVariables,
+  ConfirmAccountV2Mutation,
+  ConfirmAccountV2MutationVariables,
+  OtpAuthenticationMutation,
+  OtpAuthenticationMutationVariables,
+  OtpRequestMutation,
+  OtpRequestMutationVariables,
+} from "..";
+import {
+  CONFIRM_ACCOUNT,
+  CREATE_OTP_TOKEN_MUTATION,
+  REGISTER_ACCOUNT,
+  REQUEST_OTP_MUTATION,
+} from "../apollo/mutations";
+import { USER } from "../apollo/queries";
+import { storage } from "./storage";
+import {
   LoginOpts,
   // ChangePasswordResult,
   // LogoutOpts,
@@ -174,6 +192,18 @@ export interface AuthSDK {
    * @returns Token verification data and errors
    */
   // verifyExternalToken?: () => Promise<VerifyExternalTokenResult>;
+
+  signInMobile: (checkoutId: any, otp: string, phone: string) => {};
+
+  requestOTP: (phone: string) => {};
+
+  registerAccountV2: (email: string, phone: string) => {};
+
+  confirmAccountV2: (checkoutId: any, otp: string, phone: string) => {};
+
+  signOut: () => {};
+
+  setToken: (authToken: string, csrfToken: string) => {};
 }
 
 export const auth = ({
@@ -184,6 +214,182 @@ export const auth = ({
   const login: AuthSDK["login"] = () => {};
   const refreshExternalToken = () => {};
   const refreshToken = () => {};
+  const signInMobile: AuthSDK["signInMobile"] = async (
+    checkoutId: any,
+    otp: string,
+    phone: string
+  ) => {
+    client.writeQuery({
+      query: USER,
+      data: {
+        authenticating: true,
+      },
+    });
+
+    const { data, errors } = await client.mutate<
+      OtpAuthenticationMutation,
+      OtpAuthenticationMutationVariables
+    >({
+      mutation: CREATE_OTP_TOKEN_MUTATION,
+      variables: {
+        otp,
+        phone,
+        checkoutId,
+      },
+      update: (_, { data }) => {
+        if (data?.CreateTokenOTP?.token) {
+          storage.setTokens({
+            accessToken: data.CreateTokenOTP.token,
+            csrfToken: data.CreateTokenOTP.csrfToken,
+          });
+        } else {
+          client.writeQuery({
+            query: USER,
+            data: {
+              authenticating: false,
+            },
+          });
+        }
+      },
+    });
+
+    if (errors) {
+      return {
+        data,
+        dataError: errors,
+        pending: false,
+      };
+    }
+
+    return {
+      data: data?.CreateTokenOTP?.user,
+      dataError: errors,
+      pending: false,
+    };
+  };
+
+  const requestOTP: AuthSDK["requestOTP"] = async (phone: string) => {
+    const res = await client.mutate<
+      OtpRequestMutation,
+      OtpRequestMutationVariables
+    >({
+      mutation: REQUEST_OTP_MUTATION,
+      variables: {
+        phone,
+      },
+    });
+
+    return res;
+  };
+
+  const registerAccountV2: AuthSDK["registerAccountV2"] = async (
+    email: string,
+    phone: string
+  ) => {
+    client.writeQuery({
+      query: USER,
+      data: {
+        authenticating: true,
+      },
+    });
+
+    const { data, errors } = await client.mutate<
+      AccountRegisterV2Mutation,
+      AccountRegisterV2MutationVariables
+    >({
+      mutation: REGISTER_ACCOUNT,
+      variables: {
+        input: {
+          email,
+          phone,
+        },
+      },
+    });
+
+    return {
+      data: {
+        isActiveUser: data?.accountRegisterV2?.isActiveUser,
+        isNewUser: data?.accountRegisterV2?.isNewUser,
+        user: data?.accountRegisterV2?.user,
+      },
+      dataError: {
+        error: errors,
+      },
+    };
+  };
+
+  const confirmAccountV2: AuthSDK["confirmAccountV2"] = async (
+    checkoutId: any,
+    otp: string,
+    phone: string
+  ) => {
+    client.writeQuery({
+      query: USER,
+      data: {
+        authenticating: true,
+      },
+    });
+
+    const { data, errors } = await client.mutate<
+      ConfirmAccountV2Mutation,
+      ConfirmAccountV2MutationVariables
+    >({
+      mutation: CONFIRM_ACCOUNT,
+      variables: {
+        otp,
+        phone,
+        checkoutId,
+      },
+      update: (_, { data }) => {
+        if (data?.confirmAccountV2?.token) {
+          storage.setTokens({
+            accessToken: data.confirmAccountV2.token,
+            csrfToken: data.confirmAccountV2.csrfToken,
+          });
+        } else {
+          client.writeQuery({
+            query: USER,
+            data: {
+              authenticating: false,
+            },
+          });
+        }
+      },
+    });
+
+    if (errors) {
+      return {
+        data,
+        dataError: errors,
+        pending: false,
+      };
+    }
+
+    return {
+      data: data?.confirmAccountV2?.user,
+      dataError: errors,
+      pending: false,
+    };
+  };
+
+  const signOut: AuthSDK["signOut"] = async () => {
+    storage.clear();
+    client.resetStore();
+    return {
+      pending: false,
+    };
+  };
+
+  const setToken: AuthSDK["setToken"] = async (
+    authToken: string,
+    csrfToken: string
+  ) => {
+    storage.setTokens({
+      accessToken: authToken,
+      csrfToken: csrfToken,
+    });
+  };
+
   // const logout: AuthSDK["logout"] = async opts => {
   //   const authPluginId = storage.getAuthPluginId();
 
@@ -471,5 +677,11 @@ export const auth = ({
     login,
     refreshExternalToken,
     refreshToken,
+    signInMobile,
+    requestOTP,
+    registerAccountV2,
+    confirmAccountV2,
+    signOut,
+    setToken,
   };
 };

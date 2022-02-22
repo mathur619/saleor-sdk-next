@@ -115,7 +115,7 @@ export type AccountCreateInput = {
   /** Phone number of a user. */
   phone: Scalars["String"];
   /** Password. */
-  password: Scalars["String"];
+  password?: Maybe<Scalars["String"]>;
   /** Base of frontend URL that will be needed to create confirmation URL. */
   redirectUrl?: Maybe<Scalars["String"]>;
 };
@@ -213,6 +213,8 @@ export type AccountRegisterInputV2 = {
   phone: Scalars["String"];
   /** Password. */
   password?: Maybe<Scalars["String"]>;
+  /** Type of OTP. */
+  type?: Maybe<Scalars["String"]>;
 };
 
 /** Register a new user with phone and email. */
@@ -1294,6 +1296,8 @@ export type BannerInput = {
   imageMobile?: Maybe<Scalars["Upload"]>;
   /** Id of the related object */
   relatedId?: Maybe<Scalars["ID"]>;
+  /** Slug of the related object */
+  slug?: Maybe<Scalars["String"]>;
 };
 
 /** An enumeration. */
@@ -2639,6 +2643,8 @@ export type ContactUsInput = {
   phone: Scalars["String"];
   /** Email address of user. */
   email: Scalars["String"];
+  /** Meta form fields */
+  meta?: Maybe<Scalars["JSONString"]>;
   /** Type of query. */
   queryType: Scalars["String"];
   /** Message given from user. */
@@ -2660,6 +2666,7 @@ export type ContactUsType = Node & {
   name: Scalars["String"];
   phone: Maybe<Scalars["String"]>;
   email: Scalars["String"];
+  meta: Scalars["JSONString"];
   queryType: Scalars["String"];
   message: Maybe<Scalars["String"]>;
   createdAt: Scalars["DateTime"];
@@ -3202,6 +3209,7 @@ export type CustomBannerType = Node & {
   position: Scalars["Int"];
   relatedId: Maybe<Scalars["String"]>;
   link: Scalars["String"];
+  slug: Scalars["String"];
   image: Maybe<Scalars["String"]>;
   imageMobile: Maybe<Scalars["String"]>;
   name: Scalars["String"];
@@ -4114,6 +4122,28 @@ export type ExportScope =
   /** Export the filtered products. */
   | "FILTER";
 
+/** Add Balance to Wallet through CSV. */
+export type FarziWalletBalanceAddCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Wallet instance. */
+  wallet: Maybe<WalletType>;
+};
+
+/** Update Wallet. */
+export type FarziWalletBalanceUpdateCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Wallet instance. */
+  wallet: Maybe<WalletType>;
+};
+
 /** An enumeration. */
 export type FileTypesEnum = "CSV" | "XLSX";
 
@@ -4301,6 +4331,29 @@ export type GenericFormType = Node & {
 export type Geolocalization = {
   /** Country of the user acquired by his IP address. */
   country: Maybe<CountryDisplay>;
+};
+
+/** Creates Coupon Code for referd user. */
+export type GetReferalDiscount = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Coupon Code. */
+  couponCode: Maybe<Scalars["String"]>;
+  accountErrors: Array<AccountError>;
+};
+
+/** Create and return a user hash. */
+export type GetUserHash = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Shopify User Id */
+  userHash: Maybe<Scalars["String"]>;
 };
 
 /** A gift card is a prepaid electronic payment card accepted in stores. They can be used during checkout by providing a valid gift card codes. */
@@ -6259,12 +6312,24 @@ export type Mutation = {
   createProductCsv: Maybe<CreateProductCsv>;
   /** Create Product. */
   createProductVariantCsv: Maybe<CreateProductVariantCsv>;
+  /** Update Manufacturing Details of a product. */
+  updateManufacturingDetailsCsv: Maybe<UpdateManufacturingDetailsCsv>;
   /** Update Product Pricing on Shopify. */
   updateShopifyProductPriceCsv: Maybe<UpdateShopifyProductPriceCsv>;
   /** Update Product Tags on Shopify. */
   updateShopifyProductTagsCsv: Maybe<UpdateShopifyProductTagsCsv>;
   /** Updates a list ProductVariant quantities  */
   productVariantBulkUpdate: Maybe<ProductVariantBulkUpdate>;
+  /** Update Wallet. */
+  farziWalletBalanceUpdateCsv: Maybe<FarziWalletBalanceUpdateCsv>;
+  /** Add Balance to Wallet through CSV. */
+  farziWalletBalanceAddCsv: Maybe<FarziWalletBalanceAddCsv>;
+  /** Create and return a user hash. */
+  getUserHash: Maybe<GetUserHash>;
+  /** Creates Refer Hash for user. */
+  referAFriend: Maybe<ReferAFriend>;
+  /** Creates Coupon Code for referd user. */
+  getReferalDiscount: Maybe<GetReferalDiscount>;
 };
 
 export type MutationWishlistAddProductArgs = {
@@ -7578,6 +7643,7 @@ export type MutationAccountRegisterV2Args = {
 };
 
 export type MutationConfirmAccountV2Args = {
+  checkoutId?: Maybe<Scalars["ID"]>;
   otp: Scalars["String"];
   phone: Scalars["String"];
 };
@@ -7944,6 +8010,10 @@ export type MutationCreateProductVariantCsvArgs = {
   csvFile: Scalars["Upload"];
 };
 
+export type MutationUpdateManufacturingDetailsCsvArgs = {
+  csvFile: Scalars["Upload"];
+};
+
 export type MutationUpdateShopifyProductPriceCsvArgs = {
   csvFile: Scalars["Upload"];
 };
@@ -7954,6 +8024,27 @@ export type MutationUpdateShopifyProductTagsCsvArgs = {
 
 export type MutationProductVariantBulkUpdateArgs = {
   variants?: Maybe<Array<Maybe<VariantInput>>>;
+};
+
+export type MutationFarziWalletBalanceUpdateCsvArgs = {
+  csvFile: Scalars["Upload"];
+};
+
+export type MutationFarziWalletBalanceAddCsvArgs = {
+  csvFile: Scalars["Upload"];
+};
+
+export type MutationGetUserHashArgs = {
+  shopifyUserId: Scalars["String"];
+};
+
+export type MutationReferAFriendArgs = {
+  email: Scalars["String"];
+};
+
+export type MutationGetReferalDiscountArgs = {
+  email: Scalars["String"];
+  referHash: Scalars["String"];
 };
 
 export type NameTranslationInput = {
@@ -10771,7 +10862,7 @@ export type ProductVariantBulkUpdate = {
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
    */
   errors: Array<Error>;
-  /** A list of updated quantities of respective productVariants */
+  /** A list of updated quantities of respective productVariants in respective warehouses */
   productVariants: Maybe<Array<Maybe<ProductVariant>>>;
 };
 
@@ -11233,6 +11324,7 @@ export type Query = {
   translations: Maybe<TranslatableItemConnection>;
   /** Look up a user by ID. */
   user: Maybe<User>;
+  userExists: Maybe<UserExistsType>;
   users: Maybe<User>;
   /** Look up a voucher by ID. */
   voucher: Maybe<Voucher>;
@@ -11315,6 +11407,7 @@ export type QueryBannersArgs = {
   type?: Maybe<Scalars["String"]>;
   link?: Maybe<Scalars["String"]>;
   position?: Maybe<Scalars["Int"]>;
+  slug?: Maybe<Scalars["String"]>;
 };
 
 export type QueryCashbackArgs = {
@@ -11797,6 +11890,7 @@ export type QueryProductReviewsArgs = {
   id?: Maybe<Scalars["ID"]>;
   user?: Maybe<Scalars["String"]>;
   isPublished?: Maybe<Scalars["Boolean"]>;
+  rating?: Maybe<Scalars["Int"]>;
   before?: Maybe<Scalars["String"]>;
   after?: Maybe<Scalars["String"]>;
   first?: Maybe<Scalars["Int"]>;
@@ -12026,6 +12120,11 @@ export type QueryUserArgs = {
   id: Scalars["ID"];
 };
 
+export type QueryUserExistsArgs = {
+  phone?: Maybe<Scalars["String"]>;
+  email?: Maybe<Scalars["String"]>;
+};
+
 export type QueryUsersArgs = {
   phone?: Maybe<Scalars["String"]>;
   email?: Maybe<Scalars["String"]>;
@@ -12144,6 +12243,18 @@ export type ReducedRate = {
   rate: Scalars["Float"];
   /** A type of goods. */
   rateType: TaxRateType;
+};
+
+/** Creates Refer Hash for user. */
+export type ReferAFriend = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Hash created for the refrer. */
+  referHash: Maybe<Scalars["String"]>;
+  accountErrors: Array<AccountError>;
 };
 
 /** Refresh JWT token. Mutation tries to take refreshToken from the input.If it fails it will try to take refreshToken from the http-only cookie -refreshToken. csrfToken is required when refreshToken is provided as a cookie. */
@@ -12665,9 +12776,9 @@ export type SectionType = Node &
     /** List of public metadata items. Can be accessed without permissions. */
     metadata: Array<Maybe<MetadataItemV2>>;
     publicationDate: Maybe<Scalars["Date"]>;
-    isPublished: Scalars["Boolean"];
     /** List of private metadata items.Requires proper staff permissions to access. */
     privateMetadata: Array<Maybe<MetadataItemV2>>;
+    isPublished: Scalars["Boolean"];
     /** The ID of the object. */
     id: Scalars["ID"];
     name: Scalars["String"];
@@ -13882,9 +13993,9 @@ export type SubscriptionStatus =
 
 export type SubscriptionType = Node & {
   metadata: Maybe<Scalars["JSONString"]>;
+  privateMetadata: Maybe<Scalars["JSONString"]>;
   /** The ID of the object. */
   id: Scalars["ID"];
-  privateMetadata: Maybe<Scalars["JSONString"]>;
   user: Maybe<User>;
   product: Product;
   quantity: Array<Scalars["Int"]>;
@@ -14339,6 +14450,17 @@ export type UpdateInvoiceInput = {
   url?: Maybe<Scalars["String"]>;
 };
 
+/** Update Manufacturing Details of a product. */
+export type UpdateManufacturingDetailsCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Product instance. */
+  product: Maybe<Product>;
+};
+
 /** Updates metadata of an object. */
 export type UpdateMetadata = {
   /**
@@ -14661,6 +14783,13 @@ export type UserCreateInput = {
   redirectUrl?: Maybe<Scalars["String"]>;
 };
 
+export type UserExistsType = {
+  /** if phone exists  */
+  phoneExist: Maybe<Scalars["Boolean"]>;
+  /** if email exists  */
+  emailExist: Maybe<Scalars["Boolean"]>;
+};
+
 export type UserPermission = {
   /** Internal code for permission. */
   code: PermissionEnum;
@@ -14750,8 +14879,8 @@ export type VariantImageUnassign = {
 export type VariantInput = {
   /** variant id */
   variantId: Scalars["ID"];
-  /** variant quantity */
-  quantity: Scalars["Int"];
+  /** Warehouse with quantity available */
+  quantity: Array<Maybe<VariantQuantityInput>>;
 };
 
 /** Represents availability of a variant in the storefront. */
@@ -14768,6 +14897,13 @@ export type VariantPricingInfo = {
   priceUndiscounted: Maybe<TaxedMoney>;
   /** The discounted price in the local currency. */
   priceLocalCurrency: Maybe<TaxedMoney>;
+};
+
+export type VariantQuantityInput = {
+  /** warehouse id */
+  warehouse: Scalars["ID"];
+  /** variant quantity available */
+  quantityAvailable: Scalars["Int"];
 };
 
 /** Requests for OTP for registered user. */
@@ -15047,6 +15183,7 @@ export type VoucherRuleLinkType = Node & {
   code: Scalars["String"];
   rule: VoucherRuleType;
   isEnabled: Scalars["Boolean"];
+  usageCount: Scalars["Int"];
   created: Scalars["DateTime"];
 };
 
@@ -15080,8 +15217,10 @@ export type VoucherRuleOrderField =
   | "CODE";
 
 export type VoucherRuleType = Node & {
+  metadata: Maybe<Scalars["JSONString"]>;
   /** The ID of the object. */
   id: Scalars["ID"];
+  privateMetadata: Maybe<Scalars["JSONString"]>;
   name: Scalars["String"];
   slug: Scalars["String"];
   description: Maybe<Scalars["String"]>;
@@ -15937,6 +16076,67 @@ export type PaymentErrorFragment = Pick<
   "code" | "field" | "message"
 >;
 
+export type OtpRequestMutationVariables = Exact<{
+  phone: Scalars["String"];
+}>;
+
+export type OtpRequestMutation = {
+  RequestOTP: Maybe<
+    Pick<RequestOtp, "message"> & {
+      otpErrors: Array<Pick<OtpError, "code" | "field" | "message">>;
+    }
+  >;
+};
+
+export type OtpAuthenticationMutationVariables = Exact<{
+  phone: Scalars["String"];
+  otp: Scalars["String"];
+  checkoutId?: Maybe<Scalars["ID"]>;
+}>;
+
+export type OtpAuthenticationMutation = {
+  CreateTokenOTP: Maybe<
+    Pick<CreateTokenOtp, "token" | "refreshToken" | "csrfToken"> & {
+      user: Maybe<
+        Pick<User, "id" | "email" | "firstName" | "lastName"> & {
+          metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
+        }
+      >;
+      otpErrors: Array<Pick<OtpError, "code" | "field" | "message">>;
+    }
+  >;
+};
+
+export type AccountRegisterV2MutationVariables = Exact<{
+  input: AccountRegisterInputV2;
+}>;
+
+export type AccountRegisterV2Mutation = {
+  accountRegisterV2: Maybe<
+    Pick<AccountRegisterV2, "isNewUser" | "isActiveUser"> & {
+      user: Maybe<UserFragment>;
+      accountErrors: Array<Pick<AccountError, "field" | "message">>;
+      errors: Array<Pick<Error, "field" | "message">>;
+    }
+  >;
+};
+
+export type ConfirmAccountV2MutationVariables = Exact<{
+  otp: Scalars["String"];
+  phone: Scalars["String"];
+  checkoutId?: Maybe<Scalars["ID"]>;
+}>;
+
+export type ConfirmAccountV2Mutation = {
+  confirmAccountV2: Maybe<
+    Pick<ConfirmAccountV2, "token" | "refreshToken" | "csrfToken"> & {
+      user: Maybe<UserFragment>;
+      accountErrors: Array<Pick<AccountError, "field" | "message">>;
+      errors: Array<Pick<Error, "field" | "message">>;
+    }
+  >;
+};
+
 export type UpdateCheckoutLineMutationVariables = Exact<{
   checkoutId: Scalars["ID"];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
@@ -16465,6 +16665,267 @@ export const PaymentErrorFragmentDoc = gql`
     message
   }
 `;
+export const OtpRequestDocument = gql`
+  mutation OTPRequest($phone: String!) {
+    RequestOTP: requestOtp(phone: $phone) {
+      message
+      otpErrors {
+        code
+        field
+        message
+      }
+    }
+  }
+`;
+export type OtpRequestMutationFn = Apollo.MutationFunction<
+  OtpRequestMutation,
+  OtpRequestMutationVariables
+>;
+
+/**
+ * __useOtpRequestMutation__
+ *
+ * To run a mutation, you first call `useOtpRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useOtpRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [otpRequestMutation, { data, loading, error }] = useOtpRequestMutation({
+ *   variables: {
+ *      phone: // value for 'phone'
+ *   },
+ * });
+ */
+export function useOtpRequestMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OtpRequestMutation,
+    OtpRequestMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<OtpRequestMutation, OtpRequestMutationVariables>(
+    OtpRequestDocument,
+    options
+  );
+}
+export type OtpRequestMutationHookResult = ReturnType<
+  typeof useOtpRequestMutation
+>;
+export type OtpRequestMutationResult = Apollo.MutationResult<
+  OtpRequestMutation
+>;
+export type OtpRequestMutationOptions = Apollo.BaseMutationOptions<
+  OtpRequestMutation,
+  OtpRequestMutationVariables
+>;
+export const OtpAuthenticationDocument = gql`
+  mutation OTPAuthentication($phone: String!, $otp: String!, $checkoutId: ID) {
+    CreateTokenOTP: otpTokenCreate(
+      otp: $otp
+      phone: $phone
+      checkoutId: $checkoutId
+    ) {
+      token
+      refreshToken
+      csrfToken
+      user {
+        id
+        email
+        firstName
+        lastName
+        metadata {
+          key
+          value
+        }
+      }
+      otpErrors {
+        code
+        field
+        message
+      }
+    }
+  }
+`;
+export type OtpAuthenticationMutationFn = Apollo.MutationFunction<
+  OtpAuthenticationMutation,
+  OtpAuthenticationMutationVariables
+>;
+
+/**
+ * __useOtpAuthenticationMutation__
+ *
+ * To run a mutation, you first call `useOtpAuthenticationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useOtpAuthenticationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [otpAuthenticationMutation, { data, loading, error }] = useOtpAuthenticationMutation({
+ *   variables: {
+ *      phone: // value for 'phone'
+ *      otp: // value for 'otp'
+ *      checkoutId: // value for 'checkoutId'
+ *   },
+ * });
+ */
+export function useOtpAuthenticationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OtpAuthenticationMutation,
+    OtpAuthenticationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    OtpAuthenticationMutation,
+    OtpAuthenticationMutationVariables
+  >(OtpAuthenticationDocument, options);
+}
+export type OtpAuthenticationMutationHookResult = ReturnType<
+  typeof useOtpAuthenticationMutation
+>;
+export type OtpAuthenticationMutationResult = Apollo.MutationResult<
+  OtpAuthenticationMutation
+>;
+export type OtpAuthenticationMutationOptions = Apollo.BaseMutationOptions<
+  OtpAuthenticationMutation,
+  OtpAuthenticationMutationVariables
+>;
+export const AccountRegisterV2Document = gql`
+  mutation AccountRegisterV2($input: AccountRegisterInputV2!) {
+    accountRegisterV2(input: $input) {
+      isNewUser
+      isActiveUser
+      user {
+        ...UserFragment
+      }
+      accountErrors {
+        field
+        message
+      }
+      errors {
+        field
+        message
+      }
+    }
+  }
+  ${UserFragmentDoc}
+`;
+export type AccountRegisterV2MutationFn = Apollo.MutationFunction<
+  AccountRegisterV2Mutation,
+  AccountRegisterV2MutationVariables
+>;
+
+/**
+ * __useAccountRegisterV2Mutation__
+ *
+ * To run a mutation, you first call `useAccountRegisterV2Mutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAccountRegisterV2Mutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [accountRegisterV2Mutation, { data, loading, error }] = useAccountRegisterV2Mutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAccountRegisterV2Mutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AccountRegisterV2Mutation,
+    AccountRegisterV2MutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    AccountRegisterV2Mutation,
+    AccountRegisterV2MutationVariables
+  >(AccountRegisterV2Document, options);
+}
+export type AccountRegisterV2MutationHookResult = ReturnType<
+  typeof useAccountRegisterV2Mutation
+>;
+export type AccountRegisterV2MutationResult = Apollo.MutationResult<
+  AccountRegisterV2Mutation
+>;
+export type AccountRegisterV2MutationOptions = Apollo.BaseMutationOptions<
+  AccountRegisterV2Mutation,
+  AccountRegisterV2MutationVariables
+>;
+export const ConfirmAccountV2Document = gql`
+  mutation ConfirmAccountV2($otp: String!, $phone: String!, $checkoutId: ID) {
+    confirmAccountV2(otp: $otp, phone: $phone, checkoutId: $checkoutId) {
+      token
+      refreshToken
+      csrfToken
+      user {
+        ...UserFragment
+      }
+      accountErrors {
+        field
+        message
+      }
+      errors {
+        field
+        message
+      }
+    }
+  }
+  ${UserFragmentDoc}
+`;
+export type ConfirmAccountV2MutationFn = Apollo.MutationFunction<
+  ConfirmAccountV2Mutation,
+  ConfirmAccountV2MutationVariables
+>;
+
+/**
+ * __useConfirmAccountV2Mutation__
+ *
+ * To run a mutation, you first call `useConfirmAccountV2Mutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmAccountV2Mutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [confirmAccountV2Mutation, { data, loading, error }] = useConfirmAccountV2Mutation({
+ *   variables: {
+ *      otp: // value for 'otp'
+ *      phone: // value for 'phone'
+ *      checkoutId: // value for 'checkoutId'
+ *   },
+ * });
+ */
+export function useConfirmAccountV2Mutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ConfirmAccountV2Mutation,
+    ConfirmAccountV2MutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    ConfirmAccountV2Mutation,
+    ConfirmAccountV2MutationVariables
+  >(ConfirmAccountV2Document, options);
+}
+export type ConfirmAccountV2MutationHookResult = ReturnType<
+  typeof useConfirmAccountV2Mutation
+>;
+export type ConfirmAccountV2MutationResult = Apollo.MutationResult<
+  ConfirmAccountV2Mutation
+>;
+export type ConfirmAccountV2MutationOptions = Apollo.BaseMutationOptions<
+  ConfirmAccountV2Mutation,
+  ConfirmAccountV2MutationVariables
+>;
 export const UpdateCheckoutLineDocument = gql`
   mutation UpdateCheckoutLine($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
     checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
