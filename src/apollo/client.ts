@@ -104,7 +104,7 @@ FetchConfig = {}) => async (
   if (token) {
     init.headers = {
       ...init.headers,
-      "authorization-bearer": token,
+      Authorization: `JWT ${token}`,
     };
   }
 
