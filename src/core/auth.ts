@@ -253,6 +253,7 @@ export const auth = ({
           storage.setTokens({
             accessToken: data.CreateTokenOTP.token,
             csrfToken: data.CreateTokenOTP.csrfToken,
+            refreshToken: data.CreateTokenOTP.refreshToken,
           });
           getUserCheckout();
         } else {
@@ -358,6 +359,7 @@ export const auth = ({
           storage.setTokens({
             accessToken: data.confirmAccountV2.token,
             csrfToken: data.confirmAccountV2.csrfToken,
+            refreshToken: data.confirmAccountV2.refreshToken,
           });
           getUserCheckout();
         } else {
@@ -402,6 +404,7 @@ export const auth = ({
       accessToken: authToken,
       csrfToken: csrfToken,
     });
+    getUserCheckout();
   };
 
   const getUserCheckout: AuthSDK["getUserCheckout"] = async () => {
@@ -470,6 +473,7 @@ export const auth = ({
 
   const refreshToken: AuthSDK["refreshToken"] = (includeUser = false) => {
     const csrfToken = storage.getCSRFToken();
+    const refreshToken = storage.getRefreshToken();
 
     if (!csrfToken) {
       throw Error("csrfToken not present");
@@ -483,10 +487,12 @@ export const auth = ({
         mutation: REFRESH_TOKEN_WITH_USER,
         variables: {
           csrfToken,
+          refreshToken,
         },
         update: (_, { data }) => {
           if (data?.tokenRefresh?.token) {
             storage.setAccessToken(data.tokenRefresh.token);
+            getUserCheckout();
           } else {
             signOut();
           }
@@ -498,10 +504,12 @@ export const auth = ({
       mutation: REFRESH_TOKEN,
       variables: {
         csrfToken,
+        refreshToken,
       },
       update: (_, { data }) => {
         if (data?.tokenRefresh?.token) {
           storage.setAccessToken(data.tokenRefresh.token);
+          getUserCheckout();
         } else {
           signOut();
         }

@@ -44,8 +44,8 @@ import {
 
 export const REFRESH_TOKEN = gql`
   ${accountErrorFragment}
-  mutation refreshToken($csrfToken: String!) {
-    tokenRefresh(csrfToken: $csrfToken) {
+  mutation refreshToken($csrfToken: String!, $refreshToken: String) {
+    tokenRefresh(csrfToken: $csrfToken, refreshToken: $refreshToken) {
       token
       accountErrors {
         ...AccountErrorFragment
@@ -59,8 +59,8 @@ export const REFRESH_TOKEN = gql`
 export const REFRESH_TOKEN_WITH_USER = gql`
   ${accountErrorFragment}
   ${userFragment}
-  mutation refreshTokenWithUser($csrfToken: String!) {
-    tokenRefresh(csrfToken: $csrfToken) {
+  mutation refreshTokenWithUser($csrfToken: String!, $refreshToken: String) {
+    tokenRefresh(csrfToken: $csrfToken, refreshToken: $refreshToken) {
       token
       user {
         ...UserFragment

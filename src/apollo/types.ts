@@ -16078,6 +16078,7 @@ export type PaymentErrorFragment = Pick<
 
 export type RefreshTokenMutationVariables = Exact<{
   csrfToken: Scalars["String"];
+  refreshToken?: Maybe<Scalars["String"]>;
 }>;
 
 export type RefreshTokenMutation = {
@@ -16088,6 +16089,7 @@ export type RefreshTokenMutation = {
 
 export type RefreshTokenWithUserMutationVariables = Exact<{
   csrfToken: Scalars["String"];
+  refreshToken?: Maybe<Scalars["String"]>;
 }>;
 
 export type RefreshTokenWithUserMutation = {
@@ -16704,8 +16706,8 @@ export const PaymentErrorFragmentDoc = gql`
   }
 `;
 export const RefreshTokenDocument = gql`
-  mutation refreshToken($csrfToken: String!) {
-    tokenRefresh(csrfToken: $csrfToken) {
+  mutation refreshToken($csrfToken: String!, $refreshToken: String) {
+    tokenRefresh(csrfToken: $csrfToken, refreshToken: $refreshToken) {
       token
       accountErrors {
         ...AccountErrorFragment
@@ -16733,6 +16735,7 @@ export type RefreshTokenMutationFn = Apollo.MutationFunction<
  * const [refreshTokenMutation, { data, loading, error }] = useRefreshTokenMutation({
  *   variables: {
  *      csrfToken: // value for 'csrfToken'
+ *      refreshToken: // value for 'refreshToken'
  *   },
  * });
  */
@@ -16759,8 +16762,8 @@ export type RefreshTokenMutationOptions = Apollo.BaseMutationOptions<
   RefreshTokenMutationVariables
 >;
 export const RefreshTokenWithUserDocument = gql`
-  mutation refreshTokenWithUser($csrfToken: String!) {
-    tokenRefresh(csrfToken: $csrfToken) {
+  mutation refreshTokenWithUser($csrfToken: String!, $refreshToken: String) {
+    tokenRefresh(csrfToken: $csrfToken, refreshToken: $refreshToken) {
       token
       user {
         ...UserFragment
@@ -16792,6 +16795,7 @@ export type RefreshTokenWithUserMutationFn = Apollo.MutationFunction<
  * const [refreshTokenWithUserMutation, { data, loading, error }] = useRefreshTokenWithUserMutation({
  *   variables: {
  *      csrfToken: // value for 'csrfToken'
+ *      refreshToken: // value for 'refreshToken'
  *   },
  * });
  */
