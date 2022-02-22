@@ -16076,6 +16076,42 @@ export type PaymentErrorFragment = Pick<
   "code" | "field" | "message"
 >;
 
+export type RefreshTokenMutationVariables = Exact<{
+  csrfToken: Scalars["String"];
+}>;
+
+export type RefreshTokenMutation = {
+  tokenRefresh: Maybe<
+    Pick<RefreshToken, "token"> & { accountErrors: Array<AccountErrorFragment> }
+  >;
+};
+
+export type RefreshTokenWithUserMutationVariables = Exact<{
+  csrfToken: Scalars["String"];
+}>;
+
+export type RefreshTokenWithUserMutation = {
+  tokenRefresh: Maybe<
+    Pick<RefreshToken, "token"> & {
+      user: Maybe<UserFragment>;
+      accountErrors: Array<AccountErrorFragment>;
+    }
+  >;
+};
+
+export type VerifyTokenMutationVariables = Exact<{
+  token: Scalars["String"];
+}>;
+
+export type VerifyTokenMutation = {
+  tokenVerify: Maybe<
+    Pick<VerifyToken, "isValid" | "payload"> & {
+      user: Maybe<UserFragment>;
+      accountErrors: Array<AccountErrorFragment>;
+    }
+  >;
+};
+
 export type OtpRequestMutationVariables = Exact<{
   phone: Scalars["String"];
 }>;
@@ -16667,6 +16703,180 @@ export const PaymentErrorFragmentDoc = gql`
     message
   }
 `;
+export const RefreshTokenDocument = gql`
+  mutation refreshToken($csrfToken: String!) {
+    tokenRefresh(csrfToken: $csrfToken) {
+      token
+      accountErrors {
+        ...AccountErrorFragment
+      }
+    }
+  }
+  ${AccountErrorFragmentDoc}
+`;
+export type RefreshTokenMutationFn = Apollo.MutationFunction<
+  RefreshTokenMutation,
+  RefreshTokenMutationVariables
+>;
+
+/**
+ * __useRefreshTokenMutation__
+ *
+ * To run a mutation, you first call `useRefreshTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRefreshTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [refreshTokenMutation, { data, loading, error }] = useRefreshTokenMutation({
+ *   variables: {
+ *      csrfToken: // value for 'csrfToken'
+ *   },
+ * });
+ */
+export function useRefreshTokenMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RefreshTokenMutation,
+    RefreshTokenMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RefreshTokenMutation,
+    RefreshTokenMutationVariables
+  >(RefreshTokenDocument, options);
+}
+export type RefreshTokenMutationHookResult = ReturnType<
+  typeof useRefreshTokenMutation
+>;
+export type RefreshTokenMutationResult = Apollo.MutationResult<
+  RefreshTokenMutation
+>;
+export type RefreshTokenMutationOptions = Apollo.BaseMutationOptions<
+  RefreshTokenMutation,
+  RefreshTokenMutationVariables
+>;
+export const RefreshTokenWithUserDocument = gql`
+  mutation refreshTokenWithUser($csrfToken: String!) {
+    tokenRefresh(csrfToken: $csrfToken) {
+      token
+      user {
+        ...UserFragment
+      }
+      accountErrors {
+        ...AccountErrorFragment
+      }
+    }
+  }
+  ${UserFragmentDoc}
+  ${AccountErrorFragmentDoc}
+`;
+export type RefreshTokenWithUserMutationFn = Apollo.MutationFunction<
+  RefreshTokenWithUserMutation,
+  RefreshTokenWithUserMutationVariables
+>;
+
+/**
+ * __useRefreshTokenWithUserMutation__
+ *
+ * To run a mutation, you first call `useRefreshTokenWithUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRefreshTokenWithUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [refreshTokenWithUserMutation, { data, loading, error }] = useRefreshTokenWithUserMutation({
+ *   variables: {
+ *      csrfToken: // value for 'csrfToken'
+ *   },
+ * });
+ */
+export function useRefreshTokenWithUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RefreshTokenWithUserMutation,
+    RefreshTokenWithUserMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RefreshTokenWithUserMutation,
+    RefreshTokenWithUserMutationVariables
+  >(RefreshTokenWithUserDocument, options);
+}
+export type RefreshTokenWithUserMutationHookResult = ReturnType<
+  typeof useRefreshTokenWithUserMutation
+>;
+export type RefreshTokenWithUserMutationResult = Apollo.MutationResult<
+  RefreshTokenWithUserMutation
+>;
+export type RefreshTokenWithUserMutationOptions = Apollo.BaseMutationOptions<
+  RefreshTokenWithUserMutation,
+  RefreshTokenWithUserMutationVariables
+>;
+export const VerifyTokenDocument = gql`
+  mutation verifyToken($token: String!) {
+    tokenVerify(token: $token) {
+      isValid
+      payload
+      user {
+        ...UserFragment
+      }
+      accountErrors {
+        ...AccountErrorFragment
+      }
+    }
+  }
+  ${UserFragmentDoc}
+  ${AccountErrorFragmentDoc}
+`;
+export type VerifyTokenMutationFn = Apollo.MutationFunction<
+  VerifyTokenMutation,
+  VerifyTokenMutationVariables
+>;
+
+/**
+ * __useVerifyTokenMutation__
+ *
+ * To run a mutation, you first call `useVerifyTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVerifyTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [verifyTokenMutation, { data, loading, error }] = useVerifyTokenMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useVerifyTokenMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    VerifyTokenMutation,
+    VerifyTokenMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<VerifyTokenMutation, VerifyTokenMutationVariables>(
+    VerifyTokenDocument,
+    options
+  );
+}
+export type VerifyTokenMutationHookResult = ReturnType<
+  typeof useVerifyTokenMutation
+>;
+export type VerifyTokenMutationResult = Apollo.MutationResult<
+  VerifyTokenMutation
+>;
+export type VerifyTokenMutationOptions = Apollo.BaseMutationOptions<
+  VerifyTokenMutation,
+  VerifyTokenMutationVariables
+>;
 export const OtpRequestDocument = gql`
   mutation OTPRequest($phone: String!) {
     RequestOTP: requestOtp(phone: $phone) {

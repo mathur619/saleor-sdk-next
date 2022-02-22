@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 
 import {
+  accountErrorFragment,
   // accountErrorFragment,
   // addressFragment,
   checkoutErrorFragment,
@@ -41,52 +42,52 @@ import {
 //   }
 // `;
 
-// export const REFRESH_TOKEN = gql`
-//   ${accountErrorFragment}
-//   mutation refreshToken($csrfToken: String!) {
-//     tokenRefresh(csrfToken: $csrfToken) {
-//       token
-//       accountErrors {
-//         ...AccountErrorFragment
-//       }
-//     }
-//   }
-// `;
+export const REFRESH_TOKEN = gql`
+  ${accountErrorFragment}
+  mutation refreshToken($csrfToken: String!) {
+    tokenRefresh(csrfToken: $csrfToken) {
+      token
+      accountErrors {
+        ...AccountErrorFragment
+      }
+    }
+  }
+`;
 
 // // separate mutation so the request payload is minimal when user is not needed
 // // used for initial authentication
-// export const REFRESH_TOKEN_WITH_USER = gql`
-//   ${accountErrorFragment}
-//   ${userFragment}
-//   mutation refreshTokenWithUser($csrfToken: String!) {
-//     tokenRefresh(csrfToken: $csrfToken) {
-//       token
-//       user {
-//         ...UserFragment
-//       }
-//       accountErrors {
-//         ...AccountErrorFragment
-//       }
-//     }
-//   }
-// `;
+export const REFRESH_TOKEN_WITH_USER = gql`
+  ${accountErrorFragment}
+  ${userFragment}
+  mutation refreshTokenWithUser($csrfToken: String!) {
+    tokenRefresh(csrfToken: $csrfToken) {
+      token
+      user {
+        ...UserFragment
+      }
+      accountErrors {
+        ...AccountErrorFragment
+      }
+    }
+  }
+`;
 
-// export const VERIFY_TOKEN = gql`
-//   ${accountErrorFragment}
-//   ${userFragment}
-//   mutation verifyToken($token: String!) {
-//     tokenVerify(token: $token) {
-//       isValid
-//       payload
-//       user {
-//         ...UserFragment
-//       }
-//       accountErrors {
-//         ...AccountErrorFragment
-//       }
-//     }
-//   }
-// `;
+export const VERIFY_TOKEN = gql`
+  ${accountErrorFragment}
+  ${userFragment}
+  mutation verifyToken($token: String!) {
+    tokenVerify(token: $token) {
+      isValid
+      payload
+      user {
+        ...UserFragment
+      }
+      accountErrors {
+        ...AccountErrorFragment
+      }
+    }
+  }
+`;
 
 // export const EXTERNAL_AUTHENTICATION_URL = gql`
 //   ${accountErrorFragment}

@@ -53,6 +53,10 @@ import {
   OtpAuthenticationMutationVariables,
   OtpRequestMutation,
   OtpRequestMutationVariables,
+  RefreshTokenMutation,
+  RefreshTokenMutationVariables,
+  RefreshTokenWithUserMutation,
+  RefreshTokenWithUserMutationVariables,
   UserCheckoutDetailsQuery,
   UserCheckoutDetailsQueryVariables,
 } from "..";
@@ -60,6 +64,8 @@ import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   CONFIRM_ACCOUNT,
   CREATE_OTP_TOKEN_MUTATION,
+  REFRESH_TOKEN,
+  REFRESH_TOKEN_WITH_USER,
   REGISTER_ACCOUNT,
   REQUEST_OTP_MUTATION,
 } from "../apollo/mutations";
@@ -74,7 +80,7 @@ import {
   // LoginResult,
   // LogoutResult,
   // RefreshExternalTokenResult,
-  // RefreshTokenResult,
+  RefreshTokenResult,
   // RegisterResult,
   // RequestPasswordResetResult,
   SaleorClientMethodsProps,
@@ -125,7 +131,8 @@ export interface AuthSDK {
    * @param includeUser - Whether to fetch user. Default false.
    * @returns Authorization token.
    */
-  refreshToken: (includeUser?: boolean) => void;
+  refreshToken: (includeUser?: boolean) => Promise<RefreshTokenResult>;
+
   /**
    * Registers user with email and password.
    *
@@ -218,7 +225,7 @@ export const auth = ({
   console.log(client, channel);
   const login: AuthSDK["login"] = () => {};
   const refreshExternalToken = () => {};
-  const refreshToken = () => {};
+  // const refreshToken = () => {};
   const signInMobile: AuthSDK["signInMobile"] = async (
     checkoutId: any,
     otp: string,
@@ -461,46 +468,46 @@ export const auth = ({
   //     },
   //   });
 
-  // const refreshToken: AuthSDK["refreshToken"] = (includeUser = false) => {
-  //   const csrfToken = storage.getCSRFToken();
+  const refreshToken: AuthSDK["refreshToken"] = (includeUser = false) => {
+    const csrfToken = storage.getCSRFToken();
 
-  //   if (!csrfToken) {
-  //     throw Error("csrfToken not present");
-  //   }
+    if (!csrfToken) {
+      throw Error("csrfToken not present");
+    }
 
-  //   if (includeUser) {
-  //     return client.mutate<
-  //       RefreshTokenWithUserMutation,
-  //       RefreshTokenWithUserMutationVariables
-  //     >({
-  //       mutation: REFRESH_TOKEN_WITH_USER,
-  //       variables: {
-  //         csrfToken,
-  //       },
-  //       update: (_, { data }) => {
-  //         if (data?.tokenRefresh?.token) {
-  //           storage.setAccessToken(data.tokenRefresh.token);
-  //         } else {
-  //           logout();
-  //         }
-  //       },
-  //     });
-  //   }
+    if (includeUser) {
+      return client.mutate<
+        RefreshTokenWithUserMutation,
+        RefreshTokenWithUserMutationVariables
+      >({
+        mutation: REFRESH_TOKEN_WITH_USER,
+        variables: {
+          csrfToken,
+        },
+        update: (_, { data }) => {
+          if (data?.tokenRefresh?.token) {
+            storage.setAccessToken(data.tokenRefresh.token);
+          } else {
+            signOut();
+          }
+        },
+      });
+    }
 
-  //   return client.mutate<RefreshTokenMutation, RefreshTokenMutationVariables>({
-  //     mutation: REFRESH_TOKEN,
-  //     variables: {
-  //       csrfToken,
-  //     },
-  //     update: (_, { data }) => {
-  //       if (data?.tokenRefresh?.token) {
-  //         storage.setAccessToken(data.tokenRefresh.token);
-  //       } else {
-  //         logout();
-  //       }
-  //     },
-  //   });
-  // };
+    return client.mutate<RefreshTokenMutation, RefreshTokenMutationVariables>({
+      mutation: REFRESH_TOKEN,
+      variables: {
+        csrfToken,
+      },
+      update: (_, { data }) => {
+        if (data?.tokenRefresh?.token) {
+          storage.setAccessToken(data.tokenRefresh.token);
+        } else {
+          signOut();
+        }
+      },
+    });
+  };
 
   // const verifyToken: AuthSDK["verifyToken"] = async () => {
   //   const token = storage.getAccessToken();

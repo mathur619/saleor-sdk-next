@@ -1,6 +1,6 @@
 import {
   ApolloClient,
-  // FetchResult,
+  FetchResult,
   NormalizedCacheObject,
 } from "@apollo/client";
 import {
@@ -24,7 +24,7 @@ import {
   // ExternalRefreshMutation,
   // ExternalVerifyMutation,
   // LoginMutation,
-  // RefreshTokenMutation,
+  RefreshTokenMutation,
   // RegisterMutation,
   // RequestPasswordResetMutation,
   // SetPasswordMutation,
@@ -124,7 +124,7 @@ export type UpdateAccountAddressOpts = MutationAccountAddressUpdateArgs;
 // export type LoginData = LoginMutation["tokenCreate"];
 // export type LogoutResult = FetchResult<ExternalLogoutMutation> | null;
 // export type LogoutData = ExternalLogoutMutation["externalLogout"] | null;
-// export type RefreshTokenResult = FetchResult<RefreshTokenMutation>;
+export type RefreshTokenResult = FetchResult<RefreshTokenMutation>;
 // export type RefreshTokenData = RefreshTokenMutation["tokenRefresh"];
 // export type RegisterResult = FetchResult<RegisterMutation>;
 // export type RegisterData = RegisterMutation["accountRegister"];
