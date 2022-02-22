@@ -32,13 +32,13 @@ export const createSaleorClient = ({
   const wishlistSDK = {};
   const walletSDK = {};
   if (autologin) {
-    // const csrfToken = storage.getCSRFToken();
-    // const authPluginId = storage.getAuthPluginId();
-    // if (csrfToken && authPluginId) {
-    //   authSDK.refreshExternalToken(true);
-    // } else if (csrfToken) {
-    //   authSDK.refreshToken(true);
-    // }
+    const csrfToken = storage.getCSRFToken();
+    const authPluginId = storage.getAuthPluginId();
+    if (csrfToken && authPluginId) {
+      authSDK.refreshExternalToken(true);
+    } else if (csrfToken) {
+      authSDK.refreshToken(true);
+    }
   }
 
   const client = {
