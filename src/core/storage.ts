@@ -1,6 +1,7 @@
 import { LOCAL_STORAGE_EXISTS } from "../constants";
 import {
   SALEOR_AUTH_PLUGIN_ID,
+  SALEOR_AUTH_TOKEN,
   SALEOR_CHECKOUT,
   SALEOR_CHECKOUT_DISCOUNTS,
   SALEOR_CSRF_TOKEN,
@@ -65,6 +66,14 @@ export const createStorage = (autologinEnabled: boolean): void => {
     csrfToken = token;
   };
   const setAccessToken = (token: string | null): void => {
+    if (autologinEnabled && LOCAL_STORAGE_EXISTS) {
+      if (token) {
+        localStorage.setItem(SALEOR_AUTH_TOKEN, token);
+      } else {
+        localStorage.removeItem(SALEOR_AUTH_TOKEN);
+      }
+    }
+
     accessToken = token;
   };
 

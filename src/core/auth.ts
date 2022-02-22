@@ -53,14 +53,17 @@ import {
   OtpAuthenticationMutationVariables,
   OtpRequestMutation,
   OtpRequestMutationVariables,
+  UserCheckoutDetailsQuery,
+  UserCheckoutDetailsQueryVariables,
 } from "..";
+import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   CONFIRM_ACCOUNT,
   CREATE_OTP_TOKEN_MUTATION,
   REGISTER_ACCOUNT,
   REQUEST_OTP_MUTATION,
 } from "../apollo/mutations";
-import { USER } from "../apollo/queries";
+import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
 import { storage } from "./storage";
 import {
   LoginOpts,
@@ -204,6 +207,8 @@ export interface AuthSDK {
   signOut: () => {};
 
   setToken: (authToken: string, csrfToken: string) => {};
+
+  getUserCheckout: () => {};
 }
 
 export const auth = ({
@@ -242,6 +247,7 @@ export const auth = ({
             accessToken: data.CreateTokenOTP.token,
             csrfToken: data.CreateTokenOTP.csrfToken,
           });
+          getUserCheckout();
         } else {
           client.writeQuery({
             query: USER,
@@ -346,6 +352,7 @@ export const auth = ({
             accessToken: data.confirmAccountV2.token,
             csrfToken: data.confirmAccountV2.csrfToken,
           });
+          getUserCheckout();
         } else {
           client.writeQuery({
             query: USER,
@@ -387,6 +394,23 @@ export const auth = ({
     storage.setTokens({
       accessToken: authToken,
       csrfToken: csrfToken,
+    });
+  };
+
+  const getUserCheckout: AuthSDK["getUserCheckout"] = async () => {
+    await client.mutate<
+      UserCheckoutDetailsQuery,
+      UserCheckoutDetailsQueryVariables
+    >({
+      mutation: USER_CHECKOUT_DETAILS,
+
+      update: (_, { data }) => {
+        console.log("in update USER_CHECKOUT_DETAILS", data);
+        setLocalCheckoutInCache(client, data?.me?.checkout, true);
+        if (data?.me?.checkout?.id) {
+          storage.setCheckout(data?.me?.checkout);
+        }
+      },
     });
   };
 
@@ -683,5 +707,6 @@ export const auth = ({
     confirmAccountV2,
     signOut,
     setToken,
+    getUserCheckout,
   };
 };

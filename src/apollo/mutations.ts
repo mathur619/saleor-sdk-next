@@ -423,6 +423,7 @@ export const REQUEST_OTP_MUTATION = gql`
 `;
 
 export const CREATE_OTP_TOKEN_MUTATION = gql`
+  ${userFragment}
   mutation OTPAuthentication($phone: String!, $otp: String!, $checkoutId: ID) {
     CreateTokenOTP: otpTokenCreate(
       otp: $otp
@@ -433,14 +434,7 @@ export const CREATE_OTP_TOKEN_MUTATION = gql`
       refreshToken
       csrfToken
       user {
-        id
-        email
-        firstName
-        lastName
-        metadata {
-          key
-          value
-        }
+        ...UserFragment
       }
       otpErrors {
         code

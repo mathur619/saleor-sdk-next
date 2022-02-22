@@ -66,3 +66,15 @@ export const GET_DISCOUNT_CASHBACK_QUERY = gql`
     }
   }
 `;
+
+export const USER_CHECKOUT_DETAILS = gql`
+  ${checkoutFragment}
+  query UserCheckoutDetails {
+    me {
+      id
+      checkout {
+        ...Checkout
+      }
+    }
+  }
+`;

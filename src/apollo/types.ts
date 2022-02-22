@@ -16097,11 +16097,7 @@ export type OtpAuthenticationMutationVariables = Exact<{
 export type OtpAuthenticationMutation = {
   CreateTokenOTP: Maybe<
     Pick<CreateTokenOtp, "token" | "refreshToken" | "csrfToken"> & {
-      user: Maybe<
-        Pick<User, "id" | "email" | "firstName" | "lastName"> & {
-          metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
-        }
-      >;
+      user: Maybe<UserFragment>;
       otpErrors: Array<Pick<OtpError, "code" | "field" | "message">>;
     }
   >;
@@ -16361,6 +16357,12 @@ export type DiscountsAndCashbackQuery = {
     >
   >;
   cashback: Maybe<Pick<CashbackType, "amount" | "willAddOn">>;
+};
+
+export type UserCheckoutDetailsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type UserCheckoutDetailsQuery = {
+  me: Maybe<Pick<User, "id"> & { checkout: Maybe<CheckoutFragment> }>;
 };
 
 export const AccountErrorFragmentDoc = gql`
@@ -16732,14 +16734,7 @@ export const OtpAuthenticationDocument = gql`
       refreshToken
       csrfToken
       user {
-        id
-        email
-        firstName
-        lastName
-        metadata {
-          key
-          value
-        }
+        ...UserFragment
       }
       otpErrors {
         code
@@ -16748,6 +16743,7 @@ export const OtpAuthenticationDocument = gql`
       }
     }
   }
+  ${UserFragmentDoc}
 `;
 export type OtpAuthenticationMutationFn = Apollo.MutationFunction<
   OtpAuthenticationMutation,
@@ -18064,4 +18060,65 @@ export type DiscountsAndCashbackQueryLazyQueryHookResult = ReturnType<
 export type DiscountsAndCashbackQueryQueryResult = Apollo.QueryResult<
   DiscountsAndCashbackQuery,
   DiscountsAndCashbackQueryVariables
+>;
+export const UserCheckoutDetailsDocument = gql`
+  query UserCheckoutDetails {
+    me {
+      id
+      checkout {
+        ...Checkout
+      }
+    }
+  }
+  ${CheckoutFragmentDoc}
+`;
+
+/**
+ * __useUserCheckoutDetailsQuery__
+ *
+ * To run a query within a React component, call `useUserCheckoutDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserCheckoutDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserCheckoutDetailsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUserCheckoutDetailsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    UserCheckoutDetailsQuery,
+    UserCheckoutDetailsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    UserCheckoutDetailsQuery,
+    UserCheckoutDetailsQueryVariables
+  >(UserCheckoutDetailsDocument, options);
+}
+export function useUserCheckoutDetailsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UserCheckoutDetailsQuery,
+    UserCheckoutDetailsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    UserCheckoutDetailsQuery,
+    UserCheckoutDetailsQueryVariables
+  >(UserCheckoutDetailsDocument, options);
+}
+export type UserCheckoutDetailsQueryHookResult = ReturnType<
+  typeof useUserCheckoutDetailsQuery
+>;
+export type UserCheckoutDetailsLazyQueryHookResult = ReturnType<
+  typeof useUserCheckoutDetailsLazyQuery
+>;
+export type UserCheckoutDetailsQueryResult = Apollo.QueryResult<
+  UserCheckoutDetailsQuery,
+  UserCheckoutDetailsQueryVariables
 >;
