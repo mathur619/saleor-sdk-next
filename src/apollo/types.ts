@@ -16403,6 +16403,14 @@ export type UserCheckoutDetailsQuery = {
   me: Maybe<Pick<User, "id"> & { checkout: Maybe<CheckoutFragment> }>;
 };
 
+export type PincodeQueryVariables = Exact<{
+  pin?: Maybe<Scalars["String"]>;
+}>;
+
+export type PincodeQuery = {
+  pincode: Maybe<Pick<PincodeType, "city" | "state" | "serviceable">>;
+};
+
 export const AccountErrorFragmentDoc = gql`
   fragment AccountErrorFragment on AccountError {
     code
@@ -18335,4 +18343,54 @@ export type UserCheckoutDetailsLazyQueryHookResult = ReturnType<
 export type UserCheckoutDetailsQueryResult = Apollo.QueryResult<
   UserCheckoutDetailsQuery,
   UserCheckoutDetailsQueryVariables
+>;
+export const PincodeDocument = gql`
+  query Pincode($pin: String) {
+    pincode(pin: $pin) {
+      city
+      state
+      serviceable
+    }
+  }
+`;
+
+/**
+ * __usePincodeQuery__
+ *
+ * To run a query within a React component, call `usePincodeQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePincodeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePincodeQuery({
+ *   variables: {
+ *      pin: // value for 'pin'
+ *   },
+ * });
+ */
+export function usePincodeQuery(
+  baseOptions?: Apollo.QueryHookOptions<PincodeQuery, PincodeQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<PincodeQuery, PincodeQueryVariables>(
+    PincodeDocument,
+    options
+  );
+}
+export function usePincodeLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<PincodeQuery, PincodeQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<PincodeQuery, PincodeQueryVariables>(
+    PincodeDocument,
+    options
+  );
+}
+export type PincodeQueryHookResult = ReturnType<typeof usePincodeQuery>;
+export type PincodeLazyQueryHookResult = ReturnType<typeof usePincodeLazyQuery>;
+export type PincodeQueryResult = Apollo.QueryResult<
+  PincodeQuery,
+  PincodeQueryVariables
 >;

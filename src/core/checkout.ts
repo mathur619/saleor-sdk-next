@@ -11,6 +11,7 @@ import {
   UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
 } from "../apollo/mutations";
+import { GET_CITY_STATE_FROM_PINCODE } from "../apollo/queries";
 import {
   AddCheckoutPromoCodeMutation,
   AddCheckoutPromoCodeMutationVariables,
@@ -24,6 +25,8 @@ import {
   CreateCheckoutPaymentMutation,
   CreateCheckoutPaymentMutationVariables,
   PaymentInput,
+  PincodeQuery,
+  PincodeQueryVariables,
   RemoveCheckoutPromoCodeMutation,
   RemoveCheckoutPromoCodeMutationVariables,
   UpdateCheckoutAddressTypeMutation,
@@ -82,6 +85,7 @@ export interface CheckoutSDK {
   checkoutPaymentMethodUpdate?: (input: PaymentMethodUpdateInput) => any;
   createPayment?: (input: CreatePaymentInput) => any;
   completeCheckout?: (input?: CompleteCheckoutInput) => any;
+  getCityStateFromPincode?: (pincode: string) => {};
 }
 
 export const checkout = ({
@@ -549,6 +553,25 @@ export const checkout = ({
     return { data: null };
   };
 
+  const getCityStateFromPincode: CheckoutSDK["getCityStateFromPincode"] = async (
+    pincode: string
+  ) => {
+    const { data, errors } = await client.mutate<
+      PincodeQuery,
+      PincodeQueryVariables
+    >({
+      mutation: GET_CITY_STATE_FROM_PINCODE,
+      variables: {
+        pin: pincode,
+      },
+    });
+
+    return {
+      data,
+      errors,
+    };
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -561,5 +584,6 @@ export const checkout = ({
     checkoutPaymentMethodUpdate,
     createPayment,
     completeCheckout,
+    getCityStateFromPincode,
   };
 };
