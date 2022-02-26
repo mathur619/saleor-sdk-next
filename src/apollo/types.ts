@@ -11322,6 +11322,7 @@ export type Query = {
   translation: Maybe<TranslatableItem>;
   /** Returns a list of all translatable items of a given kind. */
   translations: Maybe<TranslatableItemConnection>;
+  useCashback: Scalars["Boolean"];
   /** Look up a user by ID. */
   user: Maybe<User>;
   userExists: Maybe<UserExistsType>;
@@ -16372,7 +16373,7 @@ export type GetCartItemsQuery = { cartItems: Maybe<CheckoutLineFragment> };
 
 export type GetLocalCheckoutQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetLocalCheckoutQuery = {
+export type GetLocalCheckoutQuery = Pick<Query, "useCashback"> & {
   localCheckout: Maybe<CheckoutFragment>;
   localCheckoutDiscounts: Maybe<
     Pick<
@@ -18166,6 +18167,7 @@ export const GetLocalCheckoutDocument = gql`
       amount
       willAddOn
     }
+    useCashback @client
   }
   ${CheckoutFragmentDoc}
 `;

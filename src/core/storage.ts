@@ -6,6 +6,7 @@ import {
   SALEOR_CHECKOUT_DISCOUNTS,
   SALEOR_CSRF_TOKEN,
   SALEOR_REFRESH_TOKEN,
+  SALEOR_USE_CASHBACK,
 } from "./constants";
 
 export let storage: {
@@ -26,6 +27,8 @@ export let storage: {
   getCheckout: () => any | null;
   setDiscounts: (discounts: any) => void;
   getDiscounts: () => any | null;
+  setUseCashback: (sseCashback: any) => void;
+  getUseCashback: () => any | null;
 };
 
 export const createStorage = (autologinEnabled: boolean): void => {
@@ -47,6 +50,9 @@ export const createStorage = (autologinEnabled: boolean): void => {
 
   let discountsStorage: any = LOCAL_STORAGE_EXISTS
     ? localStorage.getItem(SALEOR_CHECKOUT_DISCOUNTS)
+    : null;
+  let useCashbackStorage: any = LOCAL_STORAGE_EXISTS
+    ? localStorage.getItem(SALEOR_USE_CASHBACK)
     : null;
 
   const setAuthPluginId = (pluginId: string | null): void => {
@@ -135,6 +141,17 @@ export const createStorage = (autologinEnabled: boolean): void => {
     localStorage.setItem(SALEOR_CHECKOUT_DISCOUNTS, JSON.stringify(discounts));
   };
 
+  const setUseCashback = (useCashback: any) => {
+    console.log("in setUseCashback ", useCashback);
+    useCashbackStorage = useCashback;
+    localStorage.setItem(SALEOR_CHECKOUT_DISCOUNTS, useCashback);
+  };
+
+  const getUseCashback = (): any | null => {
+    console.log("in useCashbackStorage ", useCashbackStorage);
+
+    return useCashbackStorage;
+  };
   const getDiscounts = (): any | null => {
     console.log("in getDiscounts ", discountsStorage);
 
@@ -161,5 +178,7 @@ export const createStorage = (autologinEnabled: boolean): void => {
     setDiscounts,
     getDiscounts,
     getRefreshToken,
+    setUseCashback,
+    getUseCashback,
   };
 };

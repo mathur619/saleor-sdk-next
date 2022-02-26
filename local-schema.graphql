@@ -6,4 +6,5 @@ type Query {
   localCheckout: Checkout
   localCheckoutDiscounts: DiscountsType
   localCashback: CashbackType
+  useCashback: Boolean!
 }

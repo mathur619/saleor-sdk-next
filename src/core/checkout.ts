@@ -421,6 +421,10 @@ export const checkout = ({
     input: PaymentMethodUpdateInput
   ) => {
     console.log("checkoutPaymentMethodUpdate", input);
+
+    const prevUseCashback = storage.getUseCashback() || false;
+    storage.setUseCashback(input.useCashback);
+
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
@@ -447,7 +451,9 @@ export const checkout = ({
           console.log("in update checkoutPaymentMethodUpdate", data);
           setLocalCheckoutInCache(
             client,
-            data?.checkoutPaymentMethodUpdate?.checkout
+            data?.checkoutPaymentMethodUpdate?.checkout,
+            undefined,
+            input?.useCashback
           );
           if (data?.checkoutPaymentMethodUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutPaymentMethodUpdate?.checkout);
@@ -460,6 +466,8 @@ export const checkout = ({
         errors,
       };
     }
+
+    storage.setUseCashback(prevUseCashback);
 
     return { data: null };
   };

@@ -33,5 +33,7 @@ export const useCheckoutState = () => {
     availableShippingMethods: data.localCheckout?.availableShippingMethods,
 
     availablePaymentGateways: data.localCheckout?.availablePaymentGateways,
+
+    useCashback: data.useCashback,
   };
 };
