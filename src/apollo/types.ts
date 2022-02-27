@@ -16352,6 +16352,28 @@ export type CheckoutPaymentMethodUpdateMutation = {
   }>;
 };
 
+export type CreateRazorpayOrderMutationVariables = Exact<{
+  input: RazorpayCreateOrderInput;
+}>;
+
+export type CreateRazorpayOrderMutation = {
+  razorpayOrderCreate: Maybe<{
+    razorpayOrder: Maybe<
+      Pick<
+        RazorpayOrderType,
+        | "id"
+        | "amount"
+        | "amountPaid"
+        | "amountDue"
+        | "currency"
+        | "status"
+        | "createdAt"
+      >
+    >;
+    razorpayErrors: Array<Pick<RazorpayError, "field" | "code" | "message">>;
+  }>;
+};
+
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type UserDetailsQuery = Pick<
@@ -17976,6 +17998,70 @@ export type CheckoutPaymentMethodUpdateMutationResult = Apollo.MutationResult<
 export type CheckoutPaymentMethodUpdateMutationOptions = Apollo.BaseMutationOptions<
   CheckoutPaymentMethodUpdateMutation,
   CheckoutPaymentMethodUpdateMutationVariables
+>;
+export const CreateRazorpayOrderDocument = gql`
+  mutation CreateRazorpayOrder($input: RazorpayCreateOrderInput!) {
+    razorpayOrderCreate(input: $input) {
+      razorpayOrder {
+        id
+        amount
+        amountPaid
+        amountDue
+        currency
+        status
+        createdAt
+      }
+      razorpayErrors {
+        field
+        code
+        message
+      }
+    }
+  }
+`;
+export type CreateRazorpayOrderMutationFn = Apollo.MutationFunction<
+  CreateRazorpayOrderMutation,
+  CreateRazorpayOrderMutationVariables
+>;
+
+/**
+ * __useCreateRazorpayOrderMutation__
+ *
+ * To run a mutation, you first call `useCreateRazorpayOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateRazorpayOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createRazorpayOrderMutation, { data, loading, error }] = useCreateRazorpayOrderMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateRazorpayOrderMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateRazorpayOrderMutation,
+    CreateRazorpayOrderMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateRazorpayOrderMutation,
+    CreateRazorpayOrderMutationVariables
+  >(CreateRazorpayOrderDocument, options);
+}
+export type CreateRazorpayOrderMutationHookResult = ReturnType<
+  typeof useCreateRazorpayOrderMutation
+>;
+export type CreateRazorpayOrderMutationResult = Apollo.MutationResult<
+  CreateRazorpayOrderMutation
+>;
+export type CreateRazorpayOrderMutationOptions = Apollo.BaseMutationOptions<
+  CreateRazorpayOrderMutation,
+  CreateRazorpayOrderMutationVariables
 >;
 export const UserDetailsDocument = gql`
   query UserDetails {

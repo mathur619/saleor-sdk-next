@@ -1,3 +1,4 @@
+import { FetchResult } from "@apollo/client";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   ADD_CHECKOUT_PROMO_CODE,
@@ -5,6 +6,7 @@ import {
   COMPLETE_CHECKOUT,
   CREATE_CHECKOUT_MUTATION,
   CREATE_CHECKOUT_PAYMENT,
+  CREATE_RAZORPAY_ORDER,
   REMOVE_CHECKOUT_PROMO_CODE,
   UPDATE_CHECKOUT_ADDRESS_TYPE,
   UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION,
@@ -24,6 +26,8 @@ import {
   CountryCode,
   CreateCheckoutPaymentMutation,
   CreateCheckoutPaymentMutationVariables,
+  CreateRazorpayOrderMutation,
+  CreateRazorpayOrderMutationVariables,
   PaymentInput,
   PincodeQuery,
   PincodeQueryVariables,
@@ -86,6 +90,7 @@ export interface CheckoutSDK {
   createPayment?: (input: CreatePaymentInput) => any;
   completeCheckout?: (input?: CompleteCheckoutInput) => any;
   getCityStateFromPincode?: (pincode: string) => {};
+  createRazorpayOrder?: () => Promise<FetchResult<CreateRazorpayOrderMutation>>;
 }
 
 export const checkout = ({
@@ -580,6 +585,35 @@ export const checkout = ({
     };
   };
 
+  const createRazorpayOrder: CheckoutSDK["createRazorpayOrder"] = async () => {
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    console.log("checkout removePromoCode", checkout, checkout?.id);
+
+    if (checkout && checkout?.id) {
+      console.log("checkout removePromoCode in if");
+      const variables: CreateRazorpayOrderMutationVariables = {
+        input: {
+          checkoutId: checkout?.id,
+        },
+      };
+      const res = await client.mutate<
+        CreateRazorpayOrderMutation,
+        CreateRazorpayOrderMutationVariables
+      >({
+        mutation: CREATE_RAZORPAY_ORDER,
+        variables,
+      });
+
+      return res;
+    }
+
+    return { data: null };
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -593,5 +627,6 @@ export const checkout = ({
     createPayment,
     completeCheckout,
     getCityStateFromPincode,
+    createRazorpayOrder,
   };
 };

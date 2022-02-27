@@ -746,3 +746,24 @@ export const CHECKOUT_PAYMENT_METHOD_UPDATE = gql`
     }
   }
 `;
+
+export const CREATE_RAZORPAY_ORDER = gql`
+  mutation CreateRazorpayOrder($input: RazorpayCreateOrderInput!) {
+    razorpayOrderCreate(input: $input) {
+      razorpayOrder {
+        id
+        amount
+        amountPaid
+        amountDue
+        currency
+        status
+        createdAt
+      }
+      razorpayErrors {
+        field
+        code
+        message
+      }
+    }
+  }
+`;
