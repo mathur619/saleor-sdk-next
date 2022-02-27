@@ -51,6 +51,7 @@ export const GET_LOCAL_CHECKOUT = gql`
       willAddOn
     }
     useCashback @client
+    checkoutLoading @client
   }
 `;
 

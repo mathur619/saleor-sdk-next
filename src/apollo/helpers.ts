@@ -17,6 +17,7 @@ export const setLocalCheckoutInCache = async (
     data: {
       localCheckout: checkout,
       useCashback,
+      checkoutLoading: false,
     },
   });
 

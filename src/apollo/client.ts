@@ -314,6 +314,12 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
           return existing || false;
         },
       },
+      checkoutLoading: {
+        read(existing) {
+          console.log("existing checkoutLoading", existing);
+          return existing || false;
+        },
+      },
     },
   },
   User: {

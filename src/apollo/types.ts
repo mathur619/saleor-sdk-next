@@ -11150,6 +11150,7 @@ export type Query = {
   checkoutLine: Maybe<CheckoutLine>;
   /** List of checkout lines. */
   checkoutLines: Maybe<CheckoutLineCountableConnection>;
+  checkoutLoading: Scalars["Boolean"];
   checkoutUpdated: Scalars["Boolean"];
   /** List of checkouts. */
   checkouts: Maybe<CheckoutCountableConnection>;
@@ -16395,7 +16396,10 @@ export type GetCartItemsQuery = { cartItems: Maybe<CheckoutLineFragment> };
 
 export type GetLocalCheckoutQueryVariables = Exact<{ [key: string]: never }>;
 
-export type GetLocalCheckoutQuery = Pick<Query, "useCashback"> & {
+export type GetLocalCheckoutQuery = Pick<
+  Query,
+  "useCashback" | "checkoutLoading"
+> & {
   localCheckout: Maybe<CheckoutFragment>;
   localCheckoutDiscounts: Maybe<
     Pick<
@@ -18254,6 +18258,7 @@ export const GetLocalCheckoutDocument = gql`
       willAddOn
     }
     useCashback @client
+    checkoutLoading @client
   }
   ${CheckoutFragmentDoc}
 `;

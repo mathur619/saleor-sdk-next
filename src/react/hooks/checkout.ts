@@ -35,5 +35,6 @@ export const useCheckoutState = () => {
     availablePaymentGateways: data.localCheckout?.availablePaymentGateways,
 
     useCashback: data.useCashback,
+    checkoutLoading: data.checkoutLoading,
   };
 };

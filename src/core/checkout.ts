@@ -13,7 +13,10 @@ import {
   UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
 } from "../apollo/mutations";
-import { GET_CITY_STATE_FROM_PINCODE } from "../apollo/queries";
+import {
+  GET_CITY_STATE_FROM_PINCODE,
+  GET_LOCAL_CHECKOUT,
+} from "../apollo/queries";
 import {
   AddCheckoutPromoCodeMutation,
   AddCheckoutPromoCodeMutationVariables,
@@ -138,6 +141,12 @@ export const checkout = ({
     shippingAddress: IAddress,
     email: string
   ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
@@ -194,6 +203,12 @@ export const checkout = ({
   const setBillingAddress: CheckoutSDK["setBillingAddress"] = async (
     billingAddress: IAddress
   ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
@@ -247,8 +262,21 @@ export const checkout = ({
     email: string
   ) => {
     console.log("setShippingAndBillingAddress");
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
     const resShipping = await setShippingAddress(shippingAddress, email);
     const resBilling = await setBillingAddress(shippingAddress);
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: false,
+      },
+    });
     const dataError = resShipping.error || resBilling.error;
     console.log("setShippingAndBillingAddress", resShipping, resBilling);
     return {
@@ -288,6 +316,13 @@ export const checkout = ({
   const setShippingMethod: CheckoutSDK["setShippingMethod"] = async (
     shippingMethodId: string
   ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
@@ -334,6 +369,12 @@ export const checkout = ({
   const addPromoCode: CheckoutSDK["addPromoCode"] = async (
     promoCode: string
   ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
@@ -379,6 +420,13 @@ export const checkout = ({
   const removePromoCode: CheckoutSDK["removePromoCode"] = async (
     promoCode: string
   ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
@@ -425,6 +473,12 @@ export const checkout = ({
   const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] = async (
     input: PaymentMethodUpdateInput
   ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
     console.log("checkoutPaymentMethodUpdate", input);
 
     const prevUseCashback = storage.getUseCashback() || false;
@@ -480,6 +534,12 @@ export const checkout = ({
   const createPayment: CheckoutSDK["createPayment"] = async (
     input: PaymentInput
   ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null | undefined =
       checkoutString && typeof checkoutString === "string"
@@ -523,6 +583,12 @@ export const checkout = ({
   const completeCheckout: CheckoutSDK["completeCheckout"] = async (
     input: CompleteCheckoutInput | undefined
   ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null | undefined =
       checkoutString && typeof checkoutString === "string"
@@ -586,6 +652,13 @@ export const checkout = ({
   };
 
   const createRazorpayOrder: CheckoutSDK["createRazorpayOrder"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null | undefined =
       checkoutString && typeof checkoutString === "string"
@@ -606,6 +679,14 @@ export const checkout = ({
       >({
         mutation: CREATE_RAZORPAY_ORDER,
         variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: true,
+            },
+          });
+        },
       });
 
       return res;
