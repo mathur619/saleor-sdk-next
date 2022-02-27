@@ -452,7 +452,7 @@ export const checkout = ({
           setLocalCheckoutInCache(
             client,
             data?.checkoutPaymentMethodUpdate?.checkout,
-            undefined,
+            true,
             input?.useCashback
           );
           if (data?.checkoutPaymentMethodUpdate?.checkout?.id) {

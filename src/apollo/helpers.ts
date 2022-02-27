@@ -48,6 +48,7 @@ export const setLocalCheckoutInCache = async (
           amount: "0",
           willAddOn: null,
         },
+        useCashback,
       },
     });
   } else if (fetchDiscount) {
@@ -69,6 +70,7 @@ export const setLocalCheckoutInCache = async (
         localCheckout: checkout,
         localCheckoutDiscounts: res.data.checkoutDiscounts,
         localCashback: res.data.cashback,
+        useCashback,
       },
     });
   }
