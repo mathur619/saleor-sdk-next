@@ -144,7 +144,7 @@ export const createStorage = (autologinEnabled: boolean): void => {
   const setUseCashback = (useCashback: any) => {
     console.log("in setUseCashback ", useCashback);
     useCashbackStorage = useCashback;
-    localStorage.setItem(SALEOR_CHECKOUT_DISCOUNTS, useCashback);
+    localStorage.setItem(SALEOR_USE_CASHBACK, useCashback);
   };
 
   const getUseCashback = (): any | null => {

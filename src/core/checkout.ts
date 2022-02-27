@@ -477,11 +477,11 @@ export const checkout = ({
       query: GET_LOCAL_CHECKOUT,
       data: {
         checkoutLoading: true,
+        useCashback: input.useCashback,
       },
     });
     console.log("checkoutPaymentMethodUpdate", input);
 
-    const prevUseCashback = storage.getUseCashback() || false;
     storage.setUseCashback(input.useCashback);
 
     const checkoutString = storage.getCheckout();
@@ -525,8 +525,6 @@ export const checkout = ({
         errors,
       };
     }
-
-    storage.setUseCashback(prevUseCashback);
 
     return { data: null };
   };
