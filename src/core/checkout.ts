@@ -511,8 +511,7 @@ export const checkout = ({
           setLocalCheckoutInCache(
             client,
             data?.checkoutPaymentMethodUpdate?.checkout,
-            true,
-            input?.useCashback
+            true
           );
           if (data?.checkoutPaymentMethodUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutPaymentMethodUpdate?.checkout);

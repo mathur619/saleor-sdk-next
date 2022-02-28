@@ -9,14 +9,12 @@ import {
 export const setLocalCheckoutInCache = async (
   client: ApolloClient<NormalizedCacheObject>,
   checkout: any,
-  fetchDiscount?: boolean,
-  useCashback?: boolean
+  fetchDiscount?: boolean
 ) => {
   client.writeQuery({
     query: GET_LOCAL_CHECKOUT,
     data: {
       localCheckout: checkout,
-      useCashback,
       checkoutLoading: false,
     },
   });
@@ -49,7 +47,6 @@ export const setLocalCheckoutInCache = async (
           amount: "0",
           willAddOn: null,
         },
-        useCashback,
       },
     });
   } else if (fetchDiscount) {
@@ -71,7 +68,6 @@ export const setLocalCheckoutInCache = async (
         localCheckout: checkout,
         localCheckoutDiscounts: res.data.checkoutDiscounts,
         localCashback: res.data.cashback,
-        useCashback,
       },
     });
   }

@@ -306,12 +306,15 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       useCashback: {
         read(existing) {
           console.log("existing useCashback", existing);
-          if (!existing) {
+          if (existing === null || existing === undefined) {
             const useCashbackString = storage.getUseCashback();
             const useCashbackBollean = useCashbackString === "true";
             return useCashbackBollean || false;
           }
-          return existing || false;
+          if (typeof existing === "boolean") {
+            return existing;
+          }
+          return false;
         },
       },
       checkoutLoading: {
