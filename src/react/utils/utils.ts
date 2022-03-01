@@ -26,10 +26,14 @@ export function getMetadataValue(
     (meta: { key: string }) => meta?.key === key
   )[0]?.value;
 
+  console.log("metaValue 1 ", metaValue);
   if (metaValue) {
+    console.log("metaValue 2 ", metaValue, isValidJSONString(metaValue));
+
     if (isValidJSONString(metaValue)) return JSON.parse(metaValue);
     return metaValue;
   }
+  console.log("metaValue 3 ", alternateValue);
 
   if (!metaValue && alternateValue !== undefined && alternateValue !== null)
     return alternateValue.toString();

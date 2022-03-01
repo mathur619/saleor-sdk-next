@@ -38,6 +38,7 @@ export const useCartState = () => {
   const mrp =
     data.localCheckout?.lines?.reduce((total, curr) => {
       const variantMetadata = curr?.variant.metadata;
+
       const listPrice = getMetadataValue(variantMetadata, "listPrice");
       const listPriceAmount =
         typeof listPrice === "string" && listPrice && parseFloat(listPrice)
@@ -46,6 +47,16 @@ export const useCartState = () => {
             curr?.variant.pricing?.price?.gross.amount ||
             0;
       total += listPriceAmount;
+
+      console.log(
+        "variantMetadata",
+        variantMetadata,
+        listPrice,
+        listPriceAmount,
+        total,
+        typeof listPrice
+      );
+
       return total;
     }, 0) || 0;
 
