@@ -5,7 +5,7 @@ import {
 } from "../../apollo/types";
 import { hookFactory } from "../helpers/hookFactory";
 import { hookStateFactory } from "../helpers/hookStateFactory";
-import { createTaxedPriceFromAmount } from "../utils/utils";
+import { createTaxedPriceFromAmount, getMetadataValue } from "../utils/utils";
 
 const defaultPrice = {
   __typename: "TaxedMoney",
@@ -34,15 +34,42 @@ export const useCartState = () => {
       "Cache query result is undefined. Invalid cache configuration."
     );
   }
+
+  const mrp =
+    data.localCheckout?.lines?.reduce((total, curr) => {
+      const variantMetadata = curr?.variant.metadata;
+      const listPrice = getMetadataValue(variantMetadata, "listPrice");
+      const listPriceAmount =
+        typeof listPrice === "string" && listPrice && parseFloat(listPrice)
+          ? parseFloat(listPrice)
+          : curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
+            curr?.variant.pricing?.price?.gross.amount ||
+            0;
+      total += listPriceAmount;
+      return total;
+    }, 0) || 0;
+
+  const netPrice =
+    data.localCheckout?.lines?.reduce((total, curr) => {
+      const netPriceAmount =
+        curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
+        curr?.variant.pricing?.price?.gross.amount ||
+        0;
+      total += netPriceAmount;
+      return total;
+    }, 0) || 0;
+
+  const itemDiscount = mrp - netPrice;
+
   const cartState = {
     items: data?.localCheckout?.lines || [],
     totalPrice: data?.localCheckout?.totalPrice || defaultPrice,
     subtotalPrice: data?.localCheckout?.subtotalPrice || defaultPrice,
     shippingPrice: data?.localCheckout?.shippingPrice || defaultPrice,
     discount: data.localCheckout?.discount,
-    mrp: data?.localCheckout?.totalPrice || defaultPrice,
-    netPrice: data?.localCheckout?.totalPrice || defaultPrice,
-    itemDiscount: data?.localCheckout?.totalPrice || defaultPrice,
+    mrp: createTaxedPriceFromAmount(mrp || 0) || defaultPrice,
+    netPrice: createTaxedPriceFromAmount(netPrice || 0) || defaultPrice,
+    itemDiscount: createTaxedPriceFromAmount(itemDiscount || 0) || defaultPrice,
     offerDiscount: data?.localCheckout?.totalPrice || defaultPrice,
     prepaidDiscount:
       createTaxedPriceFromAmount(

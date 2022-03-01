@@ -16014,6 +16014,7 @@ export type CheckoutFragment = Pick<
   | "translatedDiscountName"
   | "voucherCode"
 > & {
+  metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
   totalPrice: Maybe<PriceFragment>;
   subtotalPrice: Maybe<PriceFragment>;
   billingAddress: Maybe<AddressFragment>;
@@ -16606,6 +16607,10 @@ export const CheckoutFragmentDoc = gql`
   fragment Checkout on Checkout {
     token
     id
+    metadata {
+      key
+      value
+    }
     totalPrice {
       ...Price
     }
