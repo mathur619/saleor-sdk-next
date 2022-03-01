@@ -21,7 +21,7 @@ export function getMetadataValue(
   metadata: any,
   key: string,
   alternateValue?: string | number
-): string | Object {
+): string | number | Object {
   const metaValue = metadata?.filter(
     (meta: { key: string }) => meta?.key === key
   )[0]?.value;

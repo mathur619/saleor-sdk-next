@@ -40,19 +40,27 @@ export const useCartState = () => {
       const variantMetadata = curr?.variant.metadata;
 
       const listPrice = getMetadataValue(variantMetadata, "listPrice");
-      const listPriceAmount =
-        typeof listPrice === "string" && listPrice && parseFloat(listPrice)
-          ? parseFloat(listPrice)
-          : curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
-            curr?.variant.pricing?.price?.gross.amount ||
-            0;
-      total += listPriceAmount;
+
+      if (listPrice && typeof listPrice === "number") {
+        console.log("listPrice 1 number", listPrice);
+        total += listPrice;
+      } else if (listPrice && typeof listPrice === "string") {
+        console.log("listPrice 2 string", listPrice);
+
+        total += parseFloat(listPrice);
+      } else {
+        console.log("listPrice 3 others", listPrice);
+
+        total +=
+          curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
+          curr?.variant.pricing?.price?.gross.amount ||
+          0;
+      }
 
       console.log(
         "variantMetadata",
         variantMetadata,
         listPrice,
-        listPriceAmount,
         total,
         typeof listPrice
       );
