@@ -323,7 +323,10 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       userWalletBalance: {
         read(existing) {
           console.log("existing userWalletBalance", existing);
-          return existing || 0;
+          if (!existing) {
+            return 0;
+          }
+          return existing;
         },
       },
     },
