@@ -49,7 +49,7 @@ export const setLocalCheckoutInCache = async (
         },
       },
     });
-  } else if (fetchDiscount) {
+  } else if (fetchDiscount && checkout?.token) {
     const res = await client.query<
       DiscountsAndCashbackQuery,
       DiscountsAndCashbackQueryVariables

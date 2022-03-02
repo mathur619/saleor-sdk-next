@@ -36,5 +36,6 @@ export const useCheckoutState = () => {
 
     useCashback: data.useCashback,
     checkoutLoading: data.checkoutLoading,
+    userWalletBalance: data.userWalletBalance,
   };
 };

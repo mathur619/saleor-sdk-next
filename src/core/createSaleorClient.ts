@@ -58,13 +58,13 @@ export const createSaleorClient = ({
     (window as any).__SALEOR_CLIENT__ = client;
   }
 
-  if (
-    checkoutSDK &&
-    checkoutSDK.createCheckout &&
-    (!storage.getCheckout() || Object.keys(checkout).length === 0)
-  ) {
-    checkoutSDK?.createCheckout();
-  }
+  // if (
+  //   checkoutSDK &&
+  //   checkoutSDK.createCheckout &&
+  //   (!storage.getCheckout() || Object.keys(checkout).length === 0)
+  // ) {
+  //   checkoutSDK?.createCheckout();
+  // }
 
   return client;
 };

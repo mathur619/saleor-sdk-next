@@ -203,13 +203,13 @@ export interface AuthSDK {
    */
   // verifyExternalToken?: () => Promise<VerifyExternalTokenResult>;
 
-  signInMobile: (checkoutId: any, otp: string, phone: string) => {};
+  signInMobile: (otp: string, phone: string) => {};
 
   requestOTP: (phone: string) => {};
 
   registerAccountV2: (email: string, phone: string) => {};
 
-  confirmAccountV2: (checkoutId: any, otp: string, phone: string) => {};
+  confirmAccountV2: (otp: string, phone: string) => {};
 
   signOut: () => {};
 
@@ -227,7 +227,6 @@ export const auth = ({
   const refreshExternalToken = () => {};
   // const refreshToken = () => {};
   const signInMobile: AuthSDK["signInMobile"] = async (
-    checkoutId: any,
     otp: string,
     phone: string
   ) => {
@@ -238,6 +237,14 @@ export const auth = ({
       },
     });
 
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    console.log("checkout confirmAccountV2", checkout);
+
     const { data, errors } = await client.mutate<
       OtpAuthenticationMutation,
       OtpAuthenticationMutationVariables
@@ -246,7 +253,7 @@ export const auth = ({
       variables: {
         otp,
         phone,
-        checkoutId,
+        checkoutId: checkout?.id,
       },
       update: (_, { data }) => {
         if (data?.CreateTokenOTP?.token) {
@@ -333,7 +340,6 @@ export const auth = ({
   };
 
   const confirmAccountV2: AuthSDK["confirmAccountV2"] = async (
-    checkoutId: any,
     otp: string,
     phone: string
   ) => {
@@ -344,6 +350,13 @@ export const auth = ({
       },
     });
 
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    console.log("checkout confirmAccountV2", checkout);
     const { data, errors } = await client.mutate<
       ConfirmAccountV2Mutation,
       ConfirmAccountV2MutationVariables
@@ -352,7 +365,7 @@ export const auth = ({
       variables: {
         otp,
         phone,
-        checkoutId,
+        checkoutId: checkout?.id,
       },
       update: (_, { data }) => {
         if (data?.confirmAccountV2?.token) {

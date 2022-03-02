@@ -7,6 +7,7 @@ import {
   CREATE_CHECKOUT_MUTATION,
   CREATE_CHECKOUT_PAYMENT,
   CREATE_RAZORPAY_ORDER,
+  GET_WALLET_AMOUNT,
   REMOVE_CHECKOUT_PROMO_CODE,
   UPDATE_CHECKOUT_ADDRESS_TYPE,
   UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION,
@@ -31,6 +32,8 @@ import {
   CreateCheckoutPaymentMutationVariables,
   CreateRazorpayOrderMutation,
   CreateRazorpayOrderMutationVariables,
+  GetWalletQuery,
+  GetWalletQueryVariables,
   PaymentInput,
   PincodeQuery,
   PincodeQueryVariables,
@@ -94,6 +97,7 @@ export interface CheckoutSDK {
   completeCheckout?: (input?: CompleteCheckoutInput) => any;
   getCityStateFromPincode?: (pincode: string) => {};
   createRazorpayOrder?: () => Promise<FetchResult<CreateRazorpayOrderMutation>>;
+  getWalletAmount?: () => Promise<FetchResult<GetWalletQuery>>;
 }
 
 export const checkout = ({
@@ -692,6 +696,22 @@ export const checkout = ({
     return { data: null };
   };
 
+  const getWalletAmount: CheckoutSDK["getWalletAmount"] = async () => {
+    const res = await client.mutate<GetWalletQuery, GetWalletQueryVariables>({
+      mutation: GET_WALLET_AMOUNT,
+      update: async (_, { data }) => {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            userWalletBalance: data?.wallet?.amount,
+          },
+        });
+      },
+    });
+
+    return res;
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -706,5 +726,6 @@ export const checkout = ({
     completeCheckout,
     getCityStateFromPincode,
     createRazorpayOrder,
+    getWalletAmount,
   };
 };

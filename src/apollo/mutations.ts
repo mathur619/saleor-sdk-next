@@ -767,3 +767,12 @@ export const CREATE_RAZORPAY_ORDER = gql`
     }
   }
 `;
+
+export const GET_WALLET_AMOUNT = gql`
+  query GetWallet {
+    wallet {
+      id
+      amount
+    }
+  }
+`;

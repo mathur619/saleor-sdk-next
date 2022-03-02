@@ -52,6 +52,7 @@ export const GET_LOCAL_CHECKOUT = gql`
     }
     useCashback @client
     checkoutLoading @client
+    userWalletBalance @client
   }
 `;
 

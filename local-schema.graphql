@@ -8,4 +8,5 @@ type Query {
   localCashback: CashbackType
   useCashback: Boolean!
   checkoutLoading: Boolean!
+  userWalletBalance: Float!
 }

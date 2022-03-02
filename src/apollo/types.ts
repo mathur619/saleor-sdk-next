@@ -11327,6 +11327,7 @@ export type Query = {
   /** Look up a user by ID. */
   user: Maybe<User>;
   userExists: Maybe<UserExistsType>;
+  userWalletBalance: Scalars["Float"];
   users: Maybe<User>;
   /** Look up a voucher by ID. */
   voucher: Maybe<Voucher>;
@@ -16376,6 +16377,12 @@ export type CreateRazorpayOrderMutation = {
   }>;
 };
 
+export type GetWalletQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetWalletQuery = {
+  wallet: Maybe<Pick<WalletType, "id" | "amount">>;
+};
+
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type UserDetailsQuery = Pick<
@@ -16399,7 +16406,7 @@ export type GetLocalCheckoutQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetLocalCheckoutQuery = Pick<
   Query,
-  "useCashback" | "checkoutLoading"
+  "useCashback" | "checkoutLoading" | "userWalletBalance"
 > & {
   localCheckout: Maybe<CheckoutFragment>;
   localCheckoutDiscounts: Maybe<
@@ -18072,6 +18079,59 @@ export type CreateRazorpayOrderMutationOptions = Apollo.BaseMutationOptions<
   CreateRazorpayOrderMutation,
   CreateRazorpayOrderMutationVariables
 >;
+export const GetWalletDocument = gql`
+  query GetWallet {
+    wallet {
+      id
+      amount
+    }
+  }
+`;
+
+/**
+ * __useGetWalletQuery__
+ *
+ * To run a query within a React component, call `useGetWalletQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWalletQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWalletQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetWalletQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetWalletQuery, GetWalletQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetWalletQuery, GetWalletQueryVariables>(
+    GetWalletDocument,
+    options
+  );
+}
+export function useGetWalletLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetWalletQuery,
+    GetWalletQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetWalletQuery, GetWalletQueryVariables>(
+    GetWalletDocument,
+    options
+  );
+}
+export type GetWalletQueryHookResult = ReturnType<typeof useGetWalletQuery>;
+export type GetWalletLazyQueryHookResult = ReturnType<
+  typeof useGetWalletLazyQuery
+>;
+export type GetWalletQueryResult = Apollo.QueryResult<
+  GetWalletQuery,
+  GetWalletQueryVariables
+>;
 export const UserDetailsDocument = gql`
   query UserDetails {
     user: me {
@@ -18264,6 +18324,7 @@ export const GetLocalCheckoutDocument = gql`
     }
     useCashback @client
     checkoutLoading @client
+    userWalletBalance @client
   }
   ${CheckoutFragmentDoc}
 `;

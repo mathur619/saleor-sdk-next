@@ -320,6 +320,12 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
           return existing || false;
         },
       },
+      userWalletBalance: {
+        read(existing) {
+          console.log("existing userWalletBalance", existing);
+          return existing || 0;
+        },
+      },
     },
   },
   User: {
