@@ -309,7 +309,7 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
           if (existing === null || existing === undefined) {
             const useCashbackString = storage.getUseCashback();
             const useCashbackBollean = useCashbackString === "true";
-            return useCashbackBollean || false;
+            return useCashbackBollean;
           }
           return existing;
         },
@@ -317,7 +317,7 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       checkoutLoading: {
         read(existing) {
           console.log("existing checkoutLoading", existing);
-          return existing || false;
+          return existing;
         },
       },
       userWalletBalance: {
