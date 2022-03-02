@@ -41,20 +41,24 @@ export const useCartState = () => {
 
       const listPrice = getMetadataValue(variantMetadata, "listPrice");
 
-      if (listPrice && typeof listPrice === "number") {
-        console.log("listPrice 1 number", listPrice);
-        total += listPrice;
-      } else if (listPrice && typeof listPrice === "string") {
-        console.log("listPrice 2 string", listPrice);
+      if (curr?.quantity) {
+        if (listPrice && typeof listPrice === "number") {
+          console.log("listPrice 1 number", listPrice);
+          total += listPrice * curr.quantity;
+        } else if (listPrice && typeof listPrice === "string") {
+          console.log("listPrice 2 string", listPrice);
 
-        total += parseFloat(listPrice);
+          total += parseFloat(listPrice) * curr.quantity;
+        } else {
+          console.log("listPrice 3 others", listPrice);
+
+          total +=
+            (curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
+              curr?.variant.pricing?.price?.gross.amount ||
+              0) * curr.quantity;
+        }
       } else {
-        console.log("listPrice 3 others", listPrice);
-
-        total +=
-          curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
-          curr?.variant.pricing?.price?.gross.amount ||
-          0;
+        total += 0;
       }
 
       console.log(
@@ -70,11 +74,15 @@ export const useCartState = () => {
 
   const netPrice =
     data.localCheckout?.lines?.reduce((total, curr) => {
-      const netPriceAmount =
-        curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
-        curr?.variant.pricing?.price?.gross.amount ||
-        0;
-      total += netPriceAmount;
+      if (curr?.quantity) {
+        const netPriceAmount =
+          (curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
+            curr?.variant.pricing?.price?.gross.amount ||
+            0) * curr.quantity;
+        total += netPriceAmount;
+      } else {
+        total += 0;
+      }
       return total;
     }, 0) || 0;
 
