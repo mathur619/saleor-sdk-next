@@ -21,6 +21,7 @@ import {
   RemoveCheckoutLineMutation,
   RemoveCheckoutLineMutationVariables,
 } from "../apollo/types";
+import { FetchResult } from "@apollo/client";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -49,14 +50,33 @@ export interface CartSDK {
 
   cashbackRecieve?: any;
 
-  addItem?: (variantId: string, quantity: number) => {};
-  removeItem?: (variantId: string) => {};
+  addItem?: (
+    variantId: string,
+    quantity: number
+  ) => Promise<
+    FetchResult<
+      CreateCheckout | AddCheckoutLineMutation,
+      Record<string, any>,
+      Record<string, any>
+    >
+  >;
+  removeItem?: (
+    variantId: string
+  ) => Promise<FetchResult<
+    RemoveCheckoutLineMutation,
+    Record<string, any>,
+    Record<string, any>
+  > | null>;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem?: (
     variantId: string,
     quantity: number,
     prevQuantity: number
-  ) => {};
+  ) => Promise<FetchResult<
+    AddCheckoutLineMutation | CreateCheckout | UpdateCheckoutLine,
+    Record<string, any>,
+    Record<string, any>
+  > | null>;
 }
 
 export const cart = ({
@@ -75,7 +95,7 @@ export const cart = ({
         : checkoutString;
 
     if (checkout && checkout?.token) {
-      await client.mutate<
+      const res = await client.mutate<
         AddCheckoutLineMutation,
         AddCheckoutLineMutationVariables
       >({
@@ -95,8 +115,9 @@ export const cart = ({
           );
         },
       });
+      return res;
     } else {
-      await client.mutate<CreateCheckout, CreateCheckoutVariables>({
+      const res = await client.mutate<CreateCheckout, CreateCheckoutVariables>({
         mutation: CREATE_CHECKOUT_MUTATION,
         variables: {
           checkoutInput: {
@@ -124,6 +145,7 @@ export const cart = ({
           }
         },
       });
+      return res;
     }
   };
 
@@ -138,7 +160,7 @@ export const cart = ({
     const lineToRemoveId = lineToRemove?.id;
 
     if (checkout && checkout?.token) {
-      await client.mutate<
+      return await client.mutate<
         RemoveCheckoutLineMutation,
         RemoveCheckoutLineMutationVariables
       >({
@@ -159,6 +181,7 @@ export const cart = ({
         },
       });
     }
+    return null;
   };
 
   const updateItem: CartSDK["updateItem"] = async (
@@ -168,7 +191,8 @@ export const cart = ({
   ) => {
     const differenceQuantity = quantity - prevQuantity;
     if (differenceQuantity > 0) {
-      addItem(variantId, differenceQuantity);
+      const res = addItem(variantId, differenceQuantity);
+      return res;
     } else {
       const checkoutString = storage.getCheckout();
       console.log("prevQuantity", prevQuantity);
@@ -190,7 +214,10 @@ export const cart = ({
       alteredLines.push({ quantity: quantity, variantId: variantId });
 
       if (checkout && checkout?.token) {
-        await client.mutate<UpdateCheckoutLine, UpdateCheckoutLineVariables>({
+        const res = await client.mutate<
+          UpdateCheckoutLine,
+          UpdateCheckoutLineVariables
+        >({
           mutation: UPDATE_CHECKOUT_LINE_MUTATION,
           variables: {
             checkoutId: checkout?.id,
@@ -207,8 +234,10 @@ export const cart = ({
             );
           },
         });
+        return res;
       }
     }
+    return null;
   };
 
   return {
