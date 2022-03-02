@@ -25,6 +25,8 @@ import {
   // ExternalVerifyMutation,
   // LoginMutation,
   RefreshTokenMutation,
+  UpdateCheckoutBillingAddressMutation,
+  UpdateCheckoutShippingAddressMutation,
   // RegisterMutation,
   // RequestPasswordResetMutation,
   // SetPasswordMutation,
@@ -82,6 +84,19 @@ export interface SaleorClientOpts {
   opts?: SaleorClientFetchOpts;
 }
 
+export interface ShippingAndBilling {
+  resShipping: FetchResult<
+    UpdateCheckoutShippingAddressMutation,
+    Record<string, any>,
+    Record<string, any>
+  > | null;
+  resBilling: FetchResult<
+    UpdateCheckoutBillingAddressMutation,
+    Record<string, any>,
+    Record<string, any>
+  > | null;
+}
+
 export type SaleorClientMethodsProps = SaleorClientInternals &
   Pick<SaleorClientConfig, "channel">;
 
@@ -125,57 +140,6 @@ export type UpdateAccountAddressOpts = MutationAccountAddressUpdateArgs;
 // export type LogoutResult = FetchResult<ExternalLogoutMutation> | null;
 // export type LogoutData = ExternalLogoutMutation["externalLogout"] | null;
 export type RefreshTokenResult = FetchResult<RefreshTokenMutation>;
-// export type RefreshTokenData = RefreshTokenMutation["tokenRefresh"];
-// export type RegisterResult = FetchResult<RegisterMutation>;
-// export type RegisterData = RegisterMutation["accountRegister"];
-// export type RequestPasswordResetResult = FetchResult<
-//   RequestPasswordResetMutation
-// >;
-// export type RequestPasswordResetData = RequestPasswordResetMutation["requestPasswordReset"];
-// export type SetPasswordResult = FetchResult<SetPasswordMutation>;
-// export type SetPasswordData = SetPasswordMutation["setPassword"];
-// export type VerifyTokenResult = FetchResult<VerifyTokenMutation>;
-// export type VerifyTokenData = VerifyTokenMutation["tokenVerify"];
-// export type GetExternalAuthUrlResult = FetchResult<
-//   ExternalAuthenticationUrlMutation
-// >;
-// export type GetExternalAuthUrlData = ExternalAuthenticationUrlMutation["externalAuthenticationUrl"];
-// export type GetExternalAccessTokenResult = FetchResult<
-//   ExternalObtainAccessTokensMutation
-// >;
-// export type GetExternalAccessTokenData = ExternalObtainAccessTokensMutation["externalObtainAccessTokens"];
-// export type RefreshExternalTokenResult = FetchResult<ExternalRefreshMutation>;
-// export type RefreshExternalTokenData = ExternalRefreshMutation["externalRefresh"];
-// export type VerifyExternalTokenResult = FetchResult<ExternalVerifyMutation>;
-// export type VerifyExternalTokenData = ExternalVerifyMutation["externalVerify"];
-// // User
-// export type AccountDeleteResult = FetchResult<AccountDeleteMutation>;
-// export type AccountDeleteData = AccountDeleteMutation["accountDelete"];
-// export type AccountRequestDeletionResult = FetchResult<
-//   AccountRequestDeletionMutation
-// >;
-// export type AccountRequestDeletionData = AccountRequestDeletionMutation["accountRequestDeletion"];
-// export type ConfirmEmailChangeResult = FetchResult<ConfirmEmailChangeMutation>;
-// export type ConfirmEmailChangeData = ConfirmEmailChangeMutation["confirmEmailChange"];
-// export type CreateAccountAddressResult = FetchResult<
-//   CreateAccountAddressMutation
-// >;
-// export type CreateAccountAddressData = CreateAccountAddressMutation["accountAddressCreate"];
-// export type DeleteAccountAddressResult = FetchResult<
-//   DeleteAccountAddressMutation
-// >;
-// export type DeleteAccountAddressData = DeleteAccountAddressMutation["accountAddressDelete"];
-// export type RequestEmailChangeResult = FetchResult<RequestEmailChangeMutation>;
-// export type RequestEmailChangeData = RequestEmailChangeMutation["requestEmailChange"];
-// export type SetAccountDefaultAddressResult = FetchResult<
-//   SetAccountDefaultAddressMutation
-// >;
-// export type SetAccountDefaultAddressData = SetAccountDefaultAddressMutation["accountSetDefaultAddress"];
-// export type UpdateAccountResult = FetchResult<AccountUpdateMutation>;
-// export type UpdateAccountData = AccountUpdateMutation["accountUpdate"];
-// export type UpdateAccountAddressResult = FetchResult<
-//   UpdateAccountAddressMutation
-// >;
-// export type UpdateAccountAddressData = UpdateAccountAddressMutation["accountAddressUpdate"];
-// export type ConfirmAccountResult = FetchResult<AccountConfirmMutation>;
-// export type ConfirmAccountData = AccountConfirmMutation["confirmAccount"];
+
+// Checkout
+export type SetShippingAndBillingAddressResult = Promise<ShippingAndBilling>;

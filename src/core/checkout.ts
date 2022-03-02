@@ -59,7 +59,10 @@ import {
   PaymentMethodUpdateInput,
 } from "../apollo/types/checkout";
 import { storage } from "./storage";
-import { SaleorClientMethodsProps } from "./types";
+import {
+  SaleorClientMethodsProps,
+  SetShippingAndBillingAddressResult,
+} from "./types";
 
 export interface CheckoutSDK {
   loaded?: any;
@@ -80,22 +83,44 @@ export interface CheckoutSDK {
 
   payment?: any;
 
-  setAddressType?: (addressId: string, type: AddressTypes) => {};
-  createCheckout?: () => {};
-  setShippingAddress?: (shippingAddress: IAddress, email: string) => any;
+  setAddressType?: (
+    addressId: string,
+    type: AddressTypes
+  ) => Promise<FetchResult<UpdateCheckoutAddressTypeMutation> | null>;
+  createCheckout?: () => Promise<FetchResult<CreateCheckout> | null>;
+  setShippingAddress?: (
+    shippingAddress: IAddress,
+    email: string
+  ) => Promise<FetchResult<UpdateCheckoutShippingAddressMutation> | null>;
   setShippingAndBillingAddress?: (
     shippingAddress: IAddress,
     email: string
-  ) => {};
-  setBillingAddress?: (billingAddress: IAddress) => any;
-  setBillingAsShippingAddress?: () => {};
-  setShippingMethod?: (shippingMethodId: string) => any;
-  addPromoCode?: (promoCode: string) => any;
-  removePromoCode?: (promoCode: string) => {};
-  checkoutPaymentMethodUpdate?: (input: PaymentMethodUpdateInput) => any;
-  createPayment?: (input: CreatePaymentInput) => any;
-  completeCheckout?: (input?: CompleteCheckoutInput) => any;
-  getCityStateFromPincode?: (pincode: string) => {};
+  ) => SetShippingAndBillingAddressResult;
+
+  setBillingAddress?: (
+    billingAddress: IAddress
+  ) => Promise<FetchResult<UpdateCheckoutBillingAddressMutation> | null>;
+  setShippingMethod?: (
+    shippingMethodId: string
+  ) => Promise<FetchResult<UpdateCheckoutShippingMethodMutation> | null>;
+  addPromoCode?: (
+    promoCode: string
+  ) => Promise<FetchResult<AddCheckoutPromoCodeMutation> | null>;
+  removePromoCode?: (
+    promoCode: string
+  ) => Promise<FetchResult<RemoveCheckoutPromoCodeMutation> | null>;
+  checkoutPaymentMethodUpdate?: (
+    input: PaymentMethodUpdateInput
+  ) => Promise<FetchResult<CheckoutPaymentMethodUpdateMutation> | null>;
+  createPayment?: (
+    input: CreatePaymentInput
+  ) => Promise<FetchResult<CreateCheckoutPaymentMutation> | null>;
+  completeCheckout?: (
+    input?: CompleteCheckoutInput
+  ) => Promise<FetchResult<CompleteCheckoutMutation> | null>;
+  getCityStateFromPincode?: (
+    pincode: string
+  ) => Promise<FetchResult<PincodeQuery> | null>;
   createRazorpayOrder?: () => Promise<FetchResult<CreateRazorpayOrderMutation>>;
   getWalletAmount?: () => Promise<FetchResult<GetWalletQuery>>;
 }
@@ -110,7 +135,7 @@ export const checkout = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     if (!(checkout && checkout?.id)) {
-      await client.mutate<CreateCheckout, CreateCheckoutVariables>({
+      return await client.mutate<CreateCheckout, CreateCheckoutVariables>({
         mutation: CREATE_CHECKOUT_MUTATION,
         variables: {
           checkoutInput: {
@@ -139,6 +164,7 @@ export const checkout = ({
         },
       });
     }
+    return null;
   };
 
   const setShippingAddress: CheckoutSDK["setShippingAddress"] = async (
@@ -177,7 +203,7 @@ export const checkout = ({
       };
       console.log("checkout setShippingAddress in if");
 
-      const { data, errors } = await client.mutate<
+      const res = await client.mutate<
         UpdateCheckoutShippingAddressMutation,
         UpdateCheckoutShippingAddressMutationVariables
       >({
@@ -195,13 +221,10 @@ export const checkout = ({
         },
       });
 
-      return {
-        data,
-        errors,
-      };
+      return res;
     }
 
-    return { data: null };
+    return null;
   };
 
   const setBillingAddress: CheckoutSDK["setBillingAddress"] = async (
@@ -236,7 +259,7 @@ export const checkout = ({
           streetAddress2: billingAddress.streetAddress2,
         },
       };
-      const { data, errors } = await client.mutate<
+      const res = await client.mutate<
         UpdateCheckoutBillingAddressMutation,
         UpdateCheckoutBillingAddressMutationVariables
       >({
@@ -253,15 +276,12 @@ export const checkout = ({
           }
         },
       });
-      return {
-        data,
-        errors,
-      };
+      return res;
     }
-    return { data: null };
+    return null;
   };
 
-  const setShippingAndBillingAddress: CheckoutSDK["setShippingAddress"] = async (
+  const setShippingAndBillingAddress: CheckoutSDK["setShippingAndBillingAddress"] = async (
     shippingAddress: IAddress,
     email: string
   ) => {
@@ -281,16 +301,22 @@ export const checkout = ({
         checkoutLoading: false,
       },
     });
-    const dataError = resShipping.error || resBilling.error;
-    console.log("setShippingAndBillingAddress", resShipping, resBilling);
-    return {
-      data: {
-        billingData: resBilling.data.checkoutBillingAddressUpdate.checkout,
-        shippingData: resShipping.data.checkoutShippingAddressUpdate.checkout,
-      },
-      dataError,
-      pending: false,
+    // const dataError = resShipping?.errors || resBilling?.errors;
+    // console.log("setShippingAndBillingAddress", resShipping, resBilling);
+    // const returnObject= {
+    //   data: {
+    //     billingData: resBilling?.data?.checkoutBillingAddressUpdate?.checkout,
+    //     shippingData: resShipping?.data?.checkoutShippingAddressUpdate?.checkout,
+    //   },
+    //   dataError,
+    //   pending: false,
+    // }
+
+    const returnObject = {
+      resShipping,
+      resBilling,
     };
+    return returnObject;
   };
 
   const setAddressType: CheckoutSDK["setAddressType"] = async (
@@ -304,7 +330,7 @@ export const checkout = ({
         : checkoutString;
 
     if (!(checkout && checkout?.id)) {
-      await client.mutate<
+      return await client.mutate<
         UpdateCheckoutAddressTypeMutation,
         UpdateCheckoutAddressTypeMutationVariables
       >({
@@ -315,6 +341,7 @@ export const checkout = ({
         },
       });
     }
+    return null;
   };
 
   const setShippingMethod: CheckoutSDK["setShippingMethod"] = async (
@@ -341,7 +368,7 @@ export const checkout = ({
       };
       console.log("checkout setShippingMethod in if");
 
-      const { data, errors } = await client.mutate<
+      const res = await client.mutate<
         UpdateCheckoutShippingMethodMutation,
         UpdateCheckoutShippingMethodMutationVariables
       >({
@@ -361,13 +388,10 @@ export const checkout = ({
         },
       });
 
-      return {
-        data,
-        errors,
-      };
+      return res;
     }
 
-    return { data: null };
+    return null;
   };
 
   const addPromoCode: CheckoutSDK["addPromoCode"] = async (
@@ -393,7 +417,7 @@ export const checkout = ({
       };
       console.log("checkout addPromoCode in if");
 
-      const { data, errors } = await client.mutate<
+      const res = await client.mutate<
         AddCheckoutPromoCodeMutation,
         AddCheckoutPromoCodeMutationVariables
       >({
@@ -412,13 +436,10 @@ export const checkout = ({
         },
       });
 
-      return {
-        data: data?.checkoutAddPromoCode?.checkout,
-        dataError: errors || data?.checkoutAddPromoCode?.errors,
-      };
+      return res;
     }
 
-    return { data: null };
+    return null;
   };
 
   const removePromoCode: CheckoutSDK["removePromoCode"] = async (
@@ -445,7 +466,7 @@ export const checkout = ({
       };
       console.log("checkout removePromoCode in if");
 
-      const { data, errors } = await client.mutate<
+      const res = await client.mutate<
         RemoveCheckoutPromoCodeMutation,
         RemoveCheckoutPromoCodeMutationVariables
       >({
@@ -465,13 +486,10 @@ export const checkout = ({
         },
       });
 
-      return {
-        data,
-        errors,
-      };
+      return res;
     }
 
-    return { data: null };
+    return null;
   };
 
   const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] = async (
@@ -503,14 +521,14 @@ export const checkout = ({
       };
       console.log("checkout checkoutPaymentMethodUpdate in if");
 
-      const { data, errors } = await client.mutate<
+      const res = await client.mutate<
         CheckoutPaymentMethodUpdateMutation,
         CheckoutPaymentMethodUpdateMutationVariables
       >({
         mutation: CHECKOUT_PAYMENT_METHOD_UPDATE,
         variables,
         update: (_, { data }) => {
-          console.log("checkoutPaymentMethodUpdate", data, errors);
+          console.log("checkoutPaymentMethodUpdate", data);
           console.log("in update checkoutPaymentMethodUpdate", data);
           setLocalCheckoutInCache(
             client,
@@ -523,13 +541,10 @@ export const checkout = ({
         },
       });
 
-      return {
-        data,
-        errors,
-      };
+      return res;
     }
 
-    return { data: null };
+    return null;
   };
 
   const createPayment: CheckoutSDK["createPayment"] = async (
@@ -554,7 +569,7 @@ export const checkout = ({
         checkoutId: checkout?.id,
         paymentInput: { ...input, amount: checkout?.totalPrice?.gross.amount },
       };
-      const { data, errors } = await client.mutate<
+      const res = await client.mutate<
         CreateCheckoutPaymentMutation,
         CreateCheckoutPaymentMutationVariables
       >({
@@ -572,13 +587,10 @@ export const checkout = ({
         },
       });
 
-      return {
-        data,
-        errors,
-      };
+      return res;
     }
 
-    return { data: null };
+    return null;
   };
 
   const completeCheckout: CheckoutSDK["completeCheckout"] = async (
@@ -608,7 +620,7 @@ export const checkout = ({
         redirectUrl: input?.redirectUrl,
         storeSource: input?.storeSource,
       };
-      const { data, errors } = await client.mutate<
+      const res = await client.mutate<
         CompleteCheckoutMutation,
         CompleteCheckoutMutationVariables
       >({
@@ -624,32 +636,23 @@ export const checkout = ({
         },
       });
 
-      return {
-        data: data?.checkoutComplete,
-        errors,
-      };
+      return res;
     }
 
-    return { data: null };
+    return null;
   };
 
   const getCityStateFromPincode: CheckoutSDK["getCityStateFromPincode"] = async (
     pincode: string
   ) => {
-    const { data, errors } = await client.mutate<
-      PincodeQuery,
-      PincodeQueryVariables
-    >({
+    const res = await client.mutate<PincodeQuery, PincodeQueryVariables>({
       mutation: GET_CITY_STATE_FROM_PINCODE,
       variables: {
         pin: pincode,
       },
     });
 
-    return {
-      data,
-      errors,
-    };
+    return res;
   };
 
   const createRazorpayOrder: CheckoutSDK["createRazorpayOrder"] = async () => {
