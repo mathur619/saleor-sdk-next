@@ -311,10 +311,7 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
             const useCashbackBollean = useCashbackString === "true";
             return useCashbackBollean || false;
           }
-          if (typeof existing === "boolean") {
-            return existing;
-          }
-          return false;
+          return existing;
         },
       },
       checkoutLoading: {
