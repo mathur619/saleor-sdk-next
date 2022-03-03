@@ -27,6 +27,18 @@ import {
   RefreshTokenMutation,
   UpdateCheckoutBillingAddressMutation,
   UpdateCheckoutShippingAddressMutation,
+  AddCheckoutPromoCodeMutation,
+  CheckoutPaymentMethodUpdateMutation,
+  CreateCheckoutPaymentMutation,
+  PincodeQuery,
+  GetWalletQuery,
+  CompleteCheckoutMutation,
+  RemoveCheckoutPromoCodeMutation,
+  UpdateCheckoutAddressTypeMutation,
+  UpdateCheckoutShippingMethodMutation,
+  CreateRazorpayOrderMutation,
+  AddCheckoutLineMutation,
+  RemoveCheckoutLineMutation,
   // RegisterMutation,
   // RequestPasswordResetMutation,
   // SetPasswordMutation,
@@ -52,6 +64,7 @@ import { CartSDK } from "./cart";
 import { CheckoutSDK } from "./checkout";
 import { WishlistSDK } from "./wishlist";
 import { WalletSDK } from "./wallet";
+import { CreateCheckout, UpdateCheckoutLine } from "../apollo/types/cartTypes";
 
 export interface SaleorClientInternals {
   apolloClient: ApolloClient<NormalizedCacheObject>;
@@ -142,4 +155,60 @@ export type UpdateAccountAddressOpts = MutationAccountAddressUpdateArgs;
 export type RefreshTokenResult = FetchResult<RefreshTokenMutation>;
 
 // Checkout
+export type SetAddressTypeResult = Promise<FetchResult<
+  UpdateCheckoutAddressTypeMutation
+> | null>;
+export type CreateCheckoutResult = Promise<FetchResult<CreateCheckout> | null>;
+export type SetShippingAddressResult = Promise<FetchResult<
+  UpdateCheckoutShippingAddressMutation
+> | null>;
 export type SetShippingAndBillingAddressResult = Promise<ShippingAndBilling>;
+export type SetBillingAddressResult = Promise<FetchResult<
+  UpdateCheckoutBillingAddressMutation
+> | null>;
+export type SetShippingMethodResult = Promise<FetchResult<
+  UpdateCheckoutShippingMethodMutation
+> | null>;
+export type AddPromoCodeResult = Promise<FetchResult<
+  AddCheckoutPromoCodeMutation
+> | null>;
+export type RemovePromoCodeResult = Promise<FetchResult<
+  RemoveCheckoutPromoCodeMutation
+> | null>;
+export type CheckoutPaymentMethodUpdateResult = Promise<FetchResult<
+  CheckoutPaymentMethodUpdateMutation
+> | null>;
+export type CreatePaymentResult = Promise<FetchResult<
+  CreateCheckoutPaymentMutation
+> | null>;
+export type CompleteCheckoutResult = Promise<FetchResult<
+  CompleteCheckoutMutation
+> | null>;
+export type GetCityStateFromPincodeResult = Promise<FetchResult<
+  PincodeQuery
+> | null>;
+export type CreateRazorpayOrderResult = Promise<FetchResult<
+  CreateRazorpayOrderMutation
+> | null>;
+export type GetWalletAmountResult = Promise<FetchResult<GetWalletQuery> | null>;
+
+// Cart
+export type AddItemResult = Promise<
+  FetchResult<
+    CreateCheckout | AddCheckoutLineMutation,
+    Record<string, any>,
+    Record<string, any>
+  >
+>;
+
+export type RemoveItemResult = Promise<FetchResult<
+  RemoveCheckoutLineMutation,
+  Record<string, any>,
+  Record<string, any>
+> | null>;
+
+export type UpdateItemResult = Promise<FetchResult<
+  AddCheckoutLineMutation | CreateCheckout | UpdateCheckoutLine,
+  Record<string, any>,
+  Record<string, any>
+> | null>;

@@ -1,4 +1,3 @@
-import { FetchResult } from "@apollo/client";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   ADD_CHECKOUT_PROMO_CODE,
@@ -60,8 +59,21 @@ import {
 } from "../apollo/types/checkout";
 import { storage } from "./storage";
 import {
+  AddPromoCodeResult,
+  CheckoutPaymentMethodUpdateResult,
+  CompleteCheckoutResult,
+  CreateCheckoutResult,
+  CreatePaymentResult,
+  CreateRazorpayOrderResult,
+  GetCityStateFromPincodeResult,
+  GetWalletAmountResult,
+  RemovePromoCodeResult,
   SaleorClientMethodsProps,
+  SetAddressTypeResult,
+  SetBillingAddressResult,
+  SetShippingAddressResult,
   SetShippingAndBillingAddressResult,
+  SetShippingMethodResult,
 } from "./types";
 
 export interface CheckoutSDK {
@@ -86,43 +98,29 @@ export interface CheckoutSDK {
   setAddressType?: (
     addressId: string,
     type: AddressTypes
-  ) => Promise<FetchResult<UpdateCheckoutAddressTypeMutation> | null>;
-  createCheckout?: () => Promise<FetchResult<CreateCheckout> | null>;
+  ) => SetAddressTypeResult;
+  createCheckout?: () => CreateCheckoutResult;
   setShippingAddress?: (
     shippingAddress: IAddress,
     email: string
-  ) => Promise<FetchResult<UpdateCheckoutShippingAddressMutation> | null>;
+  ) => SetShippingAddressResult;
   setShippingAndBillingAddress?: (
     shippingAddress: IAddress,
     email: string
   ) => SetShippingAndBillingAddressResult;
 
-  setBillingAddress?: (
-    billingAddress: IAddress
-  ) => Promise<FetchResult<UpdateCheckoutBillingAddressMutation> | null>;
-  setShippingMethod?: (
-    shippingMethodId: string
-  ) => Promise<FetchResult<UpdateCheckoutShippingMethodMutation> | null>;
-  addPromoCode?: (
-    promoCode: string
-  ) => Promise<FetchResult<AddCheckoutPromoCodeMutation> | null>;
-  removePromoCode?: (
-    promoCode: string
-  ) => Promise<FetchResult<RemoveCheckoutPromoCodeMutation> | null>;
+  setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
+  setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
+  addPromoCode?: (promoCode: string) => AddPromoCodeResult;
+  removePromoCode?: (promoCode: string) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
     input: PaymentMethodUpdateInput
-  ) => Promise<FetchResult<CheckoutPaymentMethodUpdateMutation> | null>;
-  createPayment?: (
-    input: CreatePaymentInput
-  ) => Promise<FetchResult<CreateCheckoutPaymentMutation> | null>;
-  completeCheckout?: (
-    input?: CompleteCheckoutInput
-  ) => Promise<FetchResult<CompleteCheckoutMutation> | null>;
-  getCityStateFromPincode?: (
-    pincode: string
-  ) => Promise<FetchResult<PincodeQuery> | null>;
-  createRazorpayOrder?: () => Promise<FetchResult<CreateRazorpayOrderMutation>>;
-  getWalletAmount?: () => Promise<FetchResult<GetWalletQuery>>;
+  ) => CheckoutPaymentMethodUpdateResult;
+  createPayment?: (input: CreatePaymentInput) => CreatePaymentResult;
+  completeCheckout?: (input?: CompleteCheckoutInput) => CompleteCheckoutResult;
+  getCityStateFromPincode?: (pincode: string) => GetCityStateFromPincodeResult;
+  createRazorpayOrder?: () => CreateRazorpayOrderResult;
+  getWalletAmount?: () => GetWalletAmountResult;
 }
 
 export const checkout = ({

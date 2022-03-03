@@ -1,4 +1,9 @@
-import { SaleorClientMethodsProps } from ".";
+import {
+  AddItemResult,
+  RemoveItemResult,
+  SaleorClientMethodsProps,
+  UpdateItemResult,
+} from ".";
 import {
   CreateCheckout,
   CreateCheckoutVariables,
@@ -21,7 +26,6 @@ import {
   RemoveCheckoutLineMutation,
   RemoveCheckoutLineMutationVariables,
 } from "../apollo/types";
-import { FetchResult } from "@apollo/client";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -50,33 +54,14 @@ export interface CartSDK {
 
   cashbackRecieve?: any;
 
-  addItem?: (
-    variantId: string,
-    quantity: number
-  ) => Promise<
-    FetchResult<
-      CreateCheckout | AddCheckoutLineMutation,
-      Record<string, any>,
-      Record<string, any>
-    >
-  >;
-  removeItem?: (
-    variantId: string
-  ) => Promise<FetchResult<
-    RemoveCheckoutLineMutation,
-    Record<string, any>,
-    Record<string, any>
-  > | null>;
+  addItem?: (variantId: string, quantity: number) => AddItemResult;
+  removeItem?: (variantId: string) => RemoveItemResult;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem?: (
     variantId: string,
     quantity: number,
     prevQuantity: number
-  ) => Promise<FetchResult<
-    AddCheckoutLineMutation | CreateCheckout | UpdateCheckoutLine,
-    Record<string, any>,
-    Record<string, any>
-  > | null>;
+  ) => UpdateItemResult;
 }
 
 export const cart = ({
