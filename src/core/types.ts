@@ -37,8 +37,10 @@ import {
   UpdateCheckoutAddressTypeMutation,
   UpdateCheckoutShippingMethodMutation,
   CreateRazorpayOrderMutation,
-  AddCheckoutLineMutation,
-  RemoveCheckoutLineMutation,
+  CheckoutErrorFragment,
+  CheckoutFragment,
+  Maybe,
+  CreateCheckoutMutation,
   // RegisterMutation,
   // RequestPasswordResetMutation,
   // SetPasswordMutation,
@@ -64,7 +66,6 @@ import { CartSDK } from "./cart";
 import { CheckoutSDK } from "./checkout";
 import { WishlistSDK } from "./wishlist";
 import { WalletSDK } from "./wallet";
-import { CreateCheckout, UpdateCheckoutLine } from "../apollo/types/cartTypes";
 
 export interface SaleorClientInternals {
   apolloClient: ApolloClient<NormalizedCacheObject>;
@@ -158,7 +159,9 @@ export type RefreshTokenResult = FetchResult<RefreshTokenMutation>;
 export type SetAddressTypeResult = Promise<FetchResult<
   UpdateCheckoutAddressTypeMutation
 > | null>;
-export type CreateCheckoutResult = Promise<FetchResult<CreateCheckout> | null>;
+export type CreateCheckoutResult = Promise<FetchResult<
+  CreateCheckoutMutation
+> | null>;
 export type SetShippingAddressResult = Promise<FetchResult<
   UpdateCheckoutShippingAddressMutation
 > | null>;
@@ -193,22 +196,14 @@ export type CreateRazorpayOrderResult = Promise<FetchResult<
 export type GetWalletAmountResult = Promise<FetchResult<GetWalletQuery> | null>;
 
 // Cart
-export type AddItemResult = Promise<
-  FetchResult<
-    CreateCheckout | AddCheckoutLineMutation,
-    Record<string, any>,
-    Record<string, any>
-  >
->;
 
-export type RemoveItemResult = Promise<FetchResult<
-  RemoveCheckoutLineMutation,
-  Record<string, any>,
-  Record<string, any>
-> | null>;
+export type CartMethodsReturn = {
+  data: Maybe<CheckoutFragment> | undefined;
+  errors: CheckoutErrorFragment[] | undefined;
+};
 
-export type UpdateItemResult = Promise<FetchResult<
-  AddCheckoutLineMutation | CreateCheckout | UpdateCheckoutLine,
-  Record<string, any>,
-  Record<string, any>
-> | null>;
+export type AddItemResult = Promise<CartMethodsReturn>;
+
+export type RemoveItemResult = Promise<CartMethodsReturn | null>;
+
+export type UpdateItemResult = Promise<CartMethodsReturn | null>;

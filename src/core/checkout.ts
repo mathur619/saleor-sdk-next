@@ -27,6 +27,8 @@ import {
   CompleteCheckoutMutation,
   CompleteCheckoutMutationVariables,
   CountryCode,
+  CreateCheckoutMutation,
+  CreateCheckoutMutationVariables,
   CreateCheckoutPaymentMutation,
   CreateCheckoutPaymentMutationVariables,
   CreateRazorpayOrderMutation,
@@ -47,10 +49,7 @@ import {
   UpdateCheckoutShippingMethodMutation,
   UpdateCheckoutShippingMethodMutationVariables,
 } from "../apollo/types";
-import {
-  CreateCheckout,
-  CreateCheckoutVariables,
-} from "../apollo/types/cartTypes";
+
 import {
   CompleteCheckoutInput,
   CreatePaymentInput,
@@ -133,7 +132,10 @@ export const checkout = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     if (!(checkout && checkout?.id)) {
-      return await client.mutate<CreateCheckout, CreateCheckoutVariables>({
+      return await client.mutate<
+        CreateCheckoutMutation,
+        CreateCheckoutMutationVariables
+      >({
         mutation: CREATE_CHECKOUT_MUTATION,
         variables: {
           checkoutInput: {

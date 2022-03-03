@@ -4,12 +4,7 @@ import {
   SaleorClientMethodsProps,
   UpdateItemResult,
 } from ".";
-import {
-  CreateCheckout,
-  CreateCheckoutVariables,
-  UpdateCheckoutLine,
-  UpdateCheckoutLineVariables,
-} from "../apollo/types/cartTypes";
+
 import { cartItemsVar } from "../apollo/client";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
@@ -23,8 +18,12 @@ import {
   AddCheckoutLineMutation,
   AddCheckoutLineMutationVariables,
   Checkout,
+  CreateCheckoutMutation,
+  CreateCheckoutMutationVariables,
   RemoveCheckoutLineMutation,
   RemoveCheckoutLineMutationVariables,
+  UpdateCheckoutLineMutation,
+  UpdateCheckoutLineMutationVariables,
 } from "../apollo/types";
 
 export interface CartSDK {
@@ -54,10 +53,10 @@ export interface CartSDK {
 
   cashbackRecieve?: any;
 
-  addItem?: (variantId: string, quantity: number) => AddItemResult;
-  removeItem?: (variantId: string) => RemoveItemResult;
+  addItem: (variantId: string, quantity: number) => AddItemResult;
+  removeItem: (variantId: string) => RemoveItemResult;
   subtractItem?: (variantId: string, quantity: number) => {};
-  updateItem?: (
+  updateItem: (
     variantId: string,
     quantity: number,
     prevQuantity: number
@@ -100,9 +99,16 @@ export const cart = ({
           );
         },
       });
-      return res;
+      const returnObject = {
+        data: res.data?.checkoutLinesAdd?.checkout,
+        errors: res.data?.checkoutLinesAdd?.errors,
+      };
+      return returnObject;
     } else {
-      const res = await client.mutate<CreateCheckout, CreateCheckoutVariables>({
+      const res = await client.mutate<
+        CreateCheckoutMutation,
+        CreateCheckoutMutationVariables
+      >({
         mutation: CREATE_CHECKOUT_MUTATION,
         variables: {
           checkoutInput: {
@@ -130,7 +136,11 @@ export const cart = ({
           }
         },
       });
-      return res;
+      const returnObject = {
+        data: res.data?.checkoutCreate?.checkout,
+        errors: res.data?.checkoutCreate?.errors,
+      };
+      return returnObject;
     }
   };
 
@@ -145,7 +155,7 @@ export const cart = ({
     const lineToRemoveId = lineToRemove?.id;
 
     if (checkout && checkout?.token) {
-      return await client.mutate<
+      const res = await client.mutate<
         RemoveCheckoutLineMutation,
         RemoveCheckoutLineMutationVariables
       >({
@@ -165,6 +175,11 @@ export const cart = ({
           );
         },
       });
+
+      return {
+        data: res.data?.checkoutLineDelete?.checkout,
+        errors: res.data?.checkoutLineDelete?.errors,
+      };
     }
     return null;
   };
@@ -176,7 +191,7 @@ export const cart = ({
   ) => {
     const differenceQuantity = quantity - prevQuantity;
     if (differenceQuantity > 0) {
-      const res = addItem(variantId, differenceQuantity);
+      const res = await addItem(variantId, differenceQuantity);
       return res;
     } else {
       const checkoutString = storage.getCheckout();
@@ -200,8 +215,8 @@ export const cart = ({
 
       if (checkout && checkout?.token) {
         const res = await client.mutate<
-          UpdateCheckoutLine,
-          UpdateCheckoutLineVariables
+          UpdateCheckoutLineMutation,
+          UpdateCheckoutLineMutationVariables
         >({
           mutation: UPDATE_CHECKOUT_LINE_MUTATION,
           variables: {
@@ -219,7 +234,10 @@ export const cart = ({
             );
           },
         });
-        return res;
+        return {
+          data: res.data?.checkoutLinesUpdate?.checkout,
+          errors: res.data?.checkoutLinesUpdate?.errors,
+        };
       }
     }
     return null;
