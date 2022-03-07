@@ -186,15 +186,11 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
         },
       },
       checkout: {
-        read(
-          _,
-          { toReference, canRead, cache, field, fieldName, variables }
-        ): Reference | undefined | null {
-          console.log("cache checkout", cache, field, fieldName, variables);
+        read(_, { toReference, canRead }): Reference | undefined | null {
           const ref = toReference({
             __typename: "CheckoutLinesUpdate",
           });
-          console.log("ref Checkout", ref);
+
           return canRead(ref) ? ref : null;
         },
       },
@@ -206,7 +202,7 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       cartItems: {
         read() {
           const cartItems = cartItemsVar();
-          console.log("cartItems cache", cartItems);
+
           return cartItems;
         },
       },
@@ -218,13 +214,10 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
               checkoutString && typeof checkoutString === "string"
                 ? JSON.parse(checkoutString)
                 : checkoutString;
-            console.log("no exist checkout", checkout);
-            if (checkout) {
-              console.log("no exist in if checkout 2", checkout);
 
+            if (checkout) {
               return checkout;
             }
-            console.log("no exist 2000", checkout);
 
             return {
               items: [],
@@ -234,11 +227,8 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
             };
           }
           if (existing !== null) {
-            console.log("no exist 2001", existing);
-
             return existing;
           }
-          console.log("no exist 2003", existing);
 
           return {
             items: [],
@@ -251,14 +241,12 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
 
       localCheckoutDiscounts: {
         read(existing) {
-          console.log("existing localCheckoutDiscounts", existing);
           if (!existing) {
             const discountsString = storage.getDiscounts();
             const discounts =
               discountsString && typeof discountsString === "string"
                 ? JSON.parse(discountsString)
                 : discountsString;
-            console.log("no exist 1", discounts?.checkoutDiscounts);
 
             return (
               discounts?.checkoutDiscounts || {
@@ -279,14 +267,12 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       },
       localCashback: {
         read(existing) {
-          console.log("existing localCashback", existing);
           if (!existing) {
             const discountsString = storage.getDiscounts();
             const discounts =
               discountsString && typeof discountsString === "string"
                 ? JSON.parse(discountsString)
                 : discountsString;
-            console.log("no exist 1", discounts?.cashback);
 
             return (
               discounts?.cashback || {
@@ -305,7 +291,6 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       },
       useCashback: {
         read(existing) {
-          console.log("existing useCashback", existing);
           if (existing === null || existing === undefined) {
             const useCashbackString = storage.getUseCashback();
             const useCashbackBollean = useCashbackString === "true";
@@ -316,7 +301,6 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       },
       checkoutLoading: {
         read(existing) {
-          console.log("existing checkoutLoading", existing);
           if (!existing) {
             return false;
           }
@@ -325,7 +309,6 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       },
       userWalletBalance: {
         read(existing) {
-          console.log("existing userWalletBalance", existing);
           if (!existing) {
             return 0;
           }
@@ -364,7 +347,7 @@ export const createApolloClient = (
   const cache = new InMemoryCache({
     typePolicies: getTypePolicies(autologin),
   });
-  console.log("cache", cache);
+
   client = new ApolloClient({
     cache,
     link: httpLink,

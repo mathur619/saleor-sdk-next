@@ -28,7 +28,7 @@ export const useCartState = () => {
     GetLocalCheckoutQuery,
     GetLocalCheckoutQueryVariables
   >(GET_LOCAL_CHECKOUT);
-  console.log("useCartState sdk 1000", data);
+
   if (!data) {
     throw new Error(
       "Cache query result is undefined. Invalid cache configuration."
@@ -43,15 +43,10 @@ export const useCartState = () => {
 
       if (curr?.quantity) {
         if (listPrice && typeof listPrice === "number") {
-          console.log("listPrice 1 number", listPrice);
           total += listPrice * curr.quantity;
         } else if (listPrice && typeof listPrice === "string") {
-          console.log("listPrice 2 string", listPrice);
-
           total += parseFloat(listPrice) * curr.quantity;
         } else {
-          console.log("listPrice 3 others", listPrice);
-
           total +=
             (curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
               curr?.variant.pricing?.price?.gross.amount ||
@@ -60,14 +55,6 @@ export const useCartState = () => {
       } else {
         total += 0;
       }
-
-      console.log(
-        "variantMetadata",
-        variantMetadata,
-        listPrice,
-        total,
-        typeof listPrice
-      );
 
       return total;
     }, 0) || 0;
@@ -112,6 +99,6 @@ export const useCartState = () => {
       ) || defaultPrice,
     cashbackRecieve: data?.localCashback || { amount: 0, willAddOn: null },
   };
-  console.log("cartState", cartState);
+
   return cartState;
 };

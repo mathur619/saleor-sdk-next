@@ -24,11 +24,6 @@ export const setLocalCheckoutInCache = async (
     Object.keys(checkout).length === 0 &&
     Object.getPrototypeOf(checkout) === Object.prototype
   ) {
-    console.log(
-      "checkout empty yes",
-      Object.getPrototypeOf(checkout),
-      Object.prototype
-    );
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -60,7 +55,7 @@ export const setLocalCheckoutInCache = async (
       },
       fetchPolicy: "network-only",
     });
-    console.log("DiscountsAndCashbackQuery", res);
+
     storage.setDiscounts(res.data);
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,

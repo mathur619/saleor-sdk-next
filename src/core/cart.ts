@@ -129,7 +129,6 @@ export const cart = ({
           },
         },
         update: (_, { data }) => {
-          console.log("in update CreateCheckout", data);
           setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout, true);
           if (data?.checkoutCreate?.checkout?.id) {
             storage.setCheckout(data?.checkoutCreate?.checkout);
@@ -195,7 +194,7 @@ export const cart = ({
       return res;
     } else {
       const checkoutString = storage.getCheckout();
-      console.log("prevQuantity", prevQuantity);
+
       const checkout =
         checkoutString && typeof checkoutString === "string"
           ? JSON.parse(checkoutString)
@@ -208,8 +207,6 @@ export const cart = ({
             quantity: line.quantity,
             variantId: line.variant.id,
           }));
-
-      console.log("alteredLines", alteredLines);
 
       alteredLines.push({ quantity: quantity, variantId: variantId });
 

@@ -156,7 +156,6 @@ export const checkout = ({
           },
         },
         update: (_, { data }) => {
-          console.log("in update CreateCheckout", data);
           setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout);
           if (data?.checkoutCreate?.checkout?.id) {
             storage.setCheckout(data?.checkoutCreate?.checkout);
@@ -182,7 +181,6 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    console.log("checkout setShippingAddress", checkout, checkout?.id);
 
     if (checkout && checkout?.id) {
       const variables = {
@@ -201,7 +199,6 @@ export const checkout = ({
           streetAddress2: shippingAddress.streetAddress2,
         },
       };
-      console.log("checkout setShippingAddress in if");
 
       const res = await client.mutate<
         UpdateCheckoutShippingAddressMutation,
@@ -210,7 +207,6 @@ export const checkout = ({
         mutation: UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
         variables,
         update: (_, { data }) => {
-          console.log("in update setShippingAddress", data);
           setLocalCheckoutInCache(
             client,
             data?.checkoutShippingAddressUpdate?.checkout
@@ -241,7 +237,6 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    console.log("checkout setBillingAddress", checkout, checkout?.id);
 
     if (checkout && checkout?.id) {
       const variables = {
@@ -266,7 +261,6 @@ export const checkout = ({
         mutation: UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION,
         variables,
         update: (_, { data }) => {
-          console.log("in update setBillingAddress", data);
           setLocalCheckoutInCache(
             client,
             data?.checkoutBillingAddressUpdate?.checkout
@@ -285,7 +279,6 @@ export const checkout = ({
     shippingAddress: IAddress,
     email: string
   ) => {
-    console.log("setShippingAndBillingAddress");
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -302,7 +295,7 @@ export const checkout = ({
       },
     });
     // const dataError = resShipping?.errors || resBilling?.errors;
-    // console.log("setShippingAndBillingAddress", resShipping, resBilling);
+    //
     // const returnObject= {
     //   data: {
     //     billingData: resBilling?.data?.checkoutBillingAddressUpdate?.checkout,
@@ -359,14 +352,12 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    console.log("checkout setShippingMethod", checkout, checkout?.id);
 
     if (checkout && checkout?.id) {
       const variables: UpdateCheckoutShippingMethodMutationVariables = {
         checkoutId: checkout?.id,
         shippingMethodId,
       };
-      console.log("checkout setShippingMethod in if");
 
       const res = await client.mutate<
         UpdateCheckoutShippingMethodMutation,
@@ -375,8 +366,6 @@ export const checkout = ({
         mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
         variables,
         update: (_, { data }) => {
-          console.log("in update setShippingMethod", data);
-
           if (data?.checkoutShippingMethodUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutShippingMethodUpdate?.checkout);
           }
@@ -408,14 +397,12 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    console.log("checkout addPromoCode", checkout, checkout?.id);
 
     if (checkout && checkout?.id) {
       const variables: AddCheckoutPromoCodeMutationVariables = {
         checkoutId: checkout?.id,
         promoCode,
       };
-      console.log("checkout addPromoCode in if");
 
       const res = await client.mutate<
         AddCheckoutPromoCodeMutation,
@@ -424,7 +411,6 @@ export const checkout = ({
         mutation: ADD_CHECKOUT_PROMO_CODE,
         variables,
         update: (_, { data }) => {
-          console.log("in update addPromoCode", data);
           if (data?.checkoutAddPromoCode?.checkout?.id) {
             storage.setCheckout(data?.checkoutAddPromoCode?.checkout);
           }
@@ -457,14 +443,12 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    console.log("checkout removePromoCode", checkout, checkout?.id);
 
     if (checkout && checkout?.id) {
       const variables: RemoveCheckoutPromoCodeMutationVariables = {
         checkoutId: checkout?.id,
         promoCode,
       };
-      console.log("checkout removePromoCode in if");
 
       const res = await client.mutate<
         RemoveCheckoutPromoCodeMutation,
@@ -473,8 +457,6 @@ export const checkout = ({
         mutation: REMOVE_CHECKOUT_PROMO_CODE,
         variables,
         update: (_, { data }) => {
-          console.log("in update removePromoCode", data);
-
           if (data?.checkoutRemovePromoCode?.checkout?.id) {
             storage.setCheckout(data?.checkoutRemovePromoCode?.checkout);
           }
@@ -502,7 +484,6 @@ export const checkout = ({
         useCashback: input.useCashback,
       },
     });
-    console.log("checkoutPaymentMethodUpdate", input);
 
     storage.setUseCashback(input.useCashback);
 
@@ -511,7 +492,6 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    console.log("checkout checkoutPaymentMethodUpdate", checkout, checkout?.id);
 
     if (checkout && checkout?.id) {
       const variables: CheckoutPaymentMethodUpdateMutationVariables = {
@@ -519,7 +499,6 @@ export const checkout = ({
         gatewayId: input.gateway,
         useCashback: input.useCashback,
       };
-      console.log("checkout checkoutPaymentMethodUpdate in if");
 
       const res = await client.mutate<
         CheckoutPaymentMethodUpdateMutation,
@@ -528,8 +507,6 @@ export const checkout = ({
         mutation: CHECKOUT_PAYMENT_METHOD_UPDATE,
         variables,
         update: (_, { data }) => {
-          console.log("checkoutPaymentMethodUpdate", data);
-          console.log("in update checkoutPaymentMethodUpdate", data);
           setLocalCheckoutInCache(
             client,
             data?.checkoutPaymentMethodUpdate?.checkout,
@@ -561,10 +538,8 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    console.log("checkout removePromoCode", checkout, checkout?.id);
 
     if (checkout && checkout?.id) {
-      console.log("checkout removePromoCode in if");
       const variables: CreateCheckoutPaymentMutationVariables = {
         checkoutId: checkout?.id,
         paymentInput: { ...input, amount: checkout?.totalPrice?.gross.amount },
@@ -576,7 +551,6 @@ export const checkout = ({
         mutation: CREATE_CHECKOUT_PAYMENT,
         variables,
         update: (_, { data }) => {
-          console.log("in update removePromoCode", data);
           setLocalCheckoutInCache(
             client,
             data?.checkoutPaymentCreate?.checkout
@@ -607,13 +581,11 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    console.log("checkout removePromoCode", checkout, checkout?.id);
 
     if (checkout && checkout?.id) {
-      console.log("checkout removePromoCode in if");
       const paymentDataString =
         input?.paymentData && JSON.stringify(input?.paymentData);
-      console.log("paymentDataString", paymentDataString);
+
       const variables: CompleteCheckoutMutationVariables = {
         checkoutId: checkout?.id,
         paymentData: paymentDataString,
@@ -668,10 +640,8 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    console.log("checkout removePromoCode", checkout, checkout?.id);
 
     if (checkout && checkout?.id) {
-      console.log("checkout removePromoCode in if");
       const variables: CreateRazorpayOrderMutationVariables = {
         input: {
           checkoutId: checkout?.id,

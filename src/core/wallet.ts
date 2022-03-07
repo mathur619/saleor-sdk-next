@@ -9,6 +9,5 @@ export interface WalletSDK {
 export const wallet = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): WalletSDK => {
-  console.log(client);
   return {};
 };

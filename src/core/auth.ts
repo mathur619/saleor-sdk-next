@@ -220,9 +220,7 @@ export interface AuthSDK {
 
 export const auth = ({
   apolloClient: client,
-  channel,
 }: SaleorClientMethodsProps): AuthSDK => {
-  console.log(client, channel);
   const login: AuthSDK["login"] = () => {};
   const refreshExternalToken = () => {};
   // const refreshToken = () => {};
@@ -242,8 +240,6 @@ export const auth = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-
-    console.log("checkout confirmAccountV2", checkout);
 
     const { data, errors } = await client.mutate<
       OtpAuthenticationMutation,
@@ -356,7 +352,6 @@ export const auth = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
-    console.log("checkout confirmAccountV2", checkout);
     const { data, errors } = await client.mutate<
       ConfirmAccountV2Mutation,
       ConfirmAccountV2MutationVariables
@@ -428,7 +423,6 @@ export const auth = ({
       mutation: USER_CHECKOUT_DETAILS,
 
       update: (_, { data }) => {
-        console.log("in update USER_CHECKOUT_DETAILS", data);
         setLocalCheckoutInCache(client, data?.me?.checkout, true);
         if (data?.me?.checkout?.id) {
           storage.setCheckout(data?.me?.checkout);

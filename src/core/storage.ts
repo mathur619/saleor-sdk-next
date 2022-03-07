@@ -124,37 +124,28 @@ export const createStorage = (autologinEnabled: boolean): void => {
   };
 
   const setCheckout = (checkout: any) => {
-    console.log("in setCheckout ", checkout);
     checkoutStorage = checkout;
     localStorage.setItem(SALEOR_CHECKOUT, JSON.stringify(checkout));
   };
 
   const getCheckout = (): any | null => {
-    console.log("in getCheckout ", checkoutStorage);
-
     return checkoutStorage;
   };
 
   const setDiscounts = (discounts: any) => {
-    console.log("in setDiscounts ", discounts);
     discountsStorage = discounts;
     localStorage.setItem(SALEOR_CHECKOUT_DISCOUNTS, JSON.stringify(discounts));
   };
 
   const setUseCashback = (useCashback: any) => {
-    console.log("in setUseCashback ", useCashback);
     useCashbackStorage = useCashback;
     localStorage.setItem(SALEOR_USE_CASHBACK, useCashback);
   };
 
   const getUseCashback = (): any | null => {
-    console.log("in useCashbackStorage ", useCashbackStorage);
-
     return useCashbackStorage;
   };
   const getDiscounts = (): any | null => {
-    console.log("in getDiscounts ", discountsStorage);
-
     return discountsStorage;
   };
 
