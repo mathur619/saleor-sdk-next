@@ -9,4 +9,5 @@ type Query {
   useCashback: Boolean!
   checkoutLoading: Boolean!
   userWalletBalance: Float!
+  recentOrder: Order
 }

@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   checkoutFragment,
   checkoutLineFragment,
+  orderDetailFragment,
   userFragment,
 } from "./fragments";
 
@@ -35,6 +36,7 @@ export const GET_CART_ITEMS = gql`
   }
 `;
 export const GET_LOCAL_CHECKOUT = gql`
+  ${orderDetailFragment}
   ${checkoutFragment}
   query GetLocalCheckout {
     localCheckout @client {
@@ -53,6 +55,9 @@ export const GET_LOCAL_CHECKOUT = gql`
     useCashback @client
     checkoutLoading @client
     userWalletBalance @client
+    recentOrder @client {
+      ...OrderDetail
+    }
   }
 `;
 

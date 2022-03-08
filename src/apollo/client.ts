@@ -315,6 +315,17 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
           return existing;
         },
       },
+      recentOrder: {
+        read(existing) {
+          console.log("existing 1", existing);
+          if (!existing) {
+            console.log("existing 2", existing);
+            return {};
+          }
+
+          return existing;
+        },
+      },
     },
   },
   User: {

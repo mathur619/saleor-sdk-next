@@ -11273,6 +11273,7 @@ export type Query = {
   productVariants: Maybe<ProductVariantCountableConnection>;
   /** List of the shop's products. */
   products: Maybe<ProductCountableConnection>;
+  recentOrder: Maybe<Order>;
   /** List of top selling products. */
   reportProductSales: Maybe<ProductVariantCountableConnection>;
   /** Look up a sale by ID. */
@@ -16416,6 +16417,7 @@ export type GetLocalCheckoutQuery = Pick<
     >
   >;
   localCashback: Maybe<Pick<CashbackType, "amount" | "willAddOn">>;
+  recentOrder: Maybe<OrderDetailFragment>;
 };
 
 export type DiscountsAndCashbackQueryVariables = Exact<{
@@ -18325,8 +18327,12 @@ export const GetLocalCheckoutDocument = gql`
     useCashback @client
     checkoutLoading @client
     userWalletBalance @client
+    recentOrder @client {
+      ...OrderDetail
+    }
   }
   ${CheckoutFragmentDoc}
+  ${OrderDetailFragmentDoc}
 `;
 
 /**

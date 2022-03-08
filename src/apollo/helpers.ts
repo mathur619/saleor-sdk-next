@@ -1,6 +1,7 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 import { storage } from "../core/storage";
 import { GET_DISCOUNT_CASHBACK_QUERY, GET_LOCAL_CHECKOUT } from "./queries";
+import { CompleteCheckoutMutation } from "./types";
 import {
   DiscountsAndCashbackQuery,
   DiscountsAndCashbackQueryVariables,
@@ -9,7 +10,8 @@ import {
 export const setLocalCheckoutInCache = async (
   client: ApolloClient<NormalizedCacheObject>,
   checkout: any,
-  fetchDiscount?: boolean
+  fetchDiscount?: boolean,
+  orderPlaced?: CompleteCheckoutMutation | null | undefined
 ) => {
   client.writeQuery({
     query: GET_LOCAL_CHECKOUT,
@@ -18,6 +20,15 @@ export const setLocalCheckoutInCache = async (
       checkoutLoading: false,
     },
   });
+
+  if (orderPlaced) {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        recentOrder: orderPlaced.checkoutComplete?.order,
+      },
+    });
+  }
 
   if (
     checkout &&

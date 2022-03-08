@@ -604,7 +604,7 @@ export const checkout = ({
               storage.setCheckout({});
             }
           }
-          await setLocalCheckoutInCache(client, {}, false);
+          await setLocalCheckoutInCache(client, {}, false, data);
         },
       });
 
