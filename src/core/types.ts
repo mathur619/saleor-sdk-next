@@ -1,5 +1,6 @@
 import {
   ApolloClient,
+  ApolloQueryResult,
   FetchResult,
   NormalizedCacheObject,
 } from "@apollo/client";
@@ -41,6 +42,11 @@ import {
   CheckoutFragment,
   Maybe,
   CreateCheckoutMutation,
+  OtpAuthenticationMutation,
+  OtpRequestMutation,
+  AccountRegisterV2Mutation,
+  ConfirmAccountV2Mutation,
+  UserCheckoutDetailsQuery,
   // RegisterMutation,
   // RequestPasswordResetMutation,
   // SetPasswordMutation,
@@ -207,3 +213,43 @@ export type AddItemResult = Promise<CartMethodsReturn>;
 export type RemoveItemResult = Promise<CartMethodsReturn | null>;
 
 export type UpdateItemResult = Promise<CartMethodsReturn | null>;
+
+// Auth
+
+export type SignInMobileResult = Promise<
+  FetchResult<
+    OtpAuthenticationMutation,
+    Record<string, any>,
+    Record<string, any>
+  >
+>;
+
+export type RequestOtpResult = Promise<
+  FetchResult<OtpRequestMutation, Record<string, any>, Record<string, any>>
+>;
+
+export type RegisterAccountV2Result = Promise<
+  FetchResult<
+    AccountRegisterV2Mutation,
+    Record<string, any>,
+    Record<string, any>
+  >
+>;
+
+export type ConfirmAccountV2Result = Promise<
+  FetchResult<
+    ConfirmAccountV2Mutation,
+    Record<string, any>,
+    Record<string, any>
+  >
+>;
+
+export type SignOutResult = Promise<ApolloQueryResult<any>[] | null>;
+
+export type GetUserCheckoutResult = Promise<
+  FetchResult<
+    UserCheckoutDetailsQuery,
+    Record<string, any>,
+    Record<string, any>
+  >
+>;

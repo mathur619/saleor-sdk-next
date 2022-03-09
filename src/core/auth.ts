@@ -72,7 +72,8 @@ import {
 import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
 import { storage } from "./storage";
 import {
-  LoginOpts,
+  ConfirmAccountV2Result,
+  GetUserCheckoutResult,
   // ChangePasswordResult,
   // LogoutOpts,
   // GetExternalAccessTokenResult,
@@ -81,9 +82,13 @@ import {
   // LogoutResult,
   // RefreshExternalTokenResult,
   RefreshTokenResult,
+  RegisterAccountV2Result,
+  RequestOtpResult,
   // RegisterResult,
   // RequestPasswordResetResult,
   SaleorClientMethodsProps,
+  SignInMobileResult,
+  SignOutResult,
   // SetPasswordResult,
   // VerifyExternalTokenResult,
   // VerifyTokenResult,
@@ -114,7 +119,7 @@ export interface AuthSDK {
    * @param opts - Object with user's email and password.
    * @returns Promise resolved with CreateToken type data.
    */
-  login?: (opts: LoginOpts) => void;
+  // login?: (opts: LoginOpts) => void;
   /**
    * Clears stored token and Apollo store. If external plugin was used to log in, the mutation will prepare
    * the logout URL. All values passed in field input will be added as GET parameters to the logout request.
@@ -203,25 +208,24 @@ export interface AuthSDK {
    */
   // verifyExternalToken?: () => Promise<VerifyExternalTokenResult>;
 
-  signInMobile: (otp: string, phone: string) => {};
+  signInMobile: (otp: string, phone: string) => SignInMobileResult;
 
-  requestOTP: (phone: string) => {};
+  requestOTP: (phone: string) => RequestOtpResult;
 
-  registerAccountV2: (email: string, phone: string) => {};
+  registerAccountV2: (email: string, phone: string) => RegisterAccountV2Result;
 
-  confirmAccountV2: (otp: string, phone: string) => {};
+  confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
 
-  signOut: () => {};
+  signOut: () => SignOutResult;
 
-  setToken: (authToken: string, csrfToken: string) => {};
+  setToken: (authToken: string, csrfToken: string) => GetUserCheckoutResult;
 
-  getUserCheckout: () => {};
+  getUserCheckout: () => GetUserCheckoutResult;
 }
 
 export const auth = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): AuthSDK => {
-  const login: AuthSDK["login"] = () => {};
   const refreshExternalToken = () => {};
   // const refreshToken = () => {};
   const signInMobile: AuthSDK["signInMobile"] = async (
@@ -241,7 +245,7 @@ export const auth = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
-    const { data, errors } = await client.mutate<
+    const res = await client.mutate<
       OtpAuthenticationMutation,
       OtpAuthenticationMutationVariables
     >({
@@ -270,19 +274,7 @@ export const auth = ({
       },
     });
 
-    if (errors) {
-      return {
-        data,
-        dataError: errors,
-        pending: false,
-      };
-    }
-
-    return {
-      data: data?.CreateTokenOTP?.user,
-      dataError: errors,
-      pending: false,
-    };
+    return res;
   };
 
   const requestOTP: AuthSDK["requestOTP"] = async (phone: string) => {
@@ -310,7 +302,7 @@ export const auth = ({
       },
     });
 
-    const { data, errors } = await client.mutate<
+    const res = await client.mutate<
       AccountRegisterV2Mutation,
       AccountRegisterV2MutationVariables
     >({
@@ -323,16 +315,7 @@ export const auth = ({
       },
     });
 
-    return {
-      data: {
-        isActiveUser: data?.accountRegisterV2?.isActiveUser,
-        isNewUser: data?.accountRegisterV2?.isNewUser,
-        user: data?.accountRegisterV2?.user,
-      },
-      dataError: {
-        error: errors,
-      },
-    };
+    return res;
   };
 
   const confirmAccountV2: AuthSDK["confirmAccountV2"] = async (
@@ -352,7 +335,7 @@ export const auth = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
-    const { data, errors } = await client.mutate<
+    const res = await client.mutate<
       ConfirmAccountV2Mutation,
       ConfirmAccountV2MutationVariables
     >({
@@ -381,27 +364,13 @@ export const auth = ({
       },
     });
 
-    if (errors) {
-      return {
-        data,
-        dataError: errors,
-        pending: false,
-      };
-    }
-
-    return {
-      data: data?.confirmAccountV2?.user,
-      dataError: errors,
-      pending: false,
-    };
+    return res;
   };
 
   const signOut: AuthSDK["signOut"] = async () => {
     storage.clear();
-    client.resetStore();
-    return {
-      pending: false,
-    };
+    const res = await client.resetStore();
+    return res;
   };
 
   const setToken: AuthSDK["setToken"] = async (
@@ -412,11 +381,12 @@ export const auth = ({
       accessToken: authToken,
       csrfToken: csrfToken,
     });
-    getUserCheckout();
+    const res = await getUserCheckout();
+    return res;
   };
 
   const getUserCheckout: AuthSDK["getUserCheckout"] = async () => {
-    await client.mutate<
+    const res = await client.mutate<
       UserCheckoutDetailsQuery,
       UserCheckoutDetailsQueryVariables
     >({
@@ -429,6 +399,8 @@ export const auth = ({
         }
       },
     });
+
+    return res;
   };
 
   // const logout: AuthSDK["logout"] = async opts => {
@@ -720,7 +692,6 @@ export const auth = ({
   // };
 
   return {
-    login,
     refreshExternalToken,
     refreshToken,
     signInMobile,
