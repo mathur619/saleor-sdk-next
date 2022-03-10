@@ -312,50 +312,50 @@ export const VERIFY_TOKEN = gql`
 //   }
 // `;
 
-// export const UPDATE_ACCOUNT = gql`
-//   ${userFragment}
-//   ${accountErrorFragment}
-//   mutation accountUpdate($input: AccountInput!) {
-//     accountUpdate(input: $input) {
-//       accountErrors {
-//         ...AccountErrorFragment
-//       }
-//       user {
-//         ...UserFragment
-//       }
-//     }
-//   }
-// `;
+export const UPDATE_ACCOUNT = gql`
+  ${userFragment}
+  ${accountErrorFragment}
+  mutation accountUpdate($input: AccountInput!) {
+    accountUpdate(input: $input) {
+      accountErrors {
+        ...AccountErrorFragment
+      }
+      user {
+        ...UserFragment
+      }
+    }
+  }
+`;
 
-// export const SET_ACCOUNT_DEFAULT_ADDRESS = gql`
-//   ${userFragment}
-//   ${accountErrorFragment}
-//   mutation setAccountDefaultAddress($id: ID!, $type: AddressTypeEnum!) {
-//     accountSetDefaultAddress(id: $id, type: $type) {
-//       accountErrors {
-//         ...AccountErrorFragment
-//       }
-//       user {
-//         ...UserFragment
-//       }
-//     }
-//   }
-// `;
+export const SET_ACCOUNT_DEFAULT_ADDRESS = gql`
+  ${userFragment}
+  ${accountErrorFragment}
+  mutation setAccountDefaultAddress($id: ID!, $type: AddressTypeEnum!) {
+    accountSetDefaultAddress(id: $id, type: $type) {
+      accountErrors {
+        ...AccountErrorFragment
+      }
+      user {
+        ...UserFragment
+      }
+    }
+  }
+`;
 
-// export const DELETE_ACCOUNT_ADDRESS = gql`
-//   ${userFragment}
-//   ${accountErrorFragment}
-//   mutation deleteAccountAddress($addressId: ID!) {
-//     accountAddressDelete(id: $addressId) {
-//       accountErrors {
-//         ...AccountErrorFragment
-//       }
-//       user {
-//         ...UserFragment
-//       }
-//     }
-//   }
-// `;
+export const DELETE_ACCOUNT_ADDRESS = gql`
+  ${userFragment}
+  ${accountErrorFragment}
+  mutation deleteAccountAddress($addressId: ID!) {
+    accountAddressDelete(id: $addressId) {
+      accountErrors {
+        ...AccountErrorFragment
+      }
+      user {
+        ...UserFragment
+      }
+    }
+  }
+`;
 
 // export const CREATE_ACCOUNT_ADDRESS = gql`
 //   ${addressFragment}
