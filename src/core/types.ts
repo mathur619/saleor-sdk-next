@@ -3,6 +3,7 @@ import {
   ApolloQueryResult,
   FetchResult,
   NormalizedCacheObject,
+  QueryResult,
 } from "@apollo/client";
 import {
   AccountRegisterInput,
@@ -47,6 +48,8 @@ import {
   AccountRegisterV2Mutation,
   ConfirmAccountV2Mutation,
   UserCheckoutDetailsQuery,
+  Exact,
+  OrdersByUserQuery,
   // RegisterMutation,
   // RequestPasswordResetMutation,
   // SetPasswordMutation,
@@ -200,6 +203,13 @@ export type CreateRazorpayOrderResult = Promise<FetchResult<
   CreateRazorpayOrderMutation
 > | null>;
 export type GetWalletAmountResult = Promise<FetchResult<GetWalletQuery> | null>;
+
+export type GetUserOrdersResult = Promise<
+  QueryResult<
+    OrdersByUserQuery,
+    Exact<{ perPage: number; after?: Maybe<string> | undefined }>
+  >
+>;
 
 // Cart
 

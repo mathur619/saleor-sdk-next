@@ -35,6 +35,7 @@ import {
   CreateRazorpayOrderMutationVariables,
   GetWalletQuery,
   GetWalletQueryVariables,
+  OrdersByUserQueryVariables,
   PaymentInput,
   PincodeQuery,
   PincodeQueryVariables,
@@ -48,6 +49,7 @@ import {
   UpdateCheckoutShippingAddressMutationVariables,
   UpdateCheckoutShippingMethodMutation,
   UpdateCheckoutShippingMethodMutationVariables,
+  useOrdersByUserQuery,
 } from "../apollo/types";
 
 import {
@@ -65,6 +67,7 @@ import {
   CreatePaymentResult,
   CreateRazorpayOrderResult,
   GetCityStateFromPincodeResult,
+  GetUserOrdersResult,
   GetWalletAmountResult,
   RemovePromoCodeResult,
   SaleorClientMethodsProps,
@@ -120,6 +123,7 @@ export interface CheckoutSDK {
   getCityStateFromPincode?: (pincode: string) => GetCityStateFromPincodeResult;
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
   getWalletAmount?: () => GetWalletAmountResult;
+  getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
 }
 
 export const checkout = ({
@@ -685,6 +689,17 @@ export const checkout = ({
     return res;
   };
 
+  const getUserOrders: CheckoutSDK["getUserOrders"] = async (
+    opts: OrdersByUserQueryVariables
+  ) => {
+    const res = useOrdersByUserQuery({
+      variables: opts,
+      client,
+    });
+
+    return res;
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -700,5 +715,9 @@ export const checkout = ({
     getCityStateFromPincode,
     createRazorpayOrder,
     getWalletAmount,
+    getUserOrders,
   };
 };
+
+// OrdersByUserQuery,
+// OrdersByUserQueryVariables

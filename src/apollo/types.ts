@@ -16482,6 +16482,82 @@ export type PincodeQuery = {
   pincode: Maybe<Pick<PincodeType, "city" | "state" | "serviceable">>;
 };
 
+export type OrdersByUserQueryVariables = Exact<{
+  perPage: Scalars["Int"];
+  after?: Maybe<Scalars["String"]>;
+}>;
+
+export type OrdersByUserQuery = {
+  me: Maybe<
+    Pick<User, "id"> & {
+      orders: Maybe<{
+        pageInfo: Pick<PageInfo, "hasNextPage" | "endCursor">;
+        edges: Array<{
+          node: Pick<
+            Order,
+            "id" | "token" | "number" | "statusDisplay" | "created"
+          > & {
+            shippingAddress: Maybe<Pick<Address, "id" | "postalCode">>;
+            invoices: Maybe<
+              Array<
+                Maybe<
+                  Pick<
+                    Invoice,
+                    | "createdAt"
+                    | "id"
+                    | "message"
+                    | "externalUrl"
+                    | "number"
+                    | "status"
+                    | "updatedAt"
+                    | "url"
+                  > & {
+                    metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
+                  }
+                >
+              >
+            >;
+            metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
+            total: Maybe<{
+              gross: Pick<Money, "amount" | "currency">;
+              net: Pick<Money, "amount" | "currency">;
+            }>;
+            lines: Array<
+              Maybe<
+                Pick<OrderLine, "id" | "productName" | "quantity"> & {
+                  variant: Maybe<
+                    Pick<ProductVariant, "id" | "sku" | "name"> & {
+                      weight: Maybe<Pick<Weight, "unit" | "value">>;
+                      product: Pick<Product, "id" | "name"> & {
+                        weight: Maybe<Pick<Weight, "unit" | "value">>;
+                        metadata: Array<
+                          Maybe<Pick<MetadataItem, "key" | "value">>
+                        >;
+                        category: Maybe<Pick<Category, "id" | "name" | "slug">>;
+                        pricing: Maybe<{
+                          discount: Maybe<{ net: Pick<Money, "amount"> }>;
+                          priceRange: Maybe<{
+                            start: Maybe<{ net: Pick<Money, "amount"> }>;
+                          }>;
+                          priceRangeUndiscounted: Maybe<{
+                            start: Maybe<{ net: Pick<Money, "amount"> }>;
+                          }>;
+                        }>;
+                      };
+                    }
+                  >;
+                  thumbnail: Maybe<Pick<Image, "alt" | "url">>;
+                  thumbnail2x: Maybe<Pick<Image, "url">>;
+                }
+              >
+            >;
+          };
+        }>;
+      }>;
+    }
+  >;
+};
+
 export const AccountErrorFragmentDoc = gql`
   fragment AccountErrorFragment on AccountError {
     code
@@ -18767,4 +18843,169 @@ export type PincodeLazyQueryHookResult = ReturnType<typeof usePincodeLazyQuery>;
 export type PincodeQueryResult = Apollo.QueryResult<
   PincodeQuery,
   PincodeQueryVariables
+>;
+export const OrdersByUserDocument = gql`
+  query OrdersByUser($perPage: Int!, $after: String) {
+    me {
+      id
+      orders(first: $perPage, after: $after) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        edges {
+          node {
+            id
+            shippingAddress {
+              id
+              postalCode
+            }
+            invoices {
+              createdAt
+              id
+              message
+              externalUrl
+              number
+              status
+              updatedAt
+              url
+              metadata {
+                key
+                value
+              }
+            }
+            metadata {
+              key
+              value
+            }
+            token
+            number
+            statusDisplay
+            created
+            total {
+              gross {
+                amount
+                currency
+              }
+              net {
+                amount
+                currency
+              }
+            }
+            lines {
+              id
+              productName
+              quantity
+              variant {
+                id
+                weight {
+                  unit
+                  value
+                }
+                sku
+                name
+                product {
+                  id
+                  weight {
+                    unit
+                    value
+                  }
+                  metadata {
+                    key
+                    value
+                  }
+                  category {
+                    id
+                    name
+                    slug
+                  }
+                  name
+                  pricing {
+                    discount {
+                      net {
+                        amount
+                      }
+                    }
+                    priceRange {
+                      start {
+                        net {
+                          amount
+                        }
+                      }
+                    }
+                    priceRangeUndiscounted {
+                      start {
+                        net {
+                          amount
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              thumbnail {
+                alt
+                url
+              }
+              thumbnail2x: thumbnail(size: 510) {
+                url
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useOrdersByUserQuery__
+ *
+ * To run a query within a React component, call `useOrdersByUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrdersByUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrdersByUserQuery({
+ *   variables: {
+ *      perPage: // value for 'perPage'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useOrdersByUserQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    OrdersByUserQuery,
+    OrdersByUserQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<OrdersByUserQuery, OrdersByUserQueryVariables>(
+    OrdersByUserDocument,
+    options
+  );
+}
+export function useOrdersByUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OrdersByUserQuery,
+    OrdersByUserQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<OrdersByUserQuery, OrdersByUserQueryVariables>(
+    OrdersByUserDocument,
+    options
+  );
+}
+export type OrdersByUserQueryHookResult = ReturnType<
+  typeof useOrdersByUserQuery
+>;
+export type OrdersByUserLazyQueryHookResult = ReturnType<
+  typeof useOrdersByUserLazyQuery
+>;
+export type OrdersByUserQueryResult = Apollo.QueryResult<
+  OrdersByUserQuery,
+  OrdersByUserQueryVariables
 >;
