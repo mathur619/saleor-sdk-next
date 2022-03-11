@@ -1,5 +1,6 @@
 import { CHECKOUT_DETAILS, USER } from "../apollo/queries";
 import { CheckoutDetailsQuery, UserDetailsQuery } from "../apollo/types";
+import { storage } from "./storage";
 import { SaleorClientInternals } from "./types";
 
 export type State = UserDetailsQuery | null;
@@ -18,3 +19,5 @@ export const getCheckout = (
   client.readQuery<CheckoutDetailsQuery>({
     query: CHECKOUT_DETAILS,
   });
+
+export const getToken = () => storage.getAccessToken();

@@ -1,6 +1,6 @@
 import { auth } from "./auth";
 import { user } from "./user";
-import { CheckoutState, getCheckout, getState, State } from "./state";
+import { CheckoutState, getCheckout, getState, getToken, State } from "./state";
 import { createApolloClient } from "../apollo";
 import { SaleorClient, SaleorClientOpts } from "./types";
 
@@ -51,6 +51,7 @@ export const createSaleorClient = ({
     config: { channel: _channel, setChannel, autologin },
     _internal: { apolloClient },
     getState: (): State => getState(apolloClient),
+    getToken: (): string | null => getToken(),
     getCheckout: (): CheckoutState => getCheckout(apolloClient),
   };
 

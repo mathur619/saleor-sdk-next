@@ -69,7 +69,7 @@ import {
 } from "../apollo/types";
 import { AuthSDK } from "./auth";
 import { UserSDK } from "./user";
-import { State } from "./state";
+import { CheckoutState, State } from "./state";
 import { FetchConfig } from "../apollo";
 import { CartSDK } from "./cart";
 import { CheckoutSDK } from "./checkout";
@@ -90,6 +90,8 @@ export interface SaleorClient {
   config: SaleorClientConfig;
   _internal: SaleorClientInternals;
   getState(): State;
+  getToken(): string | null;
+  getCheckout(): CheckoutState;
   cart: CartSDK;
   checkout: CheckoutSDK;
   wishlist: WishlistSDK;
