@@ -153,6 +153,19 @@ export const createStorage = (autologinEnabled: boolean): void => {
     setAuthPluginId(null);
     setAccessToken(null);
     setCSRFToken(null);
+    setRefreshToken(null);
+    setCheckout({
+      items: [],
+      totalPrice: 0,
+      subtotalPrice: 0,
+      shippingPrice: 0,
+    });
+    setUseCashback(false);
+    setDiscounts({
+      prepaidDiscount: "0",
+      couponDiscount: "0",
+      cashbackDiscount: "0",
+    });
   };
 
   storage = {
