@@ -1,5 +1,6 @@
 import React from "react";
 import { SaleorClient } from "../../core";
+import { ApolloClient, ApolloProvider } from "@apollo/client";
 
 export type SaleorContextType = {
   client: SaleorClient;
@@ -7,10 +8,10 @@ export type SaleorContextType = {
 
 export const SaleorContext = React.createContext<SaleorClient | null>(null);
 
-export const SaleorProvider: React.FC<{ client: SaleorClient }> = ({
-  client,
-  children,
-}) => {
+export const SaleorProvider: React.FC<{
+  client: SaleorClient;
+  apolloClient: ApolloClient<any>;
+}> = ({ client, apolloClient, children }) => {
   const [context, setContext] = React.useState<SaleorClient>(client);
 
   React.useEffect(() => {
@@ -20,7 +21,7 @@ export const SaleorProvider: React.FC<{ client: SaleorClient }> = ({
   if (context) {
     return (
       <SaleorContext.Provider value={context}>
-        {children}
+        <ApolloProvider client={apolloClient}>{children}</ApolloProvider>
       </SaleorContext.Provider>
     );
   }
