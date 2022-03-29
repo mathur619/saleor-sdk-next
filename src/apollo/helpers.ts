@@ -13,10 +13,12 @@ export const setLocalCheckoutInCache = async (
   fetchDiscount?: boolean,
   orderPlaced?: CompleteCheckoutMutation | null | undefined
 ) => {
+  console.log("setLocalCheckoutInCache", checkout);
   client.writeQuery({
     query: GET_LOCAL_CHECKOUT,
     data: {
       localCheckout: checkout,
+      checkoutLoading: false,
     },
   });
 
