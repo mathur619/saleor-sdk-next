@@ -302,6 +302,9 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       checkoutLoading: {
         read(existing) {
           console.log("checkoutLoading sdk", existing);
+          if (existing === undefined || existing === null) {
+            return false;
+          }
           return existing;
         },
       },
