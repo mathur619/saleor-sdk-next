@@ -25,6 +25,7 @@ import {
   UpdateCheckoutLineMutation,
   UpdateCheckoutLineMutationVariables,
 } from "../apollo/types";
+import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -72,6 +73,13 @@ export const cart = ({
     variantId: string,
     quantity: number
   ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
