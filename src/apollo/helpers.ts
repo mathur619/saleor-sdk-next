@@ -18,7 +18,6 @@ export const setLocalCheckoutInCache = async (
     query: GET_LOCAL_CHECKOUT,
     data: {
       localCheckout: checkout,
-      checkoutLoading: false,
     },
   });
 
@@ -78,4 +77,11 @@ export const setLocalCheckoutInCache = async (
       },
     });
   }
+
+  client.writeQuery({
+    query: GET_LOCAL_CHECKOUT,
+    data: {
+      checkoutLoading: false,
+    },
+  });
 };
