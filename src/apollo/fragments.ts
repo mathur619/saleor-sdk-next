@@ -265,6 +265,10 @@ export const orderPriceFragment = gql`
       amount
       currency
     }
+    tax {
+      amount
+      currency
+    }
   }
 `;
 

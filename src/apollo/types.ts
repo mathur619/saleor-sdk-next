@@ -16037,6 +16037,7 @@ export type CheckoutErrorFragment = Pick<
 export type OrderPriceFragment = {
   gross: Pick<Money, "amount" | "currency">;
   net: Pick<Money, "amount" | "currency">;
+  tax: Pick<Money, "amount" | "currency">;
 };
 
 export type OrderDetailFragment = Pick<
@@ -16787,6 +16788,10 @@ export const OrderPriceFragmentDoc = gql`
       currency
     }
     net {
+      amount
+      currency
+    }
+    tax {
       amount
       currency
     }
