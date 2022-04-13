@@ -15983,7 +15983,7 @@ export type ProductVariantFragment = Pick<
       >
     >;
   }>;
-  product: Pick<Product, "id" | "name" | "isAvailableForPurchase"> & {
+  product: Pick<Product, "id" | "name" | "slug" | "isAvailableForPurchase"> & {
     weight: Maybe<Pick<Weight, "unit" | "value">>;
     category: Maybe<Pick<Category, "id" | "name" | "slug">>;
     thumbnail: Maybe<Pick<Image, "url" | "alt">>;
@@ -16672,6 +16672,7 @@ export const ProductVariantFragmentDoc = gql`
     product {
       id
       name
+      slug
       isAvailableForPurchase
       weight {
         unit

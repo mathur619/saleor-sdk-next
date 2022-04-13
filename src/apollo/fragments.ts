@@ -129,6 +129,7 @@ export const checkoutProductVariantFragment = gql`
     product {
       id
       name
+      slug
       isAvailableForPurchase
       weight {
         unit
