@@ -1,7 +1,12 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
+import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION } from ".";
 import { storage } from "../core/storage";
 import { GET_DISCOUNT_CASHBACK_QUERY, GET_LOCAL_CHECKOUT } from "./queries";
-import { CompleteCheckoutMutation } from "./types";
+import {
+  CompleteCheckoutMutation,
+  UpdateCheckoutShippingMethodMutation,
+  UpdateCheckoutShippingMethodMutationVariables,
+} from "./types";
 import {
   DiscountsAndCashbackQuery,
   DiscountsAndCashbackQueryVariables,
@@ -56,26 +61,63 @@ export const setLocalCheckoutInCache = async (
       },
     });
   } else if (fetchDiscount && checkout?.token) {
-    const res = await client.query<
-      DiscountsAndCashbackQuery,
-      DiscountsAndCashbackQueryVariables
-    >({
-      query: GET_DISCOUNT_CASHBACK_QUERY,
-      variables: {
-        token: checkout?.token,
-      },
-      fetchPolicy: "network-only",
-    });
+    if (checkout.availableShippingMethods[0]?.id) {
+      const variables: UpdateCheckoutShippingMethodMutationVariables = {
+        checkoutId: checkout?.id,
+        shippingMethodId: checkout.availableShippingMethods[0]?.id,
+      };
 
-    storage.setDiscounts(res.data);
-    client.writeQuery({
-      query: GET_LOCAL_CHECKOUT,
-      data: {
-        localCheckout: checkout,
-        localCheckoutDiscounts: res.data.checkoutDiscounts,
-        localCashback: res.data.cashback,
-      },
-    });
+      const resShipping = await client.mutate<
+        UpdateCheckoutShippingMethodMutation,
+        UpdateCheckoutShippingMethodMutationVariables
+      >({
+        mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
+        variables,
+      });
+
+      const res = await client.query<
+        DiscountsAndCashbackQuery,
+        DiscountsAndCashbackQueryVariables
+      >({
+        query: GET_DISCOUNT_CASHBACK_QUERY,
+        variables: {
+          token: checkout?.token,
+        },
+        fetchPolicy: "network-only",
+      });
+
+      storage.setDiscounts(res.data);
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          localCheckout:
+            resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+          localCheckoutDiscounts: res.data.checkoutDiscounts,
+          localCashback: res.data.cashback,
+        },
+      });
+    } else {
+      const res = await client.query<
+        DiscountsAndCashbackQuery,
+        DiscountsAndCashbackQueryVariables
+      >({
+        query: GET_DISCOUNT_CASHBACK_QUERY,
+        variables: {
+          token: checkout?.token,
+        },
+        fetchPolicy: "network-only",
+      });
+
+      storage.setDiscounts(res.data);
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          localCheckout: checkout,
+          localCheckoutDiscounts: res.data.checkoutDiscounts,
+          localCashback: res.data.cashback,
+        },
+      });
+    }
   }
 
   client.writeQuery({
