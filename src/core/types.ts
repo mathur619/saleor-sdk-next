@@ -59,7 +59,7 @@ import {
   // AccountDeleteMutation,
   // AccountRequestDeletionMutation,
   // AccountConfirmMutation,
-  // AccountUpdateMutation,
+  AccountUpdateMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -154,6 +154,8 @@ export type RequestEmailChangeOpts = MutationRequestEmailChangeArgs;
 export type SetAccountDefaultAddressOpts = MutationAccountSetDefaultAddressArgs;
 export type UpdateAccountOpts = MutationAccountUpdateArgs;
 export type UpdateAccountAddressOpts = MutationAccountAddressUpdateArgs;
+export type UpdateAccountResult = FetchResult<AccountUpdateMutation>;
+
 // export type ConfirmAccountOpts = AccountConfirmMutationVariables;
 
 // Meethods results

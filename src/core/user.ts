@@ -7,7 +7,7 @@
 //   REQUEST_DELETE_ACCOUNT,
 //   REQUEST_EMAIL_CHANGE,
 //   SET_ACCOUNT_DEFAULT_ADDRESS,
-//   UPDATE_ACCOUNT,
+// UPDATE_ACCOUNT,
 //   UPDATE_ACCOUNT_ADDRESS,
 // } from "../apollo/mutations";
 // import {
@@ -17,8 +17,8 @@
 //   AccountDeleteMutationVariables,
 //   AccountRequestDeletionMutation,
 //   AccountRequestDeletionMutationVariables,
-//   AccountUpdateMutation,
-//   AccountUpdateMutationVariables,
+// AccountUpdateMutation,
+// AccountUpdateMutationVariables,
 //   ConfirmEmailChangeMutation,
 //   ConfirmEmailChangeMutationVariables,
 //   CreateAccountAddressMutation,
@@ -33,6 +33,8 @@
 //   UpdateAccountAddressMutationVariables,
 // } from "../apollo/types";
 // import { auth } from "./auth";
+import { AccountUpdateMutation, AccountUpdateMutationVariables } from "..";
+import { UPDATE_ACCOUNT } from "../apollo/mutations";
 import {
   // AccountDeleteResult,
   // AccountRequestDeletionResult,
@@ -43,6 +45,8 @@ import {
   // DeleteAccountAddressResult,
   // RequestEmailChangeResult,
   SaleorClientMethodsProps,
+  UpdateAccountOpts,
+  UpdateAccountResult,
   // SetAccountDefaultAddressResult,
   // UpdateAccountAddressResult,
   // UpdateAccountResult,
@@ -122,7 +126,7 @@ export interface UserSDK {
    * @param opts - Fields required to update the account of the logged-in account.
    * @returns Updated user account.
    */
-  // updateAccount: (opts: UpdateAccountOpts) => Promise<UpdateAccountResult>;
+  updateAccount: (opts: UpdateAccountOpts) => Promise<UpdateAccountResult>;
   /**
    * Updates an address of the logged-in account.
    *
@@ -198,17 +202,17 @@ export const user = ({
   //   return result;
   // };
 
-  // const updateAccount: UserSDK["updateAccount"] = async opts => {
-  //   const result = await client.mutate<
-  //     AccountUpdateMutation,
-  //     AccountUpdateMutationVariables
-  //   >({
-  //     mutation: UPDATE_ACCOUNT,
-  //     variables: { ...opts },
-  //   });
+  const updateAccount: UserSDK["updateAccount"] = async opts => {
+    const result = await client.mutate<
+      AccountUpdateMutation,
+      AccountUpdateMutationVariables
+    >({
+      mutation: UPDATE_ACCOUNT,
+      variables: { ...opts },
+    });
 
-  //   return result;
-  // };
+    return result;
+  };
 
   // const setAccountDefaultAddress: UserSDK["setAccountDefaultAddress"] = async opts => {
   //   const result = await client.mutate<
@@ -270,5 +274,5 @@ export const user = ({
   //   return result;
   // };
 
-  return {};
+  return { updateAccount };
 };
