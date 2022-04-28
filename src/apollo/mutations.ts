@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 
 import {
   accountErrorFragment,
+  addressFragment,
   // accountErrorFragment,
   // addressFragment,
   checkoutErrorFragment,
@@ -357,43 +358,43 @@ export const DELETE_ACCOUNT_ADDRESS = gql`
   }
 `;
 
-// export const CREATE_ACCOUNT_ADDRESS = gql`
-//   ${addressFragment}
-//   ${userFragment}
-//   ${accountErrorFragment}
-//   mutation createAccountAddress($input: AddressInput!) {
-//     accountAddressCreate(input: $input) {
-//       address {
-//         ...AddressFragment
-//       }
-//       accountErrors {
-//         ...AccountErrorFragment
-//       }
-//       user {
-//         ...UserFragment
-//       }
-//     }
-//   }
-// `;
+export const CREATE_ACCOUNT_ADDRESS = gql`
+  ${addressFragment}
+  ${userFragment}
+  ${accountErrorFragment}
+  mutation createAccountAddress($input: AddressInput!) {
+    accountAddressCreate(input: $input) {
+      address {
+        ...AddressFragment
+      }
+      accountErrors {
+        ...AccountErrorFragment
+      }
+      user {
+        ...UserFragment
+      }
+    }
+  }
+`;
 
-// export const UPDATE_ACCOUNT_ADDRESS = gql`
-//   ${addressFragment}
-//   ${userFragment}
-//   ${accountErrorFragment}
-//   mutation updateAccountAddress($input: AddressInput!, $id: ID!) {
-//     accountAddressUpdate(input: $input, id: $id) {
-//       address {
-//         ...AddressFragment
-//       }
-//       accountErrors {
-//         ...AccountErrorFragment
-//       }
-//       user {
-//         ...UserFragment
-//       }
-//     }
-//   }
-// `;
+export const UPDATE_ACCOUNT_ADDRESS = gql`
+  ${addressFragment}
+  ${userFragment}
+  ${accountErrorFragment}
+  mutation updateAccountAddress($input: AddressInput!, $id: ID!) {
+    accountAddressUpdate(input: $input, id: $id) {
+      address {
+        ...AddressFragment
+      }
+      accountErrors {
+        ...AccountErrorFragment
+      }
+      user {
+        ...UserFragment
+      }
+    }
+  }
+`;
 
 // export const CONFIRM_ACCOUNT = gql`
 //   ${userFragment}

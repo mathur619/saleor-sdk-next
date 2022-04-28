@@ -33,9 +33,29 @@
 //   UpdateAccountAddressMutationVariables,
 // } from "../apollo/types";
 // import { auth } from "./auth";
-import { AccountUpdateMutation, AccountUpdateMutationVariables } from "..";
-import { UPDATE_ACCOUNT } from "../apollo/mutations";
 import {
+  AccountUpdateMutation,
+  AccountUpdateMutationVariables,
+  CreateAccountAddressMutation,
+  CreateAccountAddressMutationVariables,
+  DeleteAccountAddressMutation,
+  DeleteAccountAddressMutationVariables,
+  SetAccountDefaultAddressMutation,
+  SetAccountDefaultAddressMutationVariables,
+  UpdateAccountAddressMutation,
+  UpdateAccountAddressMutationVariables,
+} from "..";
+import {
+  CREATE_ACCOUNT_ADDRESS,
+  DELETE_ACCOUNT_ADDRESS,
+  SET_ACCOUNT_DEFAULT_ADDRESS,
+  UPDATE_ACCOUNT,
+  UPDATE_ACCOUNT_ADDRESS,
+} from "../apollo/mutations";
+import {
+  CreateAccountAddressOpts,
+  CreateAccountAddressResult,
+  DeleteAccountAddressResult,
   // AccountDeleteResult,
   // AccountRequestDeletionResult,
   // ConfirmAccountOpts,
@@ -45,6 +65,10 @@ import {
   // DeleteAccountAddressResult,
   // RequestEmailChangeResult,
   SaleorClientMethodsProps,
+  SetAccountDefaultAddressOpts,
+  SetAccountDefaultAddressResult,
+  UpdateAccountAddressOpts,
+  UpdateAccountAddressResult,
   UpdateAccountOpts,
   UpdateAccountResult,
   // SetAccountDefaultAddressResult,
@@ -90,18 +114,18 @@ export interface UserSDK {
    * If provided, the new address will be automatically assigned as the customer's default address of that type.
    * @returns Updated user account.
    */
-  // createAccountAddress: (
-  //   opts: CreateAccountAddressOpts
-  // ) => Promise<CreateAccountAddressResult>;
+  createAccountAddress: (
+    opts: CreateAccountAddressOpts
+  ) => Promise<CreateAccountAddressResult>;
   /**
    * Delete an address of the logged-in account.
    *
    * @param addressId - ID of the address to delete.
    * @returns Updated user account.
    */
-  // deleteAccountAddress: (
-  //   addressId: string
-  // ) => Promise<DeleteAccountAddressResult>;
+  deleteAccountAddress: (
+    addressId: string
+  ) => Promise<DeleteAccountAddressResult>;
   /**
    * Request email change of the logged in user.
    *
@@ -117,9 +141,9 @@ export interface UserSDK {
    * @param opts - Object with ID of the address to set as default and the type of address.
    * @returns Updated user account.
    */
-  // setAccountDefaultAddress: (
-  //   opts: SetAccountDefaultAddressOpts
-  // ) => Promise<SetAccountDefaultAddressResult>;
+  setAccountDefaultAddress: (
+    opts: SetAccountDefaultAddressOpts
+  ) => Promise<SetAccountDefaultAddressResult>;
   /**
    * Updates the account of the logged-in account.
    *
@@ -133,9 +157,9 @@ export interface UserSDK {
    * @param opts - Object with ID of the address to update and fields required to update the address.
    * @returns Updated user account.
    */
-  // updateAccountAddress: (
-  //   opts: UpdateAccountAddressOpts
-  // ) => Promise<UpdateAccountAddressResult>;
+  updateAccountAddress: (
+    opts: UpdateAccountAddressOpts
+  ) => Promise<UpdateAccountAddressResult>;
   /**
    * Confirms user account with token sent by email during registration.
    *
@@ -214,53 +238,53 @@ export const user = ({
     return result;
   };
 
-  // const setAccountDefaultAddress: UserSDK["setAccountDefaultAddress"] = async opts => {
-  //   const result = await client.mutate<
-  //     SetAccountDefaultAddressMutation,
-  //     SetAccountDefaultAddressMutationVariables
-  //   >({
-  //     mutation: SET_ACCOUNT_DEFAULT_ADDRESS,
-  //     variables: { ...opts },
-  //   });
+  const setAccountDefaultAddress: UserSDK["setAccountDefaultAddress"] = async opts => {
+    const result = await client.mutate<
+      SetAccountDefaultAddressMutation,
+      SetAccountDefaultAddressMutationVariables
+    >({
+      mutation: SET_ACCOUNT_DEFAULT_ADDRESS,
+      variables: { ...opts },
+    });
 
-  //   return result;
-  // };
+    return result;
+  };
 
-  // const createAccountAddress: UserSDK["createAccountAddress"] = async opts => {
-  //   const result = await client.mutate<
-  //     CreateAccountAddressMutation,
-  //     CreateAccountAddressMutationVariables
-  //   >({
-  //     mutation: CREATE_ACCOUNT_ADDRESS,
-  //     variables: { ...opts },
-  //   });
+  const createAccountAddress: UserSDK["createAccountAddress"] = async opts => {
+    const result = await client.mutate<
+      CreateAccountAddressMutation,
+      CreateAccountAddressMutationVariables
+    >({
+      mutation: CREATE_ACCOUNT_ADDRESS,
+      variables: { ...opts },
+    });
 
-  //   return result;
-  // };
+    return result;
+  };
 
-  // const deleteAccountAddress: UserSDK["deleteAccountAddress"] = async addressId => {
-  //   const result = await client.mutate<
-  //     DeleteAccountAddressMutation,
-  //     DeleteAccountAddressMutationVariables
-  //   >({
-  //     mutation: DELETE_ACCOUNT_ADDRESS,
-  //     variables: { addressId },
-  //   });
+  const deleteAccountAddress: UserSDK["deleteAccountAddress"] = async addressId => {
+    const result = await client.mutate<
+      DeleteAccountAddressMutation,
+      DeleteAccountAddressMutationVariables
+    >({
+      mutation: DELETE_ACCOUNT_ADDRESS,
+      variables: { addressId },
+    });
 
-  //   return result;
-  // };
+    return result;
+  };
 
-  // const updateAccountAddress: UserSDK["updateAccountAddress"] = async opts => {
-  //   const result = await client.mutate<
-  //     UpdateAccountAddressMutation,
-  //     UpdateAccountAddressMutationVariables
-  //   >({
-  //     mutation: UPDATE_ACCOUNT_ADDRESS,
-  //     variables: { ...opts },
-  //   });
+  const updateAccountAddress: UserSDK["updateAccountAddress"] = async opts => {
+    const result = await client.mutate<
+      UpdateAccountAddressMutation,
+      UpdateAccountAddressMutationVariables
+    >({
+      mutation: UPDATE_ACCOUNT_ADDRESS,
+      variables: { ...opts },
+    });
 
-  //   return result;
-  // };
+    return result;
+  };
 
   // const confirmAccount: UserSDK["confirmAccount"] = async opts => {
   //   const result = await client.mutate<
@@ -274,5 +298,11 @@ export const user = ({
   //   return result;
   // };
 
-  return { updateAccount };
+  return {
+    updateAccount,
+    setAccountDefaultAddress,
+    deleteAccountAddress,
+    createAccountAddress,
+    updateAccountAddress,
+  };
 };

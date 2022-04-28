@@ -60,6 +60,10 @@ import {
   // AccountRequestDeletionMutation,
   // AccountConfirmMutation,
   AccountUpdateMutation,
+  SetAccountDefaultAddressMutation,
+  DeleteAccountAddressMutation,
+  CreateAccountAddressMutation,
+  UpdateAccountAddressMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -155,6 +159,18 @@ export type SetAccountDefaultAddressOpts = MutationAccountSetDefaultAddressArgs;
 export type UpdateAccountOpts = MutationAccountUpdateArgs;
 export type UpdateAccountAddressOpts = MutationAccountAddressUpdateArgs;
 export type UpdateAccountResult = FetchResult<AccountUpdateMutation>;
+export type SetAccountDefaultAddressResult = FetchResult<
+  SetAccountDefaultAddressMutation
+>;
+export type DeleteAccountAddressResult = FetchResult<
+  DeleteAccountAddressMutation
+>;
+export type CreateAccountAddressResult = FetchResult<
+  CreateAccountAddressMutation
+>;
+export type UpdateAccountAddressResult = FetchResult<
+  UpdateAccountAddressMutation
+>;
 
 // export type ConfirmAccountOpts = AccountConfirmMutationVariables;
 
