@@ -124,12 +124,20 @@ export interface CheckoutSDK {
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
   getWalletAmount?: () => GetWalletAmountResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
+  setUseCashback?: (useCashback: boolean) => {};
 }
 
 export const checkout = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CheckoutSDK => {
   const createCheckout: CheckoutSDK["createCheckout"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
@@ -700,6 +708,20 @@ export const checkout = ({
     return res;
   };
 
+  const setUseCashback: CheckoutSDK["setUseCashback"] = async (
+    useCashback: boolean
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+        useCashback: useCashback,
+      },
+    });
+
+    storage.setUseCashback(useCashback);
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -716,8 +738,6 @@ export const checkout = ({
     createRazorpayOrder,
     getWalletAmount,
     getUserOrders,
+    setUseCashback,
   };
 };
-
-// OrdersByUserQuery,
-// OrdersByUserQueryVariables

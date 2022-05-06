@@ -16154,6 +16154,31 @@ export type DeleteAccountAddressMutation = {
   }>;
 };
 
+export type CreateAccountAddressMutationVariables = Exact<{
+  input: AddressInput;
+}>;
+
+export type CreateAccountAddressMutation = {
+  accountAddressCreate: Maybe<{
+    address: Maybe<AddressFragment>;
+    accountErrors: Array<AccountErrorFragment>;
+    user: Maybe<UserFragment>;
+  }>;
+};
+
+export type UpdateAccountAddressMutationVariables = Exact<{
+  input: AddressInput;
+  id: Scalars["ID"];
+}>;
+
+export type UpdateAccountAddressMutation = {
+  accountAddressUpdate: Maybe<{
+    address: Maybe<AddressFragment>;
+    accountErrors: Array<AccountErrorFragment>;
+    user: Maybe<UserFragment>;
+  }>;
+};
+
 export type OtpRequestMutationVariables = Exact<{
   phone: Scalars["String"];
 }>;
@@ -17220,6 +17245,131 @@ export type DeleteAccountAddressMutationResult = Apollo.MutationResult<
 export type DeleteAccountAddressMutationOptions = Apollo.BaseMutationOptions<
   DeleteAccountAddressMutation,
   DeleteAccountAddressMutationVariables
+>;
+export const CreateAccountAddressDocument = gql`
+  mutation createAccountAddress($input: AddressInput!) {
+    accountAddressCreate(input: $input) {
+      address {
+        ...AddressFragment
+      }
+      accountErrors {
+        ...AccountErrorFragment
+      }
+      user {
+        ...UserFragment
+      }
+    }
+  }
+  ${AddressFragmentDoc}
+  ${AccountErrorFragmentDoc}
+  ${UserFragmentDoc}
+`;
+export type CreateAccountAddressMutationFn = Apollo.MutationFunction<
+  CreateAccountAddressMutation,
+  CreateAccountAddressMutationVariables
+>;
+
+/**
+ * __useCreateAccountAddressMutation__
+ *
+ * To run a mutation, you first call `useCreateAccountAddressMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateAccountAddressMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createAccountAddressMutation, { data, loading, error }] = useCreateAccountAddressMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateAccountAddressMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateAccountAddressMutation,
+    CreateAccountAddressMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateAccountAddressMutation,
+    CreateAccountAddressMutationVariables
+  >(CreateAccountAddressDocument, options);
+}
+export type CreateAccountAddressMutationHookResult = ReturnType<
+  typeof useCreateAccountAddressMutation
+>;
+export type CreateAccountAddressMutationResult = Apollo.MutationResult<
+  CreateAccountAddressMutation
+>;
+export type CreateAccountAddressMutationOptions = Apollo.BaseMutationOptions<
+  CreateAccountAddressMutation,
+  CreateAccountAddressMutationVariables
+>;
+export const UpdateAccountAddressDocument = gql`
+  mutation updateAccountAddress($input: AddressInput!, $id: ID!) {
+    accountAddressUpdate(input: $input, id: $id) {
+      address {
+        ...AddressFragment
+      }
+      accountErrors {
+        ...AccountErrorFragment
+      }
+      user {
+        ...UserFragment
+      }
+    }
+  }
+  ${AddressFragmentDoc}
+  ${AccountErrorFragmentDoc}
+  ${UserFragmentDoc}
+`;
+export type UpdateAccountAddressMutationFn = Apollo.MutationFunction<
+  UpdateAccountAddressMutation,
+  UpdateAccountAddressMutationVariables
+>;
+
+/**
+ * __useUpdateAccountAddressMutation__
+ *
+ * To run a mutation, you first call `useUpdateAccountAddressMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateAccountAddressMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateAccountAddressMutation, { data, loading, error }] = useUpdateAccountAddressMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useUpdateAccountAddressMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateAccountAddressMutation,
+    UpdateAccountAddressMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateAccountAddressMutation,
+    UpdateAccountAddressMutationVariables
+  >(UpdateAccountAddressDocument, options);
+}
+export type UpdateAccountAddressMutationHookResult = ReturnType<
+  typeof useUpdateAccountAddressMutation
+>;
+export type UpdateAccountAddressMutationResult = Apollo.MutationResult<
+  UpdateAccountAddressMutation
+>;
+export type UpdateAccountAddressMutationOptions = Apollo.BaseMutationOptions<
+  UpdateAccountAddressMutation,
+  UpdateAccountAddressMutationVariables
 >;
 export const OtpRequestDocument = gql`
   mutation OTPRequest($phone: String!) {
