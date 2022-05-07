@@ -107,10 +107,6 @@ export const cart = ({
           );
         },
       });
-      if (typeof window !== "undefined") {
-        window.localStorage?.clear(); //FOR TESTING ONLY, TO BE REMOVED
-        window.location?.reload();
-      }
       if (
         res.data?.checkoutLinesAdd?.errors &&
         res.data?.checkoutLinesAdd?.errors[0]?.code === "NOT_FOUND" &&
