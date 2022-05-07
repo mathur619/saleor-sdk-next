@@ -107,6 +107,7 @@ export const cart = ({
           );
         },
       });
+      storage.clear(); //FOR TESTING ONLY, TO BE REMOVED
       if (
         res.data?.checkoutLinesAdd?.errors &&
         res.data?.checkoutLinesAdd?.errors[0]?.code === "NOT_FOUND" &&
