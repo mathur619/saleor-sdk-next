@@ -75,6 +75,19 @@ export const setLocalCheckoutInCache = async (
         variables,
       });
 
+      if (
+        resShipping.data?.checkoutShippingMethodUpdate?.errors &&
+        resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.code ===
+          "NOT_FOUND" &&
+        resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
+          "checkoutId" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+        return;
+      }
+
       const res = await client.query<
         DiscountsAndCashbackQuery,
         DiscountsAndCashbackQueryVariables
