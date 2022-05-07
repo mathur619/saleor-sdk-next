@@ -567,9 +567,11 @@ export const checkout = ({
           if (
             data?.checkoutPaymentCreate?.errors &&
             data?.checkoutPaymentCreate?.errors[0]?.code === "NOT_FOUND" &&
-            data?.checkoutPaymentCreate?.errors[0]?.field === "checkoutId"
+            data?.checkoutPaymentCreate?.errors[0]?.field === "checkoutId" &&
+            typeof window !== "undefined"
           ) {
-            storage.clear();
+            window.localStorage?.clear();
+            window.location?.reload();
           }
           if (data?.checkoutPaymentCreate?.checkout?.id) {
             storage.setCheckout(data?.checkoutPaymentCreate?.checkout);

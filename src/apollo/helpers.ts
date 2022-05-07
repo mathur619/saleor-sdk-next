@@ -80,9 +80,11 @@ export const setLocalCheckoutInCache = async (
         resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.code ===
           "NOT_FOUND" &&
         resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
-          "checkoutId"
+          "checkoutId" &&
+        typeof window !== "undefined"
       ) {
-        storage.clear();
+        window.localStorage?.clear();
+        window.location?.reload();
         return;
       }
 
