@@ -107,6 +107,13 @@ export const cart = ({
           );
         },
       });
+      if (
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code === "NOT_FOUND" &&
+        res.data?.checkoutLinesAdd?.errors[0]?.field === "checkoutId"
+      ) {
+        storage.clear();
+      }
       const returnObject = {
         data: res.data?.checkoutLinesAdd?.checkout,
         errors: res.data?.checkoutLinesAdd?.errors,
@@ -158,7 +165,8 @@ export const cart = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     const lineToRemove =
-      checkout && checkout?.lines?.find(line => line?.variant.id === variantId);
+      checkout &&
+      checkout?.lines?.find((line) => line?.variant.id === variantId);
     const lineToRemoveId = lineToRemove?.id;
 
     if (checkout && checkout?.token) {

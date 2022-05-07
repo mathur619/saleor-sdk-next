@@ -18,7 +18,7 @@ export const setLocalCheckoutInCache = async (
   fetchDiscount?: boolean,
   orderPlaced?: CompleteCheckoutMutation | null | undefined
 ) => {
-  console.log("..setLocalCheckoutInCache", checkout);
+  console.log("setLocalCheckoutInCache", checkout);
   client.writeQuery({
     query: GET_LOCAL_CHECKOUT,
     data: {
@@ -75,7 +75,16 @@ export const setLocalCheckoutInCache = async (
         variables,
       });
 
-      console.log("resShipping", resShipping);
+      if (
+        resShipping.data?.checkoutShippingMethodUpdate?.errors &&
+        resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.code ===
+          "NOT_FOUND" &&
+        resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
+          "checkoutId"
+      ) {
+        storage.clear();
+        return;
+      }
 
       const res = await client.query<
         DiscountsAndCashbackQuery,
