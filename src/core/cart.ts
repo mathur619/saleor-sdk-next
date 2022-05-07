@@ -193,6 +193,16 @@ export const cart = ({
         },
       });
 
+      if (
+        res.data?.checkoutLineDelete?.errors &&
+        res.data?.checkoutLineDelete?.errors[0]?.code === "NOT_FOUND" &&
+        res.data?.checkoutLineDelete?.errors[0]?.field === "checkoutId" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+
       return {
         data: res.data?.checkoutLineDelete?.checkout,
         errors: res.data?.checkoutLineDelete?.errors,
