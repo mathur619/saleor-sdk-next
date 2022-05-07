@@ -107,13 +107,18 @@ export const cart = ({
           );
         },
       });
-      storage.clear(); //FOR TESTING ONLY, TO BE REMOVED
+      if (typeof window !== "undefined") {
+        window.localStorage?.clear(); //FOR TESTING ONLY, TO BE REMOVED
+        window.location?.reload();
+      }
       if (
         res.data?.checkoutLinesAdd?.errors &&
         res.data?.checkoutLinesAdd?.errors[0]?.code === "NOT_FOUND" &&
-        res.data?.checkoutLinesAdd?.errors[0]?.field === "checkoutId"
+        res.data?.checkoutLinesAdd?.errors[0]?.field === "checkoutId" &&
+        typeof window !== "undefined"
       ) {
-        storage.clear();
+        window.localStorage?.clear();
+        window.location?.reload();
       }
       const returnObject = {
         data: res.data?.checkoutLinesAdd?.checkout,
