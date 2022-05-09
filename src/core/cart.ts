@@ -116,6 +116,31 @@ export const cart = ({
         window.localStorage?.clear();
         window.location?.reload();
       }
+      if (
+        (res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code === "PRODUCT_NOT_PUBLISHED") &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+      if (
+        (res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code === "PRODUCT_UNAVAILABLE_FOR_PURCHASE") &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+      if (
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code === "GRAPHQL_ERROR" &&
+        res.data?.checkoutLinesAdd?.errors[0]?.field === "variantId" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
       const returnObject = {
         data: res.data?.checkoutLinesAdd?.checkout,
         errors: res.data?.checkoutLinesAdd?.errors,
