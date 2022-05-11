@@ -14,10 +14,29 @@ export const useCheckoutState = () => {
     GetLocalCheckoutQueryVariables
   >(GET_LOCAL_CHECKOUT);
 
+  const placeholderData = {
+    checkout: {
+      items: [],
+    },
+    loaded: true,
+    promoCodeDiscount: {
+      voucherCode: null,
+      discount: 0,
+      discountName: "",
+    },
+
+    availableShippingMethods: [],
+
+    availablePaymentGateways: [],
+
+    useCashback: false,
+    checkoutLoading: false,
+    userWalletBalance: 0,
+    recentOrder: null,
+  };
+
   if (!data) {
-    throw new Error(
-      "Cache query result is undefined. Invalid cache configuration."
-    );
+    return placeholderData;
   }
 
   return {

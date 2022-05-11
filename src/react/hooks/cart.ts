@@ -29,10 +29,27 @@ export const useCartState = () => {
     GetLocalCheckoutQueryVariables
   >(GET_LOCAL_CHECKOUT);
 
+  const placeholderData = {
+    items: [],
+    totalPrice: defaultPrice,
+    subtotalPrice: defaultPrice,
+    shippingPrice: defaultPrice,
+    discount: {
+      amount: 0,
+      currency: "INR",
+    },
+    mrp: defaultPrice,
+    netPrice: defaultPrice,
+    itemDiscount: defaultPrice,
+    offerDiscount: defaultPrice,
+    prepaidDiscount: defaultPrice,
+    cashbackDiscount: defaultPrice,
+    couponDiscount: defaultPrice,
+    cashbackRecieve: { amount: 0, willAddOn: null },
+  };
+
   if (!data) {
-    throw new Error(
-      "Cache query result is undefined. Invalid cache configuration."
-    );
+    return placeholderData;
   }
 
   const mrp =

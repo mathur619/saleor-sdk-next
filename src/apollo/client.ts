@@ -207,35 +207,37 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
         },
       },
       localCheckout: {
-        read(existing) {
-          if (!existing) {
-            const checkoutString = storage.getCheckout();
-            const checkout =
-              checkoutString && typeof checkoutString === "string"
-                ? JSON.parse(checkoutString)
-                : checkoutString;
+        read() {
+          return undefined;
+          // if (!existing) {
+          //   const checkoutString = storage.getCheckout();
+          //   const checkout =
+          //     checkoutString && typeof checkoutString === "string"
+          //       ? JSON.parse(checkoutString)
+          //       : checkoutString;
 
-            if (checkout) {
-              return checkout;
-            }
+          //   if (checkout) {
+          //     return checkout;
+          //   }
 
-            return {
-              items: [],
-              totalPrice: 0,
-              subtotalPrice: 0,
-              shippingPrice: 0,
-            };
-          }
-          if (existing !== null) {
-            return existing;
-          }
+          //   return {
+          //     items: [],
+          //     totalPrice: 0,
+          //     subtotalPrice: 0,
+          //     shippingPrice: 0,
+          //   };
+          // }
 
-          return {
-            items: [],
-            totalPrice: 0,
-            subtotalPrice: 0,
-            shippingPrice: 0,
-          };
+          // if (existing !== null && existing !== undefined) {
+          //   return existing;
+          // }
+
+          // return {
+          //   items: [],
+          //   totalPrice: 0,
+          //   subtotalPrice: 0,
+          //   shippingPrice: 0,
+          // };
         },
       },
 
@@ -256,13 +258,16 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
               }
             );
           }
-          return (
-            existing || {
-              prepaidDiscount: "0",
-              couponDiscount: "0",
-              cashbackDiscount: "0",
-            }
-          );
+
+          if (existing !== null && existing !== undefined) {
+            return existing;
+          }
+
+          return {
+            prepaidDiscount: "0",
+            couponDiscount: "0",
+            cashbackDiscount: "0",
+          };
         },
       },
       localCashback: {
@@ -332,7 +337,6 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
             console.log("existing 2", existing);
             return {};
           }
-
           return existing;
         },
       },

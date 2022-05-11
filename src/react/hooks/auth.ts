@@ -24,10 +24,14 @@ export const useAuthState = (): UserDetailsQuery => {
     UserDetailsQueryVariables
   >(USER);
 
+  const placeholderData: UserDetailsQuery = {
+    authenticated: false,
+    authenticating: false,
+    user: null,
+  };
+
   if (!data) {
-    throw new Error(
-      "Cache query result is undefined. Invalid cache configuration."
-    );
+    return placeholderData;
   }
 
   return data;
