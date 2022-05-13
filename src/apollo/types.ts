@@ -16050,6 +16050,7 @@ export type OrderDetailFragment = Pick<
   | "id"
   | "token"
   | "number"
+  | "voucher"
 > & {
   metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
   shippingAddress: Maybe<AddressFragment>;
