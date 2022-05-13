@@ -286,7 +286,9 @@ export const orderDetailFragment = gql`
     id
     token
     number
-
+    voucher {
+      code
+    }
     # invoices {
     #   createdAt
     #   id
