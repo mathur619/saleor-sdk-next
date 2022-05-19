@@ -14,6 +14,7 @@ import {
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
 } from "../apollo/mutations";
 import {
+  CHECKOUT_DETAILS,
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
 } from "../apollo/queries";
@@ -22,6 +23,8 @@ import {
   AddCheckoutPromoCodeMutationVariables,
   AddressTypes,
   Checkout,
+  CheckoutDetailsQuery,
+  CheckoutDetailsQueryVariables,
   CheckoutPaymentMethodUpdateMutation,
   CheckoutPaymentMethodUpdateMutationVariables,
   CompleteCheckoutMutation,
@@ -125,6 +128,7 @@ export interface CheckoutSDK {
   getWalletAmount?: () => GetWalletAmountResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
+  setCheckout?: (checkoutToken: string) => {};
 }
 
 export const checkout = ({
@@ -727,6 +731,32 @@ export const checkout = ({
     storage.setUseCashback(useCashback);
   };
 
+  const setCheckout: CheckoutSDK["setCheckout"] = async (
+    checkoutToken: string
+  ) => {
+    if (checkoutToken) {
+      const res = await client.query<
+        CheckoutDetailsQuery,
+        CheckoutDetailsQueryVariables
+      >({
+        query: CHECKOUT_DETAILS,
+        variables: {
+          token: checkoutToken,
+        },
+      });
+
+      setLocalCheckoutInCache(client, res.data?.checkout);
+
+      if (res.data?.checkout?.id) {
+        storage.setCheckout(res.data?.checkout);
+      }
+
+      return res;
+    }
+
+    return null;
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -744,5 +774,6 @@ export const checkout = ({
     getWalletAmount,
     getUserOrders,
     setUseCashback,
+    setCheckout,
   };
 };
