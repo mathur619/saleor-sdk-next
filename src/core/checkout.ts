@@ -126,7 +126,7 @@ export interface CheckoutSDK {
   getWalletAmount?: () => GetWalletAmountResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
-  setCheckout?: (checkoutToken: string) => {};
+  setCheckout?: (checkout: any) => {};
 }
 
 export const checkout = ({
@@ -730,30 +730,15 @@ export const checkout = ({
   };
 
   const setCheckout: CheckoutSDK["setCheckout"] = async (
-    checkoutToken: string
+    checkout: any
   ) => {
-    console.log("checkoutToken",checkoutToken)
-    
-      const res = await client.query<
-        any,
-        any
-      >({
-        query: CHECKOUT_DETAILS,
-        variables: {
-          token: checkoutToken,
-        },
-        fetchPolicy: "network-only",
-      });
-      console.log("res this",res);
+    console.log("checkoutresp", checkout)
+    if (checkout) {
+      setLocalCheckoutInCache(client, checkout);
+      storage.setCheckout(checkout);
+    }
+    return checkout;
 
-      setLocalCheckoutInCache(client, res?.data?.checkout);
-
-      if (res?.data?.checkout?.id) {
-        storage.setCheckout(res?.data?.checkout);
-      }
-
-      return res;
-    
   };
 
   return {
