@@ -737,8 +737,8 @@ export const checkout = ({
     console.log("checkoutToken",checkoutToken)
     
       const res = await client.query<
-        CheckoutDetailsQuery,
-        CheckoutDetailsQueryVariables
+        any,
+        any
       >({
         query: CHECKOUT_DETAILS,
         variables: {
