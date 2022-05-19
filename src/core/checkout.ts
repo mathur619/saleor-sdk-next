@@ -735,7 +735,7 @@ export const checkout = ({
     checkoutToken: string
   ) => {
     console.log("checkoutToken",checkoutToken)
-    if (checkoutToken) {
+    
       const res = await client.query<
         CheckoutDetailsQuery,
         CheckoutDetailsQueryVariables
@@ -744,7 +744,9 @@ export const checkout = ({
         variables: {
           token: checkoutToken,
         },
+        fetchPolicy:"network-only"
       });
+      console.log("res this",res);
 
       setLocalCheckoutInCache(client, res.data?.checkout);
 
@@ -753,9 +755,7 @@ export const checkout = ({
       }
 
       return res;
-    }
-
-    return null;
+    
   };
 
   return {
