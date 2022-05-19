@@ -23,8 +23,6 @@ import {
   AddCheckoutPromoCodeMutationVariables,
   AddressTypes,
   Checkout,
-  CheckoutDetailsQuery,
-  CheckoutDetailsQueryVariables,
   CheckoutPaymentMethodUpdateMutation,
   CheckoutPaymentMethodUpdateMutationVariables,
   CompleteCheckoutMutation,
