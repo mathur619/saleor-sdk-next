@@ -744,7 +744,7 @@ export const checkout = ({
         variables: {
           token: checkoutToken,
         },
-        fetchPolicy:"network-only"
+        fetchPolicy: "network-only",
       });
       console.log("res this",res);
 
