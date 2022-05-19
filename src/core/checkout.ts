@@ -14,7 +14,6 @@ import {
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
 } from "../apollo/mutations";
 import {
-  CHECKOUT_DETAILS,
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
 } from "../apollo/queries";
