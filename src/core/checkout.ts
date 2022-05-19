@@ -125,6 +125,7 @@ export interface CheckoutSDK {
   getWalletAmount?: () => GetWalletAmountResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
+  setCheckout?: (checkout: any) => {};
 }
 
 export const checkout = ({
@@ -727,6 +728,18 @@ export const checkout = ({
     storage.setUseCashback(useCashback);
   };
 
+  const setCheckout: CheckoutSDK["setCheckout"] = async (
+    checkout: any
+  ) => {
+    console.log("checkoutresp", checkout)
+    if (checkout) {
+      setLocalCheckoutInCache(client, checkout);
+      storage.setCheckout(checkout);
+    }
+    return checkout;
+
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -744,5 +757,6 @@ export const checkout = ({
     getWalletAmount,
     getUserOrders,
     setUseCashback,
+    setCheckout,
   };
 };
