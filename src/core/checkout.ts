@@ -745,15 +745,13 @@ export const checkout = ({
           token: checkoutToken,
         },
         fetchPolicy: "network-only",
-      }).then((response)=>{
-        console.log("response this",response);
       });
       console.log("res this",res);
 
-      setLocalCheckoutInCache(client, res.data?.checkout);
+      setLocalCheckoutInCache(client, res?.data?.checkout);
 
-      if (res.data?.checkout?.id) {
-        storage.setCheckout(res.data?.checkout);
+      if (res?.data?.checkout?.id) {
+        storage.setCheckout(res?.data?.checkout);
       }
 
       return res;
