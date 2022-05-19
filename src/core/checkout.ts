@@ -734,6 +734,7 @@ export const checkout = ({
   const setCheckout: CheckoutSDK["setCheckout"] = async (
     checkoutToken: string
   ) => {
+    console.log("checkoutToken",checkoutToken)
     if (checkoutToken) {
       const res = await client.query<
         CheckoutDetailsQuery,
