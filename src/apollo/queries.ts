@@ -23,6 +23,7 @@ export const CHECKOUT_DETAILS = gql`
     checkout(token: $token) {
       ...Checkout
     }
+    checkoutUpdated @client
   }
 `;
 
