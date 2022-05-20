@@ -733,7 +733,7 @@ export const checkout = ({
   ) => {
     console.log("checkoutresp", checkout)
     if (checkout) {
-      setLocalCheckoutInCache(client, checkout);
+      setLocalCheckoutInCache(client, checkout, true);
       storage.setCheckout(checkout);
     }
     return checkout;
