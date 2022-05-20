@@ -125,7 +125,7 @@ export interface CheckoutSDK {
   getWalletAmount?: () => GetWalletAmountResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
-  setCheckout?: (checkout: any) => {};
+  setCheckout?: (checkout: any, fetchDiscount?:boolean) => {};
 }
 
 export const checkout = ({
@@ -729,11 +729,12 @@ export const checkout = ({
   };
 
   const setCheckout: CheckoutSDK["setCheckout"] = async (
-    checkout: any
+    checkout: any,
+    fetchDiscount?: boolean
   ) => {
     console.log("checkoutresp", checkout)
     if (checkout) {
-      setLocalCheckoutInCache(client, checkout, true);
+      setLocalCheckoutInCache(client, checkout, fetchDiscount);
       storage.setCheckout(checkout);
     }
     return checkout;
