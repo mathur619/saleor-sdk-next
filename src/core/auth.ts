@@ -301,13 +301,6 @@ export const auth = ({
     email: string,
     phone: string
   ) => {
-    client.writeQuery({
-      query: USER,
-      data: {
-        authenticating: true,
-      },
-    });
-
     const res = await client.mutate<
       AccountRegisterV2Mutation,
       AccountRegisterV2MutationVariables
