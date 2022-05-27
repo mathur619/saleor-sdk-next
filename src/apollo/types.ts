@@ -16994,7 +16994,6 @@ export type AccountRegisterV2MutationVariables = Exact<{
 export type AccountRegisterV2Mutation = {
   accountRegisterV2: Maybe<
     Pick<AccountRegisterV2, "isNewUser" | "isActiveUser"> & {
-      user: Maybe<UserFragment>;
       accountErrors: Array<Pick<AccountError, "field" | "message">>;
       errors: Array<Pick<Error, "field" | "message">>;
     }
@@ -18301,9 +18300,6 @@ export const AccountRegisterV2Document = gql`
     accountRegisterV2(input: $input) {
       isNewUser
       isActiveUser
-      user {
-        ...UserFragment
-      }
       accountErrors {
         field
         message
@@ -18314,7 +18310,6 @@ export const AccountRegisterV2Document = gql`
       }
     }
   }
-  ${UserFragmentDoc}
 `;
 export type AccountRegisterV2MutationFn = Apollo.MutationFunction<
   AccountRegisterV2Mutation,
