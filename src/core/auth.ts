@@ -59,6 +59,8 @@ import {
   RefreshTokenWithUserMutationVariables,
   UserCheckoutDetailsQuery,
   UserCheckoutDetailsQueryVariables,
+  VerifyCheckoutOtpMutation,
+  VerifyCheckoutOtpMutationVariables,
 } from "..";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
@@ -68,6 +70,7 @@ import {
   REFRESH_TOKEN_WITH_USER,
   REGISTER_ACCOUNT,
   REQUEST_OTP_MUTATION,
+  VERIFY_CHECKOUT_OTP,
 } from "../apollo/mutations";
 import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
 import { storage } from "./storage";
@@ -89,6 +92,7 @@ import {
   SaleorClientMethodsProps,
   SignInMobileResult,
   SignOutResult,
+  VerifyCheckoutOTPResult,
   // SetPasswordResult,
   // VerifyExternalTokenResult,
   // VerifyTokenResult,
@@ -215,6 +219,8 @@ export interface AuthSDK {
   registerAccountV2: (email: string, phone: string) => RegisterAccountV2Result;
 
   confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
+
+  verifyCheckoutOTP: (otp: string, phone: string) => VerifyCheckoutOTPResult;
 
   signOut: () => SignOutResult;
 
@@ -361,6 +367,24 @@ export const auth = ({
             },
           });
         }
+      },
+    });
+
+    return res;
+  };
+
+  const verifyCheckoutOTP: AuthSDK["verifyCheckoutOTP"] = async (
+    otp: string,
+    phone: string
+  ) => {
+    const res = await client.mutate<
+      VerifyCheckoutOtpMutation,
+      VerifyCheckoutOtpMutationVariables
+    >({
+      mutation: VERIFY_CHECKOUT_OTP,
+      variables: {
+        otp,
+        phone,
       },
     });
 
@@ -701,5 +725,6 @@ export const auth = ({
     signOut,
     setToken,
     getUserCheckout,
+    verifyCheckoutOTP,
   };
 };

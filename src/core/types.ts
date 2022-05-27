@@ -64,6 +64,7 @@ import {
   DeleteAccountAddressMutation,
   CreateAccountAddressMutation,
   UpdateAccountAddressMutation,
+  VerifyCheckoutOtpMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -269,6 +270,14 @@ export type RegisterAccountV2Result = Promise<
 export type ConfirmAccountV2Result = Promise<
   FetchResult<
     ConfirmAccountV2Mutation,
+    Record<string, any>,
+    Record<string, any>
+  >
+>;
+
+export type VerifyCheckoutOTPResult = Promise<
+  FetchResult<
+    VerifyCheckoutOtpMutation,
     Record<string, any>,
     Record<string, any>
   >

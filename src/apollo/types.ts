@@ -17017,6 +17017,20 @@ export type ConfirmAccountV2Mutation = {
   >;
 };
 
+export type VerifyCheckoutOtpMutationVariables = Exact<{
+  otp: Scalars["String"];
+  phone: Scalars["String"];
+}>;
+
+export type VerifyCheckoutOtpMutation = {
+  verifyCheckoutOtp: Maybe<
+    Pick<VerifyCheckoutOtp, "isVerified"> & {
+      otpErrors: Array<Pick<OtpError, "field" | "message">>;
+      errors: Array<Pick<Error, "field" | "message">>;
+    }
+  >;
+};
+
 export type UpdateCheckoutLineMutationVariables = Exact<{
   checkoutId: Scalars["ID"];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
@@ -18412,6 +18426,66 @@ export type ConfirmAccountV2MutationResult = Apollo.MutationResult<
 export type ConfirmAccountV2MutationOptions = Apollo.BaseMutationOptions<
   ConfirmAccountV2Mutation,
   ConfirmAccountV2MutationVariables
+>;
+export const VerifyCheckoutOtpDocument = gql`
+  mutation VerifyCheckoutOtp($otp: String!, $phone: String!) {
+    verifyCheckoutOtp(otp: $otp, phone: $phone) {
+      isVerified
+      otpErrors {
+        field
+        message
+      }
+      errors {
+        field
+        message
+      }
+    }
+  }
+`;
+export type VerifyCheckoutOtpMutationFn = Apollo.MutationFunction<
+  VerifyCheckoutOtpMutation,
+  VerifyCheckoutOtpMutationVariables
+>;
+
+/**
+ * __useVerifyCheckoutOtpMutation__
+ *
+ * To run a mutation, you first call `useVerifyCheckoutOtpMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVerifyCheckoutOtpMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [verifyCheckoutOtpMutation, { data, loading, error }] = useVerifyCheckoutOtpMutation({
+ *   variables: {
+ *      otp: // value for 'otp'
+ *      phone: // value for 'phone'
+ *   },
+ * });
+ */
+export function useVerifyCheckoutOtpMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    VerifyCheckoutOtpMutation,
+    VerifyCheckoutOtpMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    VerifyCheckoutOtpMutation,
+    VerifyCheckoutOtpMutationVariables
+  >(VerifyCheckoutOtpDocument, options);
+}
+export type VerifyCheckoutOtpMutationHookResult = ReturnType<
+  typeof useVerifyCheckoutOtpMutation
+>;
+export type VerifyCheckoutOtpMutationResult = Apollo.MutationResult<
+  VerifyCheckoutOtpMutation
+>;
+export type VerifyCheckoutOtpMutationOptions = Apollo.BaseMutationOptions<
+  VerifyCheckoutOtpMutation,
+  VerifyCheckoutOtpMutationVariables
 >;
 export const UpdateCheckoutLineDocument = gql`
   mutation UpdateCheckoutLine($checkoutId: ID!, $lines: [CheckoutLineInput]!) {

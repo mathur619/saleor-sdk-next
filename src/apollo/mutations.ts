@@ -490,6 +490,22 @@ export const CONFIRM_ACCOUNT = gql`
   }
 `;
 
+export const VERIFY_CHECKOUT_OTP = gql`
+  mutation VerifyCheckoutOtp($otp: String!, $phone: String!) {
+    verifyCheckoutOtp(otp: $otp, phone: $phone) {
+      isVerified
+      otpErrors {
+        field
+        message
+      }
+      errors {
+        field
+        message
+      }
+    }
+  }
+`;
+
 export const UPDATE_CHECKOUT_LINE_MUTATION = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
