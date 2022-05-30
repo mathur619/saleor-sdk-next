@@ -781,6 +781,26 @@ export const CREATE_RAZORPAY_ORDER = gql`
   }
 `;
 
+export const PAYTM_TXN_CREATE = gql`
+  mutation PaytmTxnCreate($input: PaytmCreateOrderInput!) {
+    paytmOrderCreate(input: $input) {
+      paytmOrder {
+        txnToken
+        status
+        createdAt
+        merchantId
+        callbackUrl
+        orderId
+      }
+      paytmErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
 export const GET_WALLET_AMOUNT = gql`
   query GetWallet {
     wallet {

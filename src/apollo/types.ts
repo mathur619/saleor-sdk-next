@@ -17232,6 +17232,27 @@ export type CreateRazorpayOrderMutation = {
   }>;
 };
 
+export type PaytmTxnCreateMutationVariables = Exact<{
+  input: PaytmCreateOrderInput;
+}>;
+
+export type PaytmTxnCreateMutation = {
+  paytmOrderCreate: Maybe<{
+    paytmOrder: Maybe<
+      Pick<
+        PaytmOrderType,
+        | "txnToken"
+        | "status"
+        | "createdAt"
+        | "merchantId"
+        | "callbackUrl"
+        | "orderId"
+      >
+    >;
+    paytmErrors: Array<Pick<PaytmError, "field" | "message" | "code">>;
+  }>;
+};
+
 export type GetWalletQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetWalletQuery = {
@@ -19377,6 +19398,69 @@ export type CreateRazorpayOrderMutationResult = Apollo.MutationResult<
 export type CreateRazorpayOrderMutationOptions = Apollo.BaseMutationOptions<
   CreateRazorpayOrderMutation,
   CreateRazorpayOrderMutationVariables
+>;
+export const PaytmTxnCreateDocument = gql`
+  mutation PaytmTxnCreate($input: PaytmCreateOrderInput!) {
+    paytmOrderCreate(input: $input) {
+      paytmOrder {
+        txnToken
+        status
+        createdAt
+        merchantId
+        callbackUrl
+        orderId
+      }
+      paytmErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+export type PaytmTxnCreateMutationFn = Apollo.MutationFunction<
+  PaytmTxnCreateMutation,
+  PaytmTxnCreateMutationVariables
+>;
+
+/**
+ * __usePaytmTxnCreateMutation__
+ *
+ * To run a mutation, you first call `usePaytmTxnCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePaytmTxnCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [paytmTxnCreateMutation, { data, loading, error }] = usePaytmTxnCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function usePaytmTxnCreateMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PaytmTxnCreateMutation,
+    PaytmTxnCreateMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PaytmTxnCreateMutation,
+    PaytmTxnCreateMutationVariables
+  >(PaytmTxnCreateDocument, options);
+}
+export type PaytmTxnCreateMutationHookResult = ReturnType<
+  typeof usePaytmTxnCreateMutation
+>;
+export type PaytmTxnCreateMutationResult = Apollo.MutationResult<
+  PaytmTxnCreateMutation
+>;
+export type PaytmTxnCreateMutationOptions = Apollo.BaseMutationOptions<
+  PaytmTxnCreateMutation,
+  PaytmTxnCreateMutationVariables
 >;
 export const GetWalletDocument = gql`
   query GetWallet {
