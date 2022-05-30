@@ -21,7 +21,6 @@ import {
   RefreshTokenMutation,
 } from "./types";
 // import { UpdateCheckoutLine_checkoutLinesUpdate_checkout_lines } from "./cartTypes";
-import { setContext } from "@apollo/client/link/context";
 
 let client: ApolloClient<NormalizedCacheObject>;
 let authClient: AuthSDK;
@@ -370,25 +369,9 @@ export const createApolloClient = (
     typePolicies: getTypePolicies(autologin),
   });
 
-  const authLink = setContext(async (_, { headers }) => {
-    let ip;
-    if (typeof window !== "undefined") {
-      ip = localStorage.getItem("ip");
-    }
-  
-    return {
-      headers: {
-        ...headers,
-        "x-client-ip-address": ip || "",
-        "x-client-user-agent":
-          typeof window !== "undefined" ? window.navigator.userAgent : "",
-      },
-    };
-  });
-
   client = new ApolloClient({
     cache,
-    link: authLink.concat(httpLink),
+    link: httpLink,
   });
 
   /**
