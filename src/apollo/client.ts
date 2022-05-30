@@ -373,7 +373,7 @@ export const createApolloClient = (
   const authLink = setContext(async (_, { headers }) => {
     let ip;
     if (typeof window !== "undefined") {
-      ip = localStorage.getItem("ip");
+      ip = sessionStorage.getItem("ip");
     }
   
     return {
