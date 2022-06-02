@@ -121,11 +121,13 @@ export interface CheckoutSDK {
   createPayment?: (input: CreatePaymentInput) => CreatePaymentResult;
   completeCheckout?: (input?: CompleteCheckoutInput) => CompleteCheckoutResult;
   getCityStateFromPincode?: (pincode: string) => GetCityStateFromPincodeResult;
-  createRazorpayOrder?: () => CreateRazorpayOrderResult;
+  createRazorpayOrder?: (
+    opts?: CreateRazorpayOrderMutationVariables
+  ) => CreateRazorpayOrderResult;
   getWalletAmount?: () => GetWalletAmountResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
-  setCheckout?: (checkout: any, fetchDiscount?:boolean) => {};
+  setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
 }
 
 export const checkout = ({
@@ -288,40 +290,42 @@ export const checkout = ({
     return null;
   };
 
-  const setShippingAndBillingAddress: CheckoutSDK["setShippingAndBillingAddress"] =
-    async (shippingAddress: IAddress, email: string) => {
-      client.writeQuery({
-        query: GET_LOCAL_CHECKOUT,
-        data: {
-          checkoutLoading: true,
-        },
-      });
+  const setShippingAndBillingAddress: CheckoutSDK["setShippingAndBillingAddress"] = async (
+    shippingAddress: IAddress,
+    email: string
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
 
-      const resShipping = await setShippingAddress(shippingAddress, email);
-      const resBilling = await setBillingAddress(shippingAddress);
-      client.writeQuery({
-        query: GET_LOCAL_CHECKOUT,
-        data: {
-          checkoutLoading: false,
-        },
-      });
-      // const dataError = resShipping?.errors || resBilling?.errors;
-      //
-      // const returnObject= {
-      //   data: {
-      //     billingData: resBilling?.data?.checkoutBillingAddressUpdate?.checkout,
-      //     shippingData: resShipping?.data?.checkoutShippingAddressUpdate?.checkout,
-      //   },
-      //   dataError,
-      //   pending: false,
-      // }
+    const resShipping = await setShippingAddress(shippingAddress, email);
+    const resBilling = await setBillingAddress(shippingAddress);
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: false,
+      },
+    });
+    // const dataError = resShipping?.errors || resBilling?.errors;
+    //
+    // const returnObject= {
+    //   data: {
+    //     billingData: resBilling?.data?.checkoutBillingAddressUpdate?.checkout,
+    //     shippingData: resShipping?.data?.checkoutShippingAddressUpdate?.checkout,
+    //   },
+    //   dataError,
+    //   pending: false,
+    // }
 
-      const returnObject = {
-        resShipping,
-        resBilling,
-      };
-      return returnObject;
+    const returnObject = {
+      resShipping,
+      resBilling,
     };
+    return returnObject;
+  };
 
   const setAddressType: CheckoutSDK["setAddressType"] = async (
     addressId: string,
@@ -485,54 +489,55 @@ export const checkout = ({
     return null;
   };
 
-  const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] =
-    async (input: PaymentMethodUpdateInput) => {
-      client.writeQuery({
-        query: GET_LOCAL_CHECKOUT,
-        data: {
-          checkoutLoading: true,
-          useCashback: input.useCashback,
+  const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] = async (
+    input: PaymentMethodUpdateInput
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+        useCashback: input.useCashback,
+      },
+    });
+
+    storage.setUseCashback(input.useCashback);
+
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: CheckoutPaymentMethodUpdateMutationVariables = {
+        checkoutId: checkout?.id,
+        gatewayId: input.gateway,
+        useCashback: input.useCashback,
+      };
+
+      const res = await client.mutate<
+        CheckoutPaymentMethodUpdateMutation,
+        CheckoutPaymentMethodUpdateMutationVariables
+      >({
+        mutation: CHECKOUT_PAYMENT_METHOD_UPDATE,
+        variables,
+        update: (_, { data }) => {
+          setLocalCheckoutInCache(
+            client,
+            data?.checkoutPaymentMethodUpdate?.checkout,
+            true
+          );
+          if (data?.checkoutPaymentMethodUpdate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutPaymentMethodUpdate?.checkout);
+          }
         },
       });
 
-      storage.setUseCashback(input.useCashback);
+      return res;
+    }
 
-      const checkoutString = storage.getCheckout();
-      const checkout =
-        checkoutString && typeof checkoutString === "string"
-          ? JSON.parse(checkoutString)
-          : checkoutString;
-
-      if (checkout && checkout?.id) {
-        const variables: CheckoutPaymentMethodUpdateMutationVariables = {
-          checkoutId: checkout?.id,
-          gatewayId: input.gateway,
-          useCashback: input.useCashback,
-        };
-
-        const res = await client.mutate<
-          CheckoutPaymentMethodUpdateMutation,
-          CheckoutPaymentMethodUpdateMutationVariables
-        >({
-          mutation: CHECKOUT_PAYMENT_METHOD_UPDATE,
-          variables,
-          update: (_, { data }) => {
-            setLocalCheckoutInCache(
-              client,
-              data?.checkoutPaymentMethodUpdate?.checkout,
-              true
-            );
-            if (data?.checkoutPaymentMethodUpdate?.checkout?.id) {
-              storage.setCheckout(data?.checkoutPaymentMethodUpdate?.checkout);
-            }
-          },
-        });
-
-        return res;
-      }
-
-      return null;
-    };
+    return null;
+  };
 
   const createPayment: CheckoutSDK["createPayment"] = async (
     input: PaymentInput
@@ -633,19 +638,22 @@ export const checkout = ({
     return null;
   };
 
-  const getCityStateFromPincode: CheckoutSDK["getCityStateFromPincode"] =
-    async (pincode: string) => {
-      const res = await client.mutate<PincodeQuery, PincodeQueryVariables>({
-        mutation: GET_CITY_STATE_FROM_PINCODE,
-        variables: {
-          pin: pincode,
-        },
-      });
+  const getCityStateFromPincode: CheckoutSDK["getCityStateFromPincode"] = async (
+    pincode: string
+  ) => {
+    const res = await client.mutate<PincodeQuery, PincodeQueryVariables>({
+      mutation: GET_CITY_STATE_FROM_PINCODE,
+      variables: {
+        pin: pincode,
+      },
+    });
 
-      return res;
-    };
+    return res;
+  };
 
-  const createRazorpayOrder: CheckoutSDK["createRazorpayOrder"] = async () => {
+  const createRazorpayOrder: CheckoutSDK["createRazorpayOrder"] = async (
+    opts?: CreateRazorpayOrderMutationVariables
+  ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -659,10 +667,14 @@ export const checkout = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
-    if (checkout && checkout?.id) {
+    const optsCheckoutId = opts?.input?.checkoutId;
+
+    const finalCheckoutId = optsCheckoutId || checkout?.id;
+
+    if (finalCheckoutId) {
       const variables: CreateRazorpayOrderMutationVariables = {
         input: {
-          checkoutId: checkout?.id,
+          checkoutId: finalCheckoutId,
         },
       };
       const res = await client.mutate<
@@ -732,13 +744,12 @@ export const checkout = ({
     checkout: any,
     fetchDiscount?: boolean
   ) => {
-    console.log("checkoutresp", checkout)
+    console.log("checkoutresp", checkout);
     if (checkout) {
       setLocalCheckoutInCache(client, checkout, fetchDiscount);
       storage.setCheckout(checkout);
     }
     return checkout;
-
   };
 
   return {
