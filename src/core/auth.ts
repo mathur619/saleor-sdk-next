@@ -216,7 +216,12 @@ export interface AuthSDK {
 
   requestOTP: (phone: string) => RequestOtpResult;
 
-  registerAccountV2: (email: string, phone: string) => RegisterAccountV2Result;
+  registerAccountV2: (
+    email: string,
+    phone: string,
+    firstName?: string,
+    lastName?: string
+  ) => RegisterAccountV2Result;
 
   confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
 
@@ -299,7 +304,9 @@ export const auth = ({
 
   const registerAccountV2: AuthSDK["registerAccountV2"] = async (
     email: string,
-    phone: string
+    phone: string,
+    firstName?: string,
+    lastName?: string
   ) => {
     const res = await client.mutate<
       AccountRegisterV2Mutation,
@@ -310,6 +317,8 @@ export const auth = ({
         input: {
           email,
           phone,
+          firstName,
+          lastName,
         },
       },
     });
