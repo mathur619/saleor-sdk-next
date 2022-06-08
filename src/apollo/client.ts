@@ -56,100 +56,100 @@ export const createFetch = ({
   input: RequestInfo,
   init: RequestInit = {}
 ): Promise<Response> => {
-  if (!client) {
-    throw new Error(
-      "Could not find Saleor's client instance. Did you forget to call createSaleorClient()?"
-    );
-  }
-
-  let token = storage.getAccessToken();
-  // const authPluginId = storage.getAuthPluginId();
-
-  try {
-    if (
-      ["refreshToken", "externalRefresh"].includes(
-        // INFO: Non-null assertion is enabled because the block is wrapped inside try/catch
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        JSON.parse(init.body!.toString()).operationName
-      )
-    ) {
-      return fetch(input, init);
+    if (!client) {
+      throw new Error(
+        "Could not find Saleor's client instance. Did you forget to call createSaleorClient()?"
+      );
     }
-  } catch (e) {}
 
-  if (autoTokenRefresh && token) {
-    // auto refresh token before provided time skew (in seconds) until it expires
-    const expirationTime =
-      (jwtDecode<JWTToken>(token).exp - tokenRefreshTimeSkew) * 1000;
+    let token = storage.getAccessToken();
+    // const authPluginId = storage.getAuthPluginId();
 
     try {
-      if (refreshPromise) {
-        await refreshPromise;
-      } else if (Date.now() >= expirationTime) {
-        // refreshToken automatically updates token in storage
-        refreshPromise = authClient.refreshToken();
-        await refreshPromise;
+      if (
+        ["refreshToken", "externalRefresh"].includes(
+          // INFO: Non-null assertion is enabled because the block is wrapped inside try/catch
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          JSON.parse(init.body!.toString()).operationName
+        )
+      ) {
+        return fetch(input, init);
       }
-    } catch (e) {
-    } finally {
-      refreshPromise = null;
-    }
-    token = storage.getAccessToken();
-  }
+    } catch (e) { }
 
-  if (token) {
-    init.headers = {
-      ...init.headers,
-      Authorization: `JWT ${token}`,
-    };
-  }
+    if (autoTokenRefresh && token) {
+      // auto refresh token before provided time skew (in seconds) until it expires
+      const expirationTime =
+        (jwtDecode<JWTToken>(token).exp - tokenRefreshTimeSkew) * 1000;
 
-  if (refreshOnUnauthorized && token) {
-    const response = await fetch(input, init);
-    const data: FetchResult = await response.clone().json();
-    const isUnauthenticated = data?.errors?.some(
-      error => error.extensions?.exception.code === "ExpiredSignatureError"
-    );
-    let refreshTokenResponse: FetchResult<
-      RefreshTokenMutation,
-      Record<string, unknown>,
-      Record<string, unknown>
-    > | null = null;
-
-    if (isUnauthenticated) {
       try {
         if (refreshPromise) {
-          refreshTokenResponse = await refreshPromise;
-        } else {
+          await refreshPromise;
+        } else if (Date.now() >= expirationTime) {
+          // refreshToken automatically updates token in storage
           refreshPromise = authClient.refreshToken();
-          refreshTokenResponse = await refreshPromise;
-        }
-
-        if (
-          refreshTokenResponse.data &&
-          refreshTokenResponse.data?.tokenRefresh?.token
-        ) {
-          // check if mutation returns a valid token after refresh and retry the request
-          return createFetch({
-            autoTokenRefresh: false,
-            refreshOnUnauthorized: false,
-          })(input, init);
-        } else {
-          // after Saleor returns ExpiredSignatureError status and token refresh fails
-          // we log out the user and return the failed response
-          authClient.signOut();
+          await refreshPromise;
         }
       } catch (e) {
       } finally {
         refreshPromise = null;
       }
+      token = storage.getAccessToken();
     }
 
-    return response;
-  }
+    if (token) {
+      init.headers = {
+        ...init.headers,
+        Authorization: `JWT ${token}`,
+      };
+    }
 
-  return fetch(input, init);
-};
+    if (refreshOnUnauthorized && token) {
+      const response = await fetch(input, init);
+      const data: FetchResult = await response.clone().json();
+      const isUnauthenticated = data?.errors?.some(
+        error => error.extensions?.exception.code === "ExpiredSignatureError"
+      );
+      let refreshTokenResponse: FetchResult<
+        RefreshTokenMutation,
+        Record<string, unknown>,
+        Record<string, unknown>
+      > | null = null;
+
+      if (isUnauthenticated) {
+        try {
+          if (refreshPromise) {
+            refreshTokenResponse = await refreshPromise;
+          } else {
+            refreshPromise = authClient.refreshToken();
+            refreshTokenResponse = await refreshPromise;
+          }
+
+          if (
+            refreshTokenResponse.data &&
+            refreshTokenResponse.data?.tokenRefresh?.token
+          ) {
+            // check if mutation returns a valid token after refresh and retry the request
+            return createFetch({
+              autoTokenRefresh: false,
+              refreshOnUnauthorized: false,
+            })(input, init);
+          } else {
+            // after Saleor returns ExpiredSignatureError status and token refresh fails
+            // we log out the user and return the failed response
+            authClient.signOut();
+          }
+        } catch (e) {
+        } finally {
+          refreshPromise = null;
+        }
+      }
+
+      return response;
+    }
+
+    return fetch(input, init);
+  };
 
 export const cartItemsVar = makeVar<Maybe<CheckoutLineFragment>[]>([]);
 
@@ -371,17 +371,40 @@ export const createApolloClient = (
   });
 
   const authLink = setContext(async (_, { headers }) => {
-    let ip;
+    let ip, fbp, fbq;
     if (typeof window !== "undefined") {
+      function getCookie(name) {
+        // Split cookie string and get all individual name=value pairs in an array
+        var cookieArr = document.cookie.split(";");
+
+        // Loop through the array elements
+        for (var i = 0; i < cookieArr.length; i++) {
+          var cookiePair = cookieArr[i].split("=");
+
+          /* Removing whitespace at the beginning of the cookie name
+          and compare it with the given string */
+          if (name == cookiePair[0].trim()) {
+            // Decode the cookie value and return
+            return decodeURIComponent(cookiePair[1]);
+          }
+        }
+
+        // Return null if not found
+        return null;
+      }
       ip = sessionStorage.getItem("ip");
+      fbp = getCookie("_fbp");
+      fbq = getCookie("_fbq");
     }
-  
+
     return {
       headers: {
         ...headers,
         "x-client-ip-address": ip || "",
         "x-client-user-agent":
           typeof window !== "undefined" ? window.navigator.userAgent : "",
+        "x-fbp": fbp || "",
+        "x-fbq": fbq || "",
       },
     };
   });
