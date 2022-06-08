@@ -373,13 +373,13 @@ export const createApolloClient = (
   const authLink = setContext(async (_, { headers }) => {
     let ip, fbp, fbq;
     if (typeof window !== "undefined") {
-      function getCookie(name:string) {
+      function getCookie(name:any) {
         // Split cookie string and get all individual name=value pairs in an array
         var cookieArr = document.cookie.split(";");
 
         // Loop through the array elements
         for (var i = 0; i < cookieArr.length; i++) {
-          var cookiePair:string = cookieArr[i].split("=");
+          var cookiePair:any = cookieArr[i].split("=");
 
           /* Removing whitespace at the beginning of the cookie name
           and compare it with the given string */
