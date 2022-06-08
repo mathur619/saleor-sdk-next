@@ -732,7 +732,7 @@ export const checkout = ({
     checkout: any,
     fetchDiscount?: boolean
   ) => {
-    console.log("checkoutresp", checkout)
+    //console.log("checkoutresp", checkout)
     if (checkout) {
       setLocalCheckoutInCache(client, checkout, fetchDiscount);
       storage.setCheckout(checkout);
