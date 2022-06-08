@@ -173,7 +173,7 @@ export const user = ({
   apolloClient: client,
   channel,
 }: SaleorClientMethodsProps): UserSDK => {
-  console.log(client, channel);
+  //console.log(client, channel);
   // const _auth = auth({ apolloClient: client, channel });
 
   // const accountDelete: UserSDK["accountDelete"] = async token => {
