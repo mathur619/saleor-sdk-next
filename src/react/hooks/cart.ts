@@ -24,10 +24,19 @@ const defaultPrice = {
 export const useCart = hookFactory("cart");
 
 export const useCartState = () => {
-  const { data } = hookStateFactory<
+  const res = hookStateFactory<
     GetLocalCheckoutQuery,
     GetLocalCheckoutQueryVariables
   >(GET_LOCAL_CHECKOUT);
+
+  const { data, error, networkStatus, previousData, loading } = res;
+  console.log("useCartState", {
+    res,
+    error,
+    networkStatus,
+    previousData,
+    loading,
+  });
 
   if (!data) {
     throw new Error(

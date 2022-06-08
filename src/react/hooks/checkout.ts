@@ -9,10 +9,20 @@ import { hookStateFactory } from "../helpers/hookStateFactory";
 export const useCheckout = hookFactory("checkout");
 
 export const useCheckoutState = () => {
-  const { data } = hookStateFactory<
+  const res = hookStateFactory<
     GetLocalCheckoutQuery,
     GetLocalCheckoutQueryVariables
   >(GET_LOCAL_CHECKOUT);
+
+  const { data, error, networkStatus, previousData, loading } = res;
+
+  console.log("useCheckoutState", {
+    res,
+    error,
+    networkStatus,
+    previousData,
+    loading,
+  });
 
   if (!data) {
     throw new Error(
