@@ -25,6 +25,7 @@ export const useAuthState = (): UserDetailsQuery => {
   const { data, error, networkStatus, previousData, loading } = res;
   console.log("useAuthState", {
     res,
+    data,
     error,
     networkStatus,
     previousData,
@@ -32,10 +33,10 @@ export const useAuthState = (): UserDetailsQuery => {
   });
 
   if (!data) {
-    throw new Error(
-      "Cache query result is undefined. Invalid cache configuration."
-    );
+    // throw new Error(
+    //   "Cache query result is undefined. Invalid cache configuration."
+    // );
   }
 
-  return data;
+  return data || { authenticated: false, authenticating: false, user: null };
 };
