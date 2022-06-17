@@ -18,8 +18,10 @@ import {
   AddCheckoutLineMutation,
   AddCheckoutLineMutationVariables,
   Checkout,
+  CheckoutLineInput,
   CreateCheckoutMutation,
   CreateCheckoutMutationVariables,
+  Maybe,
   RemoveCheckoutLineMutation,
   RemoveCheckoutLineMutationVariables,
   UpdateCheckoutLineMutation,
@@ -60,7 +62,8 @@ export interface CartSDK {
   updateItem: (
     variantId: string,
     quantity: number,
-    prevQuantity: number
+    prevQuantity: number,
+    updatedLines?: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
   ) => UpdateItemResult;
 }
 
@@ -117,16 +120,18 @@ export const cart = ({
         window.location?.reload();
       }
       if (
-        (res.data?.checkoutLinesAdd?.errors &&
-        res.data?.checkoutLinesAdd?.errors[0]?.code === "PRODUCT_NOT_PUBLISHED") &&
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code ===
+          "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
         window.location?.reload();
       }
       if (
-        (res.data?.checkoutLinesAdd?.errors &&
-        res.data?.checkoutLinesAdd?.errors[0]?.code === "PRODUCT_UNAVAILABLE_FOR_PURCHASE") &&
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code ===
+          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
@@ -192,8 +197,7 @@ export const cart = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     const lineToRemove =
-      checkout &&
-      checkout?.lines?.find((line) => line?.variant.id === variantId);
+      checkout && checkout?.lines?.find(line => line?.variant.id === variantId);
     const lineToRemoveId = lineToRemove?.id;
 
     if (checkout && checkout?.token) {
@@ -228,16 +232,18 @@ export const cart = ({
         window.location?.reload();
       }
       if (
-        (res.data?.checkoutLineDelete?.errors &&
-        res.data?.checkoutLineDelete?.errors[0]?.code === "PRODUCT_NOT_PUBLISHED") &&
+        res.data?.checkoutLineDelete?.errors &&
+        res.data?.checkoutLineDelete?.errors[0]?.code ===
+          "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
         window.location?.reload();
       }
       if (
-        (res.data?.checkoutLineDelete?.errors &&
-        res.data?.checkoutLineDelete?.errors[0]?.code === "PRODUCT_UNAVAILABLE_FOR_PURCHASE") &&
+        res.data?.checkoutLineDelete?.errors &&
+        res.data?.checkoutLineDelete?.errors[0]?.code ===
+          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
@@ -264,7 +270,8 @@ export const cart = ({
   const updateItem: CartSDK["updateItem"] = async (
     variantId: string,
     quantity: number,
-    prevQuantity: number
+    prevQuantity: number,
+    updatedLines?: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
   ) => {
     const differenceQuantity = quantity - prevQuantity;
     if (differenceQuantity > 0) {
@@ -296,7 +303,7 @@ export const cart = ({
           mutation: UPDATE_CHECKOUT_LINE_MUTATION,
           variables: {
             checkoutId: checkout?.id,
-            lines: alteredLines,
+            lines: updatedLines || alteredLines,
           },
           update: async (_, { data }) => {
             if (data?.checkoutLinesUpdate?.checkout?.id) {
