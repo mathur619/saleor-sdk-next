@@ -153,6 +153,9 @@ export const checkoutProductVariantFragment = gql`
         key
         value
       }
+      tags {
+        name
+      }
     }
   }
 `;

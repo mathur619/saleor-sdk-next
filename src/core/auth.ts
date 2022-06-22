@@ -59,6 +59,8 @@ import {
   RefreshTokenWithUserMutationVariables,
   UserCheckoutDetailsQuery,
   UserCheckoutDetailsQueryVariables,
+  VerifyCheckoutOtpMutation,
+  VerifyCheckoutOtpMutationVariables,
 } from "..";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
@@ -68,6 +70,7 @@ import {
   REFRESH_TOKEN_WITH_USER,
   REGISTER_ACCOUNT,
   REQUEST_OTP_MUTATION,
+  VERIFY_CHECKOUT_OTP,
 } from "../apollo/mutations";
 import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
 import { storage } from "./storage";
@@ -89,6 +92,7 @@ import {
   SaleorClientMethodsProps,
   SignInMobileResult,
   SignOutResult,
+  VerifyCheckoutOTPResult,
   // SetPasswordResult,
   // VerifyExternalTokenResult,
   // VerifyTokenResult,
@@ -212,9 +216,16 @@ export interface AuthSDK {
 
   requestOTP: (phone: string) => RequestOtpResult;
 
-  registerAccountV2: (email: string, phone: string) => RegisterAccountV2Result;
+  registerAccountV2: (
+    email: string,
+    phone: string,
+    firstName?: string,
+    lastName?: string
+  ) => RegisterAccountV2Result;
 
   confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
+
+  verifyCheckoutOTP: (otp: string, phone: string) => VerifyCheckoutOTPResult;
 
   signOut: () => SignOutResult;
 
@@ -293,15 +304,10 @@ export const auth = ({
 
   const registerAccountV2: AuthSDK["registerAccountV2"] = async (
     email: string,
-    phone: string
+    phone: string,
+    firstName?: string,
+    lastName?: string
   ) => {
-    client.writeQuery({
-      query: USER,
-      data: {
-        authenticating: true,
-      },
-    });
-
     const res = await client.mutate<
       AccountRegisterV2Mutation,
       AccountRegisterV2MutationVariables
@@ -311,6 +317,8 @@ export const auth = ({
         input: {
           email,
           phone,
+          firstName,
+          lastName,
         },
       },
     });
@@ -361,6 +369,24 @@ export const auth = ({
             },
           });
         }
+      },
+    });
+
+    return res;
+  };
+
+  const verifyCheckoutOTP: AuthSDK["verifyCheckoutOTP"] = async (
+    otp: string,
+    phone: string
+  ) => {
+    const res = await client.mutate<
+      VerifyCheckoutOtpMutation,
+      VerifyCheckoutOtpMutationVariables
+    >({
+      mutation: VERIFY_CHECKOUT_OTP,
+      variables: {
+        otp,
+        phone,
       },
     });
 
@@ -701,5 +727,6 @@ export const auth = ({
     signOut,
     setToken,
     getUserCheckout,
+    verifyCheckoutOTP,
   };
 };

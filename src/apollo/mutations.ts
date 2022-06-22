@@ -448,14 +448,10 @@ export const CREATE_OTP_TOKEN_MUTATION = gql`
 `;
 
 export const REGISTER_ACCOUNT = gql`
-  ${userFragment}
   mutation AccountRegisterV2($input: AccountRegisterInputV2!) {
     accountRegisterV2(input: $input) {
       isNewUser
       isActiveUser
-      user {
-        ...UserFragment
-      }
       accountErrors {
         field
         message
@@ -479,6 +475,22 @@ export const CONFIRM_ACCOUNT = gql`
         ...UserFragment
       }
       accountErrors {
+        field
+        message
+      }
+      errors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export const VERIFY_CHECKOUT_OTP = gql`
+  mutation VerifyCheckoutOtp($otp: String!, $phone: String!) {
+    verifyCheckoutOtp(otp: $otp, phone: $phone) {
+      isVerified
+      otpErrors {
         field
         message
       }
@@ -764,6 +776,26 @@ export const CREATE_RAZORPAY_ORDER = gql`
         field
         code
         message
+      }
+    }
+  }
+`;
+
+export const PAYTM_TXN_CREATE = gql`
+  mutation PaytmTxnCreate($input: PaytmCreateOrderInput!) {
+    paytmOrderCreate(input: $input) {
+      paytmOrder {
+        txnToken
+        status
+        createdAt
+        merchantId
+        callbackUrl
+        orderId
+      }
+      paytmErrors {
+        field
+        message
+        code
       }
     }
   }
