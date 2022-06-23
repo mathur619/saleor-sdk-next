@@ -306,22 +306,12 @@ export const checkout = ({
 
     const resShipping = await setShippingAddress(shippingAddress, email);
     const resBilling = await setBillingAddress(shippingAddress);
-    client.writeQuery({
-      query: GET_LOCAL_CHECKOUT,
-      data: {
-        checkoutLoading: false,
-      },
-    });
-    // const dataError = resShipping?.errors || resBilling?.errors;
-    //
-    // const returnObject= {
+    // client.writeQuery({
+    //   query: GET_LOCAL_CHECKOUT,
     //   data: {
-    //     billingData: resBilling?.data?.checkoutBillingAddressUpdate?.checkout,
-    //     shippingData: resShipping?.data?.checkoutShippingAddressUpdate?.checkout,
+    //     checkoutLoading: false,
     //   },
-    //   dataError,
-    //   pending: false,
-    // }
+    // });
 
     const returnObject = {
       resShipping,
@@ -684,7 +674,7 @@ export const checkout = ({
           client.writeQuery({
             query: GET_LOCAL_CHECKOUT,
             data: {
-              checkoutLoading: true,
+              checkoutLoading: false,
             },
           });
         },
