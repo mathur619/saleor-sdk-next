@@ -66,7 +66,7 @@ export interface CartSDK {
   ) => UpdateItemResult;
 
   updateItemWithLines: (
-    updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
+    updatedLines: Array<Maybe<CheckoutLineInput>>
   ) => UpdateItemResult;
 }
 
@@ -329,7 +329,7 @@ export const cart = ({
   };
 
   const updateItemWithLines: CartSDK["updateItemWithLines"] = async (
-    updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
+    updatedLines: Array<Maybe<CheckoutLineInput>>
   ) => {
     const checkoutString = storage.getCheckout();
 
@@ -363,8 +363,43 @@ export const cart = ({
         data: res.data?.checkoutLinesUpdate?.checkout,
         errors: res.data?.checkoutLinesUpdate?.errors,
       };
+    } else {
+      const res = await client.mutate<
+        CreateCheckoutMutation,
+        CreateCheckoutMutationVariables
+      >({
+        mutation: CREATE_CHECKOUT_MUTATION,
+        variables: {
+          checkoutInput: {
+            lines: updatedLines || [],
+            email: "dummy@dummy.com",
+            shippingAddress: {
+              city: "delhi",
+              companyName: "dummy",
+              country: "IN",
+              countryArea: "Delhi",
+              firstName: "dummy",
+              lastName: "dummy",
+              phone: "7894561230",
+              postalCode: "110006",
+              streetAddress1: "dummy",
+              streetAddress2: "dummy",
+            },
+          },
+        },
+        update: (_, { data }) => {
+          setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout, true);
+          if (data?.checkoutCreate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutCreate?.checkout);
+          }
+        },
+      });
+      const returnObject = {
+        data: res.data?.checkoutCreate?.checkout,
+        errors: res.data?.checkoutCreate?.errors,
+      };
+      return returnObject;
     }
-    return null;
   };
 
   return {
