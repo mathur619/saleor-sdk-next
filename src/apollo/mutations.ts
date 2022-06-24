@@ -809,3 +809,14 @@ export const GET_WALLET_AMOUNT = gql`
     }
   }
 `;
+
+export const CREATE_CASHFREE_ORDER = gql`
+  mutation CreateCashfreeOrder($input: CashfreeCreateOrderInput!) {
+    cashfreeOrderCreate(input: $input) {
+      cashfreeOrder {
+        paymentUrl
+        token
+      }
+    }
+  }
+`;

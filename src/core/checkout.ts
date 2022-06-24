@@ -3,6 +3,7 @@ import {
   ADD_CHECKOUT_PROMO_CODE,
   CHECKOUT_PAYMENT_METHOD_UPDATE,
   COMPLETE_CHECKOUT,
+  CREATE_CASHFREE_ORDER,
   CREATE_CHECKOUT_MUTATION,
   CREATE_CHECKOUT_PAYMENT,
   CREATE_RAZORPAY_ORDER,
@@ -53,6 +54,8 @@ import {
   UpdateCheckoutShippingMethodMutation,
   UpdateCheckoutShippingMethodMutationVariables,
   useOrdersByUserQuery,
+  CreateCashfreeOrderMutation,
+  CreateCashfreeOrderMutationVariables,
 } from "../apollo/types";
 
 import {
@@ -66,6 +69,7 @@ import {
   AddPromoCodeResult,
   CheckoutPaymentMethodUpdateResult,
   CompleteCheckoutResult,
+  CreateCashfreeOrderResult,
   CreateCheckoutResult,
   CreatePaymentResult,
   CreatePaytmOrderResult,
@@ -131,6 +135,7 @@ export interface CheckoutSDK {
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
+  createCashfreeOrder?: () => CreateCashfreeOrderResult;
 }
 
 export const checkout = ({
@@ -784,12 +789,53 @@ export const checkout = ({
     checkout: any,
     fetchDiscount?: boolean
   ) => {
-
     if (checkout) {
       setLocalCheckoutInCache(client, checkout, fetchDiscount);
       storage.setCheckout(checkout);
     }
     return checkout;
+  };
+
+  const createCashfreeOrder: CheckoutSDK["createCashfreeOrder"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: CreateCashfreeOrderMutationVariables = {
+        input: {
+          checkoutId: checkout?.id,
+        },
+      };
+      const res = await client.mutate<
+        CreateCashfreeOrderMutation,
+        CreateCashfreeOrderMutationVariables
+      >({
+        mutation: CREATE_CASHFREE_ORDER,
+        variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: true,
+            },
+          });
+        },
+      });
+
+      return res;
+    }
+
+    return { data: null };
   };
 
   return {
@@ -811,5 +857,6 @@ export const checkout = ({
     getUserOrders,
     setUseCashback,
     setCheckout,
+    createCashfreeOrder,
   };
 };
