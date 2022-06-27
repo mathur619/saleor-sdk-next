@@ -814,6 +814,7 @@ export const checkout = ({
       const variables: CreateCashfreeOrderMutationVariables = {
         input: {
           checkoutId: checkout?.id,
+          returnUrl: "/checkout/address",
         },
       };
       const res = await client.mutate<
