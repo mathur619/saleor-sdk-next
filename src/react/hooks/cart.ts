@@ -24,19 +24,33 @@ const defaultPrice = {
 export const useCart = hookFactory("cart");
 
 export const useCartState = () => {
-  const { data } = hookStateFactory<
+  const res = hookStateFactory<
     GetLocalCheckoutQuery,
     GetLocalCheckoutQueryVariables
   >(GET_LOCAL_CHECKOUT);
 
+  const { data, error, networkStatus, previousData, loading } = res;
+  console.log("useCartState", {
+    res,
+    data,
+    error,
+    networkStatus,
+    previousData,
+    loading,
+  });
+
   if (!data) {
-    throw new Error(
-      "Cache query result is undefined. Invalid cache configuration."
-    );
+    // throw new Error(
+    //   "Cache query result is undefined. Invalid cache configuration."
+    // );
+    if(typeof window !== "undefined") {
+      window.localStorage?.clear();
+      window.location?.reload();
+    }
   }
 
   const mrp =
-    data.localCheckout?.lines?.reduce((total, curr) => {
+    data?.localCheckout?.lines?.reduce((total, curr) => {
       const variantMetadata = curr?.variant.metadata;
 
       const listPrice = getMetadataValue(variantMetadata, "listPrice");
@@ -60,7 +74,7 @@ export const useCartState = () => {
     }, 0) || 0;
 
   const netPrice =
-    data.localCheckout?.lines?.reduce((total, curr) => {
+    data?.localCheckout?.lines?.reduce((total, curr) => {
       if (curr?.quantity) {
         const netPriceAmount =
           (curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
@@ -80,7 +94,7 @@ export const useCartState = () => {
     totalPrice: data?.localCheckout?.totalPrice || defaultPrice,
     subtotalPrice: data?.localCheckout?.subtotalPrice || defaultPrice,
     shippingPrice: data?.localCheckout?.shippingPrice || defaultPrice,
-    discount: data.localCheckout?.discount,
+    discount: data?.localCheckout?.discount,
     mrp: createTaxedPriceFromAmount(mrp || 0) || defaultPrice,
     netPrice: createTaxedPriceFromAmount(netPrice || 0) || defaultPrice,
     itemDiscount: createTaxedPriceFromAmount(itemDiscount || 0) || defaultPrice,

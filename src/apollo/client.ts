@@ -216,6 +216,7 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
                 ? JSON.parse(checkoutString)
                 : checkoutString;
 
+            console.log("localCheckout checkout sdk", existing, checkout);
             if (checkout) {
               return checkout;
             }

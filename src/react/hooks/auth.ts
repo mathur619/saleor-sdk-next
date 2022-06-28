@@ -19,16 +19,28 @@ export const useAuth = hookFactory("auth");
  * @returns Object with user's data
  */
 export const useAuthState = (): UserDetailsQuery => {
-  const { data } = hookStateFactory<
-    UserDetailsQuery,
-    UserDetailsQueryVariables
-  >(USER);
+  const res = hookStateFactory<UserDetailsQuery, UserDetailsQueryVariables>(
+    USER
+  );
+  const { data, error, networkStatus, previousData, loading } = res;
+  console.log("useAuthState", {
+    res,
+    data,
+    error,
+    networkStatus,
+    previousData,
+    loading,
+  });
 
   if (!data) {
-    throw new Error(
-      "Cache query result is undefined. Invalid cache configuration."
-    );
+    // throw new Error(
+    //   "Cache query result is undefined. Invalid cache configuration."
+    // );
+    if(typeof window !== "undefined") {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
   }
 
-  return data;
+  return data || { authenticated: false, authenticating: false, user: null };
 };
