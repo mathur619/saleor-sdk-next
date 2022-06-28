@@ -29,15 +29,7 @@ export const useCartState = () => {
     GetLocalCheckoutQueryVariables
   >(GET_LOCAL_CHECKOUT);
 
-  const { data, error, networkStatus, previousData, loading } = res;
-  console.log("useCartState", {
-    res,
-    data,
-    error,
-    networkStatus,
-    previousData,
-    loading,
-  });
+  const { data } = res;
 
   if (!data) {
     // throw new Error(
