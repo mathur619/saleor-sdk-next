@@ -3,7 +3,7 @@ module.exports = {
     includes: ["src/**/*.ts"],
     name: "sdk",
     service: {
-      url: "https://gourmetgardenstageapi.farziengineer.co/graphql/",
+      url: "https://gourmetgardenapi.farziengineer.co/graphql/",
       name: "saleor",
     },
   },

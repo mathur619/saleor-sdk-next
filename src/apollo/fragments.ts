@@ -177,7 +177,7 @@ export const checkoutLineFragment = gql`
   fragment CheckoutLine on CheckoutLine {
     id
     quantity
-
+    data
     totalPrice {
       ...Price
     }
