@@ -14,16 +14,8 @@ export const useCheckoutState = () => {
     GetLocalCheckoutQueryVariables
   >(GET_LOCAL_CHECKOUT);
 
-  const { data, error, networkStatus, previousData, loading } = res;
+  const { data } = res;
 
-  console.log("useCheckoutState", {
-    res,
-    data,
-    error,
-    networkStatus,
-    previousData,
-    loading,
-  });
 
   if (!data) {
     // throw new Error(

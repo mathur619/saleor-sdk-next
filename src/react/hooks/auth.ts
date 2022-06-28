@@ -22,15 +22,7 @@ export const useAuthState = (): UserDetailsQuery => {
   const res = hookStateFactory<UserDetailsQuery, UserDetailsQueryVariables>(
     USER
   );
-  const { data, error, networkStatus, previousData, loading } = res;
-  console.log("useAuthState", {
-    res,
-    data,
-    error,
-    networkStatus,
-    previousData,
-    loading,
-  });
+  const { data } = res;
 
   if (!data) {
     // throw new Error(
