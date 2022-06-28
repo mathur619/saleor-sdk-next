@@ -29,6 +29,10 @@ export const useCheckoutState = () => {
     // throw new Error(
     //   "Cache query result is undefined. Invalid cache configuration."
     // );
+    if(typeof window !== "undefined") {
+      window.localStorage?.clear();
+      window.location?.reload();
+    }
   }
 
   return {
