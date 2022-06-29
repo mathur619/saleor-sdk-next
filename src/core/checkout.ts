@@ -135,7 +135,7 @@ export interface CheckoutSDK {
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
-  createCashfreeOrder?: () => CreateCashfreeOrderResult;
+  createCashfreeOrder?: (returnURL?: string) => CreateCashfreeOrderResult;
 }
 
 export const checkout = ({
@@ -796,7 +796,7 @@ export const checkout = ({
     return checkout;
   };
 
-  const createCashfreeOrder: CheckoutSDK["createCashfreeOrder"] = async () => {
+  const createCashfreeOrder: CheckoutSDK["createCashfreeOrder"] = async returnURL => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -814,7 +814,7 @@ export const checkout = ({
       const variables: CreateCashfreeOrderMutationVariables = {
         input: {
           checkoutId: checkout?.id,
-          returnUrl: "/checkout/address",
+          returnUrl: returnURL || "/checkout/address",
         },
       };
       const res = await client.mutate<
