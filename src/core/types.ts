@@ -66,6 +66,7 @@ import {
   UpdateAccountAddressMutation,
   VerifyCheckoutOtpMutation,
   PaytmTxnCreateMutation,
+  CreateCashfreeOrderMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -223,6 +224,10 @@ export type GetCityStateFromPincodeResult = Promise<FetchResult<
 > | null>;
 export type CreateRazorpayOrderResult = Promise<FetchResult<
   CreateRazorpayOrderMutation
+> | null>;
+
+export type CreateCashfreeOrderResult = Promise<FetchResult<
+  CreateCashfreeOrderMutation
 > | null>;
 
 export type CreatePaytmOrderResult = Promise<
