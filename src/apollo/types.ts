@@ -17313,6 +17313,7 @@ export type UpdateAccountAddressMutation = {
 
 export type OtpRequestMutationVariables = Exact<{
   phone: Scalars["String"];
+  type?: Maybe<Scalars["String"]>;
 }>;
 
 export type OtpRequestMutation = {
@@ -18546,8 +18547,8 @@ export type UpdateAccountAddressMutationOptions = Apollo.BaseMutationOptions<
   UpdateAccountAddressMutationVariables
 >;
 export const OtpRequestDocument = gql`
-  mutation OTPRequest($phone: String!) {
-    RequestOTP: requestOtp(phone: $phone) {
+  mutation OTPRequest($phone: String!, $type: String) {
+    RequestOTP: requestOtp(phone: $phone, type: $type) {
       message
       otpErrors {
         code
@@ -18576,6 +18577,7 @@ export type OtpRequestMutationFn = Apollo.MutationFunction<
  * const [otpRequestMutation, { data, loading, error }] = useOtpRequestMutation({
  *   variables: {
  *      phone: // value for 'phone'
+ *      type: // value for 'type'
  *   },
  * });
  */

@@ -214,7 +214,7 @@ export interface AuthSDK {
 
   signInMobile: (otp: string, phone: string) => SignInMobileResult;
 
-  requestOTP: (phone: string) => RequestOtpResult;
+  requestOTP: (phone: string, type?: string) => RequestOtpResult;
 
   registerAccountV2: (
     email: string,
@@ -288,7 +288,10 @@ export const auth = ({
     return res;
   };
 
-  const requestOTP: AuthSDK["requestOTP"] = async (phone: string) => {
+  const requestOTP: AuthSDK["requestOTP"] = async (
+    phone: string,
+    type?: string
+  ) => {
     const res = await client.mutate<
       OtpRequestMutation,
       OtpRequestMutationVariables
@@ -296,6 +299,7 @@ export const auth = ({
       mutation: REQUEST_OTP_MUTATION,
       variables: {
         phone,
+        type,
       },
     });
 
