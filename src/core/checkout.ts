@@ -8,6 +8,7 @@ import {
   CREATE_RAZORPAY_ORDER,
   GET_WALLET_AMOUNT,
   PAYTM_TXN_CREATE,
+  REFRESH_CHECKOUT,
   REMOVE_CHECKOUT_PROMO_CODE,
   UPDATE_CHECKOUT_ADDRESS_TYPE,
   UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION,
@@ -42,6 +43,8 @@ import {
   PaytmTxnCreateMutationVariables,
   PincodeQuery,
   PincodeQueryVariables,
+  RefreshCheckoutMutation,
+  RefreshCheckoutMutationVariables,
   RemoveCheckoutPromoCodeMutation,
   RemoveCheckoutPromoCodeMutationVariables,
   UpdateCheckoutAddressTypeMutation,
@@ -73,6 +76,7 @@ import {
   GetCityStateFromPincodeResult,
   GetUserOrdersResult,
   GetWalletAmountResult,
+  RefreshCheckoutResult,
   RemovePromoCodeResult,
   SaleorClientMethodsProps,
   SetAddressTypeResult,
@@ -131,6 +135,7 @@ export interface CheckoutSDK {
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
+  refreshCheckout?: () => RefreshCheckoutResult;
 }
 
 export const checkout = ({
@@ -782,6 +787,41 @@ export const checkout = ({
     return checkout;
   };
 
+  const refreshCheckout: CheckoutSDK["refreshCheckout"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    if (!(checkout && checkout?.id)) {
+      const res = await client.mutate<
+        RefreshCheckoutMutation,
+        RefreshCheckoutMutationVariables
+      >({
+        mutation: REFRESH_CHECKOUT,
+        variables: {
+          checkoutId: checkout?.id,
+        },
+        update: (_, { data }) => {
+          setLocalCheckoutInCache(client, data?.checkoutRefresh?.checkout);
+          if (data?.checkoutRefresh?.checkout?.id) {
+            storage.setCheckout(data?.checkoutRefresh?.checkout);
+          }
+        },
+      });
+
+      return res;
+    }
+    return null;
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -801,5 +841,6 @@ export const checkout = ({
     getUserOrders,
     setUseCashback,
     setCheckout,
+    refreshCheckout,
   };
 };

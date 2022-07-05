@@ -66,6 +66,7 @@ import {
   UpdateAccountAddressMutation,
   VerifyCheckoutOtpMutation,
   PaytmTxnCreateMutation,
+  RefreshCheckoutMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -236,6 +237,12 @@ export type GetUserOrdersResult = Promise<
     Exact<{ perPage: number; after?: Maybe<string> | undefined }>
   >
 >;
+
+export type RefreshCheckoutResult = Promise<FetchResult<
+  RefreshCheckoutMutation,
+  Record<string, any>,
+  Record<string, any>
+> | null>;
 
 // Cart
 

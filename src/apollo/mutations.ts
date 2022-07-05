@@ -809,3 +809,18 @@ export const GET_WALLET_AMOUNT = gql`
     }
   }
 `;
+
+export const REFRESH_CHECKOUT = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation RefreshCheckout($checkoutId: ID!) {
+    checkoutRefresh(checkoutId: $checkoutId) {
+      checkout {
+        ...Checkout
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;
