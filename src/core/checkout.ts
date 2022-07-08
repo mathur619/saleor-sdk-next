@@ -800,7 +800,7 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-    if (!(checkout && checkout?.id)) {
+    if (checkout && checkout?.id) {
       const res = await client.mutate<
         RefreshCheckoutMutation,
         RefreshCheckoutMutationVariables
