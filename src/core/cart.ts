@@ -18,6 +18,7 @@ import {
   AddCheckoutLineMutation,
   AddCheckoutLineMutationVariables,
   Checkout,
+  CheckoutCreateInput,
   CreateCheckoutMutation,
   CreateCheckoutMutationVariables,
   RemoveCheckoutLineMutation,
@@ -54,7 +55,11 @@ export interface CartSDK {
 
   cashbackRecieve?: any;
 
-  addItem: (variantId: string, quantity: number) => AddItemResult;
+  addItem: (
+    variantId: string,
+    quantity: number,
+    tags?: string[]
+  ) => AddItemResult;
   removeItem: (variantId: string) => RemoveItemResult;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem: (
@@ -71,7 +76,8 @@ export const cart = ({
 
   const addItem: CartSDK["addItem"] = async (
     variantId: string,
-    quantity: number
+    quantity: number,
+    tags?: string[]
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -117,16 +123,18 @@ export const cart = ({
         window.location?.reload();
       }
       if (
-        (res.data?.checkoutLinesAdd?.errors &&
-        res.data?.checkoutLinesAdd?.errors[0]?.code === "PRODUCT_NOT_PUBLISHED") &&
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code ===
+          "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
         window.location?.reload();
       }
       if (
-        (res.data?.checkoutLinesAdd?.errors &&
-        res.data?.checkoutLinesAdd?.errors[0]?.code === "PRODUCT_UNAVAILABLE_FOR_PURCHASE") &&
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code ===
+          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
@@ -147,28 +155,50 @@ export const cart = ({
       };
       return returnObject;
     } else {
+      let checkoutInputVariables:CheckoutCreateInput;
+      if (tags) {
+        checkoutInputVariables = {
+          lines: [{ quantity: quantity, variantId: variantId }],
+          email: "dummy@dummy.com",
+          tags,
+          shippingAddress: {
+            city: "delhi",
+            companyName: "dummy",
+            country: "IN",
+            countryArea: "Delhi",
+            firstName: "dummy",
+            lastName: "dummy",
+            phone: "7894561230",
+            postalCode: "110006",
+            streetAddress1: "dummy",
+            streetAddress2: "dummy",
+          },
+        };
+      } else {
+        checkoutInputVariables = {
+          lines: [{ quantity: quantity, variantId: variantId }],
+          email: "dummy@dummy.com",
+          shippingAddress: {
+            city: "delhi",
+            companyName: "dummy",
+            country: "IN",
+            countryArea: "Delhi",
+            firstName: "dummy",
+            lastName: "dummy",
+            phone: "7894561230",
+            postalCode: "110006",
+            streetAddress1: "dummy",
+            streetAddress2: "dummy",
+          },
+        };
+      }
       const res = await client.mutate<
         CreateCheckoutMutation,
         CreateCheckoutMutationVariables
       >({
         mutation: CREATE_CHECKOUT_MUTATION,
         variables: {
-          checkoutInput: {
-            lines: [{ quantity: quantity, variantId: variantId }],
-            email: "dummy@dummy.com",
-            shippingAddress: {
-              city: "delhi",
-              companyName: "dummy",
-              country: "IN",
-              countryArea: "Delhi",
-              firstName: "dummy",
-              lastName: "dummy",
-              phone: "7894561230",
-              postalCode: "110006",
-              streetAddress1: "dummy",
-              streetAddress2: "dummy",
-            },
-          },
+          checkoutInput: checkoutInputVariables,
         },
         update: (_, { data }) => {
           setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout, true);
@@ -192,8 +222,7 @@ export const cart = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     const lineToRemove =
-      checkout &&
-      checkout?.lines?.find((line) => line?.variant.id === variantId);
+      checkout && checkout?.lines?.find(line => line?.variant.id === variantId);
     const lineToRemoveId = lineToRemove?.id;
 
     if (checkout && checkout?.token) {
@@ -228,16 +257,18 @@ export const cart = ({
         window.location?.reload();
       }
       if (
-        (res.data?.checkoutLineDelete?.errors &&
-        res.data?.checkoutLineDelete?.errors[0]?.code === "PRODUCT_NOT_PUBLISHED") &&
+        res.data?.checkoutLineDelete?.errors &&
+        res.data?.checkoutLineDelete?.errors[0]?.code ===
+          "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
         window.location?.reload();
       }
       if (
-        (res.data?.checkoutLineDelete?.errors &&
-        res.data?.checkoutLineDelete?.errors[0]?.code === "PRODUCT_UNAVAILABLE_FOR_PURCHASE") &&
+        res.data?.checkoutLineDelete?.errors &&
+        res.data?.checkoutLineDelete?.errors[0]?.code ===
+          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
