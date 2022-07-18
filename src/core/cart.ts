@@ -18,6 +18,7 @@ import {
   AddCheckoutLineMutation,
   AddCheckoutLineMutationVariables,
   Checkout,
+  CheckoutCreateInput,
   CreateCheckoutMutation,
   CreateCheckoutMutationVariables,
   RemoveCheckoutLineMutation,
@@ -154,7 +155,7 @@ export const cart = ({
       };
       return returnObject;
     } else {
-      let checkoutInputVariables;
+      let checkoutInputVariables:CheckoutCreateInput;
       if (tags) {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
