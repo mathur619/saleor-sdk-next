@@ -1936,11 +1936,12 @@ export type CheckoutCreateInput = {
   lines: Array<Maybe<CheckoutLineInput>>;
   /** The customer's email address. */
   email?: Maybe<Scalars['String']>;
-  tags?: string[];
   /** The mailing address to where the checkout will be shipped. Note: the address will be ignored if the checkout doesn't contain shippable items. */
   shippingAddress?: Maybe<AddressInput>;
   /** Billing address of the customer. */
   billingAddress?: Maybe<AddressInput>;
+  /** Tags if any, associated with the Checkout */
+  tags?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 /** Sets the customer as the owner of the checkout. */
