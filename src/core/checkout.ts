@@ -633,10 +633,10 @@ export const checkout = ({
         update: async (_, { data }) => {
           if (data?.checkoutComplete?.order?.id) {
             if (!data?.checkoutComplete.confirmationNeeded) {
+              await setLocalCheckoutInCache(client, {}, false, data);
               storage.setCheckout({});
             }
           }
-          await setLocalCheckoutInCache(client, {}, false, data);
         },
       });
 
