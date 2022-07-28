@@ -1,3 +1,4 @@
+import { wishlist } from "./wishlist";
 import { LOCAL_STORAGE_EXISTS } from "../constants";
 import {
   SALEOR_AUTH_PLUGIN_ID,
@@ -7,6 +8,7 @@ import {
   SALEOR_CSRF_TOKEN,
   SALEOR_REFRESH_TOKEN,
   SALEOR_USE_CASHBACK,
+  SALEOR_WISHLIST,
 } from "./constants";
 
 export let storage: {
@@ -29,6 +31,8 @@ export let storage: {
   getDiscounts: () => any | null;
   setUseCashback: (sseCashback: any) => void;
   getUseCashback: () => any | null;
+  setWishlist: (wishlist: any) => void;
+  getWishlist: () => any | null;
 };
 
 export const createStorage = (autologinEnabled: boolean): void => {
@@ -53,6 +57,9 @@ export const createStorage = (autologinEnabled: boolean): void => {
     : null;
   let useCashbackStorage: any = LOCAL_STORAGE_EXISTS
     ? localStorage.getItem(SALEOR_USE_CASHBACK)
+    : null;
+  let wishlistStorage: any = LOCAL_STORAGE_EXISTS
+    ? localStorage.getItem(SALEOR_WISHLIST)
     : null;
 
   const setAuthPluginId = (pluginId: string | null): void => {
@@ -149,6 +156,15 @@ export const createStorage = (autologinEnabled: boolean): void => {
     return discountsStorage;
   };
 
+  const setWishlist = (wishlist: any) => {
+    wishlistStorage = wishlist;
+    localStorage.setItem(SALEOR_WISHLIST, JSON.stringify(wishlist));
+  };
+
+  const getWishlist = (): any | null => {
+    return wishlistStorage;
+  };
+
   const clear = (): void => {
     setAuthPluginId(null);
     setAccessToken(null);
@@ -184,5 +200,7 @@ export const createStorage = (autologinEnabled: boolean): void => {
     getRefreshToken,
     setUseCashback,
     getUseCashback,
+    setWishlist,
+    getWishlist,
   };
 };

@@ -397,7 +397,7 @@ export const createApolloClient = (
       fbp = getCookie("_fbp");
       fbc = getCookie("_fbc");
     }
-  
+
     return {
       headers: {
         ...headers,
