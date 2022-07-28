@@ -1,3 +1,4 @@
+import { wishlist } from "./../core/wishlist";
 import { gql } from "@apollo/client";
 
 export const accountErrorFragment = gql`
@@ -367,5 +368,125 @@ export const paymentErrorFragment = gql`
     code
     field
     message
+  }
+`;
+
+export const productFragment = gql`
+  fragment productFields on Product {
+    id
+    name
+    isAvailableForPurchase
+    metadata {
+      key
+      value
+    }
+    thumbnail {
+      url
+    }
+    images {
+      id
+      alt
+      url
+    }
+    variants {
+      id
+      sku
+      name
+
+      quantityAvailable(countryCode: IN)
+      images {
+        id
+        url
+        alt
+      }
+      pricing {
+        onSale
+        priceUndiscounted {
+          gross {
+            amount
+            currency
+          }
+          net {
+            amount
+            currency
+          }
+        }
+        price {
+          gross {
+            amount
+            currency
+          }
+          net {
+            amount
+            currency
+          }
+        }
+      }
+    }
+
+    pricing {
+      priceRangeUndiscounted {
+        start {
+          net {
+            amount
+            currency
+          }
+          gross {
+            amount
+            currency
+          }
+        }
+        stop {
+          net {
+            amount
+            currency
+          }
+          gross {
+            amount
+            currency
+          }
+        }
+      }
+      priceRange {
+        start {
+          net {
+            amount
+            currency
+          }
+          gross {
+            amount
+            currency
+          }
+        }
+        stop {
+          net {
+            amount
+            currency
+          }
+          gross {
+            amount
+            currency
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const wishlistFragment = gql`
+  ${productFragment}
+  fragment Wishlist on Wishlist {
+    id
+    createdAt
+    items {
+      edges {
+        node {
+          id
+          product {
+            ...productFields
+          }
+        }
+      }
+    }
   }
 `;

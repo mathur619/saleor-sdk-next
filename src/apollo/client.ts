@@ -207,6 +207,13 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
           return cartItems;
         },
       },
+      localWishlist: {
+        read(existing) {
+          return {
+            items: [],
+          };
+        },
+      },
       localCheckout: {
         read(existing) {
           if (!existing) {
@@ -374,13 +381,13 @@ export const createApolloClient = (
   const authLink = setContext(async (_, { headers }) => {
     let ip, fbp, fbc;
     if (typeof window !== "undefined") {
-      function getCookie(name:any) {
+      function getCookie(name: any) {
         // Split cookie string and get all individual name=value pairs in an array
-        var cookieArr = document.cookie.split(";");
+        const cookieArr = document.cookie.split(";");
 
         // Loop through the array elements
-        for (var i = 0; i < cookieArr.length; i++) {
-          var cookiePair:any = cookieArr[i].split("=");
+        for (let i = 0; i < cookieArr.length; i++) {
+          const cookiePair: any = cookieArr[i].split("=");
 
           /* Removing whitespace at the beginning of the cookie name
           and compare it with the given string */

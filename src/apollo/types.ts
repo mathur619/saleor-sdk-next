@@ -1940,8 +1940,6 @@ export type CheckoutCreateInput = {
   shippingAddress?: Maybe<AddressInput>;
   /** Billing address of the customer. */
   billingAddress?: Maybe<AddressInput>;
-  /** Tags if any, associated with the Checkout */
-  tags?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 /** Sets the customer as the owner of the checkout. */
@@ -12117,6 +12115,7 @@ export type Query = {
   localCashback: Maybe<CashbackType>;
   localCheckout: Maybe<Checkout>;
   localCheckoutDiscounts: Maybe<DiscountsType>;
+  localWishlist: Maybe<Wishlist>;
   /** Return the currently authenticated user. */
   me: Maybe<User>;
   /** Look up a navigation menu by ID or name. */
@@ -17439,6 +17438,25 @@ export type PaymentFragment = (
 
 export type PaymentErrorFragment = Pick<PaymentError, 'code' | 'field' | 'message'>;
 
+export type ProductFieldsFragment = (
+  Pick<Product, 'id' | 'name' | 'isAvailableForPurchase'>
+  & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, thumbnail: Maybe<Pick<Image, 'url'>>, images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'alt' | 'url'>>>>, variants: Maybe<Array<Maybe<(
+    Pick<ProductVariant, 'id' | 'sku' | 'name' | 'quantityAvailable'>
+    & { images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'url' | 'alt'>>>>, pricing: Maybe<(
+      Pick<VariantPricingInfo, 'onSale'>
+      & { priceUndiscounted: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }>, price: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }> }
+    )> }
+  )>>>, pricing: Maybe<{ priceRangeUndiscounted: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }>, priceRange: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }> }> }
+);
+
+export type WishlistFragment = (
+  Pick<Wishlist, 'id' | 'createdAt'>
+  & { items: { edges: Array<{ node: (
+        Pick<WishlistItem, 'id'>
+        & { product: ProductFieldsFragment }
+      ) }> } }
+);
+
 export type RefreshTokenMutationVariables = Exact<{
   csrfToken: Scalars['String'];
   refreshToken?: Maybe<Scalars['String']>;
@@ -17702,6 +17720,31 @@ export type CreateCashfreeOrderMutationVariables = Exact<{
 
 export type CreateCashfreeOrderMutation = { cashfreeOrderCreate: Maybe<{ cashfreeOrder: Maybe<Pick<CashfreeOrderType, 'paymentUrl' | 'token'>> }> };
 
+export type AddWishlistProductMutationVariables = Exact<{
+  productId: Scalars['ID'];
+}>;
+
+
+export type AddWishlistProductMutation = { wishlistAddProduct: Maybe<{ wishlist: Maybe<Array<Maybe<(
+      Pick<WishlistItem, 'id'>
+      & { wishlist: (
+        Pick<Wishlist, 'id' | 'createdAt'>
+        & { items: { edges: Array<{ node: (
+              Pick<WishlistItem, 'id'>
+              & { product: (
+                Pick<Product, 'id' | 'name' | 'isAvailableForPurchase'>
+                & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, thumbnail: Maybe<Pick<Image, 'url'>>, images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'alt' | 'url'>>>>, variants: Maybe<Array<Maybe<(
+                  Pick<ProductVariant, 'id' | 'sku' | 'name' | 'quantityAvailable'>
+                  & { images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'url' | 'alt'>>>>, pricing: Maybe<(
+                    Pick<VariantPricingInfo, 'onSale'>
+                    & { priceUndiscounted: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }>, price: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }> }
+                  )> }
+                )>>>, pricing: Maybe<{ priceRangeUndiscounted: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }>, priceRange: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }> }> }
+              ) }
+            ) }> } }
+      ) }
+    )>>> }> };
+
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -17780,6 +17823,11 @@ export type OrdersByUserQuery = { me: Maybe<(
           )>> }
         ) }> }> }
   )> };
+
+export type GetLocalWishlistQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetLocalWishlistQuery = { localWishlist: Maybe<WishlistFragment> };
 
 export const AccountErrorFragmentDoc = gql`
     fragment AccountErrorFragment on AccountError {
@@ -18092,6 +18140,121 @@ export const PaymentErrorFragmentDoc = gql`
   message
 }
     `;
+export const ProductFieldsFragmentDoc = gql`
+    fragment productFields on Product {
+  id
+  name
+  isAvailableForPurchase
+  metadata {
+    key
+    value
+  }
+  thumbnail {
+    url
+  }
+  images {
+    id
+    alt
+    url
+  }
+  variants {
+    id
+    sku
+    name
+    quantityAvailable(countryCode: IN)
+    images {
+      id
+      url
+      alt
+    }
+    pricing {
+      onSale
+      priceUndiscounted {
+        gross {
+          amount
+          currency
+        }
+        net {
+          amount
+          currency
+        }
+      }
+      price {
+        gross {
+          amount
+          currency
+        }
+        net {
+          amount
+          currency
+        }
+      }
+    }
+  }
+  pricing {
+    priceRangeUndiscounted {
+      start {
+        net {
+          amount
+          currency
+        }
+        gross {
+          amount
+          currency
+        }
+      }
+      stop {
+        net {
+          amount
+          currency
+        }
+        gross {
+          amount
+          currency
+        }
+      }
+    }
+    priceRange {
+      start {
+        net {
+          amount
+          currency
+        }
+        gross {
+          amount
+          currency
+        }
+      }
+      stop {
+        net {
+          amount
+          currency
+        }
+        gross {
+          amount
+          currency
+        }
+      }
+    }
+  }
+}
+    `;
+export const WishlistFragmentDoc = gql`
+    fragment Wishlist on Wishlist {
+  id
+  createdAt
+  items {
+    edges {
+      node {
+        id
+        product {
+          ...productFields
+        }
+      }
+    }
+  }
+}
+    ${ProductFieldsFragmentDoc}`;
 export const RefreshTokenDocument = gql`
     mutation refreshToken($csrfToken: String!, $refreshToken: String) {
   tokenRefresh(csrfToken: $csrfToken, refreshToken: $refreshToken) {
@@ -19361,6 +19524,149 @@ export function useCreateCashfreeOrderMutation(baseOptions?: Apollo.MutationHook
 export type CreateCashfreeOrderMutationHookResult = ReturnType<typeof useCreateCashfreeOrderMutation>;
 export type CreateCashfreeOrderMutationResult = Apollo.MutationResult<CreateCashfreeOrderMutation>;
 export type CreateCashfreeOrderMutationOptions = Apollo.BaseMutationOptions<CreateCashfreeOrderMutation, CreateCashfreeOrderMutationVariables>;
+export const AddWishlistProductDocument = gql`
+    mutation AddWishlistProduct($productId: ID!) {
+  wishlistAddProduct(productId: $productId) {
+    wishlist {
+      id
+      wishlist {
+        id
+        createdAt
+        items(first: 20) {
+          edges {
+            node {
+              id
+              product {
+                id
+                name
+                isAvailableForPurchase
+                metadata {
+                  key
+                  value
+                }
+                thumbnail {
+                  url
+                }
+                images {
+                  id
+                  alt
+                  url
+                }
+                variants {
+                  id
+                  sku
+                  name
+                  quantityAvailable(countryCode: IN)
+                  images {
+                    id
+                    url
+                    alt
+                  }
+                  pricing {
+                    onSale
+                    priceUndiscounted {
+                      gross {
+                        amount
+                        currency
+                      }
+                      net {
+                        amount
+                        currency
+                      }
+                    }
+                    price {
+                      gross {
+                        amount
+                        currency
+                      }
+                      net {
+                        amount
+                        currency
+                      }
+                    }
+                  }
+                }
+                pricing {
+                  priceRangeUndiscounted {
+                    start {
+                      net {
+                        amount
+                        currency
+                      }
+                      gross {
+                        amount
+                        currency
+                      }
+                    }
+                    stop {
+                      net {
+                        amount
+                        currency
+                      }
+                      gross {
+                        amount
+                        currency
+                      }
+                    }
+                  }
+                  priceRange {
+                    start {
+                      net {
+                        amount
+                        currency
+                      }
+                      gross {
+                        amount
+                        currency
+                      }
+                    }
+                    stop {
+                      net {
+                        amount
+                        currency
+                      }
+                      gross {
+                        amount
+                        currency
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+export type AddWishlistProductMutationFn = Apollo.MutationFunction<AddWishlistProductMutation, AddWishlistProductMutationVariables>;
+
+/**
+ * __useAddWishlistProductMutation__
+ *
+ * To run a mutation, you first call `useAddWishlistProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddWishlistProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addWishlistProductMutation, { data, loading, error }] = useAddWishlistProductMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useAddWishlistProductMutation(baseOptions?: Apollo.MutationHookOptions<AddWishlistProductMutation, AddWishlistProductMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddWishlistProductMutation, AddWishlistProductMutationVariables>(AddWishlistProductDocument, options);
+      }
+export type AddWishlistProductMutationHookResult = ReturnType<typeof useAddWishlistProductMutation>;
+export type AddWishlistProductMutationResult = Apollo.MutationResult<AddWishlistProductMutation>;
+export type AddWishlistProductMutationOptions = Apollo.BaseMutationOptions<AddWishlistProductMutation, AddWishlistProductMutationVariables>;
 export const UserDetailsDocument = gql`
     query UserDetails {
   user: me {
@@ -19774,3 +20080,37 @@ export function useOrdersByUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type OrdersByUserQueryHookResult = ReturnType<typeof useOrdersByUserQuery>;
 export type OrdersByUserLazyQueryHookResult = ReturnType<typeof useOrdersByUserLazyQuery>;
 export type OrdersByUserQueryResult = Apollo.QueryResult<OrdersByUserQuery, OrdersByUserQueryVariables>;
+export const GetLocalWishlistDocument = gql`
+    query getLocalWishlist {
+  localWishlist @client {
+    ...Wishlist
+  }
+}
+    ${WishlistFragmentDoc}`;
+
+/**
+ * __useGetLocalWishlistQuery__
+ *
+ * To run a query within a React component, call `useGetLocalWishlistQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLocalWishlistQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLocalWishlistQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetLocalWishlistQuery(baseOptions?: Apollo.QueryHookOptions<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>(GetLocalWishlistDocument, options);
+      }
+export function useGetLocalWishlistLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>(GetLocalWishlistDocument, options);
+        }
+export type GetLocalWishlistQueryHookResult = ReturnType<typeof useGetLocalWishlistQuery>;
+export type GetLocalWishlistLazyQueryHookResult = ReturnType<typeof useGetLocalWishlistLazyQuery>;
+export type GetLocalWishlistQueryResult = Apollo.QueryResult<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>;
