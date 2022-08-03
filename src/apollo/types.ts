@@ -2103,6 +2103,8 @@ export type CheckoutCreateInput = {
   shippingAddress?: Maybe<AddressInput>;
   /** Billing address of the customer. */
   billingAddress?: Maybe<AddressInput>;
+  /** Tags if any, associated with the Checkout */
+  tags?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 /** Sets the customer as the owner of the checkout. */
