@@ -30,7 +30,9 @@ export const wishlist = ({
         productId: productId,
       },
       update: (_, { data }) => {
+        console.log("wishlistSDK Update", data);
         if (data?.wishlist) {
+          console.log("wishlistSDK inside if", data?.wishlist);
           storage.setWishlist(data?.wishlist);
         }
       },
