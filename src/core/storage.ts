@@ -1,4 +1,3 @@
-import { wishlist } from "./wishlist";
 import { LOCAL_STORAGE_EXISTS } from "../constants";
 import {
   SALEOR_AUTH_PLUGIN_ID,

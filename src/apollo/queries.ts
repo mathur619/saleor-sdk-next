@@ -1,10 +1,8 @@
-import { wishlist } from "./../core/wishlist";
 import { gql } from "@apollo/client";
 import {
   checkoutFragment,
   checkoutLineFragment,
   orderDetailFragment,
-  productFragment,
   userFragment,
   wishlistFragment,
 } from "./fragments";

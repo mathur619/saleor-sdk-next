@@ -209,6 +209,9 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       },
       localWishlist: {
         read(existing) {
+          if (!existing) {
+            return { items: [] };
+          }
           return {
             items: [],
           };

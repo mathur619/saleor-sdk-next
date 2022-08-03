@@ -1,4 +1,3 @@
-import { wishlist } from "./../core/wishlist";
 import { gql } from "@apollo/client";
 
 export const accountErrorFragment = gql`
