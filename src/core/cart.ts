@@ -93,6 +93,7 @@ export const cart = ({
         : checkoutString;
 
     if (checkout && checkout?.token) {
+      console.log("tags from sdk if", tags);
       const res = await client.mutate<
         AddCheckoutLineMutation,
         AddCheckoutLineMutationVariables
@@ -125,7 +126,7 @@ export const cart = ({
       if (
         res.data?.checkoutLinesAdd?.errors &&
         res.data?.checkoutLinesAdd?.errors[0]?.code ===
-          "PRODUCT_NOT_PUBLISHED" &&
+        "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
@@ -134,7 +135,7 @@ export const cart = ({
       if (
         res.data?.checkoutLinesAdd?.errors &&
         res.data?.checkoutLinesAdd?.errors[0]?.code ===
-          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
+        "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
@@ -155,7 +156,8 @@ export const cart = ({
       };
       return returnObject;
     } else {
-      let checkoutInputVariables:CheckoutCreateInput;
+      let checkoutInputVariables: CheckoutCreateInput;
+      console.log("tags from sdk else", tags);
       if (tags) {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
@@ -174,6 +176,7 @@ export const cart = ({
             streetAddress2: "dummy",
           },
         };
+        console.log("checkoutInputVariables from sdk if", checkoutInputVariables);
       } else {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
@@ -191,6 +194,7 @@ export const cart = ({
             streetAddress2: "dummy",
           },
         };
+        console.log("tacheckoutInputVariables from sdk else", checkoutInputVariables);
       }
       const res = await client.mutate<
         CreateCheckoutMutation,
@@ -259,7 +263,7 @@ export const cart = ({
       if (
         res.data?.checkoutLineDelete?.errors &&
         res.data?.checkoutLineDelete?.errors[0]?.code ===
-          "PRODUCT_NOT_PUBLISHED" &&
+        "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
@@ -268,7 +272,7 @@ export const cart = ({
       if (
         res.data?.checkoutLineDelete?.errors &&
         res.data?.checkoutLineDelete?.errors[0]?.code ===
-          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
+        "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
