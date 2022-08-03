@@ -1,10 +1,8 @@
 import {
-  Product,
   WishlistAddProductMutation,
-  WishlistAddProductMutationVariables,
+  AddWishlistProductMutationVariables,
 } from "./../apollo/types";
 import { storage } from "./storage";
-import { ApolloClient } from "@apollo/client";
 import { SaleorClientMethodsProps, WishlistAddProductResult } from ".";
 import { WISHLIST_ADD_PRODUCT } from "../apollo";
 export interface WishlistSDK {
@@ -25,7 +23,7 @@ export const wishlist = ({
   ) => {
     const res = await client.mutate<
       WishlistAddProductMutation,
-      WishlistAddProductMutationVariables
+      AddWishlistProductMutationVariables
     >({
       mutation: WISHLIST_ADD_PRODUCT,
       variables: {
