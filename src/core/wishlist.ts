@@ -5,6 +5,7 @@ import {
 import { storage } from "./storage";
 import { SaleorClientMethodsProps, WishlistAddProductResult } from ".";
 import { WISHLIST_ADD_PRODUCT } from "../apollo";
+import { setLocalWishlistInCache } from "../apollo/helpers";
 export interface WishlistSDK {
   loaded?: boolean;
 
@@ -33,6 +34,7 @@ export const wishlist = ({
         console.log("wishlistSDK Update", data);
         if (data?.wishlist) {
           console.log("wishlistSDK inside if", data?.wishlist);
+          setLocalWishlistInCache(client, data?.wishlist);
           storage.setWishlist(data?.wishlist);
         }
       },

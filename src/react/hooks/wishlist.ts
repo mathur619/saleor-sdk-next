@@ -14,6 +14,7 @@ export const useWishlistState = () => {
     GetLocalWishlistQuery,
     GetLocalWishlistQueryVariables
   >(GET_LOCAL_WISHLIST);
+  console.log("useWishlistState res", res);
 
   return res.data?.localWishlist?.items?.edges;
 };

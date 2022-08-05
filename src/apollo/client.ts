@@ -210,11 +210,22 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       localWishlist: {
         read(existing) {
           if (!existing) {
-            return { items: [] };
+            const wishlistString = storage.getWishlist();
+            const wishlist =
+              wishlistString && typeof wishlistString === "string"
+                ? JSON.parse(wishlistString)
+                : wishlistString;
+
+            console.log("localwishlist wishlist sdk", existing, wishlist);
+            if (wishlist) {
+              return wishlist;
+            }
+
+            return {
+              items: [],
+            };
           }
-          return {
-            items: [],
-          };
+          return existing;
         },
       },
       localCheckout: {
