@@ -22,6 +22,7 @@ export const useCheckoutState = () => {
     // );
     if (typeof window !== "undefined") {
       window.localStorage?.clear();
+      console.log("checkout hook reload");
       window.location?.reload();
     }
   }

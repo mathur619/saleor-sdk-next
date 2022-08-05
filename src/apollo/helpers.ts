@@ -88,6 +88,7 @@ export const setLocalCheckoutInCache = async (
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
+        console.log("cart reload helper");
         window.location?.reload();
         return;
       }
