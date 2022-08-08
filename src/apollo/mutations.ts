@@ -820,3 +820,13 @@ export const CREATE_CASHFREE_ORDER = gql`
     }
   }
 `;
+
+export const  CHECKOUT_CUSTOMER_ATTACH = gql`
+  mutation CheckoutCustomerAttach($checkoutId:ID!,$customerId:ID){
+    checkoutCustomerAttach(checkoutId:$checkoutId,customerId:$customerId){
+      checkout{
+        id
+      }
+    }
+  }
+`;

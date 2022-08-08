@@ -71,6 +71,7 @@ import {
   REGISTER_ACCOUNT,
   REQUEST_OTP_MUTATION,
   VERIFY_CHECKOUT_OTP,
+  CHECKOUT_CUSTOMER_ATTACH,
 } from "../apollo/mutations";
 import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
 import { storage } from "./storage";
@@ -285,6 +286,16 @@ export const auth = ({
       },
     });
 
+    if (checkout?.id && res.data?.CreateTokenOTP?.user?.id) {
+      client.mutate({
+        mutation: CHECKOUT_CUSTOMER_ATTACH,
+        variables: {
+          checkoutId: checkout.id,
+          customerId: res.data.CreateTokenOTP.user.id,
+        },
+      });
+    }
+
     return res;
   };
 
@@ -371,6 +382,16 @@ export const auth = ({
         }
       },
     });
+
+    if (checkout?.id && res.data?.confirmAccountV2?.user?.id) {
+      client.mutate({
+        mutation: CHECKOUT_CUSTOMER_ATTACH,
+        variables: {
+          checkoutId: checkout.id,
+          customerId: res.data.confirmAccountV2.user.id,
+        },
+      });
+    }
 
     return res;
   };
