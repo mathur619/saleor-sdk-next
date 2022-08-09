@@ -17702,6 +17702,21 @@ export type CreateCashfreeOrderMutationVariables = Exact<{
 
 export type CreateCashfreeOrderMutation = { cashfreeOrderCreate: Maybe<{ cashfreeOrder: Maybe<Pick<CashfreeOrderType, 'paymentUrl' | 'token'>> }> };
 
+export type CheckoutCustomerAttachMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+  customerId?: Maybe<Scalars['ID']>;
+}>;
+
+
+export type CheckoutCustomerAttachMutation = { checkoutCustomerAttach: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>> }> };
+
+export type PayuOrderCreateMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+}>;
+
+
+export type PayuOrderCreateMutation = { payuOrderCreate: Maybe<{ payuOrder: Maybe<Pick<PayuOrderType, 'token' | 'paymentUrl' | 'payload'>> }> };
+
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -19361,6 +19376,79 @@ export function useCreateCashfreeOrderMutation(baseOptions?: Apollo.MutationHook
 export type CreateCashfreeOrderMutationHookResult = ReturnType<typeof useCreateCashfreeOrderMutation>;
 export type CreateCashfreeOrderMutationResult = Apollo.MutationResult<CreateCashfreeOrderMutation>;
 export type CreateCashfreeOrderMutationOptions = Apollo.BaseMutationOptions<CreateCashfreeOrderMutation, CreateCashfreeOrderMutationVariables>;
+export const CheckoutCustomerAttachDocument = gql`
+    mutation CheckoutCustomerAttach($checkoutId: ID!, $customerId: ID) {
+  checkoutCustomerAttach(checkoutId: $checkoutId, customerId: $customerId) {
+    checkout {
+      id
+    }
+  }
+}
+    `;
+export type CheckoutCustomerAttachMutationFn = Apollo.MutationFunction<CheckoutCustomerAttachMutation, CheckoutCustomerAttachMutationVariables>;
+
+/**
+ * __useCheckoutCustomerAttachMutation__
+ *
+ * To run a mutation, you first call `useCheckoutCustomerAttachMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCheckoutCustomerAttachMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [checkoutCustomerAttachMutation, { data, loading, error }] = useCheckoutCustomerAttachMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      customerId: // value for 'customerId'
+ *   },
+ * });
+ */
+export function useCheckoutCustomerAttachMutation(baseOptions?: Apollo.MutationHookOptions<CheckoutCustomerAttachMutation, CheckoutCustomerAttachMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CheckoutCustomerAttachMutation, CheckoutCustomerAttachMutationVariables>(CheckoutCustomerAttachDocument, options);
+      }
+export type CheckoutCustomerAttachMutationHookResult = ReturnType<typeof useCheckoutCustomerAttachMutation>;
+export type CheckoutCustomerAttachMutationResult = Apollo.MutationResult<CheckoutCustomerAttachMutation>;
+export type CheckoutCustomerAttachMutationOptions = Apollo.BaseMutationOptions<CheckoutCustomerAttachMutation, CheckoutCustomerAttachMutationVariables>;
+export const PayuOrderCreateDocument = gql`
+    mutation payuOrderCreate($checkoutId: ID!) {
+  payuOrderCreate(checkoutId: $checkoutId) {
+    payuOrder {
+      token
+      paymentUrl
+      payload
+    }
+  }
+}
+    `;
+export type PayuOrderCreateMutationFn = Apollo.MutationFunction<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>;
+
+/**
+ * __usePayuOrderCreateMutation__
+ *
+ * To run a mutation, you first call `usePayuOrderCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePayuOrderCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [payuOrderCreateMutation, { data, loading, error }] = usePayuOrderCreateMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *   },
+ * });
+ */
+export function usePayuOrderCreateMutation(baseOptions?: Apollo.MutationHookOptions<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>(PayuOrderCreateDocument, options);
+      }
+export type PayuOrderCreateMutationHookResult = ReturnType<typeof usePayuOrderCreateMutation>;
+export type PayuOrderCreateMutationResult = Apollo.MutationResult<PayuOrderCreateMutation>;
+export type PayuOrderCreateMutationOptions = Apollo.BaseMutationOptions<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>;
 export const UserDetailsDocument = gql`
     query UserDetails {
   user: me {

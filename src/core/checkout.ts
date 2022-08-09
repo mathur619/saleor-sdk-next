@@ -14,6 +14,7 @@ import {
   UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION,
   UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
+  CREATE_PAYU_ORDER,
 } from "../apollo/mutations";
 import {
   GET_CITY_STATE_FROM_PINCODE,
@@ -56,6 +57,8 @@ import {
   useOrdersByUserQuery,
   CreateCashfreeOrderMutation,
   CreateCashfreeOrderMutationVariables,
+  PayuOrderCreateMutation,
+  PayuOrderCreateMutationVariables,
 } from "../apollo/types";
 
 import {
@@ -84,6 +87,7 @@ import {
   SetShippingAddressResult,
   SetShippingAndBillingAddressResult,
   SetShippingMethodResult,
+  PayuOrderCreateMutationResult
 } from "./types";
 
 export interface CheckoutSDK {
@@ -136,6 +140,7 @@ export interface CheckoutSDK {
   setUseCashback?: (useCashback: boolean) => {};
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
   createCashfreeOrder?: (returnURL?: string) => CreateCashfreeOrderResult;
+  createPayuOrder?: () => PayuOrderCreateMutationResult;
 }
 
 export const checkout = ({
@@ -839,6 +844,46 @@ export const checkout = ({
     return { data: null };
   };
 
+  const createPayuOrder: CheckoutSDK["createPayuOrder"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: PayuOrderCreateMutationVariables = {
+        checkoutId: checkout?.id,
+      };
+      const res = await client.mutate<
+        PayuOrderCreateMutation,
+        PayuOrderCreateMutationVariables
+      >({
+        mutation: CREATE_PAYU_ORDER,
+        variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: true,
+            },
+          });
+        },
+      });
+
+      return res;
+    }
+
+    return { data: null };
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -859,5 +904,6 @@ export const checkout = ({
     setUseCashback,
     setCheckout,
     createCashfreeOrder,
+    createPayuOrder,
   };
 };

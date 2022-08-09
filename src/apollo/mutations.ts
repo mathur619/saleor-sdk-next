@@ -830,3 +830,15 @@ export const  CHECKOUT_CUSTOMER_ATTACH = gql`
     }
   }
 `;
+
+export const CREATE_PAYU_ORDER = gql`
+  mutation payuOrderCreate($checkoutId: ID!) {
+    payuOrderCreate(checkoutId: $checkoutId) {
+      payuOrder{
+        token
+        paymentUrl
+        payload
+      }
+    }
+  }
+`;
