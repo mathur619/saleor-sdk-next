@@ -215,6 +215,9 @@ export const checkoutFragment = gql`
       key
       value
     }
+    tags{
+      name
+    }
     totalPrice {
       ...Price
     }

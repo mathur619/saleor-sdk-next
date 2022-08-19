@@ -1820,6 +1820,8 @@ export type Checkout = Node & ObjectWithMetadata & {
   checkoutUrl: Maybe<Scalars['String']>;
   /** List of events associated with the checkout. */
   events: Maybe<Array<Maybe<CheckoutEvent>>>;
+
+  tags?: Array<Maybe<Pick<TagType, 'name'>>>;
 };
 
 /** Adds note to the checkout. */
@@ -17411,7 +17413,7 @@ export type PaymentGatewayFragment = (
 
 export type CheckoutFragment = (
   Pick<Checkout, 'token' | 'id' | 'email' | 'isShippingRequired' | 'discountName' | 'translatedDiscountName' | 'voucherCode'>
-  & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, totalPrice: Maybe<PriceFragment>, subtotalPrice: Maybe<PriceFragment>, billingAddress: Maybe<AddressFragment>, shippingAddress: Maybe<AddressFragment>, availableShippingMethods: Array<Maybe<ShippingMethodFragment>>, shippingMethod: Maybe<ShippingMethodFragment>, shippingPrice: Maybe<PriceFragment>, lines: Maybe<Array<Maybe<CheckoutLineFragment>>>, discount: Maybe<Pick<Money, 'currency' | 'amount'>>, availablePaymentGateways: Array<PaymentGatewayFragment> }
+  & { tags: Array<Maybe<Pick<TagType, 'name'>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, totalPrice: Maybe<PriceFragment>, subtotalPrice: Maybe<PriceFragment>, billingAddress: Maybe<AddressFragment>, shippingAddress: Maybe<AddressFragment>, availableShippingMethods: Array<Maybe<ShippingMethodFragment>>, shippingMethod: Maybe<ShippingMethodFragment>, shippingPrice: Maybe<PriceFragment>, lines: Maybe<Array<Maybe<CheckoutLineFragment>>>, discount: Maybe<Pick<Money, 'currency' | 'amount'>>, availablePaymentGateways: Array<PaymentGatewayFragment> }
 );
 
 export type CheckoutErrorFragment = Pick<CheckoutError, 'code' | 'field' | 'message'>;
