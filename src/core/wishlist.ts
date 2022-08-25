@@ -23,8 +23,10 @@ export const wishlist = ({
     productId: string
   ) => {
     const res = await client.mutate<
-      WishlistAddProductMutation,
-      AddWishlistProductMutationVariables
+      // WishlistAddProductMutation,
+      // AddWishlistProductMutationVariables
+      any,
+      any
     >({
       mutation: WISHLIST_ADD_PRODUCT,
       variables: {
@@ -34,8 +36,8 @@ export const wishlist = ({
         console.log("wishlistSDK Update", data);
         if (data) {
           console.log("wishlistSDK inside if", data);
-          setLocalWishlistInCache(client, data);
-          storage.setWishlist(data);
+          setLocalWishlistInCache(client, data?.wishlistAddProduct?.wishlist);
+          storage.setWishlist(data?.wishlistAddProduct?.wishlist);
         }
       },
     });

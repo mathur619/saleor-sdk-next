@@ -305,12 +305,14 @@ export type GetUserCheckoutResult = Promise<
   >
 >;
 
-export type WishlistAddProductResult = Promise<
-  FetchResult<
-    WishlistAddProductMutation,
-    Record<string, any>,
-    Record<string, any>
-  >
->;
+// export type WishlistAddProductResult = Promise<
+//   FetchResult<
+//     WishlistAddProductMutation,
+//     Record<string, any>,
+//     Record<string, any>
+//   >
+// >;
+
+export type WishlistAddProductResult = any;
 
 export type WishlistStateResult = Maybe<WishlistFragment> | undefined;
