@@ -34,8 +34,8 @@ export const wishlist = ({
         console.log("wishlistSDK Update", data);
         if (data) {
           console.log("wishlistSDK inside if", data);
-          setLocalWishlistInCache(client, data?.wishlist);
-          storage.setWishlist(data?.wishlist);
+          setLocalWishlistInCache(client, data);
+          storage.setWishlist(data);
         }
       },
     });
