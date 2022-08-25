@@ -17521,7 +17521,8 @@ export type OtpRequestMutation = { RequestOTP: Maybe<(
   )> };
 
 export type OtpAuthenticationMutationVariables = Exact<{
-  phone: Scalars['String'];
+  phone?: Scalars['String'];
+  email?: Scalars['String'];
   otp: Scalars['String'];
   checkoutId?: Maybe<Scalars['ID']>;
 }>;
