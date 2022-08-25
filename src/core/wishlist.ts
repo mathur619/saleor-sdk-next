@@ -1,7 +1,7 @@
-import {
-  WishlistAddProductMutation,
-  AddWishlistProductMutationVariables,
-} from "./../apollo/types";
+// import {
+//   WishlistAddProductMutation,
+//   AddWishlistProductMutationVariables,
+// } from "./../apollo/types";
 import { storage } from "./storage";
 import { SaleorClientMethodsProps, WishlistAddProductResult } from ".";
 import { WISHLIST_ADD_PRODUCT } from "../apollo";

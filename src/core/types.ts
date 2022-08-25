@@ -67,7 +67,7 @@ import {
   VerifyCheckoutOtpMutation,
   PaytmTxnCreateMutation,
   CreateCashfreeOrderMutation,
-  WishlistAddProductMutation,
+  // WishlistAddProductMutation,
   WishlistFragment,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
