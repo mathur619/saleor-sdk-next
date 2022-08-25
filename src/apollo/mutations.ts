@@ -429,8 +429,8 @@ export const CREATE_OTP_TOKEN_MUTATION = gql`
   mutation OTPAuthentication($phone: String, $email: String, $otp: String!, $checkoutId: ID) {
     CreateTokenOTP: otpTokenCreate(
       otp: $otp
-      phone?: $phone
-      email?: $email
+      phone: $phone
+      email: $email
       checkoutId: $checkoutId
     ) {
       token
