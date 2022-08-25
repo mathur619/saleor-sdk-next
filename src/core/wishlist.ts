@@ -32,8 +32,8 @@ export const wishlist = ({
       },
       update: (_, { data }) => {
         console.log("wishlistSDK Update", data);
-        if (data?.wishlist) {
-          console.log("wishlistSDK inside if", data?.wishlist);
+        if (data) {
+          console.log("wishlistSDK inside if", data);
           setLocalWishlistInCache(client, data?.wishlist);
           storage.setWishlist(data?.wishlist);
         }
