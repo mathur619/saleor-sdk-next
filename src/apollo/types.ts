@@ -18570,6 +18570,27 @@ export const AccountErrorFragmentDoc = gql`
 }
     `;
 
+export const AddressFragmentDoc = gql`
+    fragment Address on Address {
+  id
+  firstName
+  lastName
+  companyName
+  streetAddress1
+  streetAddress2
+  city
+  postalCode
+  country {
+    code
+    country
+  }
+  countryArea
+  phone
+  isDefaultBillingAddress
+  isDefaultShippingAddress
+}
+    `;
+
 export const UserFragmentDoc = gql`
     fragment UserFragment on User {
   id
@@ -18604,26 +18625,7 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
-export const AddressFragmentDoc = gql`
-    fragment Address on Address {
-  id
-  firstName
-  lastName
-  companyName
-  streetAddress1
-  streetAddress2
-  city
-  postalCode
-  country {
-    code
-    country
-  }
-  countryArea
-  phone
-  isDefaultBillingAddress
-  isDefaultShippingAddress
-}
-    `;
+
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
