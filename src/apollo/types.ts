@@ -2103,8 +2103,6 @@ export type CheckoutCreateInput = {
   shippingAddress?: Maybe<AddressInput>;
   /** Billing address of the customer. */
   billingAddress?: Maybe<AddressInput>;
-  /** Tags if any, associated with the Checkout */
-  tags?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 /** Sets the customer as the owner of the checkout. */
@@ -18542,6 +18540,28 @@ export type GetLocalWishlistQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetLocalWishlistQuery = { localWishlist: Maybe<WishlistFragment> };
 
+export type WishlistQueryVariables = Exact<{
+  first: Scalars['Int'];
+}>;
+
+
+export type WishlistQuery = { wishlist: Maybe<(
+    Pick<Wishlist, 'id'>
+    & { items: { edges: Array<{ node: (
+          Pick<WishlistItem, 'id'>
+          & { product: (
+            Pick<Product, 'id' | 'name' | 'slug' | 'isAvailableForPurchase'>
+            & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, productType: Pick<ProductType, 'name'>, thumbnail: Maybe<Pick<Image, 'url'>>, images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'url' | 'alt'>>>>, variants: Maybe<Array<Maybe<(
+              Pick<ProductVariant, 'id' | 'sku' | 'name' | 'quantityAvailable'>
+              & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, attributes: Array<{ attribute: Pick<Attribute, 'name'>, values: Array<Maybe<Pick<AttributeValue, 'name'>>> }>, images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'url' | 'alt'>>>>, pricing: Maybe<(
+                Pick<VariantPricingInfo, 'onSale'>
+                & { priceUndiscounted: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }>, price: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }> }
+              )> }
+            )>>>, pricing: Maybe<{ priceRangeUndiscounted: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }>, priceRange: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }> }> }
+          ), variants: { edges: Array<{ node: Pick<ProductVariant, 'id' | 'name'> }> } }
+        ) }> } }
+  )> };
+
 export const AccountErrorFragmentDoc = gql`
     fragment AccountErrorFragment on AccountError {
   code
@@ -18549,26 +18569,7 @@ export const AccountErrorFragmentDoc = gql`
   message
 }
     `;
-export const AddressFragmentDoc = gql`
-fragment Address on Address {
-id
-firstName
-lastName
-companyName
-streetAddress1
-streetAddress2
-city
-postalCode
-country {
-code
-country
-}
-countryArea
-phone
-isDefaultBillingAddress
-isDefaultShippingAddress
-}
-`;
+
 export const UserFragmentDoc = gql`
     fragment UserFragment on User {
   id
@@ -18603,7 +18604,26 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
-
+export const AddressFragmentDoc = gql`
+    fragment Address on Address {
+  id
+  firstName
+  lastName
+  companyName
+  streetAddress1
+  streetAddress2
+  city
+  postalCode
+  country {
+    code
+    country
+  }
+  countryArea
+  phone
+  isDefaultBillingAddress
+  isDefaultShippingAddress
+}
+    `;
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -20827,3 +20847,166 @@ export function useGetLocalWishlistLazyQuery(baseOptions?: Apollo.LazyQueryHookO
 export type GetLocalWishlistQueryHookResult = ReturnType<typeof useGetLocalWishlistQuery>;
 export type GetLocalWishlistLazyQueryHookResult = ReturnType<typeof useGetLocalWishlistLazyQuery>;
 export type GetLocalWishlistQueryResult = Apollo.QueryResult<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>;
+export const WishlistDocument = gql`
+    query Wishlist($first: Int!) {
+  wishlist {
+    id
+    items(first: $first) {
+      edges {
+        node {
+          id
+          product {
+            id
+            name
+            slug
+            isAvailableForPurchase
+            metadata {
+              key
+              value
+            }
+            productType {
+              name
+            }
+            thumbnail {
+              url
+            }
+            images {
+              id
+              url
+              alt
+            }
+            variants {
+              id
+              sku
+              name
+              metadata {
+                key
+                value
+              }
+              attributes {
+                attribute {
+                  name
+                }
+                values {
+                  name
+                }
+              }
+              quantityAvailable(countryCode: IN)
+              images {
+                id
+                url
+                alt
+              }
+              pricing {
+                onSale
+                priceUndiscounted {
+                  gross {
+                    amount
+                    currency
+                  }
+                  net {
+                    amount
+                    currency
+                  }
+                }
+                price {
+                  gross {
+                    amount
+                    currency
+                  }
+                  net {
+                    amount
+                    currency
+                  }
+                }
+              }
+            }
+            pricing {
+              priceRangeUndiscounted {
+                start {
+                  net {
+                    amount
+                    currency
+                  }
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+                stop {
+                  net {
+                    amount
+                    currency
+                  }
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+              }
+              priceRange {
+                start {
+                  net {
+                    amount
+                    currency
+                  }
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+                stop {
+                  net {
+                    amount
+                    currency
+                  }
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+              }
+            }
+          }
+          variants(first: $first) {
+            edges {
+              node {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useWishlistQuery__
+ *
+ * To run a query within a React component, call `useWishlistQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWishlistQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWishlistQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useWishlistQuery(baseOptions: Apollo.QueryHookOptions<WishlistQuery, WishlistQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<WishlistQuery, WishlistQueryVariables>(WishlistDocument, options);
+      }
+export function useWishlistLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WishlistQuery, WishlistQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<WishlistQuery, WishlistQueryVariables>(WishlistDocument, options);
+        }
+export type WishlistQueryHookResult = ReturnType<typeof useWishlistQuery>;
+export type WishlistLazyQueryHookResult = ReturnType<typeof useWishlistLazyQuery>;
+export type WishlistQueryResult = Apollo.QueryResult<WishlistQuery, WishlistQueryVariables>;

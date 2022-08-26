@@ -4,7 +4,7 @@
 // } from "./../apollo/types";
 import { storage } from "./storage";
 import { SaleorClientMethodsProps, WishlistAddProductResult } from ".";
-import { WISHLIST_ADD_PRODUCT } from "../apollo";
+import { GET_WISHLIST, WISHLIST_ADD_PRODUCT } from "../apollo";
 import { setLocalWishlistInCache } from "../apollo/helpers";
 export interface WishlistSDK {
   loaded?: boolean;
@@ -46,7 +46,22 @@ export const wishlist = ({
     });
     return res?.data?.wishlistAddProduct?.wishlist[0]?.wishlist;
   };
+
+  const getWishlist: WishlistSDK["getWishlist"] = async () => {
+    const res = await client.query<any, any>({
+      query: GET_WISHLIST,
+      variables: {
+        first: 20,
+      },
+      fetchPolicy: "network-only",
+    });
+
+    console.log("getWishlist res", res);
+
+    return res;
+  };
   return {
     addItemInWishlist,
+    getWishlist,
   };
 };
