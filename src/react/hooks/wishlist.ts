@@ -16,5 +16,9 @@ export const useWishlistState = () => {
   >(GET_LOCAL_WISHLIST);
   console.log("useWishlistState res", res);
 
-  return res.data?.localWishlist?.items?.edges;
+  const { data } = res;
+
+  return {
+    items: data?.localWishlist?.items?.edges || [],
+  };
 };
