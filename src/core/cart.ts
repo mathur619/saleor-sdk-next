@@ -12,6 +12,7 @@ import {
   CREATE_CHECKOUT_MUTATION,
   REMOVE_CHECKOUT_LINE_MUTATION,
   UPDATE_CHECKOUT_LINE_MUTATION,
+  UPDATE_METADATA,
 } from "../apollo/mutations";
 import { storage } from "./storage";
 import {
@@ -56,7 +57,11 @@ export interface CartSDK {
 
   cashbackRecieve?: any;
 
-  addItem: (variantId: string, quantity: number) => AddItemResult;
+  addItem: (
+    variantId: string,
+    quantity: number,
+    pincode?: string
+  ) => AddItemResult;
   removeItem: (variantId: string) => RemoveItemResult;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem: (
@@ -73,11 +78,12 @@ export interface CartSDK {
 export const cart = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CartSDK => {
-  let items = cartItemsVar();
+  const items = cartItemsVar();
 
   const addItem: CartSDK["addItem"] = async (
     variantId: string,
-    quantity: number
+    quantity: number,
+    pincode?: string
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -185,6 +191,19 @@ export const cart = ({
           }
         },
       });
+
+      if (pincode) {
+        console.log("pincode", pincode);
+        const updatePincodeRes = await client.mutate<any, any>({
+          mutation: UPDATE_METADATA,
+          variables: {
+            id: res.data?.checkoutCreate?.checkout?.id,
+            input: [{ key: "pincode", value: pincode }],
+          },
+        });
+        console.log("updatePincodeRes", updatePincodeRes);
+      }
+
       const returnObject = {
         data: res.data?.checkoutCreate?.checkout,
         errors: res.data?.checkoutCreate?.errors,

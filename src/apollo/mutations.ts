@@ -1,3 +1,4 @@
+// import { UpdateMetadata } from './types';
 import { gql } from "@apollo/client";
 
 import {
@@ -820,6 +821,23 @@ export const REFRESH_CHECKOUT = gql`
       }
       errors: checkoutErrors {
         ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const UPDATE_METADATA = gql`
+  mutation UpdateMetadata($id: ID!, $input: [MetadataInput!]!) {
+    updateMetadata(id: $id, input: $input) {
+      metadataErrors {
+        field
+        message
+      }
+      item {
+        metadata {
+          key
+          value
+        }
       }
     }
   }
