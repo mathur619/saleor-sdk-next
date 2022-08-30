@@ -314,5 +314,6 @@ export type GetUserCheckoutResult = Promise<
 // >;
 
 export type WishlistAddProductResult = any;
+export type WishlistRemoveProductResult = any;
 
 export type WishlistStateResult = Maybe<WishlistFragment> | undefined;

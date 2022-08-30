@@ -3,8 +3,12 @@
 //   AddWishlistProductMutationVariables,
 // } from "./../apollo/types";
 import { storage } from "./storage";
-import { SaleorClientMethodsProps, WishlistAddProductResult } from ".";
-import { GET_WISHLIST, WISHLIST_ADD_PRODUCT } from "../apollo";
+import { SaleorClientMethodsProps, WishlistAddProductResult, WishlistRemoveProductResult } from ".";
+import {
+  GET_WISHLIST,
+  WISHLIST_ADD_PRODUCT,
+  WISHLIST_REMOVE_PRODUCT,
+} from "../apollo";
 import { setLocalWishlistInCache } from "../apollo/helpers";
 export interface WishlistSDK {
   loaded?: boolean;
@@ -13,7 +17,7 @@ export interface WishlistSDK {
 
   getWishlist?: () => {};
   addItemInWishlist?: (productId: string) => WishlistAddProductResult;
-  removeItemInWishlist?: () => {};
+  removeItemInWishlist?: (productId: string) => WishlistRemoveProductResult;
 }
 
 export const wishlist = ({
@@ -60,8 +64,37 @@ export const wishlist = ({
 
     return res;
   };
+
+  const removeItemInWishlist: WishlistSDK["removeItemInWishlist"] = async (
+    productId: string
+  ) => {
+    const res = await client.mutate<
+      // WishlistAddProductMutation,
+      // AddWishlistProductMutationVariables
+      any,
+      any
+    >({
+      mutation: WISHLIST_REMOVE_PRODUCT,
+      variables: {
+        productId: productId,
+      },
+      update: (_, { data }) => {
+        console.log("wishlistSDK Update remove", data);
+        if (data) {
+          console.log("wishlistSDK inside if remove", data);
+          setLocalWishlistInCache(
+            client,
+            data?.wishlistAddProduct?.wishlist[0]?.wishlist
+          );
+          storage.setWishlist(data?.wishlistAddProduct?.wishlist[0]?.wishlist);
+        }
+      },
+    });
+    return res?.data?.wishlistAddProduct?.wishlist[0]?.wishlist;
+  };
   return {
     addItemInWishlist,
     getWishlist,
+    removeItemInWishlist,
   };
 };
