@@ -152,7 +152,7 @@ export const createFetch = ({
 };
 
 export const cartItemsVar = makeVar<Maybe<CheckoutLineFragment>[]>([]);
-export const wishlistItemsVar = makeVar<Maybe<any>[]>([]);
+export const wishlistItemsVar = makeVar<any>({});
 
 const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
   Query: {
@@ -203,6 +203,7 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       },
       cartItems: {
         read() {
+          console.log("cartItems", cartItemsVar());
           const cartItems = cartItemsVar();
 
           return cartItems;
