@@ -19,6 +19,7 @@ export const useWishlistState = () => {
   const { data } = res;
 
   return {
+    wishlist: data?.localWishlist || {},
     items: data?.localWishlist?.items?.edges || [],
   };
 };

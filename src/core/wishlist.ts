@@ -10,7 +10,7 @@ import {
 } from ".";
 import {
   GET_WISHLIST,
-  wishlistItemsVar,
+  // wishlistItemsVar,
   WISHLIST_ADD_PRODUCT,
   WISHLIST_REMOVE_PRODUCT,
 } from "../apollo";
@@ -28,7 +28,7 @@ export interface WishlistSDK {
 export const wishlist = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): WishlistSDK => {
-  let items = wishlistItemsVar();
+  // let items = wishlistItemsVar();
   const addItemInWishlist: WishlistSDK["addItemInWishlist"] = async (
     productId: string
   ) => {
@@ -102,6 +102,5 @@ export const wishlist = ({
     addItemInWishlist,
     getWishlist,
     removeItemInWishlist,
-    items,
   };
 };

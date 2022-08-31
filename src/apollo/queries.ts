@@ -360,11 +360,11 @@ export const GET_WISHLIST = gql`
   }
 `;
 
-export const GET_WISHLIST_ITEMS = gql`
-  ${wishlistFragment}
-  query GetWishlistItems {
-    wishlistItems @client {
-      ...Wishlist
-    }
-  }
-`;
+// export const GET_WISHLIST_ITEMS = gql`
+//   ${wishlistFragment}
+//   query GetWishlistItems {
+//     wishlistLocalItems @client {
+//       ...Wishlist
+//     }
+//   }
+// `;
