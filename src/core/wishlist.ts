@@ -28,7 +28,6 @@ export interface WishlistSDK {
 export const wishlist = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): WishlistSDK => {
-  // let items = wishlistItemsVar();
   const addItemInWishlist: WishlistSDK["addItemInWishlist"] = async (
     productId: string
   ) => {
@@ -45,7 +44,7 @@ export const wishlist = ({
       update: (_, { data }) => {
         console.log("wishlistSDK Update", data);
         if (data) {
-          console.log("wishlistSDK inside if", data);
+          console.log("wishlistSDK inside if", data, _);
           setLocalWishlistInCache(
             client,
             data?.wishlistAddProduct?.wishlist[0]?.wishlist
@@ -85,7 +84,7 @@ export const wishlist = ({
         productId: productId,
       },
       update: (_, { data }) => {
-        console.log("wishlistSDK Update remove", data);
+        console.log("wishlistSDK Update remove", data, _);
         if (data) {
           console.log("wishlistSDK inside if remove", data);
           setLocalWishlistInCache(
