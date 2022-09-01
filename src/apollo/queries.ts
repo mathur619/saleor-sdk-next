@@ -217,9 +217,7 @@ export const GET_LOCAL_WISHLIST = gql`
   ${wishlistFragment}
   query getLocalWishlist {
     localWishlist @client {
-      wishlist {
-        ...Wishlist
-      }
+      ...Wishlist
     }
   }
 `;
