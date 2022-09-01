@@ -12,8 +12,10 @@ export const useWishlist = hookFactory("wishlist");
 export const useWishlistState = () => {
   try {
     const res = hookStateFactory<
-      GetLocalWishlistQuery,
-      GetLocalWishlistQueryVariables
+      // GetLocalWishlistQuery,
+      // GetLocalWishlistQueryVariables
+      any,
+      any
     >(GET_LOCAL_WISHLIST);
     console.log("useWishlistState res", res);
 
