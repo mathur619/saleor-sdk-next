@@ -1,6 +1,6 @@
 import {
-  GetLocalWishlistQuery,
-  GetLocalWishlistQueryVariables,
+  // GetLocalWishlistQuery,
+  // GetLocalWishlistQueryVariables,
   GET_LOCAL_WISHLIST,
 } from "../../apollo";
 
