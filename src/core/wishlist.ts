@@ -15,7 +15,6 @@ import {
   WISHLIST_REMOVE_PRODUCT,
 } from "../apollo";
 import { setLocalWishlistInCache } from "../apollo/helpers";
-import { Cache } from "@apollo/client";
 export interface WishlistSDK {
   loaded?: boolean;
 
