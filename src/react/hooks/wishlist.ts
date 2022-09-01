@@ -26,4 +26,6 @@ export const useWishlistState = () => {
   } catch (e) {
     console.log("errorrrrrrrrrr", e);
   }
+
+  return {};
 };
