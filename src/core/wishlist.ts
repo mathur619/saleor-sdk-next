@@ -15,6 +15,7 @@ import {
   WISHLIST_REMOVE_PRODUCT,
 } from "../apollo";
 import { setLocalWishlistInCache } from "../apollo/helpers";
+import { Cache } from "@apollo/client";
 export interface WishlistSDK {
   loaded?: boolean;
 
@@ -42,6 +43,7 @@ export const wishlist = ({
         productId: productId,
       },
       update: (_, { data }) => {
+        console.log("cache", _);
         console.log("wishlistSDK Update", data);
         if (data) {
           console.log("wishlistSDK inside if", data, _);
