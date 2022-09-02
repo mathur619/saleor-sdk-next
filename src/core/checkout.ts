@@ -720,6 +720,21 @@ export const checkout = ({
         },
       });
 
+      if (
+        (res?.errors &&
+          res?.errors[0]?.message) ||
+        (res?.data?.razorpayOrderCreate
+          ?.razorpayErrors &&
+          res?.data?.razorpayOrderCreate
+            ?.razorpayErrors[0]?.message)
+      ) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
       return res;
     }
 
