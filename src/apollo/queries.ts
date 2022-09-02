@@ -216,7 +216,7 @@ export const USER_ORDER_DETAILS = gql`
 export const GET_LOCAL_WISHLIST = gql`
   ${wishlistFragment}
   query getLocalWishlist {
-    wishlist @client {
+    localWishlist @client {
       ...Wishlist
     }
   }
@@ -226,6 +226,7 @@ export const GET_WISHLIST = gql`
   query Wishlist($first: Int!) {
     wishlist {
       id
+      createdAt
       items(first: $first) {
         edges {
           node {

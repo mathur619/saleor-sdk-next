@@ -1,3 +1,4 @@
+import { wishlist } from "./wishlist";
 // import {
 //   WishlistAddProductMutation,
 //   AddWishlistProductMutationVariables,
@@ -66,8 +67,10 @@ export const wishlist = ({
       fetchPolicy: "network-only",
     });
 
-    console.log("getWishlist res", res);
-
+    if (res?.data?.wishlist) {
+      setLocalWishlistInCache(client, res?.data?.wishlist);
+      storage.setWishlist(res?.data?.wishlist);
+    }
     return res;
   };
 
