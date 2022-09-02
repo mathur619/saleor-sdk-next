@@ -1,3 +1,4 @@
+import { wishlist } from './../core/wishlist';
 import { gql } from "@apollo/client";
 import {
   checkoutFragment,
@@ -216,7 +217,7 @@ export const USER_ORDER_DETAILS = gql`
 export const GET_LOCAL_WISHLIST = gql`
   ${wishlistFragment}
   query getLocalWishlist {
-    localWishlist @client {
+    wishlist @client {
       ...Wishlist
     }
   }
