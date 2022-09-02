@@ -21,6 +21,11 @@ export const useWishlistState = () => {
 
     const { data } = res;
 
+    const resData = res?.client.readQuery({
+      query: GET_LOCAL_WISHLIST,
+    });
+
+    console.log("resData readQuery", resData);
     return {
       wishlist: data?.localWishlist || {},
       items: data?.localWishlist?.items?.edges || [],

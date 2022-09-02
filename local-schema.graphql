@@ -10,4 +10,5 @@ type Query {
   checkoutLoading: Boolean!
   userWalletBalance: Float!
   recentOrder: Order
+  localWishlist: wishlist
 }
