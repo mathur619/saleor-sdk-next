@@ -1,4 +1,3 @@
-import { wishlist } from "./wishlist";
 // import {
 //   WishlistAddProductMutation,
 //   AddWishlistProductMutationVariables,
