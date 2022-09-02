@@ -391,8 +391,6 @@ export const productFragment = gql`
       id
       sku
       name
-
-      quantityAvailable(countryCode: IN)
       images {
         id
         url

@@ -267,7 +267,6 @@ export const GET_WISHLIST = gql`
                     name
                   }
                 }
-                quantityAvailable(countryCode: IN)
                 images {
                   id
                   url

@@ -853,8 +853,6 @@ export const WISHLIST_ADD_PRODUCT = gql`
                     id
                     sku
                     name
-
-                    quantityAvailable(countryCode: IN)
                     images {
                       id
                       url
@@ -983,7 +981,6 @@ export const WISHLIST_REMOVE_PRODUCT = gql`
                         name
                       }
                     }
-                    quantityAvailable(countryCode: IN)
                     images {
                       id
                       url
