@@ -1,7 +1,10 @@
 import {
+  // GetLocalCheckoutQuery,
+  // GetLocalCheckoutQueryVariables,
+  GET_LOCAL_CHECKOUT,
   // GetLocalWishlistQuery,
   // GetLocalWishlistQueryVariables,
-  GET_LOCAL_WISHLIST,
+  // GET_LOCAL_WISHLIST,
 } from "../../apollo";
 
 import { hookFactory } from "../helpers/hookFactory";
@@ -11,12 +14,19 @@ export const useWishlist = hookFactory("wishlist");
 
 export const useWishlistState = () => {
   try {
+    // const res = hookStateFactory<
+    //   // GetLocalWishlistQuery,
+    //   // GetLocalWishlistQueryVariables
+    //   any,
+    //   any
+    // >(GET_LOCAL_WISHLIST);
     const res = hookStateFactory<
-      // GetLocalWishlistQuery,
-      // GetLocalWishlistQueryVariables
+      // GetLocalCheckoutQuery,
+      // GetLocalCheckoutQueryVariables
       any,
       any
-    >(GET_LOCAL_WISHLIST);
+    >(GET_LOCAL_CHECKOUT);
+
     console.log("useWishlistState res", res);
 
     const { data } = res;
