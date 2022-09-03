@@ -208,24 +208,28 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
         },
       },
       localWishlist: {
-        read(existing) {
-          if (!existing) {
-            const wishlistString = storage.getWishlist();
-            const wishlist =
-              wishlistString && typeof wishlistString === "string"
-                ? JSON.parse(wishlistString)
-                : wishlistString;
+        read(_, { toReference, canRead }): Reference | undefined | null {
+          // if (!existing) {
+          //   const wishlistString = storage.getWishlist();
+          //   const wishlist =
+          //     wishlistString && typeof wishlistString === "string"
+          //       ? JSON.parse(wishlistString)
+          //       : wishlistString;
 
-            console.log("localwishlist wishlist sdk", existing, wishlist);
-            if (wishlist) {
-              return wishlist;
-            }
+          //   console.log("localwishlist wishlist sdk", existing, wishlist);
+          //   if (wishlist) {
+          //     return wishlist;
+          //   }
 
-            return {
-              items: [],
-            };
-          }
-          return existing;
+          //   return {
+          //     items: [],
+          //   };
+          // }
+          const ref = toReference({
+            __typename: "Wishlist",
+          });
+
+          return canRead(ref) ? ref : null;
         },
       },
       localCheckout: {
