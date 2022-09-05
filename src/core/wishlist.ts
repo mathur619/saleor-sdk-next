@@ -67,7 +67,7 @@ export const wishlist = ({
     });
 
     if (res?.data?.wishlist) {
-      setLocalWishlistInCache(client, res?.data?.wishlist);
+      await setLocalWishlistInCache(client, res?.data?.wishlist);
       storage.setWishlist(res?.data?.wishlist);
     }
     return res;
