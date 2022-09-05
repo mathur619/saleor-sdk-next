@@ -59,9 +59,6 @@ export const GET_LOCAL_CHECKOUT = gql`
     recentOrder @client {
       ...OrderDetail
     }
-    localWishlist @client {
-      ...Wishlist
-    }
   }
 `;
 
