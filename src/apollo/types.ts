@@ -460,6 +460,29 @@ export type Allocation = Node & {
   warehouse: Warehouse;
 };
 
+export type ApiCallsFilterInput = {
+  apiName?: Maybe<Scalars['String']>;
+  userEmail?: Maybe<Scalars['String']>;
+  actionPerformed?: Maybe<Scalars['String']>;
+  created?: Maybe<DateRangeInput>;
+  search?: Maybe<Scalars['String']>;
+};
+
+export type ApiCallsSort =
+  | 'API_NAME'
+  | 'ACTION_PERFORMED'
+  | 'USER'
+  | 'USER_EMAIL'
+  | 'DESCRIPTION'
+  | 'CREATED';
+
+export type ApiCallsSortType = {
+  /** Specifies the direction in which to sort products. */
+  direction: OrderDirection;
+  /** Sort ApiCalls by the selected field. */
+  field?: Maybe<ApiCallsSort>;
+};
+
 export type ApiCallsType = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
@@ -471,18 +494,18 @@ export type ApiCallsType = Node & {
   actionPerformed: Scalars['String'];
 };
 
-export type ApiCallsTypeConnection = {
+export type ApiCallsTypeCountableConnection = {
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
-  /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ApiCallsTypeEdge>>;
+  edges: Array<ApiCallsTypeCountableEdge>;
+  /** A total count of items in the collection. */
+  totalCount: Maybe<Scalars['Int']>;
 };
 
-/** A Relay edge containing a `ApiCallsType` and its cursor. */
-export type ApiCallsTypeEdge = {
-  /** The item at the end of the edge */
-  node: Maybe<ApiCallsType>;
-  /** A cursor for use in pagination */
+export type ApiCallsTypeCountableEdge = {
+  /** The item at the end of the edge. */
+  node: ApiCallsType;
+  /** A cursor for use in pagination. */
   cursor: Scalars['String'];
 };
 
@@ -792,6 +815,146 @@ export type AppUpdate = {
   errors: Array<Error>;
   appErrors: Array<AppError>;
   app: Maybe<App>;
+};
+
+export type ArchiveOrderError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: Maybe<ArchiveOrderErrorCodeEnum>;
+};
+
+/** An enumeration. */
+export type ArchiveOrderErrorCodeEnum =
+  | 'INVALID'
+  | 'GRAPHQL_ERROR'
+  | 'NOT_FOUND'
+  | 'UNIQUE';
+
+export type ArchiveOrderFilterInput = {
+  status?: Maybe<Array<Maybe<OrderStatusFilter>>>;
+  customer?: Maybe<Scalars['String']>;
+  created?: Maybe<DateRangeInput>;
+  search?: Maybe<Scalars['String']>;
+};
+
+export type ArchiveOrderInput = {
+  /** A list of order lines, each containing information about an item in the order. */
+  lines: Array<Maybe<ArchiveOrderLineInput>>;
+  /** ID of the order on foreign store. */
+  foreignOrderId: Scalars['String'];
+  /** Datetime at which order was placed. */
+  placedOn?: Maybe<Scalars['String']>;
+  /** The customer's email address. */
+  email?: Maybe<Scalars['String']>;
+  /** Billing address of the customer. */
+  shippingAddress?: Maybe<AddressInput>;
+  /** Billing address of the customer. */
+  billingAddress?: Maybe<AddressInput>;
+  /** Total net amount of the order. */
+  totalNetAmount?: Maybe<Scalars['Decimal']>;
+  /** Total gross amount of the order. */
+  totalGrossAmount?: Maybe<Scalars['Decimal']>;
+  /** Name of the discount applied on the order. */
+  discountName?: Maybe<Scalars['String']>;
+  /** Discount amount of the order. */
+  discountAmount?: Maybe<Scalars['Decimal']>;
+  /** Status of the order. */
+  status?: Maybe<OrderStatusInputEnum>;
+  /** Note associated with the order. */
+  note?: Maybe<Scalars['String']>;
+  /** Metadata of the order. */
+  metadata?: Maybe<Scalars['String']>;
+  /** Private metadata of the order. */
+  privateMetadata?: Maybe<Scalars['String']>;
+};
+
+export type ArchiveOrderLineInput = {
+  /** Name of the product variant. */
+  variantName: Scalars['ID'];
+  /** The number of items purchased. */
+  quantity: Scalars['Int'];
+  /** Name of the product. */
+  productName?: Maybe<Scalars['String']>;
+  /** SKU of the product variant. */
+  productSku?: Maybe<Scalars['String']>;
+  /** Net unit price of the item. */
+  unitPriceNetAmount?: Maybe<Scalars['Decimal']>;
+  /** Gross unit price of the item. */
+  unitPriceGrossAmount?: Maybe<Scalars['Decimal']>;
+  /** URL of the image. */
+  imageUrl?: Maybe<Scalars['String']>;
+};
+
+export type ArchiveOrderSortField =
+  /** Sort orders by number. */
+  | 'NUMBER'
+  /** Sort orders by creation date. */
+  | 'CREATION_DATE'
+  /** Sort orders by customer. */
+  | 'CUSTOMER'
+  /** Sort orders by fulfillment status. */
+  | 'FULFILLMENT_STATUS'
+  /** Sort orders by total. */
+  | 'TOTAL';
+
+export type ArchiveOrderSortingInput = {
+  /** Specifies the direction in which to sort products. */
+  direction: OrderDirection;
+  /** Sort archive_orders by the selected field. */
+  field: ArchiveOrderSortField;
+};
+
+/** An enumeration. */
+export type ArchiveOrderStatus =
+  /** Draft */
+  | 'DRAFT'
+  /** Unfulfilled */
+  | 'UNFULFILLED'
+  /** Partially fulfilled */
+  | 'PARTIALLY_FULFILLED'
+  /** Fulfilled */
+  | 'FULFILLED'
+  /** Canceled */
+  | 'CANCELED';
+
+export type ArchiveOrderType = Node & {
+  metadata: Maybe<Scalars['JSONString']>;
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  privateMetadata: Maybe<Scalars['JSONString']>;
+  foreignOrderId: Scalars['String'];
+  created: Scalars['DateTime'];
+  placedOn: Maybe<Scalars['DateTime']>;
+  userEmail: Scalars['String'];
+  user: Maybe<User>;
+  status: ArchiveOrderStatus;
+  billingAddress: Maybe<Address>;
+  shippingAddress: Maybe<Address>;
+  totalNetAmount: Scalars['Float'];
+  totalGrossAmount: Scalars['Float'];
+  discountAmount: Scalars['Float'];
+  discountName: Maybe<Scalars['String']>;
+  currency: Scalars['String'];
+  languageCode: Scalars['String'];
+  note: Scalars['String'];
+};
+
+export type ArchiveOrderTypeConnection = {
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<ArchiveOrderTypeEdge>>;
+};
+
+/** A Relay edge containing a `ArchiveOrderType` and its cursor. */
+export type ArchiveOrderTypeEdge = {
+  /** The item at the end of the edge */
+  node: Maybe<ArchiveOrderType>;
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
 };
 
 /** Assigns storefront's navigation menus. */
@@ -1471,7 +1634,7 @@ export type CashfreeCreateOrderInput = {
   /** Checkout ID. */
   checkoutId: Scalars['ID'];
   /** Url to redirect to after payment. */
-  returnUrl?: Maybe<Scalars['String']>;
+  returnUrl: Scalars['String'];
 };
 
 export type CashfreeOrderType = {
@@ -1942,8 +2105,7 @@ export type CheckoutCreateInput = {
   shippingAddress?: Maybe<AddressInput>;
   /** Billing address of the customer. */
   billingAddress?: Maybe<AddressInput>;
-  /** Tags if any, associated with the Checkout */
-  tags?: Maybe<Array<Maybe<Scalars['String']>>>;
+  tags?:any;
 };
 
 /** Sets the customer as the owner of the checkout. */
@@ -2445,6 +2607,18 @@ export type CollectionDelete = {
   errors: Array<Error>;
   productErrors: Array<ProductError>;
   collection: Maybe<Collection>;
+};
+
+/** Duplicate a collection. */
+export type CollectionDuplicate = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Collection which is being duplicated. */
+  collection: Maybe<Collection>;
+  productErrors: Array<ProductError>;
 };
 
 export type CollectionFilterInput = {
@@ -3137,6 +3311,17 @@ export type CouponDiscountTypeEdge = {
   cursor: Scalars['String'];
 };
 
+/** Create a new archive order. */
+export type CreateArchiveOrder = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  archiveOrder: Maybe<ArchiveOrderType>;
+  archiveOrderErrors: Array<ArchiveOrderError>;
+};
+
 /** Create a new banner */
 export type CreateBanner = {
   /**
@@ -3282,6 +3467,33 @@ export type CreateRazorpayOrder = {
   razorpayOrder: Maybe<RazorpayOrderType>;
   razorpayErrors: Array<RazorpayError>;
 };
+
+/** Upload Review CSV. */
+export type CreateReviewCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** List of reviews created. */
+  reviews: Maybe<Array<Maybe<ProductReviewType>>>;
+  createReviewError: Array<CreateReviewCsvError>;
+};
+
+export type CreateReviewCsvError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: CreateReviewCsvErrorCode;
+};
+
+/** An enumeration. */
+export type CreateReviewCsvErrorCode =
+  | 'INVALID_FILE_FORMAT'
+  | 'NOT_FOUND'
+  | 'INVALID';
 
 /** Creates an order on Sezzle. */
 export type CreateSezzleOrder = {
@@ -3597,6 +3809,17 @@ export type DeactivateAllUserTokens = {
 };
 
 
+/** Delete an archive order. */
+export type DeleteArchiveOrder = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  archiveOrderErrors: Array<ArchiveOrderError>;
+  archiveOrder: Maybe<ArchiveOrderType>;
+};
+
 /** Delete a banner */
 export type DeleteBanner = {
   /**
@@ -3689,6 +3912,18 @@ export type DeletePrivateMetadataV2 = {
 
 /** Edit existing product review. */
 export type DeleteProductReview = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A product review instance. */
+  productReview: Maybe<ProductReviewType>;
+  productReviewErrors: Array<ProductReviewError>;
+};
+
+/** Delete product review by product */
+export type DeleteProductReviewByProduct = {
   /**
    * List of errors that occurred executing the mutation.
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
@@ -3896,6 +4131,11 @@ export type DigitalContentUrlCreateInput = {
   content: Scalars['ID'];
 };
 
+/** An enumeration. */
+export type DiscountAmountType =
+  | 'PERCENTAGE'
+  | 'FIXED';
+
 export type DiscountError = {
   /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
   field: Maybe<Scalars['String']>;
@@ -3941,6 +4181,42 @@ export type Domain = {
   sslEnabled: Scalars['Boolean'];
   /** Shop's absolute URL. */
   url: Scalars['String'];
+};
+
+/** Create a new voucher for draft order */
+export type DraftOrderAddPromoCode = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance instance. */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
+};
+
+/** Adds COD charges to an order's total */
+export type DraftOrderApplyCod = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance. */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
+};
+
+/** Adds COD charges to an order's total */
+export type DraftOrderApplyPrePaid = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance. */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
 };
 
 /** Deletes draft orders. */
@@ -4077,6 +4353,42 @@ export type DraftOrderLinesCreate = {
   order: Maybe<Order>;
   /** List of newly added order lines. */
   orderLines: Maybe<Array<OrderLine>>;
+  orderErrors: Array<OrderError>;
+};
+
+/** Removes COD charges from an orders total */
+export type DraftOrderRemoveCod = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance. */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
+};
+
+/** Removes COD charges from an orders total */
+export type DraftOrderRemovePrePaid = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance. */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
+};
+
+/** Create a new voucher for draft order */
+export type DraftOrderRemovePromoCode = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance. */
+  order: Maybe<Order>;
   orderErrors: Array<OrderError>;
 };
 
@@ -4388,6 +4700,32 @@ export type ExportWalletInput = {
   fileType: FileTypesEnum;
 };
 
+export type FailedOrder = Node & {
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  /** Failed checkout. */
+  checkout: Maybe<Checkout>;
+  transactionToken: Maybe<Scalars['String']>;
+  paymentToken: Maybe<Scalars['String']>;
+  errorMessage: Maybe<Scalars['String']>;
+  created: Scalars['DateTime'];
+};
+
+export type FailedOrderConnection = {
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<FailedOrderEdge>>;
+};
+
+/** A Relay edge containing a `FailedOrder` and its cursor. */
+export type FailedOrderEdge = {
+  /** The item at the end of the edge */
+  node: Maybe<FailedOrder>;
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
+};
+
 /** Add Balance to Wallet through CSV. */
 export type FarziWalletBalanceAddCsv = {
   /**
@@ -4399,6 +4737,18 @@ export type FarziWalletBalanceAddCsv = {
   wallet: Maybe<WalletType>;
 };
 
+/** Add/Sub Wallet Balance of a user from Email */
+export type FarziWalletBalanceEmailUpdate = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Wallet instance. */
+  wallet: Maybe<WalletType>;
+  WalletErrors: Array<FarziWalletError>;
+};
+
 /** Sub Balance to Wallet through CSV. */
 export type FarziWalletBalanceSubCsv = {
   /**
@@ -4408,6 +4758,32 @@ export type FarziWalletBalanceSubCsv = {
   errors: Array<Error>;
   /** A Wallet instance. */
   wallet: Maybe<WalletType>;
+};
+
+export type FarziWalletError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: FarziWalletErrorCode;
+};
+
+/** An enumeration. */
+export type FarziWalletErrorCode =
+  | 'UNAUTHORIZED';
+
+export type FarziWalletInputEmail = {
+  /** Email of the user */
+  email: Scalars['String'];
+  /** Amount of wallet to update */
+  amount: Scalars['Float'];
+  /** Reason for updation */
+  reason: Scalars['String'];
+  /** ADD/SUB Option to update */
+  type: Scalars['String'];
+  /** Secret for updation */
+  secret: Scalars['String'];
 };
 
 /** An enumeration. */
@@ -4585,6 +4961,11 @@ export type GenericFormError = {
 export type GenericFormErrorCode =
   | 'PHONE_NUMBER_INVALID';
 
+export type GenericFormFilterInput = {
+  email?: Maybe<Scalars['String']>;
+  formName?: Maybe<Scalars['String']>;
+};
+
 export type GenericFormInput = {
   /** Name of user. */
   name: Scalars['String'];
@@ -4594,10 +4975,13 @@ export type GenericFormInput = {
   email: Scalars['String'];
   /** Response body. */
   responseBody: Scalars['String'];
+  /** form name */
+  formName?: Maybe<Scalars['String']>;
 };
 
 export type GenericFormType = Node & {
   responseId: Scalars['ID'];
+  formName: Maybe<Scalars['String']>;
   responseBody: Maybe<Scalars['String']>;
   name: Maybe<Scalars['String']>;
   phone: Maybe<Scalars['String']>;
@@ -4605,6 +4989,21 @@ export type GenericFormType = Node & {
   createdAt: Scalars['DateTime'];
   /** The ID of the object. */
   id: Scalars['ID'];
+};
+
+export type GenericFormTypeConnection = {
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<GenericFormTypeEdge>>;
+};
+
+/** A Relay edge containing a `GenericFormType` and its cursor. */
+export type GenericFormTypeEdge = {
+  /** The item at the end of the edge */
+  node: Maybe<GenericFormType>;
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
 };
 
 
@@ -5877,6 +6276,8 @@ export type Mutation = {
   collectionAddProducts: Maybe<CollectionAddProducts>;
   /** Creates a new collection. */
   collectionCreate: Maybe<CollectionCreate>;
+  /** Duplicate a collection. */
+  collectionDuplicate: Maybe<CollectionDuplicate>;
   /** Deletes a collection. */
   collectionDelete: Maybe<CollectionDelete>;
   /** Reorder the products of a collection. */
@@ -6627,8 +7028,16 @@ export type Mutation = {
   menuItemMoveV2: Maybe<MenuItemMoveV2>;
   /** Create Product. */
   createProductCsv: Maybe<CreateProductCsv>;
+  /** Upload Review CSV. */
+  createReviewCsv: Maybe<CreateReviewCsv>;
+  /** Create Product. */
+  updateCollectionMetadata: Maybe<UpdateCollectionMetadata>;
+  /** Update ProductVariant metadata. */
+  updateProductvariantMetadata: Maybe<UpdateProductvariantMetadata>;
   /** Bulk Upload Price CSV */
   bulkPriceUpdateCsv: Maybe<BulkPriceUpdateCsv>;
+  /** Create Product. */
+  updateProductsMetadataCsv: Maybe<UpdateProductsMetadataCsv>;
   /** Create Product. */
   createProductVariantCsv: Maybe<CreateProductVariantCsv>;
   /** Update Manufacturing Details of a product. */
@@ -6643,6 +7052,8 @@ export type Mutation = {
   farziWalletBalanceSubCsv: Maybe<FarziWalletBalanceSubCsv>;
   /** Add Balance to Wallet through CSV. */
   farziWalletBalanceAddCsv: Maybe<FarziWalletBalanceAddCsv>;
+  /** Add/Sub Wallet Balance of a user from Email */
+  farziWalletBalanceEmailUpdate: Maybe<FarziWalletBalanceEmailUpdate>;
   /** Create and return a user hash. */
   getUserHash: Maybe<GetUserHash>;
   /** Export orders to csv file. */
@@ -6657,12 +7068,38 @@ export type Mutation = {
   walletExport: Maybe<ExportWallet>;
   /** Upload Images of a product. */
   uploadProductImageCsv: Maybe<UploadProductImageCsv>;
+  /** Upload Collection ID CSV */
+  uploadCollectionidCsv: Maybe<UploadCollectionIdcsv>;
   /** Creates checkout from an existing order */
   reOrder: Maybe<ReOrder>;
   /** Create JWT token via google oauth2. */
   createTokenOauth: Maybe<CreateTokenOAuth>;
+  /** Create a new nutrition form entry. */
+  nutritionFormCreate: Maybe<NutritionFormCreate>;
   /** Trigger a cron as specified in input. */
   triggerCron: Maybe<TriggerCron>;
+  /** Create a new voucher for draft order */
+  draftOrderAddPromoCode: Maybe<DraftOrderAddPromoCode>;
+  /** Create a new voucher for draft order */
+  draftOrderRemovePromoCode: Maybe<DraftOrderRemovePromoCode>;
+  /** Adds COD charges to an order's total */
+  draftOrderApplyCod: Maybe<DraftOrderApplyCod>;
+  /** Removes COD charges from an orders total */
+  draftOrderRemoveCod: Maybe<DraftOrderRemoveCod>;
+  /** Adds COD charges to an order's total */
+  draftOrderApplyPrepaid: Maybe<DraftOrderApplyPrePaid>;
+  /** Removes COD charges from an orders total */
+  draftOrderRemovePrepaid: Maybe<DraftOrderRemovePrePaid>;
+  /** Send or resend order confirmation email for order */
+  sendOrderEmail: Maybe<SendOrderEmail>;
+  /** Delete product review by product */
+  deleteProductReviewByProductId: Maybe<DeleteProductReviewByProduct>;
+  /** Create a new archive order. */
+  archiveOrderCreate: Maybe<CreateArchiveOrder>;
+  /** Update an archive order. */
+  archiveOrderUpdate: Maybe<UpdateArchiveOrder>;
+  /** Delete an archive order. */
+  archiveOrderDelete: Maybe<DeleteArchiveOrder>;
 };
 
 
@@ -7004,6 +7441,11 @@ export type MutationCollectionAddProductsArgs = {
 
 export type MutationCollectionCreateArgs = {
   input: CollectionCreateInput;
+};
+
+
+export type MutationCollectionDuplicateArgs = {
+  collectionId: Scalars['ID'];
 };
 
 
@@ -8757,7 +9199,27 @@ export type MutationCreateProductCsvArgs = {
 };
 
 
+export type MutationCreateReviewCsvArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
+export type MutationUpdateCollectionMetadataArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
+export type MutationUpdateProductvariantMetadataArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
 export type MutationBulkPriceUpdateCsvArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
+export type MutationUpdateProductsMetadataCsvArgs = {
   csvFile: Scalars['Upload'];
 };
 
@@ -8797,6 +9259,11 @@ export type MutationFarziWalletBalanceAddCsvArgs = {
 };
 
 
+export type MutationFarziWalletBalanceEmailUpdateArgs = {
+  input: FarziWalletInputEmail;
+};
+
+
 export type MutationGetUserHashArgs = {
   shopifyUserId: Scalars['String'];
 };
@@ -8833,6 +9300,11 @@ export type MutationUploadProductImageCsvArgs = {
 };
 
 
+export type MutationUploadCollectionidCsvArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
 export type MutationReOrderArgs = {
   orderId?: Maybe<Scalars['ID']>;
 };
@@ -8845,9 +9317,70 @@ export type MutationCreateTokenOauthArgs = {
 };
 
 
+export type MutationNutritionFormCreateArgs = {
+  input: NutritionFormInput;
+};
+
+
 export type MutationTriggerCronArgs = {
   arguments?: Maybe<Array<Maybe<Scalars['String']>>>;
   cron?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationDraftOrderAddPromoCodeArgs = {
+  input: SaleorVoucherInput;
+};
+
+
+export type MutationDraftOrderRemovePromoCodeArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationDraftOrderApplyCodArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationDraftOrderRemoveCodArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationDraftOrderApplyPrepaidArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationDraftOrderRemovePrepaidArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationSendOrderEmailArgs = {
+  orderId?: Maybe<Scalars['ID']>;
+};
+
+
+export type MutationDeleteProductReviewByProductIdArgs = {
+  productId: Scalars['ID'];
+};
+
+
+export type MutationArchiveOrderCreateArgs = {
+  input: ArchiveOrderInput;
+};
+
+
+export type MutationArchiveOrderUpdateArgs = {
+  id: Scalars['String'];
+  input: ArchiveOrderInput;
+};
+
+
+export type MutationArchiveOrderDeleteArgs = {
+  id: Scalars['ID'];
 };
 
 export type NameTranslationInput = {
@@ -8878,6 +9411,8 @@ export type Node = {
 export type NotificationInput = {
   /** Product Id */
   productId: Scalars['ID'];
+  /**  Product Variant Id */
+  productVariantId?: Maybe<Scalars['ID']>;
   /** User email. */
   email: Scalars['String'];
   /** User phone No. */
@@ -8893,8 +9428,41 @@ export type NotificationType = Node & {
   email: Scalars['String'];
   phone: Scalars['String'];
   product: Product;
+  productVariant: Maybe<ProductVariant>;
   created: Scalars['DateTime'];
   isNotified: Scalars['Boolean'];
+};
+
+/** Create a new nutrition form entry. */
+export type NutritionFormCreate = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A nutrition form instance. */
+  nutritionForm: Maybe<NutritionFormType>;
+};
+
+export type NutritionFormInput = {
+  /** Name of user. */
+  name: Scalars['String'];
+  /** Phone number of user. */
+  phone: Scalars['String'];
+  /** Email address of user. */
+  email: Scalars['String'];
+  /** Response body. */
+  responseBody: Scalars['String'];
+};
+
+export type NutritionFormType = Node & {
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  responseBody: Maybe<Scalars['JSONString']>;
+  name: Maybe<Scalars['String']>;
+  phone: Maybe<Scalars['String']>;
+  email: Maybe<Scalars['String']>;
+  createdAt: Scalars['DateTime'];
 };
 
 export type OtpError = {
@@ -8909,7 +9477,8 @@ export type OtpError = {
 /** An enumeration. */
 export type OtpErrorCodeEnum =
   | 'INVALID_PHONE'
-  | 'INVALID_OTP';
+  | 'INVALID_OTP'
+  | 'MAX_RETRY';
 
 export type ObjectWithMetadata = {
   /** List of private metadata items.Requires proper staff permissions to access. */
@@ -9310,7 +9879,8 @@ export type OrderFieldEnum =
   | 'TAX_RATE'
   | 'RAZORPAY'
   | 'AWB'
-  | 'SHIPROCKET_STATUS';
+  | 'SHIPROCKET_STATUS'
+  | 'PAYMENT_ID';
 
 export type OrderFilterInput = {
   paymentStatus?: Maybe<Array<Maybe<PaymentChargeStatusEnum>>>;
@@ -9322,6 +9892,7 @@ export type OrderFilterInput = {
   createdTime?: Maybe<DateTimeRangeInput>;
   search?: Maybe<Scalars['String']>;
   tags?: Maybe<TagsListInput>;
+  invoiceDate?: Maybe<DateRangeInput>;
 };
 
 /** Creates new fulfillments for an order. */
@@ -9481,6 +10052,14 @@ export type OrderStatus =
 export type OrderStatusFilter =
   | 'READY_TO_FULFILL'
   | 'READY_TO_CAPTURE'
+  | 'UNFULFILLED'
+  | 'PARTIALLY_FULFILLED'
+  | 'FULFILLED'
+  | 'CANCELED';
+
+/** An enumeration. */
+export type OrderStatusInputEnum =
+  | 'DRAFT'
   | 'UNFULFILLED'
   | 'PARTIALLY_FULFILLED'
   | 'FULFILLED'
@@ -11195,7 +11774,7 @@ export type ProductReviewType = Node & {
   verified: Scalars['Boolean'];
   externalReviewId: Maybe<Scalars['String']>;
   created: Scalars['DateTime'];
-  publishedDate: Maybe<Scalars['Date']>;
+  publishedDate: Maybe<Scalars['DateTime']>;
   updated: Scalars['DateTime'];
   sortOrder: Maybe<Scalars['Int']>;
   adminReply: Scalars['String'];
@@ -12039,13 +12618,16 @@ export type Query = {
   addressType: Maybe<AddressLinkType>;
   /** Returns address validation rules. */
   addressValidationRules: Maybe<AddressValidationData>;
-  apiCalls: Maybe<ApiCallsTypeConnection>;
+  apiCalls: Maybe<ApiCallsTypeCountableConnection>;
   /** Look up a app by ID. */
   app: Maybe<App>;
   /** List of the apps. */
   apps: Maybe<AppCountableConnection>;
   /** List of all apps installations */
   appsInstallations: Array<AppInstallation>;
+  archiveOrder: Maybe<ArchiveOrderType>;
+  /** List of orders. */
+  archiveOrders: Maybe<ArchiveOrderTypeConnection>;
   /** Look up an attribute by ID. */
   attribute: Maybe<Attribute>;
   /** List of the shop's attributes. */
@@ -12104,8 +12686,11 @@ export type Query = {
   /** List of export files. */
   exportFiles: Maybe<ExportFileCountableConnection>;
   exportOrders: Maybe<OrderCountableConnection>;
+  /** List of Failed Orders. */
+  failedOrders: Maybe<FailedOrderConnection>;
   filterCheckouts: Maybe<CheckoutTypeCountableConnection>;
   freeCheckoutLines: Maybe<Array<Maybe<CheckoutLine>>>;
+  genericForms: Maybe<GenericFormTypeConnection>;
   /** Look up a gift card by ID. */
   giftCard: Maybe<GiftCard>;
   /** List of gift cards. */
@@ -12119,6 +12704,7 @@ export type Query = {
   localCashback: Maybe<CashbackType>;
   localCheckout: Maybe<Checkout>;
   localCheckoutDiscounts: Maybe<DiscountsType>;
+  localWishlist: Maybe<Wishlist>;
   /** Return the currently authenticated user. */
   me: Maybe<User>;
   /** Look up a navigation menu by ID or name. */
@@ -12308,14 +12894,12 @@ export type QueryAddressValidationRulesArgs = {
 
 
 export type QueryApiCallsArgs = {
+  filter?: Maybe<ApiCallsFilterInput>;
+  sortBy?: Maybe<ApiCallsSortType>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  apiName?: Maybe<Scalars['String']>;
-  userEmail?: Maybe<Scalars['String']>;
-  actionPerformed?: Maybe<Scalars['String']>;
-  created?: Maybe<Scalars['DateTime']>;
 };
 
 
@@ -12327,6 +12911,21 @@ export type QueryAppArgs = {
 export type QueryAppsArgs = {
   filter?: Maybe<AppFilterInput>;
   sortBy?: Maybe<AppSortingInput>;
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryArchiveOrderArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryArchiveOrdersArgs = {
+  sortBy?: Maybe<ArchiveOrderSortingInput>;
+  filter?: Maybe<ArchiveOrderFilterInput>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -12585,6 +13184,14 @@ export type QueryExportOrdersArgs = {
 };
 
 
+export type QueryFailedOrdersArgs = {
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
 export type QueryFilterCheckoutsArgs = {
   start?: Maybe<Scalars['DateTime']>;
   end?: Maybe<Scalars['DateTime']>;
@@ -12603,6 +13210,15 @@ export type QueryFilterCheckoutsArgs = {
 
 export type QueryFreeCheckoutLinesArgs = {
   token?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryGenericFormsArgs = {
+  filter?: Maybe<GenericFormFilterInput>;
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
 };
 
 
@@ -13680,6 +14296,16 @@ export type SaleUpdate = {
   sale: Maybe<Sale>;
 };
 
+export type SaleorVoucherInput = {
+  /** id of the draft order */
+  orderId: Scalars['ID'];
+  /** voucher code */
+  code: Scalars['String'];
+  /** type of discount */
+  discountType?: Maybe<DiscountAmountType>;
+  discountAmount: Scalars['Int'];
+};
+
 /** Seachtap Search Input. */
 export type SearchtapInput = {
   /** Fields List */
@@ -14040,6 +14666,18 @@ export type SelectedAttribute = {
   attribute: Attribute;
   /** Values of an attribute. */
   values: Array<Maybe<AttributeValue>>;
+};
+
+/** Send or resend order confirmation email for order */
+export type SendOrderEmail = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** sends or resends order confirmation emails */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
 };
 
 export type SeoInput = {
@@ -15772,6 +16410,17 @@ export type UpdateAddressType = {
   addressLink: Maybe<AddressLinkType>;
 };
 
+/** Update an archive order. */
+export type UpdateArchiveOrder = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  archiveOrder: Maybe<ArchiveOrderType>;
+  archiveOrderErrors: Array<ArchiveOrderError>;
+};
+
 /** Update a banner */
 export type UpdateBanner = {
   /**
@@ -15782,6 +16431,17 @@ export type UpdateBanner = {
   /** A banner instance. */
   banner: Maybe<CustomBannerType>;
   bannerErrors: Array<BannerError>;
+};
+
+/** Create Product. */
+export type UpdateCollectionMetadata = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
 };
 
 /** Update an Influencer. */
@@ -15869,6 +16529,28 @@ export type UpdatePrivateMetadataV2 = {
   item: Maybe<ObjectWithMetadataV2>;
 };
 
+/** Create Product. */
+export type UpdateProductsMetadataCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+};
+
+/** Update ProductVariant metadata. */
+export type UpdateProductvariantMetadata = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+};
+
 /** Create or update reply on Product Review */
 export type UpdateReplyOnProductReview = {
   /**
@@ -15952,6 +16634,31 @@ export type UpdateVoucherRuleLink = {
   voucherErrors: Array<VoucherError>;
 };
 
+
+/** Upload Collection ID CSV */
+export type UploadCollectionIdcsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+  collectionUpdateErrors: Array<UploadCollectionIdError>;
+};
+
+export type UploadCollectionIdError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code.. */
+  code: UploadCollectionIdErrorCode;
+};
+
+/** An enumeration. */
+export type UploadCollectionIdErrorCode =
+  | 'INVALID_FILE_FORMAT';
 
 /** Upload Images of a product. */
 export type UploadProductImageCsv = {
@@ -16607,9 +17314,9 @@ export type VoucherRuleOrderField =
 
 export type VoucherRuleType = Node & {
   metadata: Maybe<Scalars['JSONString']>;
+  privateMetadata: Maybe<Scalars['JSONString']>;
   /** The ID of the object. */
   id: Scalars['ID'];
-  privateMetadata: Maybe<Scalars['JSONString']>;
   name: Scalars['String'];
   slug: Scalars['String'];
   description: Maybe<Scalars['String']>;
@@ -17136,6 +17843,8 @@ export type WebhookEventTypeEnum =
   | 'CHECKOUT_QUANTITY_CHANGED'
   | 'CHECKOUT_CREATED'
   | 'CHECKOUT_UPDATED'
+  | 'CHECKOUT_SHIPPING_ADDRESS_UPDATED'
+  | 'CHECKOUT_VOUCHER_UPDATED'
   | 'FULFILLMENT_CREATED';
 
 export type WebhookFilterInput = {
@@ -17159,6 +17868,8 @@ export type WebhookSampleEventTypeEnum =
   | 'CHECKOUT_QUANTITY_CHANGED'
   | 'CHECKOUT_CREATED'
   | 'CHECKOUT_UPDATED'
+  | 'CHECKOUT_SHIPPING_ADDRESS_UPDATED'
+  | 'CHECKOUT_VOUCHER_UPDATED'
   | 'FULFILLMENT_CREATED';
 
 export type WebhookSortField =
@@ -17441,6 +18152,25 @@ export type PaymentFragment = (
 
 export type PaymentErrorFragment = Pick<PaymentError, 'code' | 'field' | 'message'>;
 
+export type ProductFieldsFragment = (
+  Pick<Product, 'id' | 'name' | 'isAvailableForPurchase'>
+  & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, thumbnail: Maybe<Pick<Image, 'url'>>, images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'alt' | 'url'>>>>, variants: Maybe<Array<Maybe<(
+    Pick<ProductVariant, 'id' | 'sku' | 'name' | 'quantityAvailable'>
+    & { images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'url' | 'alt'>>>>, pricing: Maybe<(
+      Pick<VariantPricingInfo, 'onSale'>
+      & { priceUndiscounted: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }>, price: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }> }
+    )> }
+  )>>>, pricing: Maybe<{ priceRangeUndiscounted: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }>, priceRange: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }> }> }
+);
+
+export type WishlistFragment = (
+  Pick<Wishlist, 'id' | 'createdAt'>
+  & { items: { edges: Array<{ node: (
+        Pick<WishlistItem, 'id'>
+        & { product: ProductFieldsFragment }
+      ) }> } }
+);
+
 export type RefreshTokenMutationVariables = Exact<{
   csrfToken: Scalars['String'];
   refreshToken?: Maybe<Scalars['String']>;
@@ -17705,6 +18435,31 @@ export type CreateCashfreeOrderMutationVariables = Exact<{
 
 export type CreateCashfreeOrderMutation = { cashfreeOrderCreate: Maybe<{ cashfreeOrder: Maybe<Pick<CashfreeOrderType, 'paymentUrl' | 'token'>> }> };
 
+export type AddWishlistProductMutationVariables = Exact<{
+  productId: Scalars['ID'];
+}>;
+
+
+export type AddWishlistProductMutation = { wishlistAddProduct: Maybe<{ wishlist: Maybe<Array<Maybe<(
+      Pick<WishlistItem, 'id'>
+      & { wishlist: (
+        Pick<Wishlist, 'id' | 'createdAt'>
+        & { items: { edges: Array<{ node: (
+              Pick<WishlistItem, 'id'>
+              & { product: (
+                Pick<Product, 'id' | 'name' | 'isAvailableForPurchase'>
+                & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, thumbnail: Maybe<Pick<Image, 'url'>>, images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'alt' | 'url'>>>>, variants: Maybe<Array<Maybe<(
+                  Pick<ProductVariant, 'id' | 'sku' | 'name' | 'quantityAvailable'>
+                  & { images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'url' | 'alt'>>>>, pricing: Maybe<(
+                    Pick<VariantPricingInfo, 'onSale'>
+                    & { priceUndiscounted: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }>, price: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }> }
+                  )> }
+                )>>>, pricing: Maybe<{ priceRangeUndiscounted: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }>, priceRange: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }> }> }
+              ) }
+            ) }> } }
+      ) }
+    )>>> }> };
+
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -17784,6 +18539,33 @@ export type OrdersByUserQuery = { me: Maybe<(
         ) }> }> }
   )> };
 
+export type GetLocalWishlistQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetLocalWishlistQuery = { localWishlist: Maybe<WishlistFragment> };
+
+export type WishlistQueryVariables = Exact<{
+  first: Scalars['Int'];
+}>;
+
+
+export type WishlistQuery = { wishlist: Maybe<(
+    Pick<Wishlist, 'id'>
+    & { items: { edges: Array<{ node: (
+          Pick<WishlistItem, 'id'>
+          & { product: (
+            Pick<Product, 'id' | 'name' | 'slug' | 'isAvailableForPurchase'>
+            & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, productType: Pick<ProductType, 'name'>, thumbnail: Maybe<Pick<Image, 'url'>>, images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'url' | 'alt'>>>>, variants: Maybe<Array<Maybe<(
+              Pick<ProductVariant, 'id' | 'sku' | 'name' | 'quantityAvailable'>
+              & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, attributes: Array<{ attribute: Pick<Attribute, 'name'>, values: Array<Maybe<Pick<AttributeValue, 'name'>>> }>, images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'url' | 'alt'>>>>, pricing: Maybe<(
+                Pick<VariantPricingInfo, 'onSale'>
+                & { priceUndiscounted: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }>, price: Maybe<{ gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> }> }
+              )> }
+            )>>>, pricing: Maybe<{ priceRangeUndiscounted: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }>, priceRange: Maybe<{ start: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }>, stop: Maybe<{ net: Pick<Money, 'amount' | 'currency'>, gross: Pick<Money, 'amount' | 'currency'> }> }> }> }
+          ), variants: { edges: Array<{ node: Pick<ProductVariant, 'id' | 'name'> }> } }
+        ) }> } }
+  )> };
+
 export const AccountErrorFragmentDoc = gql`
     fragment AccountErrorFragment on AccountError {
   code
@@ -17791,8 +18573,9 @@ export const AccountErrorFragmentDoc = gql`
   message
 }
     `;
+
 export const AddressFragmentDoc = gql`
-    fragment AddressFragment on Address {
+    fragment Address on Address {
   id
   firstName
   lastName
@@ -17800,7 +18583,6 @@ export const AddressFragmentDoc = gql`
   streetAddress1
   streetAddress2
   city
-  cityArea
   postalCode
   country {
     code
@@ -17812,6 +18594,7 @@ export const AddressFragmentDoc = gql`
   isDefaultShippingAddress
 }
     `;
+
 export const UserFragmentDoc = gql`
     fragment UserFragment on User {
   id
@@ -17846,6 +18629,7 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
+
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -18095,6 +18879,121 @@ export const PaymentErrorFragmentDoc = gql`
   message
 }
     `;
+export const ProductFieldsFragmentDoc = gql`
+    fragment productFields on Product {
+  id
+  name
+  isAvailableForPurchase
+  metadata {
+    key
+    value
+  }
+  thumbnail {
+    url
+  }
+  images {
+    id
+    alt
+    url
+  }
+  variants {
+    id
+    sku
+    name
+    quantityAvailable(countryCode: IN)
+    images {
+      id
+      url
+      alt
+    }
+    pricing {
+      onSale
+      priceUndiscounted {
+        gross {
+          amount
+          currency
+        }
+        net {
+          amount
+          currency
+        }
+      }
+      price {
+        gross {
+          amount
+          currency
+        }
+        net {
+          amount
+          currency
+        }
+      }
+    }
+  }
+  pricing {
+    priceRangeUndiscounted {
+      start {
+        net {
+          amount
+          currency
+        }
+        gross {
+          amount
+          currency
+        }
+      }
+      stop {
+        net {
+          amount
+          currency
+        }
+        gross {
+          amount
+          currency
+        }
+      }
+    }
+    priceRange {
+      start {
+        net {
+          amount
+          currency
+        }
+        gross {
+          amount
+          currency
+        }
+      }
+      stop {
+        net {
+          amount
+          currency
+        }
+        gross {
+          amount
+          currency
+        }
+      }
+    }
+  }
+}
+    `;
+export const WishlistFragmentDoc = gql`
+    fragment Wishlist on Wishlist {
+  id
+  createdAt
+  items {
+    edges {
+      node {
+        id
+        product {
+          ...productFields
+        }
+      }
+    }
+  }
+}
+    ${ProductFieldsFragmentDoc}`;
 export const RefreshTokenDocument = gql`
     mutation refreshToken($csrfToken: String!, $refreshToken: String) {
   tokenRefresh(csrfToken: $csrfToken, refreshToken: $refreshToken) {
@@ -19364,6 +20263,149 @@ export function useCreateCashfreeOrderMutation(baseOptions?: Apollo.MutationHook
 export type CreateCashfreeOrderMutationHookResult = ReturnType<typeof useCreateCashfreeOrderMutation>;
 export type CreateCashfreeOrderMutationResult = Apollo.MutationResult<CreateCashfreeOrderMutation>;
 export type CreateCashfreeOrderMutationOptions = Apollo.BaseMutationOptions<CreateCashfreeOrderMutation, CreateCashfreeOrderMutationVariables>;
+export const AddWishlistProductDocument = gql`
+    mutation AddWishlistProduct($productId: ID!) {
+  wishlistAddProduct(productId: $productId) {
+    wishlist {
+      id
+      wishlist {
+        id
+        createdAt
+        items(first: 20) {
+          edges {
+            node {
+              id
+              product {
+                id
+                name
+                isAvailableForPurchase
+                metadata {
+                  key
+                  value
+                }
+                thumbnail {
+                  url
+                }
+                images {
+                  id
+                  alt
+                  url
+                }
+                variants {
+                  id
+                  sku
+                  name
+                  quantityAvailable(countryCode: IN)
+                  images {
+                    id
+                    url
+                    alt
+                  }
+                  pricing {
+                    onSale
+                    priceUndiscounted {
+                      gross {
+                        amount
+                        currency
+                      }
+                      net {
+                        amount
+                        currency
+                      }
+                    }
+                    price {
+                      gross {
+                        amount
+                        currency
+                      }
+                      net {
+                        amount
+                        currency
+                      }
+                    }
+                  }
+                }
+                pricing {
+                  priceRangeUndiscounted {
+                    start {
+                      net {
+                        amount
+                        currency
+                      }
+                      gross {
+                        amount
+                        currency
+                      }
+                    }
+                    stop {
+                      net {
+                        amount
+                        currency
+                      }
+                      gross {
+                        amount
+                        currency
+                      }
+                    }
+                  }
+                  priceRange {
+                    start {
+                      net {
+                        amount
+                        currency
+                      }
+                      gross {
+                        amount
+                        currency
+                      }
+                    }
+                    stop {
+                      net {
+                        amount
+                        currency
+                      }
+                      gross {
+                        amount
+                        currency
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+export type AddWishlistProductMutationFn = Apollo.MutationFunction<AddWishlistProductMutation, AddWishlistProductMutationVariables>;
+
+/**
+ * __useAddWishlistProductMutation__
+ *
+ * To run a mutation, you first call `useAddWishlistProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddWishlistProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addWishlistProductMutation, { data, loading, error }] = useAddWishlistProductMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useAddWishlistProductMutation(baseOptions?: Apollo.MutationHookOptions<AddWishlistProductMutation, AddWishlistProductMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddWishlistProductMutation, AddWishlistProductMutationVariables>(AddWishlistProductDocument, options);
+      }
+export type AddWishlistProductMutationHookResult = ReturnType<typeof useAddWishlistProductMutation>;
+export type AddWishlistProductMutationResult = Apollo.MutationResult<AddWishlistProductMutation>;
+export type AddWishlistProductMutationOptions = Apollo.BaseMutationOptions<AddWishlistProductMutation, AddWishlistProductMutationVariables>;
 export const UserDetailsDocument = gql`
     query UserDetails {
   user: me {
@@ -19777,3 +20819,200 @@ export function useOrdersByUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type OrdersByUserQueryHookResult = ReturnType<typeof useOrdersByUserQuery>;
 export type OrdersByUserLazyQueryHookResult = ReturnType<typeof useOrdersByUserLazyQuery>;
 export type OrdersByUserQueryResult = Apollo.QueryResult<OrdersByUserQuery, OrdersByUserQueryVariables>;
+export const GetLocalWishlistDocument = gql`
+    query getLocalWishlist {
+  localWishlist @client {
+    ...Wishlist
+  }
+}
+    ${WishlistFragmentDoc}`;
+
+/**
+ * __useGetLocalWishlistQuery__
+ *
+ * To run a query within a React component, call `useGetLocalWishlistQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLocalWishlistQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLocalWishlistQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetLocalWishlistQuery(baseOptions?: Apollo.QueryHookOptions<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>(GetLocalWishlistDocument, options);
+      }
+export function useGetLocalWishlistLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>(GetLocalWishlistDocument, options);
+        }
+export type GetLocalWishlistQueryHookResult = ReturnType<typeof useGetLocalWishlistQuery>;
+export type GetLocalWishlistLazyQueryHookResult = ReturnType<typeof useGetLocalWishlistLazyQuery>;
+export type GetLocalWishlistQueryResult = Apollo.QueryResult<GetLocalWishlistQuery, GetLocalWishlistQueryVariables>;
+export const WishlistDocument = gql`
+    query Wishlist($first: Int!) {
+  wishlist {
+    id
+    items(first: $first) {
+      edges {
+        node {
+          id
+          product {
+            id
+            name
+            slug
+            isAvailableForPurchase
+            metadata {
+              key
+              value
+            }
+            productType {
+              name
+            }
+            thumbnail {
+              url
+            }
+            images {
+              id
+              url
+              alt
+            }
+            variants {
+              id
+              sku
+              name
+              metadata {
+                key
+                value
+              }
+              attributes {
+                attribute {
+                  name
+                }
+                values {
+                  name
+                }
+              }
+              quantityAvailable(countryCode: IN)
+              images {
+                id
+                url
+                alt
+              }
+              pricing {
+                onSale
+                priceUndiscounted {
+                  gross {
+                    amount
+                    currency
+                  }
+                  net {
+                    amount
+                    currency
+                  }
+                }
+                price {
+                  gross {
+                    amount
+                    currency
+                  }
+                  net {
+                    amount
+                    currency
+                  }
+                }
+              }
+            }
+            pricing {
+              priceRangeUndiscounted {
+                start {
+                  net {
+                    amount
+                    currency
+                  }
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+                stop {
+                  net {
+                    amount
+                    currency
+                  }
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+              }
+              priceRange {
+                start {
+                  net {
+                    amount
+                    currency
+                  }
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+                stop {
+                  net {
+                    amount
+                    currency
+                  }
+                  gross {
+                    amount
+                    currency
+                  }
+                }
+              }
+            }
+          }
+          variants(first: $first) {
+            edges {
+              node {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useWishlistQuery__
+ *
+ * To run a query within a React component, call `useWishlistQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWishlistQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWishlistQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useWishlistQuery(baseOptions: Apollo.QueryHookOptions<WishlistQuery, WishlistQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<WishlistQuery, WishlistQueryVariables>(WishlistDocument, options);
+      }
+export function useWishlistLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WishlistQuery, WishlistQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<WishlistQuery, WishlistQueryVariables>(WishlistDocument, options);
+        }
+export type WishlistQueryHookResult = ReturnType<typeof useWishlistQuery>;
+export type WishlistLazyQueryHookResult = ReturnType<typeof useWishlistLazyQuery>;
+export type WishlistQueryResult = Apollo.QueryResult<WishlistQuery, WishlistQueryVariables>;

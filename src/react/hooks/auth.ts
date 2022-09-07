@@ -28,10 +28,11 @@ export const useAuthState = (): UserDetailsQuery => {
     // throw new Error(
     //   "Cache query result is undefined. Invalid cache configuration."
     // );
-    if(typeof window !== "undefined") {
-        window.localStorage?.clear();
-        window.location?.reload();
-      }
+    if (typeof window !== "undefined") {
+      console.log("auth reload");
+      window.localStorage?.clear();
+      window.location?.reload();
+    }
   }
 
   return data || { authenticated: false, authenticating: false, user: null };

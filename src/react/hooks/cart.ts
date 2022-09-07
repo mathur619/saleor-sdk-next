@@ -30,12 +30,12 @@ export const useCartState = () => {
   >(GET_LOCAL_CHECKOUT);
 
   const { data } = res;
-
   if (!data) {
     // throw new Error(
     //   "Cache query result is undefined. Invalid cache configuration."
     // );
     if(typeof window !== "undefined") {
+      console.log("cart hook reload");
       window.localStorage?.clear();
       window.location?.reload();
     }

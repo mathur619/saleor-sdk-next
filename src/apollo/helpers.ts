@@ -1,7 +1,11 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION } from ".";
 import { storage } from "../core/storage";
-import { GET_DISCOUNT_CASHBACK_QUERY, GET_LOCAL_CHECKOUT } from "./queries";
+import {
+  GET_DISCOUNT_CASHBACK_QUERY,
+  GET_LOCAL_CHECKOUT,
+  GET_LOCAL_WISHLIST,
+} from "./queries";
 import {
   CompleteCheckoutMutation,
   UpdateCheckoutShippingMethodMutation,
@@ -84,6 +88,7 @@ export const setLocalCheckoutInCache = async (
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
+        console.log("cart reload helper");
         window.location?.reload();
         return;
       }
@@ -137,6 +142,19 @@ export const setLocalCheckoutInCache = async (
     query: GET_LOCAL_CHECKOUT,
     data: {
       checkoutLoading: false,
+    },
+  });
+};
+
+export const setLocalWishlistInCache = async (
+  client: ApolloClient<NormalizedCacheObject>,
+  wishlist: any
+) => {
+  console.log("wishlist setLocalWishlistInCache", wishlist);
+  client.writeQuery({
+    query: GET_LOCAL_WISHLIST,
+    data: {
+      wishlist: wishlist,
     },
   });
 };

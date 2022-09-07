@@ -822,10 +822,258 @@ export const CREATE_CASHFREE_ORDER = gql`
   }
 `;
 
-export const  CHECKOUT_CUSTOMER_ATTACH = gql`
-  mutation CheckoutCustomerAttach($checkoutId:ID!,$customerId:ID){
-    checkoutCustomerAttach(checkoutId:$checkoutId,customerId:$customerId){
-      checkout{
+export const WISHLIST_ADD_PRODUCT = gql`
+  mutation AddWishlistProduct($productId: ID!) {
+    wishlistAddProduct(productId: $productId) {
+      wishlist {
+        id
+        wishlist {
+          id
+          createdAt
+          items(first: 20) {
+            edges {
+              node {
+                id
+                product {
+                  id
+                  name
+                  isAvailableForPurchase
+                  metadata {
+                    key
+                    value
+                  }
+                  thumbnail {
+                    url
+                  }
+                  images {
+                    id
+                    alt
+                    url
+                  }
+                  variants {
+                    id
+                    sku
+                    name
+                    images {
+                      id
+                      url
+                      alt
+                    }
+                    pricing {
+                      onSale
+                      priceUndiscounted {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                      price {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+
+                  pricing {
+                    priceRangeUndiscounted {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                    priceRange {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const WISHLIST_REMOVE_PRODUCT = gql`
+  mutation wishlistRemoveProduct($productId: ID!) {
+    WishlistRemoveProduct: wishlistRemoveProduct(productId: $productId) {
+      wishlist {
+        id
+        wishlist {
+          id
+          createdAt
+          items(first: 20) {
+            edges {
+              node {
+                id
+                product {
+                  id
+                  name
+                  isPublished
+                  slug
+                  isAvailableForPurchase
+                  metadata {
+                    key
+                    value
+                  }
+                  thumbnail {
+                    url
+                  }
+                  images {
+                    id
+                    alt
+                    url
+                  }
+                  variants {
+                    id
+                    sku
+                    name
+                    attributes {
+                      attribute {
+                        name
+                      }
+                      values {
+                        name
+                      }
+                    }
+                    images {
+                      id
+                      url
+                      alt
+                    }
+                    pricing {
+                      onSale
+                      priceUndiscounted {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                      price {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                  productType {
+                    name
+                  }
+                  pricing {
+                    priceRangeUndiscounted {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                    priceRange {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const CHECKOUT_CUSTOMER_ATTACH = gql`
+  mutation CheckoutCustomerAttach($checkoutId: ID!, $customerId: ID) {
+    checkoutCustomerAttach(checkoutId: $checkoutId, customerId: $customerId) {
+      checkout {
         id
       }
     }

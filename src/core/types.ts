@@ -67,6 +67,8 @@ import {
   VerifyCheckoutOtpMutation,
   PaytmTxnCreateMutation,
   CreateCashfreeOrderMutation,
+  // WishlistAddProductMutation,
+  WishlistFragment,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -302,3 +304,16 @@ export type GetUserCheckoutResult = Promise<
     Record<string, any>
   >
 >;
+
+// export type WishlistAddProductResult = Promise<
+//   FetchResult<
+//     WishlistAddProductMutation,
+//     Record<string, any>,
+//     Record<string, any>
+//   >
+// >;
+
+export type WishlistAddProductResult = any;
+export type WishlistRemoveProductResult = any;
+
+export type WishlistStateResult = Maybe<WishlistFragment> | undefined;

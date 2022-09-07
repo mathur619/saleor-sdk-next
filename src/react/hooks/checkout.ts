@@ -16,13 +16,14 @@ export const useCheckoutState = () => {
 
   const { data } = res;
 
-
+  console.log("GetLocalCheckoutQuery", data);
   if (!data) {
     // throw new Error(
     //   "Cache query result is undefined. Invalid cache configuration."
     // );
-    if(typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       window.localStorage?.clear();
+      console.log("checkout hook reload");
       window.location?.reload();
     }
   }
