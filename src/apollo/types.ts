@@ -17488,6 +17488,7 @@ export type OrderDetailFragment = Pick<
   subtotal: Maybe<OrderPriceFragment>;
   total: Maybe<OrderPriceFragment>;
   shippingPrice: Maybe<OrderPriceFragment>;
+  payments: Maybe<Array<Maybe<Payment>>>;
 };
 
 export type PaymentFragment = Pick<Payment, "id" | "gateway" | "token"> & {

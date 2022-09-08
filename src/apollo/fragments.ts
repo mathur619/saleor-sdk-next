@@ -293,6 +293,9 @@ export const orderDetailFragment = gql`
     voucher {
       code
     }
+    payments{
+      gateway 
+    }
     # invoices {
     #   createdAt
     #   id
