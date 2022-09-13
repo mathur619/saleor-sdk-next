@@ -10,6 +10,7 @@ import {
   PAYTM_TXN_CREATE,
   REFRESH_CHECKOUT,
   REMOVE_CHECKOUT_PROMO_CODE,
+  REORDER,
   UPDATE_CHECKOUT_ADDRESS_TYPE,
   UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION,
   UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
@@ -47,6 +48,8 @@ import {
   RefreshCheckoutMutationVariables,
   RemoveCheckoutPromoCodeMutation,
   RemoveCheckoutPromoCodeMutationVariables,
+  ReOrderMutation,
+  ReOrderMutationVariables,
   UpdateCheckoutAddressTypeMutation,
   UpdateCheckoutAddressTypeMutationVariables,
   UpdateCheckoutBillingAddressMutation,
@@ -78,6 +81,7 @@ import {
   GetWalletAmountResult,
   RefreshCheckoutResult,
   RemovePromoCodeResult,
+  ReOrderResult,
   SaleorClientMethodsProps,
   SetAddressTypeResult,
   SetBillingAddressResult,
@@ -136,6 +140,11 @@ export interface CheckoutSDK {
   setUseCashback?: (useCashback: boolean) => {};
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
   refreshCheckout?: () => RefreshCheckoutResult;
+  reOrder?: (
+    orderId: string,
+    pincode: string,
+    skipLines: boolean
+  ) => ReOrderResult;
 }
 
 export const checkout = ({
@@ -822,6 +831,45 @@ export const checkout = ({
     return null;
   };
 
+  const reOrder: CheckoutSDK["reOrder"] = async (
+    orderId: string,
+    pincode: string,
+    skipLines: boolean
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const res = await client.mutate<ReOrderMutation, ReOrderMutationVariables>({
+      mutation: REORDER,
+      variables: {
+        orderId: orderId,
+        pincode: pincode,
+        skipLines: skipLines,
+      },
+      update: (_, { data }) => {
+        if (data?.reOrder?.checkout?.id) {
+          setLocalCheckoutInCache(client, data?.reOrder?.checkout);
+          storage.setCheckout(data?.reOrder?.checkout);
+        }
+      },
+    });
+
+    if (res?.data?.reOrder?.reorderErrors?.length) {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
+    }
+
+    return res;
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -842,5 +890,6 @@ export const checkout = ({
     setUseCashback,
     setCheckout,
     refreshCheckout,
+    reOrder,
   };
 };

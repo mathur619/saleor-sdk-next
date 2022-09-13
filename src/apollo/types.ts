@@ -471,19 +471,28 @@ export type Allocation = Node & {
   warehouse: Warehouse;
 };
 
+export type ApiCallsFilterInput = {
+  apiName?: Maybe<Scalars["String"]>;
+  userEmail?: Maybe<Scalars["String"]>;
+  actionPerformed?: Maybe<Scalars["String"]>;
+  created?: Maybe<DateRangeInput>;
+  search?: Maybe<Scalars["String"]>;
+};
+
 export type ApiCallsSort =
-  | "API_NAME_ASC"
-  | "API_NAME_DESC"
-  | "ACTION_PERFORMED_ASC"
-  | "ACTION_PERFORMED_DESC"
-  | "USER_ASC"
-  | "USER_DESC"
-  | "USER_EMAIL_ASC"
-  | "USER_EMAIL_DESC"
-  | "DESCRIPTION_ASC"
-  | "DESCRIPTION_DESC"
-  | "NEWEST"
-  | "OLDEST";
+  | "API_NAME"
+  | "ACTION_PERFORMED"
+  | "USER"
+  | "USER_EMAIL"
+  | "DESCRIPTION"
+  | "CREATED";
+
+export type ApiCallsSortType = {
+  /** Specifies the direction in which to sort products. */
+  direction: OrderDirection;
+  /** Sort ApiCalls by the selected field. */
+  field?: Maybe<ApiCallsSort>;
+};
 
 export type ApiCallsType = Node & {
   /** The ID of the object. */
@@ -496,18 +505,18 @@ export type ApiCallsType = Node & {
   actionPerformed: Scalars["String"];
 };
 
-export type ApiCallsTypeConnection = {
+export type ApiCallsTypeCountableConnection = {
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
-  /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ApiCallsTypeEdge>>;
+  edges: Array<ApiCallsTypeCountableEdge>;
+  /** A total count of items in the collection. */
+  totalCount: Maybe<Scalars["Int"]>;
 };
 
-/** A Relay edge containing a `ApiCallsType` and its cursor. */
-export type ApiCallsTypeEdge = {
-  /** The item at the end of the edge */
-  node: Maybe<ApiCallsType>;
-  /** A cursor for use in pagination */
+export type ApiCallsTypeCountableEdge = {
+  /** The item at the end of the edge. */
+  node: ApiCallsType;
+  /** A cursor for use in pagination. */
   cursor: Scalars["String"];
 };
 
@@ -1619,7 +1628,7 @@ export type CashfreeCreateOrderInput = {
   /** Checkout ID. */
   checkoutId: Scalars["ID"];
   /** Url to redirect to after payment. */
-  returnUrl?: Maybe<Scalars["String"]>;
+  returnUrl: Scalars["String"];
 };
 
 export type CashfreeOrderType = {
@@ -1627,6 +1636,8 @@ export type CashfreeOrderType = {
   token: Maybe<Scalars["String"]>;
   /** Cashfree Payment url to use. */
   paymentUrl: Maybe<Scalars["String"]>;
+  /** Cashfree Order token for SDK. */
+  orderToken: Maybe<Scalars["String"]>;
 };
 
 export type CatalogueInput = {
@@ -1964,6 +1975,8 @@ export type Checkout = Node &
     checkoutUrl: Maybe<Scalars["String"]>;
     /** List of events associated with the checkout. */
     events: Maybe<Array<Maybe<CheckoutEvent>>>;
+    /** List of tags associated with the checkout. */
+    tags: Maybe<Array<Maybe<TagType>>>;
   };
 
 /** Adds note to the checkout. */
@@ -2084,6 +2097,8 @@ export type CheckoutCreateInput = {
   shippingAddress?: Maybe<AddressInput>;
   /** Billing address of the customer. */
   billingAddress?: Maybe<AddressInput>;
+  /** Tags if any, associated with the Checkout */
+  tags?: Maybe<Array<Maybe<Scalars["String"]>>>;
 };
 
 /** Sets the customer as the owner of the checkout. */
@@ -2367,6 +2382,8 @@ export type CheckoutType = Node &
     checkoutUrl: Maybe<Scalars["String"]>;
     /** List of events associated with the checkout. */
     events: Maybe<Array<Maybe<CheckoutEvent>>>;
+    /** List of tags associated with the checkout. */
+    tags: Maybe<Array<Maybe<TagType>>>;
   };
 
 /** Checkout object. */
@@ -3348,6 +3365,17 @@ export type CreateHostingFile = {
   hosting: Maybe<HostingType>;
 };
 
+/** Create a new File that is going to be hosted. */
+export type CreateHostingFileNoAuth = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A hosting File instance. */
+  hostingNoAuth: Maybe<HostingNoAuthType>;
+};
+
 /** Create Influencer. */
 export type CreateInfluencer = {
   /**
@@ -3763,6 +3791,13 @@ export type CustomerInput = {
   note?: Maybe<Scalars["String"]>;
 };
 
+export type CustomerMetaInput = {
+  /** Fields required to update metadata key. */
+  key: Scalars["String"];
+  /** Fields required to update metadata value. */
+  value: Scalars["String"];
+};
+
 /** Updates an existing customer. */
 export type CustomerUpdate = {
   /**
@@ -3911,6 +3946,18 @@ export type DeleteProductReview = {
   productReviewErrors: Array<ProductReviewError>;
 };
 
+/** Delete product review by product */
+export type DeleteProductReviewByProduct = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A product review instance. */
+  productReview: Maybe<ProductReviewType>;
+  productReviewErrors: Array<ProductReviewError>;
+};
+
 /** Delete an ShopifyUser instance. */
 export type DeleteShopifyUser = {
   /**
@@ -3944,6 +3991,31 @@ export type DeleteVoucherRule = {
   errors: Array<Error>;
   voucherErrors: Array<VoucherError>;
   voucherRule: Maybe<VoucherRuleType>;
+};
+
+export type DeliveryScheduleInput = {
+  /** name of the warehouse */
+  warehouse?: Maybe<Scalars["String"]>;
+  /** delivery date */
+  deliveryDate?: Maybe<Scalars["Date"]>;
+  /** delivery time */
+  deliveryTime?: Maybe<Scalars["String"]>;
+  /** available slots */
+  availableSlots?: Maybe<Scalars["Int"]>;
+  /** slots filled */
+  slotsFilled?: Maybe<Scalars["Int"]>;
+  /** start time */
+  startTime?: Maybe<Scalars["String"]>;
+  /** end time */
+  endTime?: Maybe<Scalars["String"]>;
+  /**  is express */
+  isExpress?: Maybe<Scalars["Boolean"]>;
+  /** delivery day */
+  deliveryDay?: Maybe<Scalars["String"]>;
+  /** minimum order */
+  minimumOrder?: Maybe<Scalars["Int"]>;
+  /** delivery fee */
+  deliveryFee?: Maybe<Scalars["Int"]>;
 };
 
 export type DeliverySchedulerType = Node &
@@ -4951,10 +5023,13 @@ export type GenericFormInput = {
   email: Scalars["String"];
   /** Response body. */
   responseBody: Scalars["String"];
+  /** form name */
+  formName?: Maybe<Scalars["String"]>;
 };
 
 export type GenericFormType = Node & {
   responseId: Scalars["ID"];
+  formName: Maybe<Scalars["String"]>;
   responseBody: Maybe<Scalars["String"]>;
   name: Maybe<Scalars["String"]>;
   phone: Maybe<Scalars["String"]>;
@@ -5199,6 +5274,22 @@ export type HostingInput = {
   file?: Maybe<Scalars["Upload"]>;
   /** File name */
   name: Scalars["String"];
+};
+
+export type HostingNoAuthInput = {
+  /** Hosted file on admin panel. */
+  file?: Maybe<Scalars["Upload"]>;
+  /** File name */
+  name: Scalars["String"];
+};
+
+export type HostingNoAuthType = Node & {
+  /** The ID of the object. */
+  id: Scalars["ID"];
+  name: Scalars["String"];
+  file: Maybe<Scalars["String"]>;
+  /** The URL of the file */
+  fileUrl: Maybe<Scalars["String"]>;
 };
 
 export type HostingOrder = {
@@ -6393,6 +6484,8 @@ export type Mutation = {
   paymentVoid: Maybe<PaymentVoid>;
   /** Initializes payment process when it is required by gateway. */
   paymentInitialize: Maybe<PaymentInitialize>;
+  /** creates intent for payment. */
+  stripePaymentIntentCreate: Maybe<StripePaymentIntentCreate>;
   /** Creates a new page. */
   pageCreate: Maybe<PageCreate>;
   /** Deletes a page. */
@@ -6779,6 +6872,8 @@ export type Mutation = {
   exportProductsV2: Maybe<ExportProductsV2>;
   /** Create a new File that is going to be hosted. */
   createHostingFile: Maybe<CreateHostingFile>;
+  /** Create a new File that is going to be hosted. */
+  createHostingFileNoAuth: Maybe<CreateHostingFileNoAuth>;
   /** Delete a file that is hosted. */
   deleteHostingFile: Maybe<DeleteHostingFile>;
   /** Create Notification. */
@@ -6811,6 +6906,8 @@ export type Mutation = {
   productImageCreateV2: Maybe<ProductImageCreateV2>;
   /** Create a product_review image. This mutation must be sent as a `multipart` request. More detailed specs of the upload format can be found here: https://github.com/jaydenseric/graphql-multipart-request-spec */
   productReviewImageCreate: Maybe<ProductReviewImageCreate>;
+  /** Update a product_review image. This mutation must be sent as a `multipart` request. More detailed specs of the upload format can be found here: https://github.com/jaydenseric/graphql-multipart-request-spec */
+  productReviewImageUpdate: Maybe<ProductReviewImageUpdate>;
   /** Deletes a product_review image. */
   productReviewImageDelete: Maybe<ProductReviewImageDelete>;
   /** Create a product_review video. This mutation must be sent as a `multipart` request. More detailed specs of the upload format can be found here: https://github.com/jaydenseric/graphql-multipart-request-spec */
@@ -6965,6 +7062,8 @@ export type Mutation = {
   checkoutRemovePromoCodeShopify: Maybe<CheckoutRemovePromoCodeShopify>;
   /** Create a user avatar. For all users. This mutation must be sent as a `multipart` request. More detailed specs of the upload format can be found here: https://github.com/jaydenseric/graphql-multipart-request-spec */
   userAvatarUpdateV2: Maybe<UserAvatarUpdateV2>;
+  /** Update Customer metadata. */
+  updateCustomerNoAuth: Maybe<UpdateCustomerNoAuth>;
   /** Deletes a user avatar. Only for staff members. */
   userAvatarDeleteV2: Maybe<UserAvatarDeleteV2>;
   /** Cancel a DTC Order */
@@ -6977,12 +7076,20 @@ export type Mutation = {
   menuItemMoveV2: Maybe<MenuItemMoveV2>;
   /** Create Product. */
   createProductCsv: Maybe<CreateProductCsv>;
+  /** Update Product Attributes. */
+  updateProductCsv: Maybe<UpdateProductCsv>;
   /** Upload Review CSV. */
   createReviewCsv: Maybe<CreateReviewCsv>;
+  /** Create Product. */
+  updateCollectionMetadata: Maybe<UpdateCollectionMetadata>;
+  /** Update ProductVariant metadata. */
+  updateProductvariantMetadata: Maybe<UpdateProductvariantMetadata>;
   /** Create Product. */
   updateInventoryCsv: Maybe<UpdateInventoryCsv>;
   /** Bulk Upload Price CSV */
   bulkPriceUpdateCsv: Maybe<BulkPriceUpdateCsv>;
+  /** Create Product. */
+  updateProductsMetadataCsv: Maybe<UpdateProductsMetadataCsv>;
   /** Create Product. */
   createProductVariantCsv: Maybe<CreateProductVariantCsv>;
   /** Update Manufacturing Details of a product. */
@@ -7013,16 +7120,12 @@ export type Mutation = {
   walletExport: Maybe<ExportWallet>;
   /** Upload Images of a product. */
   uploadProductImageCsv: Maybe<UploadProductImageCsv>;
+  /** Upload Collection ID CSV */
+  uploadCollectionidCsv: Maybe<UploadCollectionIdcsv>;
   /** Creates checkout from an existing order */
   reOrder: Maybe<ReOrder>;
   /** Create JWT token via google oauth2. */
   createTokenOauth: Maybe<CreateTokenOAuth>;
-  /** Create a new archive order. */
-  archiveOrderCreate: Maybe<CreateArchiveOrder>;
-  /** Update an archive order. */
-  archiveOrderUpdate: Maybe<UpdateArchiveOrder>;
-  /** Delete an archive order. */
-  archiveOrderDelete: Maybe<DeleteArchiveOrder>;
   /** Create a new nutrition form entry. */
   nutritionFormCreate: Maybe<NutritionFormCreate>;
   /** Trigger a cron as specified in input. */
@@ -7041,6 +7144,18 @@ export type Mutation = {
   draftOrderRemovePrepaid: Maybe<DraftOrderRemovePrePaid>;
   /** Create Product. */
   createShippingZones: Maybe<CreateShippingZonesCsv>;
+  /** Send or resend order confirmation email for order */
+  sendOrderEmail: Maybe<SendOrderEmail>;
+  /** Delete product review by product */
+  deleteProductReviewByProductId: Maybe<DeleteProductReviewByProduct>;
+  /** Create a new archive order. */
+  archiveOrderCreate: Maybe<CreateArchiveOrder>;
+  /** Update an archive order. */
+  archiveOrderUpdate: Maybe<UpdateArchiveOrder>;
+  /** Delete an archive order. */
+  archiveOrderDelete: Maybe<DeleteArchiveOrder>;
+  /** Update Delivery Scheduler */
+  updateDeliverySchedule: Maybe<UpdateDeliverySchedule>;
 };
 
 export type MutationWishlistAddProductArgs = {
@@ -7622,6 +7737,10 @@ export type MutationPaymentVoidArgs = {
 export type MutationPaymentInitializeArgs = {
   gateway: Scalars["String"];
   paymentData?: Maybe<Scalars["JSONString"]>;
+};
+
+export type MutationStripePaymentIntentCreateArgs = {
+  checkoutToken: Scalars["ID"];
 };
 
 export type MutationPageCreateArgs = {
@@ -8340,6 +8459,10 @@ export type MutationCreateHostingFileArgs = {
   input: HostingInput;
 };
 
+export type MutationCreateHostingFileNoAuthArgs = {
+  input: HostingNoAuthInput;
+};
+
 export type MutationDeleteHostingFileArgs = {
   hostingId: Scalars["ID"];
 };
@@ -8410,6 +8533,11 @@ export type MutationProductImageCreateV2Args = {
 };
 
 export type MutationProductReviewImageCreateArgs = {
+  input: ProductReviewImageCreateInput;
+};
+
+export type MutationProductReviewImageUpdateArgs = {
+  id: Scalars["ID"];
   input: ProductReviewImageCreateInput;
 };
 
@@ -8758,6 +8886,11 @@ export type MutationUserAvatarUpdateV2Args = {
   image: Scalars["Upload"];
 };
 
+export type MutationUpdateCustomerNoAuthArgs = {
+  id: Scalars["ID"];
+  input: CustomerMetaInput;
+};
+
 export type MutationDtcOrderCancelArgs = {
   input: OrderCancelInput;
 };
@@ -8779,7 +8912,19 @@ export type MutationCreateProductCsvArgs = {
   csvFile: Scalars["Upload"];
 };
 
+export type MutationUpdateProductCsvArgs = {
+  csvFile: Scalars["Upload"];
+};
+
 export type MutationCreateReviewCsvArgs = {
+  csvFile: Scalars["Upload"];
+};
+
+export type MutationUpdateCollectionMetadataArgs = {
+  csvFile: Scalars["Upload"];
+};
+
+export type MutationUpdateProductvariantMetadataArgs = {
   csvFile: Scalars["Upload"];
 };
 
@@ -8788,6 +8933,10 @@ export type MutationUpdateInventoryCsvArgs = {
 };
 
 export type MutationBulkPriceUpdateCsvArgs = {
+  csvFile: Scalars["Upload"];
+};
+
+export type MutationUpdateProductsMetadataCsvArgs = {
   csvFile: Scalars["Upload"];
 };
 
@@ -8852,27 +9001,20 @@ export type MutationUploadProductImageCsvArgs = {
   csvFile: Scalars["Upload"];
 };
 
+export type MutationUploadCollectionidCsvArgs = {
+  csvFile: Scalars["Upload"];
+};
+
 export type MutationReOrderArgs = {
   orderId?: Maybe<Scalars["ID"]>;
+  pincode?: Maybe<Scalars["String"]>;
+  skipLines?: Maybe<Scalars["Boolean"]>;
 };
 
 export type MutationCreateTokenOauthArgs = {
   checkoutId?: Maybe<Scalars["ID"]>;
   socialMedia: SocialMedia;
   token: Scalars["String"];
-};
-
-export type MutationArchiveOrderCreateArgs = {
-  input: ArchiveOrderInput;
-};
-
-export type MutationArchiveOrderUpdateArgs = {
-  id: Scalars["String"];
-  input: ArchiveOrderInput;
-};
-
-export type MutationArchiveOrderDeleteArgs = {
-  id: Scalars["ID"];
 };
 
 export type MutationNutritionFormCreateArgs = {
@@ -8910,6 +9052,32 @@ export type MutationDraftOrderRemovePrepaidArgs = {
 
 export type MutationCreateShippingZonesArgs = {
   csvFile: Scalars["Upload"];
+};
+
+export type MutationSendOrderEmailArgs = {
+  orderId?: Maybe<Scalars["ID"]>;
+};
+
+export type MutationDeleteProductReviewByProductIdArgs = {
+  productId: Scalars["ID"];
+};
+
+export type MutationArchiveOrderCreateArgs = {
+  input: ArchiveOrderInput;
+};
+
+export type MutationArchiveOrderUpdateArgs = {
+  id: Scalars["String"];
+  input: ArchiveOrderInput;
+};
+
+export type MutationArchiveOrderDeleteArgs = {
+  id: Scalars["ID"];
+};
+
+export type MutationUpdateDeliveryScheduleArgs = {
+  id: Scalars["ID"];
+  input?: Maybe<DeliveryScheduleInput>;
 };
 
 export type NameTranslationInput = {
@@ -9004,7 +9172,7 @@ export type OtpError = {
 };
 
 /** An enumeration. */
-export type OtpErrorCodeEnum = "INVALID_PHONE" | "INVALID_OTP";
+export type OtpErrorCodeEnum = "INVALID_PHONE" | "INVALID_OTP" | "MAX_RETRY";
 
 export type ObjectWithMetadata = {
   /** List of private metadata items.Requires proper staff permissions to access. */
@@ -11143,6 +11311,8 @@ export type ProductOrderField =
   | "PRICE"
   /** Sort products by a minimal price of a product's variant. */
   | "MINIMAL_PRICE"
+  /** Sort products by default_variant_price. */
+  | "DEFAULT_VARIANT_PRICE"
   /** Sort products by update date. */
   | "DATE"
   /** Sort products by type. */
@@ -11182,7 +11352,11 @@ export type ProductReviewError = {
 };
 
 /** An enumeration. */
-export type ProductReviewErrorCode = "INVALID" | "NOT_FOUND" | "REQUIRED";
+export type ProductReviewErrorCode =
+  | "INVALID"
+  | "NOT_FOUND"
+  | "REQUIRED"
+  | "PHONE_NUMBER_INVALID";
 
 export type ProductReviewFilterInput = {
   product?: Maybe<Scalars["String"]>;
@@ -11258,11 +11432,27 @@ export type ProductReviewImageTypeEdge = {
   cursor: Scalars["String"];
 };
 
+/** Update a product_review image. This mutation must be sent as a `multipart` request. More detailed specs of the upload format can be found here: https://github.com/jaydenseric/graphql-multipart-request-spec */
+export type ProductReviewImageUpdate = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  productReview: Maybe<ProductReviewType>;
+  image: Maybe<ProductReviewImageType>;
+  productErrors: Array<ProductError>;
+};
+
 export type ProductReviewInput = {
   /** Product Id */
   productId?: Maybe<Scalars["ID"]>;
   /** Name of the user */
   userName?: Maybe<Scalars["String"]>;
+  /** email of the user */
+  userEmail?: Maybe<Scalars["String"]>;
+  /** phone of the user/reviewer */
+  phone?: Maybe<Scalars["String"]>;
   /** Title of the product review */
   title?: Maybe<Scalars["String"]>;
   /** User review on the product */
@@ -11277,6 +11467,33 @@ export type ProductReviewInput = {
   verified?: Maybe<Scalars["Boolean"]>;
 };
 
+export type ProductReviewOrder = {
+  /** Specifies the direction in which to sort products. */
+  direction: OrderDirection;
+  /** Sort product reviews by the selected field. */
+  field?: Maybe<ProductReviewOrderField>;
+};
+
+export type ProductReviewOrderField =
+  /** Sort productReviews by  user name. */
+  | "USER_NAME"
+  /** Sort productReviews by rating. */
+  | "RATING"
+  /** Sort productReviews by products name */
+  | "PRODUCT_NAME"
+  /** Sort productReviews by published. */
+  | "PUBLISHED"
+  /** Sort productReviews by published date. */
+  | "PUBLICATION_DATE"
+  /** Sort productReviews by create date. */
+  | "CREATION_DATE"
+  /** Sort productReviews by update date. */
+  | "HELPFUL"
+  /** Sort productReviews by publication status. */
+  | "VERIFIED"
+  /** Sort productReviews by admin reply */
+  | "ADMIN_REPLY";
+
 export type ProductReviewSortOrders =
   | "HIGHEST_RATING"
   | "LOWEST_RATING"
@@ -11290,6 +11507,8 @@ export type ProductReviewType = Node & {
   id: Scalars["ID"];
   user: Maybe<User>;
   userName: Maybe<Scalars["String"]>;
+  userEmail: Maybe<Scalars["String"]>;
+  phone: Maybe<Scalars["String"]>;
   product: Product;
   title: Maybe<Scalars["String"]>;
   review: Scalars["String"];
@@ -12129,7 +12348,7 @@ export type Query = {
   addressType: Maybe<AddressLinkType>;
   /** Returns address validation rules. */
   addressValidationRules: Maybe<AddressValidationData>;
-  apiCalls: Maybe<ApiCallsTypeConnection>;
+  apiCalls: Maybe<ApiCallsTypeCountableConnection>;
   /** Look up a app by ID. */
   app: Maybe<App>;
   /** List of the apps. */
@@ -12275,6 +12494,8 @@ export type Query = {
   /** Look up a product by ID. */
   product: Maybe<Product>;
   productOffers: Maybe<Array<Maybe<Scalars["String"]>>>;
+  /** Look up a product review by ID. */
+  productReview: Maybe<ProductReviewType>;
   productReviews: Maybe<ProductReviewTypeCountableConnection>;
   productReviewsAll: Maybe<ProductReviewTypeCountableConnection>;
   /** Look up a product type by ID. */
@@ -12399,15 +12620,12 @@ export type QueryAddressValidationRulesArgs = {
 };
 
 export type QueryApiCallsArgs = {
-  sort?: Maybe<ApiCallsSort>;
+  filter?: Maybe<ApiCallsFilterInput>;
+  sortBy?: Maybe<ApiCallsSortType>;
   before?: Maybe<Scalars["String"]>;
   after?: Maybe<Scalars["String"]>;
   first?: Maybe<Scalars["Int"]>;
   last?: Maybe<Scalars["Int"]>;
-  apiName?: Maybe<Scalars["String"]>;
-  userEmail?: Maybe<Scalars["String"]>;
-  actionPerformed?: Maybe<Scalars["String"]>;
-  created?: Maybe<Scalars["DateTime"]>;
 };
 
 export type QueryAppArgs = {
@@ -12954,6 +13172,10 @@ export type QueryProductOffersArgs = {
   productId?: Maybe<Scalars["ID"]>;
 };
 
+export type QueryProductReviewArgs = {
+  id?: Maybe<Scalars["ID"]>;
+};
+
 export type QueryProductReviewsArgs = {
   product: Scalars["ID"];
   id?: Maybe<Scalars["ID"]>;
@@ -12970,6 +13192,7 @@ export type QueryProductReviewsArgs = {
 
 export type QueryProductReviewsAllArgs = {
   filter?: Maybe<ProductReviewFilterInput>;
+  sortBy?: Maybe<ProductReviewOrder>;
   before?: Maybe<Scalars["String"]>;
   after?: Maybe<Scalars["String"]>;
   first?: Maybe<Scalars["Int"]>;
@@ -13348,7 +13571,20 @@ export type ReOrder = {
   errors: Array<Error>;
   /** checkout with checkout items */
   checkout: Maybe<Checkout>;
+  reorderErrors: Array<ReOrderError>;
 };
+
+export type ReOrderError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars["String"]>;
+  /** The error message. */
+  message: Maybe<Scalars["String"]>;
+  /** The error code. */
+  code: Maybe<ReOrderErrorCodeEnum>;
+};
+
+/** An enumeration. */
+export type ReOrderErrorCodeEnum = "INVALID" | "PINCODE_MISMATCHED";
 
 /** Represents a reduced VAT rate for a particular type of goods. */
 export type ReducedRate = {
@@ -14031,6 +14267,18 @@ export type SelectedAttribute = {
   attribute: Attribute;
   /** Values of an attribute. */
   values: Array<Maybe<AttributeValue>>;
+};
+
+/** Send or resend order confirmation email for order */
+export type SendOrderEmail = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** sends or resends order confirmation emails */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
 };
 
 export type SeoInput = {
@@ -15120,6 +15368,22 @@ export type StockInput = {
   quantity?: Maybe<Scalars["Int"]>;
 };
 
+/** creates intent for payment. */
+export type StripePaymentIntentCreate = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** intent Client Secret */
+  clientSecret: Maybe<Scalars["String"]>;
+  /** intent ID */
+  intentId: Maybe<Scalars["ID"]>;
+  /** redirection domain url */
+  redirectDomain: Maybe<Scalars["String"]>;
+  intentCreationPaymentError: Array<PaymentError>;
+};
+
 /** Create Subscription. */
 export type SubscriptionCreate = {
   /**
@@ -15764,6 +16028,42 @@ export type UpdateBanner = {
   bannerErrors: Array<BannerError>;
 };
 
+/** Create Product. */
+export type UpdateCollectionMetadata = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars["String"]>;
+};
+
+/** Update Customer metadata. */
+export type UpdateCustomerNoAuth = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An updated customer metadata. */
+  message: Maybe<Scalars["String"]>;
+  /** An updated user instance. */
+  user: Maybe<User>;
+  accountErrors: Array<AccountError>;
+};
+
+/** Update Delivery Scheduler */
+export type UpdateDeliverySchedule = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /**  update delivery scheduler */
+  deliveryScheduler: Maybe<DeliverySchedulerType>;
+};
+
 /** Update an Influencer. */
 export type UpdateInfluencer = {
   /**
@@ -15860,6 +16160,39 @@ export type UpdatePrivateMetadataV2 = {
   item: Maybe<ObjectWithMetadataV2>;
 };
 
+/** Update Product Attributes. */
+export type UpdateProductCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars["String"]>;
+};
+
+/** Create Product. */
+export type UpdateProductsMetadataCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars["String"]>;
+};
+
+/** Update ProductVariant metadata. */
+export type UpdateProductvariantMetadata = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars["String"]>;
+};
+
 /** Create or update reply on Product Review */
 export type UpdateReplyOnProductReview = {
   /**
@@ -15942,6 +16275,30 @@ export type UpdateVoucherRuleLink = {
   voucherRuleLink: Maybe<VoucherRuleLinkType>;
   voucherErrors: Array<VoucherError>;
 };
+
+/** Upload Collection ID CSV */
+export type UploadCollectionIdcsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars["String"]>;
+  collectionUpdateErrors: Array<UploadCollectionIdError>;
+};
+
+export type UploadCollectionIdError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars["String"]>;
+  /** The error message. */
+  message: Maybe<Scalars["String"]>;
+  /** The error code.. */
+  code: UploadCollectionIdErrorCode;
+};
+
+/** An enumeration. */
+export type UploadCollectionIdErrorCode = "INVALID_FILE_FORMAT" | "INVALID";
 
 /** Upload Images of a product. */
 export type UploadProductImageCsv = {
@@ -17474,6 +17831,7 @@ export type OrderDetailFragment = Pick<
   | "number"
 > & {
   voucher: Maybe<Pick<Voucher, "code">>;
+  payments: Maybe<Array<Maybe<Pick<Payment, "gateway">>>>;
   metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
   shippingAddress: Maybe<AddressFragment>;
   lines: Array<
@@ -17488,7 +17846,6 @@ export type OrderDetailFragment = Pick<
   subtotal: Maybe<OrderPriceFragment>;
   total: Maybe<OrderPriceFragment>;
   shippingPrice: Maybe<OrderPriceFragment>;
-  payments: Maybe<Array<Maybe<Payment>>>;
 };
 
 export type PaymentFragment = Pick<Payment, "id" | "gateway" | "token"> & {
@@ -17914,6 +18271,19 @@ export type RefreshCheckoutMutation = {
   }>;
 };
 
+export type ReOrderMutationVariables = Exact<{
+  orderId?: Maybe<Scalars["ID"]>;
+  pincode?: Maybe<Scalars["String"]>;
+  skipLines?: Maybe<Scalars["Boolean"]>;
+}>;
+
+export type ReOrderMutation = {
+  reOrder: Maybe<{
+    reorderErrors: Array<Pick<ReOrderError, "field" | "message" | "code">>;
+    checkout: Maybe<CheckoutFragment>;
+  }>;
+};
+
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type UserDetailsQuery = Pick<
@@ -18310,6 +18680,9 @@ export const OrderDetailFragmentDoc = gql`
     number
     voucher {
       code
+    }
+    payments {
+      gateway
     }
     metadata {
       key
@@ -20230,6 +20603,63 @@ export type RefreshCheckoutMutationResult = Apollo.MutationResult<
 export type RefreshCheckoutMutationOptions = Apollo.BaseMutationOptions<
   RefreshCheckoutMutation,
   RefreshCheckoutMutationVariables
+>;
+export const ReOrderDocument = gql`
+  mutation ReOrder($orderId: ID, $pincode: String, $skipLines: Boolean) {
+    reOrder(orderId: $orderId, pincode: $pincode, skipLines: $skipLines) {
+      reorderErrors {
+        field
+        message
+        code
+      }
+      checkout {
+        ...Checkout
+      }
+    }
+  }
+  ${CheckoutFragmentDoc}
+`;
+export type ReOrderMutationFn = Apollo.MutationFunction<
+  ReOrderMutation,
+  ReOrderMutationVariables
+>;
+
+/**
+ * __useReOrderMutation__
+ *
+ * To run a mutation, you first call `useReOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [reOrderMutation, { data, loading, error }] = useReOrderMutation({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *      pincode: // value for 'pincode'
+ *      skipLines: // value for 'skipLines'
+ *   },
+ * });
+ */
+export function useReOrderMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ReOrderMutation,
+    ReOrderMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<ReOrderMutation, ReOrderMutationVariables>(
+    ReOrderDocument,
+    options
+  );
+}
+export type ReOrderMutationHookResult = ReturnType<typeof useReOrderMutation>;
+export type ReOrderMutationResult = Apollo.MutationResult<ReOrderMutation>;
+export type ReOrderMutationOptions = Apollo.BaseMutationOptions<
+  ReOrderMutation,
+  ReOrderMutationVariables
 >;
 export const UserDetailsDocument = gql`
   query UserDetails {
