@@ -37,7 +37,9 @@ export const userFragment = gql`
     email
     firstName
     lastName
-    tags
+    tags{
+      name
+    }
     isStaff
     metadata {
       key
