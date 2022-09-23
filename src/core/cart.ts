@@ -67,6 +67,7 @@ export interface CartSDK {
     quantity: number,
     prevQuantity: number
   ) => UpdateItemResult;
+  clearCart?: () => UpdateItemResult;
 }
 
 export const cart = ({
@@ -155,7 +156,7 @@ export const cart = ({
       };
       return returnObject;
     } else {
-      let checkoutInputVariables:CheckoutCreateInput;
+      let checkoutInputVariables: CheckoutCreateInput;
       if (tags) {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
@@ -349,10 +350,55 @@ export const cart = ({
     return null;
   };
 
+  const clearCart: CartSDK["clearCart"] = async () => {
+    const checkoutString = storage.getCheckout();
+
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    const alteredLines =
+      checkout &&
+      checkout?.lines?.map((line: any) => ({
+        quantity: 0,
+        variantId: line?.variant?.id,
+      }));
+
+    if (checkout && checkout?.token) {
+      const res = await client.mutate<
+        UpdateCheckoutLineMutation,
+        UpdateCheckoutLineMutationVariables
+      >({
+        mutation: UPDATE_CHECKOUT_LINE_MUTATION,
+        variables: {
+          checkoutId: checkout?.id,
+          lines: alteredLines,
+        },
+        update: async (_, { data }) => {
+          if (data?.checkoutLinesUpdate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
+          }
+          await setLocalCheckoutInCache(
+            client,
+            data?.checkoutLinesUpdate?.checkout,
+            true
+          );
+        },
+      });
+      return {
+        data: res.data?.checkoutLinesUpdate?.checkout,
+        errors: res.data?.checkoutLinesUpdate?.errors,
+      };
+    }
+
+    return null;
+  };
+
   return {
     items,
     addItem,
     removeItem,
     updateItem,
+    clearCart,
   };
 };
