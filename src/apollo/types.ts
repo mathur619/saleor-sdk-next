@@ -18132,7 +18132,7 @@ export type CheckoutErrorFragment = Pick<CheckoutError, 'code' | 'field' | 'mess
 export type OrderPriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'>, tax: Pick<Money, 'amount' | 'currency'> };
 
 export type OrderDetailFragment = (
-  Pick<Order, 'userEmail' | 'paymentStatus' | 'paymentStatusDisplay' | 'status' | 'statusDisplay' | 'id' | 'token' | 'number'>
+  Pick<Order, 'userEmail' | 'paymentStatus' | 'paymentStatusDisplay' | 'status' | 'statusDisplay' | 'id' | 'token' | 'number' | 'payments'>
   & { voucher: Maybe<Pick<Voucher, 'code'>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, shippingAddress: Maybe<AddressFragment>, lines: Array<Maybe<(
     Pick<OrderLine, 'id' | 'productName' | 'quantity'>
     & { variant: Maybe<ProductVariantFragment>, unitPrice: Maybe<(
