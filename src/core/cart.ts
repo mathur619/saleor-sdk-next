@@ -68,12 +68,58 @@ export interface CartSDK {
   updateItemWithLines: (
     updatedLines: Array<Maybe<CheckoutLineInput>>
   ) => UpdateItemResult;
+
+  clearCart?: () => UpdateItemResult;
 }
 
 export const cart = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CartSDK => {
   let items = cartItemsVar();
+
+  const clearCart: CartSDK["clearCart"] = async () => {
+    const checkoutString = storage.getCheckout();
+
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    const alteredLines =
+      checkout &&
+      checkout?.lines?.map((line: any) => ({
+        quantity: 0,
+        variantId: line?.variant?.id,
+      }));
+
+    if (checkout && checkout?.token) {
+      const res = await client.mutate<
+        UpdateCheckoutLineMutation,
+        UpdateCheckoutLineMutationVariables
+      >({
+        mutation: UPDATE_CHECKOUT_LINE_MUTATION,
+        variables: {
+          checkoutId: checkout?.id,
+          lines: alteredLines,
+        },
+        update: async (_, { data }) => {
+          if (data?.checkoutLinesUpdate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
+          }
+          await setLocalCheckoutInCache(
+            client,
+            data?.checkoutLinesUpdate?.checkout,
+            true
+          );
+        },
+      });
+      return {
+        data: res.data?.checkoutLinesUpdate?.checkout,
+        errors: res.data?.checkoutLinesUpdate?.errors,
+      };
+    }
+
+    return null;
+  };
 
   const addItem: CartSDK["addItem"] = async (
     variantId: string,
@@ -128,8 +174,7 @@ export const cart = ({
           "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
-        window.localStorage?.clear();
-        window.location?.reload();
+        await clearCart();
       }
       if (
         res.data?.checkoutLinesAdd?.errors &&
@@ -137,8 +182,7 @@ export const cart = ({
           "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
-        window.localStorage?.clear();
-        window.location?.reload();
+        await clearCart();
       }
       if (
         res.data?.checkoutLinesAdd?.errors &&
@@ -240,8 +284,7 @@ export const cart = ({
           "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
-        window.localStorage?.clear();
-        window.location?.reload();
+        await clearCart();
       }
       if (
         res.data?.checkoutLineDelete?.errors &&
@@ -249,8 +292,7 @@ export const cart = ({
           "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
-        window.localStorage?.clear();
-        window.location?.reload();
+        await clearCart();
       }
       if (
         res.data?.checkoutLineDelete?.errors &&
@@ -404,6 +446,7 @@ export const cart = ({
 
   return {
     items,
+    clearCart,
     addItem,
     removeItem,
     updateItem,
