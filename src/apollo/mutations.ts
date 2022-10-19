@@ -892,3 +892,20 @@ export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT = gql`
     }
   }
 `;
+
+export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutErrorFragment}
+  mutation UpdateCheckoutLineNext(
+    $checkoutId: ID!
+    $lines: [CheckoutLineInput]!
+  ) {
+    checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
+      checkout {
+        id
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;

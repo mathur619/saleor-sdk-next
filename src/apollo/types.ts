@@ -18666,6 +18666,14 @@ export type UpdateCheckoutShippingMethodNextMutation = { checkoutShippingMethodU
       & CheckoutFragment
     )>, errors: Array<CheckoutErrorFragment> }> };
 
+export type UpdateCheckoutLineNextMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+  lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
+}>;
+
+
+export type UpdateCheckoutLineNextMutation = { checkoutLinesUpdate: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>>, errors: Array<CheckoutErrorFragment> }> };
+
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -20508,6 +20516,45 @@ export function useUpdateCheckoutShippingMethodNextMutation(baseOptions?: Apollo
 export type UpdateCheckoutShippingMethodNextMutationHookResult = ReturnType<typeof useUpdateCheckoutShippingMethodNextMutation>;
 export type UpdateCheckoutShippingMethodNextMutationResult = Apollo.MutationResult<UpdateCheckoutShippingMethodNextMutation>;
 export type UpdateCheckoutShippingMethodNextMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>;
+export const UpdateCheckoutLineNextDocument = gql`
+    mutation UpdateCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
+  checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
+    checkout {
+      id
+    }
+    errors: checkoutErrors {
+      ...CheckoutError
+    }
+  }
+}
+    ${CheckoutErrorFragmentDoc}`;
+export type UpdateCheckoutLineNextMutationFn = Apollo.MutationFunction<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>;
+
+/**
+ * __useUpdateCheckoutLineNextMutation__
+ *
+ * To run a mutation, you first call `useUpdateCheckoutLineNextMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCheckoutLineNextMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCheckoutLineNextMutation, { data, loading, error }] = useUpdateCheckoutLineNextMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      lines: // value for 'lines'
+ *   },
+ * });
+ */
+export function useUpdateCheckoutLineNextMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>(UpdateCheckoutLineNextDocument, options);
+      }
+export type UpdateCheckoutLineNextMutationHookResult = ReturnType<typeof useUpdateCheckoutLineNextMutation>;
+export type UpdateCheckoutLineNextMutationResult = Apollo.MutationResult<UpdateCheckoutLineNextMutation>;
+export type UpdateCheckoutLineNextMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>;
 export const UserDetailsDocument = gql`
     query UserDetails {
   user: me {
