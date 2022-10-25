@@ -19,8 +19,10 @@ import {
   AddCheckoutLineMutationVariables,
   Checkout,
   CheckoutCreateInput,
+  CheckoutLineInput,
   CreateCheckoutMutation,
   CreateCheckoutMutationVariables,
+  Maybe,
   RemoveCheckoutLineMutation,
   RemoveCheckoutLineMutationVariables,
   UpdateCheckoutLineMutation,
@@ -66,6 +68,9 @@ export interface CartSDK {
     variantId: string,
     quantity: number,
     prevQuantity: number
+  ) => UpdateItemResult;
+  updateItemWithLines: (
+    updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
   ) => UpdateItemResult;
   clearCart?: () => UpdateItemResult;
 }
@@ -350,6 +355,45 @@ export const cart = ({
     return null;
   };
 
+  const updateItemWithLines: CartSDK["updateItemWithLines"] = async (
+    updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
+  ) => {
+    const checkoutString = storage.getCheckout();
+
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.token) {
+      const res = await client.mutate<
+        UpdateCheckoutLineMutation,
+        UpdateCheckoutLineMutationVariables
+      >({
+        mutation: UPDATE_CHECKOUT_LINE_MUTATION,
+        variables: {
+          checkoutId: checkout?.id,
+          lines: updatedLines,
+        },
+        update: async (_, { data }) => {
+          if (data?.checkoutLinesUpdate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
+          }
+          await setLocalCheckoutInCache(
+            client,
+            data?.checkoutLinesUpdate?.checkout,
+            true
+          );
+        },
+      });
+      return {
+        data: res.data?.checkoutLinesUpdate?.checkout,
+        errors: res.data?.checkoutLinesUpdate?.errors,
+      };
+    }
+    return null;
+  };
+
   const clearCart: CartSDK["clearCart"] = async () => {
     const checkoutString = storage.getCheckout();
 
@@ -400,5 +444,6 @@ export const cart = ({
     removeItem,
     updateItem,
     clearCart,
+    updateItemWithLines,
   };
 };
