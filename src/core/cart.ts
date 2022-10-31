@@ -358,6 +358,12 @@ export const cart = ({
   const updateItemWithLines: CartSDK["updateItemWithLines"] = async (
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
   ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
     const checkoutString = storage.getCheckout();
 
     const checkout =
