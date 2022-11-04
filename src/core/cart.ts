@@ -84,7 +84,8 @@ export interface CartSDK {
   addToCartNext: (
     variantId: string,
     quantity: number,
-    tags?: string[]
+    tags?: string[],
+    line_item?: any
   ) => AddItemResult;
   updateItemNext: (
     variantId: string,
@@ -376,20 +377,37 @@ export const cart = ({
   const addToCartNext: CartSDK["addToCartNext"] = async (
     variantId: string,
     quantity: number,
-    tags?: string[]
+    tags?: string[],
+    line_item?: any
   ) => {
-    client.writeQuery({
-      query: GET_LOCAL_CHECKOUT,
-      data: {
-        checkoutLoading: true,
-      },
-    });
-
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
+
+    if (line_item) {
+      const res = client.readQuery({
+        query: GET_LOCAL_CHECKOUT,
+      });
+      const checkout = res?.localCheckout;
+      let existingLines = [...checkout.lines, line_item];
+      const updatedCheckout = { ...checkout, lines: existingLines };
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          localCheckout: updatedCheckout,
+        },
+      });
+    } else {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: true,
+        },
+      });
+    }
 
     if (checkout && checkout?.token) {
       const res = await client.mutate<
@@ -868,6 +886,6 @@ export const cart = ({
     removeItem,
     updateItem,
     addToCartNext,
-    updateItemNext
+    updateItemNext,
   };
 };
