@@ -18643,7 +18643,10 @@ export type AddCheckoutLineNextMutationVariables = Exact<{
 }>;
 
 
-export type AddCheckoutLineNextMutation = { checkoutLinesAdd: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>>, errors: Array<CheckoutErrorFragment> }> };
+export type AddCheckoutLineNextMutation = { checkoutLinesAdd: Maybe<{ checkout: Maybe<(
+      Pick<Checkout, 'id'>
+      & { availableShippingMethods: Array<Maybe<Pick<ShippingMethod, 'id'>>> }
+    )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type CreateCheckoutNextMutationVariables = Exact<{
   checkoutInput: CheckoutCreateInput;
@@ -20388,6 +20391,9 @@ export const AddCheckoutLineNextDocument = gql`
   checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
     checkout {
       id
+      availableShippingMethods {
+        id
+      }
     }
     errors: checkoutErrors {
       ...CheckoutError

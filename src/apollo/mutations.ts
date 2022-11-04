@@ -837,6 +837,9 @@ export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
     checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
       checkout {
         id
+        availableShippingMethods {
+          id
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError

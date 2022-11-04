@@ -441,8 +441,8 @@ export const cart = ({
       }
 
       const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
-        checkoutId: checkout?.id,
-        shippingMethodId: checkout.availableShippingMethods[0]?.id,
+        checkoutId: res?.data?.checkoutLinesAdd?.checkout?.id,
+        shippingMethodId: res?.data?.checkoutLinesAdd?.checkout?.availableShippingMethods[0]?.id,
       };
 
       try {
@@ -868,6 +868,6 @@ export const cart = ({
     removeItem,
     updateItem,
     addToCartNext,
-    updateItemNext
+    updateItemNext,
   };
 };
