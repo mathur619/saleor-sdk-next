@@ -502,7 +502,9 @@ export const cart = ({
           CheckoutDetailsNextQueryVariables
         >({
           query: CHECKOUT_DETAILS_NEXT,
-          variables: checkout?.token,
+          variables: {
+            token: checkout?.token,
+          },
         });
         if (checkoutDetailRes?.data?.checkout?.id) {
           storage.setCheckout(checkoutDetailRes?.data?.checkout);
@@ -659,7 +661,9 @@ export const cart = ({
           CheckoutDetailsNextQueryVariables
         >({
           query: CHECKOUT_DETAILS_NEXT,
-          variables: checkout?.token,
+          variables: {
+            token: checkout?.token,
+          },
         });
         if (checkoutDetailRes?.data?.checkout?.id) {
           storage.setCheckout(checkoutDetailRes?.data?.checkout);
@@ -810,7 +814,9 @@ export const cart = ({
             CheckoutDetailsNextQueryVariables
           >({
             query: CHECKOUT_DETAILS_NEXT,
-            variables: checkout?.token,
+            variables: {
+              token: checkout?.token,
+            },
           });
           if (checkoutDetailRes?.data?.checkout?.id) {
             storage.setCheckout(checkoutDetailRes?.data?.checkout);
