@@ -1,8 +1,14 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT } from ".";
 import { storage } from "../core/storage";
-import { GET_DISCOUNT_CASHBACK_QUERY, GET_LOCAL_CHECKOUT } from "./queries";
 import {
+  CHECKOUT_DETAILS_NEXT,
+  GET_DISCOUNT_CASHBACK_QUERY,
+  GET_LOCAL_CHECKOUT,
+} from "./queries";
+import {
+  CheckoutDetailsNextQuery,
+  CheckoutDetailsNextQueryVariables,
   CompleteCheckoutMutation,
   UpdateCheckoutShippingMethodNextMutation,
   UpdateCheckoutShippingMethodNextMutationVariables,
@@ -160,4 +166,57 @@ export const setLocalCheckoutInCache = async (
       checkoutLoading: false,
     },
   });
+};
+
+export const getLatestCheckout = async (
+  client: ApolloClient<NormalizedCacheObject>,
+  checkout: any
+) => {
+  const checkoutDetailRes = await client.query<
+    CheckoutDetailsNextQuery,
+    CheckoutDetailsNextQueryVariables
+  >({
+    query: CHECKOUT_DETAILS_NEXT,
+    variables: {
+      token: checkout?.token,
+    },
+    fetchPolicy: "no-cache",
+  });
+
+  if (checkoutDetailRes?.data?.checkout?.id) {
+    storage.setCheckout(checkoutDetailRes?.data?.checkout);
+    const res = {
+      data: {
+        checkoutDiscounts: {
+          prepaidDiscount:
+            checkoutDetailRes?.data?.checkout?.paymentMethod
+              ?.prepaidDiscountAmount,
+          couponDiscount:
+            checkoutDetailRes?.data?.checkout?.paymentMethod?.couponDiscount,
+          cashbackDiscount:
+            checkoutDetailRes?.data?.checkout?.paymentMethod
+              ?.cashbackDiscountAmount,
+        },
+        cashback: checkoutDetailRes?.data?.checkout?.cashback,
+      },
+    };
+
+    storage.setDiscounts(res.data);
+
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        localCheckout: checkoutDetailRes?.data?.checkout,
+        localCheckoutDiscounts: res.data.checkoutDiscounts,
+        localCashback: res.data.cashback,
+      },
+    });
+  }
+  // @ts-ignore
+  var returnObject = {
+    data: checkoutDetailRes?.data?.checkout,
+    errors: checkoutDetailRes?.errors,
+  };
+
+  return returnObject;
 };

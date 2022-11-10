@@ -6,7 +6,7 @@ import {
 } from ".";
 
 import { cartItemsVar } from "../apollo/client";
-import { setLocalCheckoutInCache } from "../apollo/helpers";
+import { getLatestCheckout, setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   ADD_CHECKOUT_LINE_MUTATION,
   ADD_CHECKOUT_LINE_MUTATION_NEXT,
@@ -25,8 +25,6 @@ import {
   AddCheckoutLineNextMutationVariables,
   Checkout,
   CheckoutCreateInput,
-  CheckoutDetailsNextQuery,
-  CheckoutDetailsNextQueryVariables,
   CreateCheckoutMutation,
   CreateCheckoutMutationVariables,
   CreateCheckoutNextMutation,
@@ -40,7 +38,7 @@ import {
   UpdateCheckoutShippingMethodNextMutation,
   UpdateCheckoutShippingMethodNextMutationVariables,
 } from "../apollo/types";
-import { CHECKOUT_DETAILS_NEXT, GET_LOCAL_CHECKOUT } from "../apollo/queries";
+import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -84,7 +82,8 @@ export interface CartSDK {
   addToCartNext: (
     variantId: string,
     quantity: number,
-    tags?: string[]
+    tags?: string[],
+    line_item?: any
   ) => AddItemResult;
   updateItemNext: (
     variantId: string,
@@ -376,20 +375,58 @@ export const cart = ({
   const addToCartNext: CartSDK["addToCartNext"] = async (
     variantId: string,
     quantity: number,
-    tags?: string[]
+    tags?: string[],
+    line_item?: any
   ) => {
-    client.writeQuery({
-      query: GET_LOCAL_CHECKOUT,
-      data: {
-        checkoutLoading: true,
-      },
-    });
-
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
+
+    if (line_item && checkout?.id) {
+      const res = client.readQuery({
+        query: GET_LOCAL_CHECKOUT,
+      });
+      const checkout = res?.localCheckout;
+      let existingLines = [];
+      if (
+        checkout.lines.find(
+          (line: any) => line.variant.id === line_item.variant.id
+        )
+      ) {
+        existingLines = checkout.lines.map((line: any) => {
+          if (line.variant.id === line_item.variant.id) {
+            return {
+              ...line,
+              quantity: line.quantity + quantity,
+            };
+          } else {
+            return {
+              ...line,
+            };
+          }
+        });
+      } else {
+        existingLines = [...checkout.lines, line_item];
+      }
+      const updatedCheckout = { ...checkout, lines: existingLines };
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          localCheckout: updatedCheckout,
+          checkoutLoading: true,
+        },
+      });
+    } else {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: true,
+        },
+      });
+    }
 
     if (checkout && checkout?.token) {
       const res = await client.mutate<
@@ -402,6 +439,14 @@ export const cart = ({
           lines: [{ quantity: quantity, variantId: variantId }],
         },
       });
+
+      if (!res.data?.checkoutLinesAdd?.checkout?.id) {
+        await getLatestCheckout(client, checkout);
+        return {
+          data: null,
+          errors: res?.data?.checkoutLinesAdd?.errors,
+        };
+      }
 
       if (
         res.data?.checkoutLinesAdd?.errors &&
@@ -442,7 +487,9 @@ export const cart = ({
 
       const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
         checkoutId: res?.data?.checkoutLinesAdd?.checkout?.id,
-        shippingMethodId: res?.data?.checkoutLinesAdd?.checkout?.availableShippingMethods[0]?.id,
+        shippingMethodId:
+          res?.data?.checkoutLinesAdd?.checkout?.availableShippingMethods[0]
+            ?.id,
       };
 
       try {
@@ -497,48 +544,8 @@ export const cart = ({
         };
       } catch {
         //fallback if the mutation fails
-        const checkoutDetailRes = await client.query<
-          CheckoutDetailsNextQuery,
-          CheckoutDetailsNextQueryVariables
-        >({
-          query: CHECKOUT_DETAILS_NEXT,
-          variables: checkout?.token,
-        });
-        if (checkoutDetailRes?.data?.checkout?.id) {
-          storage.setCheckout(checkoutDetailRes?.data?.checkout);
-          const res = {
-            data: {
-              checkoutDiscounts: {
-                prepaidDiscount:
-                  checkoutDetailRes?.data?.checkout?.paymentMethod
-                    ?.prepaidDiscountAmount,
-                couponDiscount:
-                  checkoutDetailRes?.data?.checkout?.paymentMethod
-                    ?.couponDiscount,
-                cashbackDiscount:
-                  checkoutDetailRes?.data?.checkout?.paymentMethod
-                    ?.cashbackDiscountAmount,
-              },
-              cashback: checkoutDetailRes?.data?.checkout?.cashback,
-            },
-          };
-
-          storage.setDiscounts(res.data);
-
-          client.writeQuery({
-            query: GET_LOCAL_CHECKOUT,
-            data: {
-              localCheckout: checkoutDetailRes?.data?.checkout,
-              localCheckoutDiscounts: res.data.checkoutDiscounts,
-              localCashback: res.data.cashback,
-            },
-          });
-        }
         // @ts-ignore
-        var returnObject = {
-          data: checkoutDetailRes?.data?.checkout,
-          errors: checkoutDetailRes?.errors,
-        };
+        var returnObject = await getLatestCheckout(client, checkout);
       }
 
       client.writeQuery({
@@ -654,48 +661,8 @@ export const cart = ({
         };
       } catch {
         //fallback if the mutation fails
-        const checkoutDetailRes = await client.query<
-          CheckoutDetailsNextQuery,
-          CheckoutDetailsNextQueryVariables
-        >({
-          query: CHECKOUT_DETAILS_NEXT,
-          variables: checkout?.token,
-        });
-        if (checkoutDetailRes?.data?.checkout?.id) {
-          storage.setCheckout(checkoutDetailRes?.data?.checkout);
-          const res = {
-            data: {
-              checkoutDiscounts: {
-                prepaidDiscount:
-                  checkoutDetailRes?.data?.checkout?.paymentMethod
-                    ?.prepaidDiscountAmount,
-                couponDiscount:
-                  checkoutDetailRes?.data?.checkout?.paymentMethod
-                    ?.couponDiscount,
-                cashbackDiscount:
-                  checkoutDetailRes?.data?.checkout?.paymentMethod
-                    ?.cashbackDiscountAmount,
-              },
-              cashback: checkoutDetailRes?.data?.checkout?.cashback,
-            },
-          };
-
-          storage.setDiscounts(res.data);
-
-          client.writeQuery({
-            query: GET_LOCAL_CHECKOUT,
-            data: {
-              localCheckout: checkoutDetailRes?.data?.checkout,
-              localCheckoutDiscounts: res.data.checkoutDiscounts,
-              localCashback: res.data.cashback,
-            },
-          });
-        }
         // @ts-ignore
-        var returnObject = {
-          data: checkoutDetailRes?.data?.checkout,
-          errors: checkoutDetailRes?.errors,
-        };
+        var returnObject = await getLatestCheckout(client, checkout);
       }
       client.writeQuery({
         query: GET_LOCAL_CHECKOUT,
@@ -805,48 +772,8 @@ export const cart = ({
           };
         } catch {
           //fallback if the mutation fails
-          const checkoutDetailRes = await client.query<
-            CheckoutDetailsNextQuery,
-            CheckoutDetailsNextQueryVariables
-          >({
-            query: CHECKOUT_DETAILS_NEXT,
-            variables: checkout?.token,
-          });
-          if (checkoutDetailRes?.data?.checkout?.id) {
-            storage.setCheckout(checkoutDetailRes?.data?.checkout);
-            const res = {
-              data: {
-                checkoutDiscounts: {
-                  prepaidDiscount:
-                    checkoutDetailRes?.data?.checkout?.paymentMethod
-                      ?.prepaidDiscountAmount,
-                  couponDiscount:
-                    checkoutDetailRes?.data?.checkout?.paymentMethod
-                      ?.couponDiscount,
-                  cashbackDiscount:
-                    checkoutDetailRes?.data?.checkout?.paymentMethod
-                      ?.cashbackDiscountAmount,
-                },
-                cashback: checkoutDetailRes?.data?.checkout?.cashback,
-              },
-            };
-
-            storage.setDiscounts(res.data);
-
-            client.writeQuery({
-              query: GET_LOCAL_CHECKOUT,
-              data: {
-                localCheckout: checkoutDetailRes?.data?.checkout,
-                localCheckoutDiscounts: res.data.checkoutDiscounts,
-                localCashback: res.data.cashback,
-              },
-            });
-          }
           // @ts-ignore
-          var returnObject = {
-            data: checkoutDetailRes?.data?.checkout,
-            errors: checkoutDetailRes?.errors,
-          };
+          var returnObject = await getLatestCheckout(client, checkout);
         }
 
         client.writeQuery({
