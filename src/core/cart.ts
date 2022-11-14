@@ -508,6 +508,7 @@ export const cart = ({
           const res = {
             data: {
               checkoutDiscounts: {
+                __typename: "DiscountsType",
                 prepaidDiscount:
                   resShipping.data?.checkoutShippingMethodUpdate?.checkout
                     ?.paymentMethod?.prepaidDiscountAmount,
@@ -625,6 +626,7 @@ export const cart = ({
           const res = {
             data: {
               checkoutDiscounts: {
+                __typename: "DiscountsType",
                 prepaidDiscount:
                   resShipping.data?.checkoutShippingMethodUpdate?.checkout
                     ?.paymentMethod?.prepaidDiscountAmount,
@@ -735,6 +737,7 @@ export const cart = ({
             );
             const res = {
               data: {
+                __typename: "DiscountsType",
                 checkoutDiscounts: {
                   prepaidDiscount:
                     resShipping.data?.checkoutShippingMethodUpdate?.checkout

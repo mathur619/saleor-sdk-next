@@ -108,6 +108,7 @@ export const setLocalCheckoutInCache = async (
       const res = {
         data: {
           checkoutDiscounts: {
+            __typename: "DiscountsType",
             prepaidDiscount:
               resShipping.data?.checkoutShippingMethodUpdate?.checkout
                 ?.paymentMethod?.prepaidDiscountAmount,
@@ -188,6 +189,7 @@ export const getLatestCheckout = async (
     const res = {
       data: {
         checkoutDiscounts: {
+          __typename: "DiscountsType",
           prepaidDiscount:
             checkoutDetailRes?.data?.checkout?.paymentMethod
               ?.prepaidDiscountAmount,
