@@ -839,6 +839,11 @@ export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
         id
         availableShippingMethods {
           id
+          name
+          price {
+            currency
+            amount
+          }
         }
       }
       errors: checkoutErrors {
