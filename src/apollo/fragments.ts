@@ -212,6 +212,12 @@ export const checkoutFragment = gql`
       key
       value
     }
+    giftCards{
+      displayCode
+      currentBalance{
+        amount
+      }
+    }
     totalPrice {
       ...Price
     }
@@ -242,6 +248,7 @@ export const checkoutFragment = gql`
       currency
       amount
     }
+
     discountName
     translatedDiscountName
     voucherCode

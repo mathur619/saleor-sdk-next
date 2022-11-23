@@ -1820,6 +1820,7 @@ export type Checkout = Node & ObjectWithMetadata & {
   checkoutUrl: Maybe<Scalars['String']>;
   /** List of events associated with the checkout. */
   events: Maybe<Array<Maybe<CheckoutEvent>>>;
+  giftCards:any;
 };
 
 /** Adds note to the checkout. */
