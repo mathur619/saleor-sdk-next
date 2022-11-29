@@ -221,7 +221,8 @@ export interface AuthSDK {
     email: string,
     phone: string,
     firstName?: string,
-    lastName?: string
+    lastName?: string,
+    wigzo_learner_id?: string
   ) => RegisterAccountV2Result;
 
   confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
@@ -324,7 +325,8 @@ export const auth = ({
     email: string,
     phone: string,
     firstName?: string,
-    lastName?: string
+    lastName?: string,
+    wigzo_learner_id?: string,
   ) => {
     const res = await client.mutate<
       AccountRegisterV2Mutation,
@@ -338,6 +340,11 @@ export const auth = ({
           firstName,
           lastName,
         },
+      },
+      context: { 
+        headers: { 
+          "x-wigzo-learner-id": `${wigzo_learner_id}`  // this header will reach the server
+        } 
       },
     });
 
