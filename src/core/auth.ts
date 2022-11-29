@@ -307,7 +307,7 @@ export const auth = ({
     return res;
   };
 
-  const requestOTP: AuthSDK["requestOTP"] = async (phone: string, wigzo_learner_id?: string,) => {
+  const requestOTP: AuthSDK["requestOTP"] = async (phone: string) => {
     const res = await client.mutate<
       OtpRequestMutation,
       OtpRequestMutationVariables
@@ -315,11 +315,6 @@ export const auth = ({
       mutation: REQUEST_OTP_MUTATION,
       variables: {
         phone,
-      },
-      context: { 
-        headers: { 
-          "x-wigzo-learner-id": `${wigzo_learner_id}`  // this header will reach the server
-        } 
       },
     });
 
