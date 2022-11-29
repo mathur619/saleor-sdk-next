@@ -220,7 +220,6 @@ export interface AuthSDK {
   registerAccountV2: (
     email: string,
     phone: string,
-    wigzo_learner_id?: string,
     firstName?: string,
     lastName?: string,
   ) => RegisterAccountV2Result;
@@ -324,10 +323,32 @@ export const auth = ({
   const registerAccountV2: AuthSDK["registerAccountV2"] = async (
     email: string,
     phone: string,
-    wigzo_learner_id?: string,
     firstName?: string,
     lastName?: string,
   ) => {
+    let wigzo_learner_id;
+    if (typeof window !== "undefined") {
+      function getCookie(name:any) {
+        // Split cookie string and get all individual name=value pairs in an array
+        var cookieArr = document.cookie.split(";");
+
+        // Loop through the array elements
+        for (var i = 0; i < cookieArr.length; i++) {
+          var cookiePair:any = cookieArr[i].split("=");
+
+          /* Removing whitespace at the beginning of the cookie name
+          and compare it with the given string */
+          if (name == cookiePair[0].trim()) {
+            // Decode the cookie value and return
+            return decodeURIComponent(cookiePair[1]);
+          }
+        }
+
+        // Return null if not found
+        return null;
+      }
+      wigzo_learner_id = getCookie("WIGZO_LEARNER_ID");
+    }
     const res = await client.mutate<
       AccountRegisterV2Mutation,
       AccountRegisterV2MutationVariables
