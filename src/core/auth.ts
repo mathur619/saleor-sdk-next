@@ -220,9 +220,9 @@ export interface AuthSDK {
   registerAccountV2: (
     email: string,
     phone: string,
+    wigzo_learner_id?: string,
     firstName?: string,
     lastName?: string,
-    wigzo_learner_id?: string
   ) => RegisterAccountV2Result;
 
   confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
