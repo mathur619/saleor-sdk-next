@@ -324,9 +324,9 @@ export const auth = ({
   const registerAccountV2: AuthSDK["registerAccountV2"] = async (
     email: string,
     phone: string,
+    wigzo_learner_id?: string,
     firstName?: string,
     lastName?: string,
-    wigzo_learner_id?: string,
   ) => {
     const res = await client.mutate<
       AccountRegisterV2Mutation,
