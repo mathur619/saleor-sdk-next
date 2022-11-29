@@ -349,6 +349,7 @@ export const auth = ({
       }
       wigzo_learner_id = getCookie("WIGZO_LEARNER_ID");
     }
+    console.log("wigzo_learner_id",wigzo_learner_id)
     const res = await client.mutate<
       AccountRegisterV2Mutation,
       AccountRegisterV2MutationVariables
