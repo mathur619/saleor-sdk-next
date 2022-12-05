@@ -27,6 +27,25 @@ export const CHECKOUT_DETAILS = gql`
   }
 `;
 
+export const CHECKOUT_DETAILS_NEXT = gql`
+  ${checkoutFragment}
+  query CheckoutDetailsNext($token: UUID) {
+    checkout(token: $token) {
+      ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
+    }
+    checkoutUpdated @client
+  }
+`;
+
 export const GET_CART_ITEMS = gql`
   ${checkoutLineFragment}
   query GetCartItems {

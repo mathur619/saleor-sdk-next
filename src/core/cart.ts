@@ -6,25 +6,37 @@ import {
 } from ".";
 
 import { cartItemsVar } from "../apollo/client";
-import { setLocalCheckoutInCache } from "../apollo/helpers";
+import { getLatestCheckout, setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   ADD_CHECKOUT_LINE_MUTATION,
+  ADD_CHECKOUT_LINE_MUTATION_NEXT,
   CREATE_CHECKOUT_MUTATION,
+  CREATE_CHECKOUT_MUTATION_NEXT,
   REMOVE_CHECKOUT_LINE_MUTATION,
   UPDATE_CHECKOUT_LINE_MUTATION,
+  UPDATE_CHECKOUT_LINE_MUTATION_NEXT,
+  UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
 } from "../apollo/mutations";
 import { storage } from "./storage";
 import {
   AddCheckoutLineMutation,
   AddCheckoutLineMutationVariables,
+  AddCheckoutLineNextMutation,
+  AddCheckoutLineNextMutationVariables,
   Checkout,
   CheckoutCreateInput,
   CreateCheckoutMutation,
   CreateCheckoutMutationVariables,
+  CreateCheckoutNextMutation,
+  CreateCheckoutNextMutationVariables,
   RemoveCheckoutLineMutation,
   RemoveCheckoutLineMutationVariables,
   UpdateCheckoutLineMutation,
   UpdateCheckoutLineMutationVariables,
+  UpdateCheckoutLineNextMutation,
+  UpdateCheckoutLineNextMutationVariables,
+  UpdateCheckoutShippingMethodNextMutation,
+  UpdateCheckoutShippingMethodNextMutationVariables,
 } from "../apollo/types";
 import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
 
@@ -63,6 +75,17 @@ export interface CartSDK {
   removeItem: (variantId: string) => RemoveItemResult;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem: (
+    variantId: string,
+    quantity: number,
+    prevQuantity: number
+  ) => UpdateItemResult;
+  addToCartNext: (
+    variantId: string,
+    quantity: number,
+    tags?: string[],
+    line_item?: any
+  ) => AddItemResult;
+  updateItemNext: (
     variantId: string,
     quantity: number,
     prevQuantity: number
@@ -155,7 +178,7 @@ export const cart = ({
       };
       return returnObject;
     } else {
-      let checkoutInputVariables:CheckoutCreateInput;
+      let checkoutInputVariables: CheckoutCreateInput;
       if (tags) {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
@@ -349,10 +372,432 @@ export const cart = ({
     return null;
   };
 
+  const addToCartNext: CartSDK["addToCartNext"] = async (
+    variantId: string,
+    quantity: number,
+    tags?: string[],
+    line_item?: any
+  ) => {
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (line_item && checkout?.id) {
+      const res = client.readQuery({
+        query: GET_LOCAL_CHECKOUT,
+      });
+      const checkout = res?.localCheckout;
+      let existingLines = [];
+      if (
+        checkout.lines.find(
+          (line: any) => line.variant.id === line_item.variant.id
+        )
+      ) {
+        existingLines = checkout.lines.map((line: any) => {
+          if (line.variant.id === line_item.variant.id) {
+            return {
+              ...line,
+              quantity: line.quantity + quantity,
+            };
+          } else {
+            return {
+              ...line,
+            };
+          }
+        });
+      } else {
+        existingLines = [...checkout.lines, line_item];
+      }
+      const updatedCheckout = { ...checkout, lines: existingLines };
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          localCheckout: updatedCheckout,
+          checkoutLoading: true,
+        },
+      });
+    } else {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: true,
+        },
+      });
+    }
+
+    if (checkout && checkout?.token) {
+      const res = await client.mutate<
+        AddCheckoutLineNextMutation,
+        AddCheckoutLineNextMutationVariables
+      >({
+        mutation: ADD_CHECKOUT_LINE_MUTATION_NEXT,
+        variables: {
+          checkoutId: checkout?.id,
+          lines: [{ quantity: quantity, variantId: variantId }],
+        },
+      });
+
+      if (!res.data?.checkoutLinesAdd?.checkout?.id) {
+        await getLatestCheckout(client, checkout);
+        return {
+          data: null,
+          errors: res?.data?.checkoutLinesAdd?.errors,
+        };
+      }
+
+      if (
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code === "NOT_FOUND" &&
+        res.data?.checkoutLinesAdd?.errors[0]?.field === "checkoutId" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+      if (
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code ===
+          "PRODUCT_NOT_PUBLISHED" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+      if (
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code ===
+          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+      if (
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code === "GRAPHQL_ERROR" &&
+        res.data?.checkoutLinesAdd?.errors[0]?.field === "variantId" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+
+      const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
+        checkoutId: res?.data?.checkoutLinesAdd?.checkout?.id,
+        shippingMethodId:
+          res?.data?.checkoutLinesAdd?.checkout?.availableShippingMethods[0]
+            ?.id,
+      };
+
+      try {
+        const resShipping = await client.mutate<
+          UpdateCheckoutShippingMethodNextMutation,
+          UpdateCheckoutShippingMethodNextMutationVariables
+        >({
+          mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
+          variables,
+        });
+
+        if (resShipping.data?.checkoutShippingMethodUpdate?.checkout?.id) {
+          storage.setCheckout(
+            resShipping.data?.checkoutShippingMethodUpdate?.checkout
+          );
+          const res = {
+            data: {
+              checkoutDiscounts: {
+                __typename: "DiscountsType",
+                prepaidDiscount:
+                  resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                    ?.paymentMethod?.prepaidDiscountAmount,
+                couponDiscount:
+                  resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                    ?.paymentMethod?.couponDiscount,
+                cashbackDiscount:
+                  resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                    ?.paymentMethod?.cashbackDiscountAmount,
+              },
+              cashback:
+                resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                  ?.cashback,
+            },
+          };
+
+          storage.setDiscounts(res.data);
+
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              localCheckout:
+                resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+              localCheckoutDiscounts: res.data.checkoutDiscounts,
+              localCashback: res.data.cashback,
+            },
+          });
+        } else {
+          throw new Error("UpdateCheckoutShippingMethodNext failed");
+        }
+        var returnObject = {
+          data: resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+          errors: resShipping?.data?.checkoutShippingMethodUpdate?.errors,
+        };
+      } catch {
+        //fallback if the mutation fails
+        // @ts-ignore
+        var returnObject = await getLatestCheckout(client, checkout);
+      }
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
+
+      return returnObject;
+    } else {
+      let checkoutInputVariables: CheckoutCreateInput;
+      if (tags) {
+        checkoutInputVariables = {
+          lines: [{ quantity: quantity, variantId: variantId }],
+          email: "dummy@dummy.com",
+          tags,
+          shippingAddress: {
+            city: "delhi",
+            companyName: "dummy",
+            country: "IN",
+            countryArea: "Delhi",
+            firstName: "dummy",
+            lastName: "dummy",
+            phone: "7894561230",
+            postalCode: "110006",
+            streetAddress1: "dummy",
+            streetAddress2: "dummy",
+          },
+        };
+      } else {
+        checkoutInputVariables = {
+          lines: [{ quantity: quantity, variantId: variantId }],
+          email: "dummy@dummy.com",
+          shippingAddress: {
+            city: "delhi",
+            companyName: "dummy",
+            country: "IN",
+            countryArea: "Delhi",
+            firstName: "dummy",
+            lastName: "dummy",
+            phone: "7894561230",
+            postalCode: "110006",
+            streetAddress1: "dummy",
+            streetAddress2: "dummy",
+          },
+        };
+      }
+      const res = await client.mutate<
+        CreateCheckoutNextMutation,
+        CreateCheckoutNextMutationVariables
+      >({
+        mutation: CREATE_CHECKOUT_MUTATION_NEXT,
+        variables: {
+          checkoutInput: checkoutInputVariables,
+        },
+      });
+      const checkout = res?.data?.checkoutCreate?.checkout;
+      const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
+        checkoutId: checkout?.id,
+        shippingMethodId: checkout?.availableShippingMethods[0]?.id,
+      };
+
+      try {
+        const resShipping = await client.mutate<
+          UpdateCheckoutShippingMethodNextMutation,
+          UpdateCheckoutShippingMethodNextMutationVariables
+        >({
+          mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
+          variables,
+        });
+
+        if (resShipping.data?.checkoutShippingMethodUpdate?.checkout?.id) {
+          storage.setCheckout(
+            resShipping.data?.checkoutShippingMethodUpdate?.checkout
+          );
+          const res = {
+            data: {
+              checkoutDiscounts: {
+                __typename: "DiscountsType",
+                prepaidDiscount:
+                  resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                    ?.paymentMethod?.prepaidDiscountAmount,
+                couponDiscount:
+                  resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                    ?.paymentMethod?.couponDiscount,
+                cashbackDiscount:
+                  resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                    ?.paymentMethod?.cashbackDiscountAmount,
+              },
+              cashback:
+                resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                  ?.cashback,
+            },
+          };
+
+          storage.setDiscounts(res.data);
+
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              localCheckout:
+                resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+              localCheckoutDiscounts: res.data.checkoutDiscounts,
+              localCashback: res.data.cashback,
+            },
+          });
+        } else {
+          throw new Error("UpdateCheckoutShippingMethodNext failed");
+        }
+        var returnObject = {
+          data: resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+          errors: resShipping?.data?.checkoutShippingMethodUpdate?.errors,
+        };
+      } catch {
+        //fallback if the mutation fails
+        // @ts-ignore
+        var returnObject = await getLatestCheckout(client, checkout);
+      }
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
+      return returnObject;
+    }
+  };
+
+  const updateItemNext: CartSDK["updateItemNext"] = async (
+    variantId: string,
+    quantity: number,
+    prevQuantity: number
+  ) => {
+    const differenceQuantity = quantity - prevQuantity;
+    if (differenceQuantity > 0) {
+      const res = await addToCartNext(variantId, differenceQuantity);
+      return res;
+    } else {
+      const checkoutString = storage.getCheckout();
+
+      const checkout =
+        checkoutString && typeof checkoutString === "string"
+          ? JSON.parse(checkoutString)
+          : checkoutString;
+      const alteredLines =
+        checkout &&
+        checkout?.lines
+          .filter((line: any) => line.variant.id !== variantId)
+          .map((line: any) => ({
+            quantity: line.quantity,
+            variantId: line.variant.id,
+          }));
+
+      alteredLines.push({ quantity: quantity, variantId: variantId });
+
+      if (checkout && checkout?.token) {
+        const res = await client.mutate<
+          UpdateCheckoutLineNextMutation,
+          UpdateCheckoutLineNextMutationVariables
+        >({
+          mutation: UPDATE_CHECKOUT_LINE_MUTATION_NEXT,
+          variables: {
+            checkoutId: checkout?.id,
+            lines: alteredLines,
+          },
+        });
+        const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
+          checkoutId: checkout?.id,
+          shippingMethodId: checkout.availableShippingMethods[0]?.id,
+        };
+
+        try {
+          if (!res?.data?.checkoutLinesUpdate?.checkout?.id) {
+            throw new Error("UpdateCheckoutLineNext failed");
+          }
+          const resShipping = await client.mutate<
+            UpdateCheckoutShippingMethodNextMutation,
+            UpdateCheckoutShippingMethodNextMutationVariables
+          >({
+            mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
+            variables,
+          });
+
+          if (resShipping.data?.checkoutShippingMethodUpdate?.checkout?.id) {
+            storage.setCheckout(
+              resShipping.data?.checkoutShippingMethodUpdate?.checkout
+            );
+            const res = {
+              data: {
+                __typename: "DiscountsType",
+                checkoutDiscounts: {
+                  prepaidDiscount:
+                    resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                      ?.paymentMethod?.prepaidDiscountAmount,
+                  couponDiscount:
+                    resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                      ?.paymentMethod?.couponDiscount,
+                  cashbackDiscount:
+                    resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                      ?.paymentMethod?.cashbackDiscountAmount,
+                },
+                cashback:
+                  resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                    ?.cashback,
+              },
+            };
+
+            storage.setDiscounts(res.data);
+
+            client.writeQuery({
+              query: GET_LOCAL_CHECKOUT,
+              data: {
+                localCheckout:
+                  resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+                localCheckoutDiscounts: res.data.checkoutDiscounts,
+                localCashback: res.data.cashback,
+              },
+            });
+          } else {
+            throw new Error("UpdateCheckoutShippingMethodNext failed");
+          }
+          var returnObject = {
+            data: resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+            errors: resShipping?.data?.checkoutShippingMethodUpdate?.errors,
+          };
+        } catch {
+          //fallback if the mutation fails
+          // @ts-ignore
+          var returnObject = await getLatestCheckout(client, checkout);
+        }
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+
+        return returnObject;
+      }
+    }
+    return null;
+  };
+
   return {
     items,
     addItem,
     removeItem,
     updateItem,
+    addToCartNext,
+    updateItemNext,
   };
 };
