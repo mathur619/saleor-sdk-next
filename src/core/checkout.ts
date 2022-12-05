@@ -56,6 +56,7 @@ import {
   CreateCashfreeOrderMutationVariables,
   UpdateCheckoutShippingMethodNextMutationVariables,
   UpdateCheckoutShippingMethodNextMutation,
+  CheckoutCreateInput
 } from "../apollo/types";
 
 import {
@@ -109,7 +110,7 @@ export interface CheckoutSDK {
     addressId: string,
     type: AddressTypes
   ) => SetAddressTypeResult;
-  createCheckout?: () => CreateCheckoutResult;
+  createCheckout?: (tags?: string[]) => CreateCheckoutResult;
   setShippingAddress?: (
     shippingAddress: IAddress,
     email: string
@@ -141,7 +142,7 @@ export interface CheckoutSDK {
 export const checkout = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CheckoutSDK => {
-  const createCheckout: CheckoutSDK["createCheckout"] = async () => {
+  const createCheckout: CheckoutSDK["createCheckout"] = async (tags?: string[]) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -155,28 +156,52 @@ export const checkout = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     if (!(checkout && checkout?.id)) {
+
+      let checkoutInputVariables:CheckoutCreateInput;
+      if (tags) {
+        checkoutInputVariables = {
+          lines: [],
+          email: "dummy@dummy.com",
+          tags,
+          shippingAddress: {
+            city: "delhi",
+            companyName: "dummy",
+            country: "IN",
+            countryArea: "Delhi",
+            firstName: "dummy",
+            lastName: "dummy",
+            phone: "7894561230",
+            postalCode: "110006",
+            streetAddress1: "dummy",
+            streetAddress2: "dummy",
+          },
+        };
+      } else {
+        checkoutInputVariables = {
+          lines: [],
+          email: "dummy@dummy.com",
+          shippingAddress: {
+            city: "delhi",
+            companyName: "dummy",
+            country: "IN",
+            countryArea: "Delhi",
+            firstName: "dummy",
+            lastName: "dummy",
+            phone: "7894561230",
+            postalCode: "110006",
+            streetAddress1: "dummy",
+            streetAddress2: "dummy",
+          },
+        };
+      }
+
       return await client.mutate<
         CreateCheckoutMutation,
         CreateCheckoutMutationVariables
       >({
         mutation: CREATE_CHECKOUT_MUTATION,
         variables: {
-          checkoutInput: {
-            lines: [],
-            email: "dummy@dummy.com",
-            shippingAddress: {
-              city: "delhi",
-              companyName: "dummy",
-              country: "IN",
-              countryArea: "Delhi",
-              firstName: "dummy",
-              lastName: "dummy",
-              phone: "7894561230",
-              postalCode: "110006",
-              streetAddress1: "dummy",
-              streetAddress2: "dummy",
-            },
-          },
+          checkoutInput: checkoutInputVariables,
         },
         update: (_, { data }) => {
           setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout);
@@ -695,6 +720,21 @@ export const checkout = ({
         },
       });
 
+      if (
+        (res?.errors &&
+          res?.errors[0]?.message) ||
+        (res?.data?.razorpayOrderCreate
+          ?.razorpayErrors &&
+          res?.data?.razorpayOrderCreate
+            ?.razorpayErrors[0]?.message)
+      ) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
       return res;
     }
 

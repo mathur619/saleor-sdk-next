@@ -25,10 +25,12 @@ import {
   AddCheckoutLineNextMutationVariables,
   Checkout,
   CheckoutCreateInput,
+  CheckoutLineInput,
   CreateCheckoutMutation,
   CreateCheckoutMutationVariables,
   CreateCheckoutNextMutation,
   CreateCheckoutNextMutationVariables,
+  Maybe,
   RemoveCheckoutLineMutation,
   RemoveCheckoutLineMutationVariables,
   UpdateCheckoutLineMutation,
@@ -90,6 +92,10 @@ export interface CartSDK {
     quantity: number,
     prevQuantity: number
   ) => UpdateItemResult;
+  updateItemWithLines: (
+    updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
+  ) => UpdateItemResult;
+  clearCart?: () => UpdateItemResult;
 }
 
 export const cart = ({
@@ -792,6 +798,133 @@ export const cart = ({
     return null;
   };
 
+  const updateItemWithLines: CartSDK["updateItemWithLines"] = async (
+    updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    const checkoutString = storage.getCheckout();
+
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.token) {
+      const res = await client.mutate<
+        UpdateCheckoutLineMutation,
+        UpdateCheckoutLineMutationVariables
+      >({
+        mutation: UPDATE_CHECKOUT_LINE_MUTATION,
+        variables: {
+          checkoutId: checkout?.id,
+          lines: updatedLines,
+        },
+        update: async (_, { data }) => {
+          if (data?.checkoutLinesUpdate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
+          }
+          await setLocalCheckoutInCache(
+            client,
+            data?.checkoutLinesUpdate?.checkout,
+            true
+          );
+        },
+      });
+      return {
+        data: res.data?.checkoutLinesUpdate?.checkout,
+        errors: res.data?.checkoutLinesUpdate?.errors,
+      };
+    } else {
+      let lineItemsInFormat = Array.isArray(updatedLines) ? updatedLines : [updatedLines]
+      let checkoutInputVariables: CheckoutCreateInput;
+      checkoutInputVariables = {
+        lines: lineItemsInFormat,
+        email: "dummy@dummy.com",
+        shippingAddress: {
+          city: "delhi",
+          companyName: "dummy",
+          country: "IN",
+          countryArea: "Delhi",
+          firstName: "dummy",
+          lastName: "dummy",
+          phone: "7894561230",
+          postalCode: "110006",
+          streetAddress1: "dummy",
+          streetAddress2: "dummy",
+        },
+      };
+      const res = await client.mutate<
+        CreateCheckoutMutation,
+        CreateCheckoutMutationVariables
+      >({
+        mutation: CREATE_CHECKOUT_MUTATION,
+        variables: {
+          checkoutInput: checkoutInputVariables,
+        },
+        update: (_, { data }) => {
+          setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout, true);
+          if (data?.checkoutCreate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutCreate?.checkout);
+          }
+        },
+      });
+      const returnObject = {
+        data: res.data?.checkoutCreate?.checkout,
+        errors: res.data?.checkoutCreate?.errors,
+      };
+      return returnObject;
+    }
+  };
+
+  const clearCart: CartSDK["clearCart"] = async () => {
+    const checkoutString = storage.getCheckout();
+
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    const alteredLines =
+      checkout &&
+      checkout?.lines?.map((line: any) => ({
+        quantity: 0,
+        variantId: line?.variant?.id,
+      }));
+
+    if (checkout && checkout?.token) {
+      const res = await client.mutate<
+        UpdateCheckoutLineMutation,
+        UpdateCheckoutLineMutationVariables
+      >({
+        mutation: UPDATE_CHECKOUT_LINE_MUTATION,
+        variables: {
+          checkoutId: checkout?.id,
+          lines: alteredLines,
+        },
+        update: async (_, { data }) => {
+          if (data?.checkoutLinesUpdate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutLinesUpdate?.checkout);
+          }
+          await setLocalCheckoutInCache(
+            client,
+            data?.checkoutLinesUpdate?.checkout,
+            true
+          );
+        },
+      });
+      return {
+        data: res.data?.checkoutLinesUpdate?.checkout,
+        errors: res.data?.checkoutLinesUpdate?.errors,
+      };
+    }
+
+    return null;
+  };
+
   return {
     items,
     addItem,
@@ -799,5 +932,7 @@ export const cart = ({
     updateItem,
     addToCartNext,
     updateItemNext,
+    clearCart,
+    updateItemWithLines,
   };
 };
