@@ -94,6 +94,10 @@ export const setLocalCheckoutInCache = async (
         return;
       }
 
+      if (!resShipping.data?.checkoutShippingMethodUpdate?.checkout?.id) {
+        return;
+      }
+
       // const res = await client.query<
       //   DiscountsAndCashbackQuery,
       //   DiscountsAndCashbackQueryVariables
