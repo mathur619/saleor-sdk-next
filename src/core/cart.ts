@@ -611,6 +611,12 @@ export const cart = ({
         },
       });
       const checkout = res?.data?.checkoutCreate?.checkout;
+      if(!checkout?.id){
+        return {
+          data: undefined,
+          errors: res?.data?.checkoutCreate?.errors
+        };
+      }
       const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
         checkoutId: checkout?.id,
         shippingMethodId: checkout?.availableShippingMethods[0]?.id,
