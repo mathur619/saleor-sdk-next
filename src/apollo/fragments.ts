@@ -37,6 +37,9 @@ export const userFragment = gql`
     email
     firstName
     lastName
+    tags{
+      name
+    }
     isStaff
     metadata {
       key
@@ -212,12 +215,15 @@ export const checkoutFragment = gql`
       key
       value
     }
+    tags{
+      name
+    }
     giftCards{
       displayCode
       currentBalance{
         amount
       }
-    }
+     }
     totalPrice {
       ...Price
     }

@@ -276,6 +276,18 @@ export type AccountUpdateMeta = {
   user: Maybe<User>;
 };
 
+/** Update Product Tags */
+export type AddBulkProductTagsCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success Message */
+  message: Maybe<Scalars['String']>;
+  productErrors: Array<ProductError>;
+};
+
 /** Updates tags of the object. */
 export type AddTags = {
   /**
@@ -817,6 +829,31 @@ export type AppUpdate = {
   app: Maybe<App>;
 };
 
+
+export type ArchieveOrderAddressInput = {
+  /** Given name. */
+  firstName?: Maybe<Scalars['String']>;
+  /** Family name. */
+  lastName?: Maybe<Scalars['String']>;
+  /** Company or organization. */
+  companyName?: Maybe<Scalars['String']>;
+  /** Address. */
+  address1?: Maybe<Scalars['String']>;
+  /** Address. */
+  address2?: Maybe<Scalars['String']>;
+  /** City. */
+  city?: Maybe<Scalars['String']>;
+  /** District. */
+  cityArea?: Maybe<Scalars['String']>;
+  /** Postal code. */
+  zip?: Maybe<Scalars['String']>;
+  /** Country. */
+  countryCode?: Maybe<CountryCode>;
+  /** State or province. */
+  province?: Maybe<Scalars['String']>;
+  /** Phone number. */
+  phone?: Maybe<Scalars['String']>;
+};
 export type ArchiveOrderError = {
   /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
   field: Maybe<Scalars['String']>;
@@ -850,9 +887,10 @@ export type ArchiveOrderInput = {
   /** The customer's email address. */
   email?: Maybe<Scalars['String']>;
   /** Billing address of the customer. */
-  shippingAddress?: Maybe<AddressInput>;
+
+  shippingAddress?: Maybe<ArchieveOrderAddressInput>;
   /** Billing address of the customer. */
-  billingAddress?: Maybe<AddressInput>;
+  billingAddress?: Maybe<ArchieveOrderAddressInput>;
   /** Total net amount of the order. */
   totalNetAmount?: Maybe<Scalars['Decimal']>;
   /** Total gross amount of the order. */
@@ -2013,6 +2051,11 @@ export type Checkout = Node & ObjectWithMetadata & {
   events: Maybe<Array<Maybe<CheckoutEvent>>>;
   /** List of tags associated with the checkout. */
   tags: Maybe<Array<Maybe<TagType>>>;
+  /** PaymentMethod of Checkout. */
+  paymentMethod: Maybe<PaymentMethodType>;
+  /** Cashback of Checkout. */
+  cashback: Maybe<CashbackType>;
+
 };
 
 /** Adds note to the checkout. */
@@ -2407,6 +2450,11 @@ export type CheckoutType = Node & ObjectWithMetadata & {
   events: Maybe<Array<Maybe<CheckoutEvent>>>;
   /** List of tags associated with the checkout. */
   tags: Maybe<Array<Maybe<TagType>>>;
+  /** PaymentMethod of Checkout. */
+  paymentMethod: Maybe<PaymentMethodType>;
+  /** Cashback of Checkout. */
+  cashback: Maybe<CashbackType>;
+
 };
 
 
@@ -7342,6 +7390,8 @@ export type Mutation = {
   sendOrderEmail: Maybe<SendOrderEmail>;
   /** Delete product review by product */
   deleteProductReviewByProductId: Maybe<DeleteProductReviewByProduct>;
+  /** Update Product Tags */
+  addBulkTags: Maybe<AddBulkProductTagsCsv>;
   /** Create a new archive order. */
   archiveOrderCreate: Maybe<CreateArchiveOrder>;
   /** Update an archive order. */
@@ -9650,7 +9700,6 @@ export type MutationTriggerCronArgs = {
   cron?: Maybe<Scalars['String']>;
 };
 
-
 export type MutationDraftOrderAddPromoCodeArgs = {
   input: SaleorVoucherInput;
 };
@@ -9726,6 +9775,85 @@ export type NameTranslationInput = {
   name?: Maybe<Scalars['String']>;
 };
 
+export type MutationDraftOrderAddPromoCodeArgs = {
+  input: SaleorVoucherInput;
+};
+
+
+export type MutationDraftOrderRemovePromoCodeArgs = {
+  orderId: Scalars['ID'];
+};
+
+export type MutationDraftOrderApplyCodArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationDraftOrderRemoveCodArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationDraftOrderApplyPrepaidArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationDraftOrderRemovePrepaidArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationSendOrderEmailArgs = {
+  orderId?: Maybe<Scalars['ID']>;
+};
+
+
+export type MutationDeleteProductReviewByProductIdArgs = {
+  productId: Scalars['ID'];
+};
+
+
+export type MutationAddBulkTagsArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
+export type MutationArchiveOrderCreateArgs = {
+  input: ArchiveOrderInput;
+};
+
+
+export type MutationArchiveOrderUpdateArgs = {
+  id: Scalars['String'];
+  input: ArchiveOrderInput;
+};
+
+
+export type MutationArchiveOrderDeleteArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationEmailTemplateCreateArgs = {
+  input?: Maybe<EmailTemplateInput>;
+};
+
+
+export type MutationEmailTemplateUpdateArgs = {
+  id: Scalars['ID'];
+  input?: Maybe<EmailTemplateInput>;
+};
+
+
+export type MutationEmailTemplateDeleteArgs = {
+  id: Scalars['ID'];
+};
+
+export type NameTranslationInput = {
+  name?: Maybe<Scalars['String']>;
+};
+
 /** Represents shop's navigation menus. */
 export type Navigation = {
   /** Main navigation bar. */
@@ -9745,7 +9873,6 @@ export type Node = {
   /** The ID of the object. */
   id: Scalars['ID'];
 };
-
 /** Single Notification Details */
 export type NotificationInput = {
   /** Product Id */
@@ -11160,6 +11287,33 @@ export type PaymentInput = {
   billingAddress?: Maybe<AddressInput>;
   /** URL of a storefront view where user should be redirected after requiring additional actions. Payment with additional actions will not be finished if this field is not provided. */
   returnUrl?: Maybe<Scalars['String']>;
+};
+
+export type PaymentMethodType = Node & ObjectWithMetadata & {
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  checkout: CheckoutType;
+  prepaidDiscountAmount: Scalars['Float'];
+  cashbackDiscountAmount: Scalars['Float'];
+  gateway: Scalars['String'];
+  useCashback: Scalars['Boolean'];
+  created: Scalars['DateTime'];
+  updated: Scalars['DateTime'];
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItem>>;
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItem>>;
+  /**
+   * List of privately stored metadata namespaces.
+   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
+   */
+  privateMeta: Array<Maybe<MetaStore>>;
+  /**
+   * List of publicly stored metadata namespaces.
+   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
+   */
+  meta: Array<Maybe<MetaStore>>;
+  couponDiscount: Maybe<Scalars['String']>;
 };
 
 /** Refunds the captured payment amount. */
@@ -16720,7 +16874,6 @@ export type TemplateMailType =
   | 'NOTIFICATION'
   | 'INVOICE'
   | 'CONTACT_US';
-
 /** Attempts to add a ticket express voucher to a checkout. */
 export type TicketExpressAddPromoCode = {
   /**
@@ -16744,7 +16897,6 @@ export type TicketExpressRemovePromoCode = {
   checkout: Maybe<Checkout>;
   checkoutErrors: Array<CheckoutError>;
 };
-
 /** Requests for Token for registered user. */
 export type TokenCreateWithAdmin = {
   /**
@@ -16932,6 +17084,31 @@ export type UpdateBanner = {
 
 /** Create Product. */
 export type UpdateCollectionMetadata = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+};
+
+/** Update Customer metadata. */
+export type UpdateCustomerNoAuth = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An updated customer metadata. */
+  message: Maybe<Scalars['String']>;
+  /** An updated user instance. */
+  user: Maybe<User>;
+  accountErrors: Array<AccountError>;
+};
+
+/** Update an Influencer. */
+export type UpdateInfluencer = {
   /**
    * List of errors that occurred executing the mutation.
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
@@ -18629,7 +18806,7 @@ export type AddressFragment = (
 
 export type UserFragment = (
   Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'isStaff'>
-  & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, defaultShippingAddress: Maybe<AddressFragment>, defaultBillingAddress: Maybe<AddressFragment>, addresses: Maybe<Array<Maybe<AddressFragment>>> }
+  & { tags: Array<Maybe<Pick<TagType, 'name'>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, defaultShippingAddress: Maybe<AddressFragment>, defaultBillingAddress: Maybe<AddressFragment>, addresses: Maybe<Array<Maybe<AddressFragment>>> }
 );
 
 export type PriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> };
@@ -18665,6 +18842,7 @@ export type PaymentGatewayFragment = (
 
 export type CheckoutFragment = (
   Pick<Checkout, 'token' | 'id' | 'email' | 'isShippingRequired' | 'discountName' | 'translatedDiscountName' | 'voucherCode'>
+  & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, tags: Maybe<Array<Maybe<Pick<TagType, 'name'>>>>, totalPrice: Maybe<PriceFragment>, subtotalPrice: Maybe<PriceFragment>, billingAddress: Maybe<AddressFragment>, shippingAddress: Maybe<AddressFragment>, availableShippingMethods: Array<Maybe<ShippingMethodFragment>>, shippingMethod: Maybe<ShippingMethodFragment>, shippingPrice: Maybe<PriceFragment>, lines: Maybe<Array<Maybe<CheckoutLineFragment>>>, discount: Maybe<Pick<Money, 'currency' | 'amount'>>, availablePaymentGateways: Array<PaymentGatewayFragment> }
   & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, giftCards: Maybe<Array<Maybe<(
     Pick<GiftCard, 'displayCode'>
     & { currentBalance: Maybe<Pick<Money, 'amount'>> }
@@ -18776,7 +18954,8 @@ export type OtpRequestMutation = { RequestOTP: Maybe<(
   )> };
 
 export type OtpAuthenticationMutationVariables = Exact<{
-  phone: Scalars['String'];
+  phone?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
   otp: Scalars['String'];
   checkoutId?: Maybe<Scalars['ID']>;
 }>;
@@ -18967,6 +19146,49 @@ export type CheckoutCustomerAttachMutationVariables = Exact<{
 
 export type CheckoutCustomerAttachMutation = { checkoutCustomerAttach: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>> }> };
 
+
+export type AddCheckoutLineNextMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+  lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
+}>;
+
+
+export type AddCheckoutLineNextMutation = { checkoutLinesAdd: Maybe<{ checkout: Maybe<(
+      Pick<Checkout, 'id'>
+      & { availableShippingMethods: Array<Maybe<(
+        Pick<ShippingMethod, 'id' | 'name'>
+        & { price: Maybe<Pick<Money, 'currency' | 'amount'>> }
+      )>> }
+    )>, errors: Array<CheckoutErrorFragment> }> };
+
+export type CreateCheckoutNextMutationVariables = Exact<{
+  checkoutInput: CheckoutCreateInput;
+}>;
+
+
+export type CreateCheckoutNextMutation = { checkoutCreate: Maybe<{ errors: Array<CheckoutErrorFragment>, checkout: Maybe<(
+      Pick<Checkout, 'id' | 'token'>
+      & { availableShippingMethods: Array<Maybe<Pick<ShippingMethod, 'id'>>> }
+    )> }> };
+
+export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
+  checkoutId?: Scalars['ID'];
+  shippingMethodId?: Scalars['ID'];
+}>;
+
+
+export type UpdateCheckoutShippingMethodNextMutation = { checkoutShippingMethodUpdate: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
+
+export type UpdateCheckoutLineNextMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+  lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
+}>;
+
+
+export type UpdateCheckoutLineNextMutation = { checkoutLinesUpdate: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>>, errors: Array<CheckoutErrorFragment> }> };
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -18983,6 +19205,19 @@ export type CheckoutDetailsQueryVariables = Exact<{
 export type CheckoutDetailsQuery = (
   Pick<Query, 'checkoutUpdated'>
   & { checkout: Maybe<CheckoutFragment> }
+);
+
+export type CheckoutDetailsNextQueryVariables = Exact<{
+  token?: Maybe<Scalars['UUID']>;
+}>;
+
+
+export type CheckoutDetailsNextQuery = (
+  Pick<Query, 'checkoutUpdated'>
+  & { checkout: Maybe<(
+    { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+    & CheckoutFragment
+  )> }
 );
 
 export type GetCartItemsQueryVariables = Exact<{ [key: string]: never; }>;
@@ -19080,6 +19315,9 @@ export const UserFragmentDoc = gql`
   email
   firstName
   lastName
+  tags {
+    name
+  }
   isStaff
   metadata {
     key
@@ -19108,6 +19346,7 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
+
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -19218,7 +19457,10 @@ export const CheckoutFragmentDoc = gql`
     key
     value
   }
-  giftCards {
+  tags {
+    name  
+}
+giftCards {
     displayCode
     currentBalance {
       amount
@@ -19726,10 +19968,11 @@ export type OtpRequestMutationHookResult = ReturnType<typeof useOtpRequestMutati
 export type OtpRequestMutationResult = Apollo.MutationResult<OtpRequestMutation>;
 export type OtpRequestMutationOptions = Apollo.BaseMutationOptions<OtpRequestMutation, OtpRequestMutationVariables>;
 export const OtpAuthenticationDocument = gql`
-    mutation OTPAuthentication($phone: String!, $otp: String!, $checkoutId: ID) {
+    mutation OTPAuthentication($phone: String, $email: String, $otp: String!, $checkoutId: ID) {
   CreateTokenOTP: otpTokenCreate(
     otp: $otp
     phone: $phone
+    email: $email
     checkoutId: $checkoutId
   ) {
     token
@@ -19762,6 +20005,7 @@ export type OtpAuthenticationMutationFn = Apollo.MutationFunction<OtpAuthenticat
  * const [otpAuthenticationMutation, { data, loading, error }] = useOtpAuthenticationMutation({
  *   variables: {
  *      phone: // value for 'phone'
+ *      email: // value for 'email'
  *      otp: // value for 'otp'
  *      checkoutId: // value for 'checkoutId'
  *   },
@@ -20668,6 +20912,186 @@ export function useCheckoutCustomerAttachMutation(baseOptions?: Apollo.MutationH
 export type CheckoutCustomerAttachMutationHookResult = ReturnType<typeof useCheckoutCustomerAttachMutation>;
 export type CheckoutCustomerAttachMutationResult = Apollo.MutationResult<CheckoutCustomerAttachMutation>;
 export type CheckoutCustomerAttachMutationOptions = Apollo.BaseMutationOptions<CheckoutCustomerAttachMutation, CheckoutCustomerAttachMutationVariables>;
+export const AddCheckoutLineNextDocument = gql`
+    mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
+  checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
+    checkout {
+      id
+      availableShippingMethods {
+        id
+        name
+        price {
+          currency
+          amount
+        }
+      }
+    }
+    errors: checkoutErrors {
+      ...CheckoutError
+    }
+  }
+}
+    ${CheckoutErrorFragmentDoc}`;
+export type AddCheckoutLineNextMutationFn = Apollo.MutationFunction<AddCheckoutLineNextMutation, AddCheckoutLineNextMutationVariables>;
+
+/**
+ * __useAddCheckoutLineNextMutation__
+ *
+ * To run a mutation, you first call `useAddCheckoutLineNextMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddCheckoutLineNextMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addCheckoutLineNextMutation, { data, loading, error }] = useAddCheckoutLineNextMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      lines: // value for 'lines'
+ *   },
+ * });
+ */
+export function useAddCheckoutLineNextMutation(baseOptions?: Apollo.MutationHookOptions<AddCheckoutLineNextMutation, AddCheckoutLineNextMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddCheckoutLineNextMutation, AddCheckoutLineNextMutationVariables>(AddCheckoutLineNextDocument, options);
+      }
+export type AddCheckoutLineNextMutationHookResult = ReturnType<typeof useAddCheckoutLineNextMutation>;
+export type AddCheckoutLineNextMutationResult = Apollo.MutationResult<AddCheckoutLineNextMutation>;
+export type AddCheckoutLineNextMutationOptions = Apollo.BaseMutationOptions<AddCheckoutLineNextMutation, AddCheckoutLineNextMutationVariables>;
+export const CreateCheckoutNextDocument = gql`
+    mutation CreateCheckoutNext($checkoutInput: CheckoutCreateInput!) {
+  checkoutCreate(input: $checkoutInput) {
+    errors: checkoutErrors {
+      ...CheckoutError
+    }
+    checkout {
+      id
+      token
+      availableShippingMethods {
+        id
+      }
+    }
+  }
+}
+    ${CheckoutErrorFragmentDoc}`;
+export type CreateCheckoutNextMutationFn = Apollo.MutationFunction<CreateCheckoutNextMutation, CreateCheckoutNextMutationVariables>;
+
+/**
+ * __useCreateCheckoutNextMutation__
+ *
+ * To run a mutation, you first call `useCreateCheckoutNextMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCheckoutNextMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCheckoutNextMutation, { data, loading, error }] = useCreateCheckoutNextMutation({
+ *   variables: {
+ *      checkoutInput: // value for 'checkoutInput'
+ *   },
+ * });
+ */
+export function useCreateCheckoutNextMutation(baseOptions?: Apollo.MutationHookOptions<CreateCheckoutNextMutation, CreateCheckoutNextMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateCheckoutNextMutation, CreateCheckoutNextMutationVariables>(CreateCheckoutNextDocument, options);
+      }
+export type CreateCheckoutNextMutationHookResult = ReturnType<typeof useCreateCheckoutNextMutation>;
+export type CreateCheckoutNextMutationResult = Apollo.MutationResult<CreateCheckoutNextMutation>;
+export type CreateCheckoutNextMutationOptions = Apollo.BaseMutationOptions<CreateCheckoutNextMutation, CreateCheckoutNextMutationVariables>;
+export const UpdateCheckoutShippingMethodNextDocument = gql`
+    mutation UpdateCheckoutShippingMethodNext($checkoutId: ID!, $shippingMethodId: ID!) {
+  checkoutShippingMethodUpdate(
+    checkoutId: $checkoutId
+    shippingMethodId: $shippingMethodId
+  ) {
+    checkout {
+      ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
+    }
+    errors: checkoutErrors {
+      ...CheckoutError
+    }
+  }
+}
+    ${CheckoutFragmentDoc}
+${CheckoutErrorFragmentDoc}`;
+export type UpdateCheckoutShippingMethodNextMutationFn = Apollo.MutationFunction<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>;
+
+/**
+ * __useUpdateCheckoutShippingMethodNextMutation__
+ *
+ * To run a mutation, you first call `useUpdateCheckoutShippingMethodNextMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCheckoutShippingMethodNextMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCheckoutShippingMethodNextMutation, { data, loading, error }] = useUpdateCheckoutShippingMethodNextMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      shippingMethodId: // value for 'shippingMethodId'
+ *   },
+ * });
+ */
+export function useUpdateCheckoutShippingMethodNextMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>(UpdateCheckoutShippingMethodNextDocument, options);
+      }
+export type UpdateCheckoutShippingMethodNextMutationHookResult = ReturnType<typeof useUpdateCheckoutShippingMethodNextMutation>;
+export type UpdateCheckoutShippingMethodNextMutationResult = Apollo.MutationResult<UpdateCheckoutShippingMethodNextMutation>;
+export type UpdateCheckoutShippingMethodNextMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>;
+export const UpdateCheckoutLineNextDocument = gql`
+    mutation UpdateCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
+  checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
+    checkout {
+      id
+    }
+    errors: checkoutErrors {
+      ...CheckoutError
+    }
+  }
+}
+    ${CheckoutErrorFragmentDoc}`;
+export type UpdateCheckoutLineNextMutationFn = Apollo.MutationFunction<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>;
+
+/**
+ * __useUpdateCheckoutLineNextMutation__
+ *
+ * To run a mutation, you first call `useUpdateCheckoutLineNextMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCheckoutLineNextMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCheckoutLineNextMutation, { data, loading, error }] = useUpdateCheckoutLineNextMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      lines: // value for 'lines'
+ *   },
+ * });
+ */
+export function useUpdateCheckoutLineNextMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>(UpdateCheckoutLineNextDocument, options);
+      }
+export type UpdateCheckoutLineNextMutationHookResult = ReturnType<typeof useUpdateCheckoutLineNextMutation>;
+export type UpdateCheckoutLineNextMutationResult = Apollo.MutationResult<UpdateCheckoutLineNextMutation>;
+export type UpdateCheckoutLineNextMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>;
 export const UserDetailsDocument = gql`
     query UserDetails {
   user: me {
@@ -20740,6 +21164,51 @@ export function useCheckoutDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type CheckoutDetailsQueryHookResult = ReturnType<typeof useCheckoutDetailsQuery>;
 export type CheckoutDetailsLazyQueryHookResult = ReturnType<typeof useCheckoutDetailsLazyQuery>;
 export type CheckoutDetailsQueryResult = Apollo.QueryResult<CheckoutDetailsQuery, CheckoutDetailsQueryVariables>;
+export const CheckoutDetailsNextDocument = gql`
+    query CheckoutDetailsNext($token: UUID) {
+  checkout(token: $token) {
+    ...Checkout
+    paymentMethod {
+      cashbackDiscountAmount
+      couponDiscount
+      prepaidDiscountAmount
+    }
+    cashback {
+      amount
+      willAddOn
+    }
+  }
+  checkoutUpdated @client
+}
+    ${CheckoutFragmentDoc}`;
+
+/**
+ * __useCheckoutDetailsNextQuery__
+ *
+ * To run a query within a React component, call `useCheckoutDetailsNextQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckoutDetailsNextQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckoutDetailsNextQuery({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useCheckoutDetailsNextQuery(baseOptions?: Apollo.QueryHookOptions<CheckoutDetailsNextQuery, CheckoutDetailsNextQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CheckoutDetailsNextQuery, CheckoutDetailsNextQueryVariables>(CheckoutDetailsNextDocument, options);
+      }
+export function useCheckoutDetailsNextLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CheckoutDetailsNextQuery, CheckoutDetailsNextQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CheckoutDetailsNextQuery, CheckoutDetailsNextQueryVariables>(CheckoutDetailsNextDocument, options);
+        }
+export type CheckoutDetailsNextQueryHookResult = ReturnType<typeof useCheckoutDetailsNextQuery>;
+export type CheckoutDetailsNextLazyQueryHookResult = ReturnType<typeof useCheckoutDetailsNextLazyQuery>;
+export type CheckoutDetailsNextQueryResult = Apollo.QueryResult<CheckoutDetailsNextQuery, CheckoutDetailsNextQueryVariables>;
 export const GetCartItemsDocument = gql`
     query GetCartItems {
   cartItems @client {

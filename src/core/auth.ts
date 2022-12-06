@@ -213,7 +213,7 @@ export interface AuthSDK {
    */
   // verifyExternalToken?: () => Promise<VerifyExternalTokenResult>;
 
-  signInMobile: (otp: string, phone: string) => SignInMobileResult;
+  signInMobile: (otp: string, phone?: string, email?: string) => SignInMobileResult;
 
   requestOTP: (phone: string) => RequestOtpResult;
 
@@ -242,7 +242,8 @@ export const auth = ({
   // const refreshToken = () => {};
   const signInMobile: AuthSDK["signInMobile"] = async (
     otp: string,
-    phone: string
+    phone?: string,
+    email?: string
   ) => {
     client.writeQuery({
       query: USER,
@@ -257,16 +258,22 @@ export const auth = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
+    const CreateTokenOTPVariables = phone ? {
+      otp,
+      phone,
+      checkoutId: checkout?.id,
+    } : {
+      otp,
+      email,
+      checkoutId: checkout?.id,
+    }
+
     const res = await client.mutate<
       OtpAuthenticationMutation,
       OtpAuthenticationMutationVariables
     >({
       mutation: CREATE_OTP_TOKEN_MUTATION,
-      variables: {
-        otp,
-        phone,
-        checkoutId: checkout?.id,
-      },
+      variables: CreateTokenOTPVariables,
       update: (_, { data }) => {
         if (data?.CreateTokenOTP?.token) {
           storage.setTokens({
