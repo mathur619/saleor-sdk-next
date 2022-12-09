@@ -829,7 +829,6 @@ export type AppUpdate = {
   app: Maybe<App>;
 };
 
-
 export type ArchieveOrderAddressInput = {
   /** Given name. */
   firstName?: Maybe<Scalars['String']>;
@@ -854,6 +853,7 @@ export type ArchieveOrderAddressInput = {
   /** Phone number. */
   phone?: Maybe<Scalars['String']>;
 };
+
 export type ArchiveOrderError = {
   /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
   field: Maybe<Scalars['String']>;
@@ -887,7 +887,6 @@ export type ArchiveOrderInput = {
   /** The customer's email address. */
   email?: Maybe<Scalars['String']>;
   /** Billing address of the customer. */
-
   shippingAddress?: Maybe<ArchieveOrderAddressInput>;
   /** Billing address of the customer. */
   billingAddress?: Maybe<ArchieveOrderAddressInput>;
@@ -2055,7 +2054,6 @@ export type Checkout = Node & ObjectWithMetadata & {
   paymentMethod: Maybe<PaymentMethodType>;
   /** Cashback of Checkout. */
   cashback: Maybe<CashbackType>;
-
 };
 
 /** Adds note to the checkout. */
@@ -2454,7 +2452,6 @@ export type CheckoutType = Node & ObjectWithMetadata & {
   paymentMethod: Maybe<PaymentMethodType>;
   /** Cashback of Checkout. */
   cashback: Maybe<CashbackType>;
-
 };
 
 
@@ -3708,20 +3705,6 @@ export type CreditCard = {
   expMonth: Maybe<Scalars['Int']>;
   /** Four-digit number representing the card’s expiration year. */
   expYear: Maybe<Scalars['Int']>;
-};
-
-/** Credits Wallet to refered user. */
-export type CreditsWalletToReferedUser = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** Wallet Amount Credited. */
-  walletAmount: Maybe<Scalars['String']>;
-  /** Discount code for the User */
-  voucherCode: Maybe<Scalars['String']>;
-  accountErrors: Array<AccountError>;
 };
 
 export type CustomBannerType = Node & {
@@ -5284,16 +5267,19 @@ export type GetUserHash = {
 export type GiftCard = Node & {
   /** Gift card code. */
   code: Maybe<Scalars['String']>;
-  isActive: Scalars['Boolean'];
+  /** The customer who bought a gift card. */
+  user: Maybe<User>;
+  created: Scalars['DateTime'];
+  startDate: Scalars['Date'];
+  endDate: Maybe<Scalars['Date']>;
   lastUsedOn: Maybe<Scalars['DateTime']>;
+  isActive: Scalars['Boolean'];
   initialBalance: Maybe<Money>;
   currentBalance: Maybe<Money>;
   /** The ID of the object. */
   id: Scalars['ID'];
   /** Code in format which allows displaying in a user interface. */
   displayCode: Maybe<Scalars['String']>;
-  /** The customer who bought a gift card. */
-  user: Maybe<User>;
 };
 
 /** Activate a gift card. */
@@ -5303,7 +5289,7 @@ export type GiftCardActivate = {
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
    */
   errors: Array<Error>;
-  /** Activated gift card. */
+  /** A gift card to activate. */
   giftCard: Maybe<GiftCard>;
   giftCardErrors: Array<GiftCardError>;
 };
@@ -5335,20 +5321,16 @@ export type GiftCardCreate = {
 };
 
 export type GiftCardCreateInput = {
-  /** The gift card tags to add. */
-  addTags?: Maybe<Array<Scalars['String']>>;
-  /** The gift card expiry date. */
-  expiryDate?: Maybe<Scalars['Date']>;
-  /** Balance of the gift card. */
-  balance: PriceInput;
-  /** Email of the customer to whom gift card will be sent. */
+  /** Start date of the gift card in ISO 8601 format. */
+  startDate?: Maybe<Scalars['Date']>;
+  /** End date of the gift card in ISO 8601 format. */
+  endDate?: Maybe<Scalars['Date']>;
+  /** Value of the gift card. */
+  balance?: Maybe<Scalars['PositiveDecimal']>;
+  /** The customer's email of the gift card buyer. */
   userEmail?: Maybe<Scalars['String']>;
-  /** Determine if gift card is active. */
-  isActive: Scalars['Boolean'];
-  /** Code to use the gift card. The code is now auto generated. */
+  /** Code to use the gift card. */
   code?: Maybe<Scalars['String']>;
-  /** The gift card note from the staff member. */
-  note?: Maybe<Scalars['String']>;
 };
 
 /** Deactivate a gift card. */
@@ -5358,20 +5340,9 @@ export type GiftCardDeactivate = {
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
    */
   errors: Array<Error>;
-  /** Deactivated gift card. */
+  /** A gift card to deactivate. */
   giftCard: Maybe<GiftCard>;
   giftCardErrors: Array<GiftCardError>;
-};
-
-/** Delete gift card. */
-export type GiftCardDelete = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  giftCardErrors: Array<GiftCardError>;
-  giftCard: Maybe<GiftCard>;
 };
 
 export type GiftCardError = {
@@ -5404,14 +5375,14 @@ export type GiftCardUpdate = {
 };
 
 export type GiftCardUpdateInput = {
-  /** The gift card tags to add. */
-  addTags?: Maybe<Array<Scalars['String']>>;
-  /** The gift card expiry date. */
-  expiryDate?: Maybe<Scalars['Date']>;
-  /** The gift card tags to remove. */
-  removeTags?: Maybe<Array<Scalars['String']>>;
-  /** The gift card balance amount. */
-  balanceAmount?: Maybe<Scalars['PositiveDecimal']>;
+  /** Start date of the gift card in ISO 8601 format. */
+  startDate?: Maybe<Scalars['Date']>;
+  /** End date of the gift card in ISO 8601 format. */
+  endDate?: Maybe<Scalars['Date']>;
+  /** Value of the gift card. */
+  balance?: Maybe<Scalars['PositiveDecimal']>;
+  /** The customer's email of the gift card buyer. */
+  userEmail?: Maybe<Scalars['String']>;
 };
 
 export type GokwikType = {
@@ -6862,8 +6833,6 @@ export type Mutation = {
   giftCardActivate: Maybe<GiftCardActivate>;
   /** Creates a new gift card. */
   giftCardCreate: Maybe<GiftCardCreate>;
-  /** Delete gift card. */
-  giftCardDelete: Maybe<GiftCardDelete>;
   /** Deactivate a gift card. */
   giftCardDeactivate: Maybe<GiftCardDeactivate>;
   /** Update a gift card. */
@@ -7186,10 +7155,6 @@ export type Mutation = {
   voucherRuleLinkUpdate: Maybe<UpdateVoucherRuleLink>;
   /** Set the payment method of checkout */
   checkoutPaymentMethodUpdate: Maybe<UpdatePaymentMethod>;
-  /** Attempts to add a ticket express voucher to a checkout. */
-  ticketExpressCouponApply: Maybe<TicketExpressAddPromoCode>;
-  /** Attempts to remove a ticket express voucher to a checkout. */
-  ticketExpressCouponRemove: Maybe<TicketExpressRemovePromoCode>;
   /** Upload an invoice pdf. */
   invoiceUpload: Maybe<InvoiceUpload>;
   /** Update an address type */
@@ -7352,14 +7317,8 @@ export type Mutation = {
   referAFriend: Maybe<ReferAFriend>;
   /** Creates Coupon Code for referd user. */
   getReferalDiscount: Maybe<GetReferalDiscount>;
-  /** Creates Refer Hash for user. */
-  referalGetHash: Maybe<ReferalGetHash>;
-  /** Credits Wallet to refered user. */
-  creditsWalletToReferedUser: Maybe<CreditsWalletToReferedUser>;
   /** Add Wallet Balance of a user from a csv file */
   walletBalanceAddCsv: Maybe<WalletBalanceAddCsv>;
-  /** Add Wallet Balance of a user for some particular reasons. */
-  walletBalanceAdd: Maybe<WalletBalanceAdd>;
   /** Export orders to csv file. */
   walletExport: Maybe<ExportWallet>;
   /** Upload Images of a product. */
@@ -8438,11 +8397,6 @@ export type MutationGiftCardCreateArgs = {
 };
 
 
-export type MutationGiftCardDeleteArgs = {
-  id: Scalars['ID'];
-};
-
-
 export type MutationGiftCardDeactivateArgs = {
   id: Scalars['ID'];
 };
@@ -9194,18 +9148,6 @@ export type MutationCheckoutPaymentMethodUpdateArgs = {
 };
 
 
-export type MutationTicketExpressCouponApplyArgs = {
-  checkoutId: Scalars['ID'];
-  voucherCode: Scalars['String'];
-};
-
-
-export type MutationTicketExpressCouponRemoveArgs = {
-  checkoutId: Scalars['ID'];
-  voucherCode: Scalars['String'];
-};
-
-
 export type MutationInvoiceUploadArgs = {
   uri: Scalars['String'];
 };
@@ -9640,25 +9582,8 @@ export type MutationGetReferalDiscountArgs = {
 };
 
 
-export type MutationReferalGetHashArgs = {
-  email: Scalars['String'];
-};
-
-
-export type MutationCreditsWalletToReferedUserArgs = {
-  email: Scalars['String'];
-  referHash: Scalars['String'];
-};
-
-
 export type MutationWalletBalanceAddCsvArgs = {
   input: WalletCsvInput;
-};
-
-
-export type MutationWalletBalanceAddArgs = {
-  email: Scalars['String'];
-  reason: Scalars['String'];
 };
 
 
@@ -9700,80 +9625,6 @@ export type MutationTriggerCronArgs = {
   cron?: Maybe<Scalars['String']>;
 };
 
-export type MutationDraftOrderAddPromoCodeArgs = {
-  input: SaleorVoucherInput;
-};
-
-
-export type MutationDraftOrderRemovePromoCodeArgs = {
-  orderId: Scalars['ID'];
-};
-
-
-export type MutationDraftOrderApplyCodArgs = {
-  orderId: Scalars['ID'];
-};
-
-
-export type MutationDraftOrderRemoveCodArgs = {
-  orderId: Scalars['ID'];
-};
-
-
-export type MutationDraftOrderApplyPrepaidArgs = {
-  orderId: Scalars['ID'];
-};
-
-
-export type MutationDraftOrderRemovePrepaidArgs = {
-  orderId: Scalars['ID'];
-};
-
-
-export type MutationSendOrderEmailArgs = {
-  orderId?: Maybe<Scalars['ID']>;
-};
-
-
-export type MutationDeleteProductReviewByProductIdArgs = {
-  productId: Scalars['ID'];
-};
-
-
-export type MutationArchiveOrderCreateArgs = {
-  input: ArchiveOrderInput;
-};
-
-
-export type MutationArchiveOrderUpdateArgs = {
-  id: Scalars['String'];
-  input: ArchiveOrderInput;
-};
-
-
-export type MutationArchiveOrderDeleteArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type MutationEmailTemplateCreateArgs = {
-  input?: Maybe<EmailTemplateInput>;
-};
-
-
-export type MutationEmailTemplateUpdateArgs = {
-  id: Scalars['ID'];
-  input?: Maybe<EmailTemplateInput>;
-};
-
-
-export type MutationEmailTemplateDeleteArgs = {
-  id: Scalars['ID'];
-};
-
-export type NameTranslationInput = {
-  name?: Maybe<Scalars['String']>;
-};
 
 export type MutationDraftOrderAddPromoCodeArgs = {
   input: SaleorVoucherInput;
@@ -9783,6 +9634,7 @@ export type MutationDraftOrderAddPromoCodeArgs = {
 export type MutationDraftOrderRemovePromoCodeArgs = {
   orderId: Scalars['ID'];
 };
+
 
 export type MutationDraftOrderApplyCodArgs = {
   orderId: Scalars['ID'];
@@ -9873,6 +9725,7 @@ export type Node = {
   /** The ID of the object. */
   id: Scalars['ID'];
 };
+
 /** Single Notification Details */
 export type NotificationInput = {
   /** Product Id */
@@ -11652,13 +11505,6 @@ export type PluginUpdateInput = {
 };
 
 
-export type PriceInput = {
-  /** Currency code. */
-  currency: Scalars['String'];
-  /** Amount of money. */
-  amount: Scalars['PositiveDecimal'];
-};
-
 export type PriceRangeInput = {
   /** Price greater than or equal to. */
   gte?: Maybe<Scalars['Float']>;
@@ -11956,7 +11802,6 @@ export type ProductFilterInput = {
   rating?: Maybe<IntRangeInput>;
   minimalPrice?: Maybe<PriceRangeInput>;
   productTypes?: Maybe<Array<Maybe<Scalars['ID']>>>;
-  searchAdmin?: Maybe<Scalars['String']>;
   ids?: Maybe<Array<Maybe<Scalars['ID']>>>;
 };
 
@@ -14116,8 +13961,7 @@ export type QueryProductReviewArgs = {
 
 
 export type QueryProductReviewsArgs = {
-  product?: Maybe<Scalars['ID']>;
-  productSlug?: Maybe<Scalars['String']>;
+  product: Scalars['ID'];
   id?: Maybe<Scalars['ID']>;
   user?: Maybe<Scalars['String']>;
   isPublished?: Maybe<Scalars['Boolean']>;
@@ -14569,18 +14413,6 @@ export type ReferAFriend = {
    */
   errors: Array<Error>;
   /** Hash created for the refrer. */
-  referHash: Maybe<Scalars['String']>;
-  accountErrors: Array<AccountError>;
-};
-
-/** Creates Refer Hash for user. */
-export type ReferalGetHash = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** Hash created for the referrer. */
   referHash: Maybe<Scalars['String']>;
   accountErrors: Array<AccountError>;
 };
@@ -16874,29 +16706,7 @@ export type TemplateMailType =
   | 'NOTIFICATION'
   | 'INVOICE'
   | 'CONTACT_US';
-/** Attempts to add a ticket express voucher to a checkout. */
-export type TicketExpressAddPromoCode = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** A checkout instance. */
-  checkout: Maybe<Checkout>;
-  checkoutErrors: Array<CheckoutError>;
-};
 
-/** Attempts to remove a ticket express voucher to a checkout. */
-export type TicketExpressRemovePromoCode = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** A checkout instance. */
-  checkout: Maybe<Checkout>;
-  checkoutErrors: Array<CheckoutError>;
-};
 /** Requests for Token for registered user. */
 export type TokenCreateWithAdmin = {
   /**
@@ -17084,31 +16894,6 @@ export type UpdateBanner = {
 
 /** Create Product. */
 export type UpdateCollectionMetadata = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** Success message */
-  message: Maybe<Scalars['String']>;
-};
-
-/** Update Customer metadata. */
-export type UpdateCustomerNoAuth = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** An updated customer metadata. */
-  message: Maybe<Scalars['String']>;
-  /** An updated user instance. */
-  user: Maybe<User>;
-  accountErrors: Array<AccountError>;
-};
-
-/** Update an Influencer. */
-export type UpdateInfluencer = {
   /**
    * List of errors that occurred executing the mutation.
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
@@ -18143,18 +17928,6 @@ export type VoucherUpdate = {
   voucher: Maybe<Voucher>;
 };
 
-/** Add Wallet Balance of a user for some particular reasons. */
-export type WalletBalanceAdd = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** Wallet Amount Credited. */
-  walletAmount: Maybe<Scalars['String']>;
-  WalletErrors: Array<WalletError>;
-};
-
 /** Add Wallet Balance of a user from a csv file */
 export type WalletBalanceAddCsv = {
   /**
@@ -18842,8 +18615,7 @@ export type PaymentGatewayFragment = (
 
 export type CheckoutFragment = (
   Pick<Checkout, 'token' | 'id' | 'email' | 'isShippingRequired' | 'discountName' | 'translatedDiscountName' | 'voucherCode'>
-  & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, tags: Maybe<Array<Maybe<Pick<TagType, 'name'>>>>, totalPrice: Maybe<PriceFragment>, subtotalPrice: Maybe<PriceFragment>, billingAddress: Maybe<AddressFragment>, shippingAddress: Maybe<AddressFragment>, availableShippingMethods: Array<Maybe<ShippingMethodFragment>>, shippingMethod: Maybe<ShippingMethodFragment>, shippingPrice: Maybe<PriceFragment>, lines: Maybe<Array<Maybe<CheckoutLineFragment>>>, discount: Maybe<Pick<Money, 'currency' | 'amount'>>, availablePaymentGateways: Array<PaymentGatewayFragment> }
-  & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, giftCards: Maybe<Array<Maybe<(
+  & { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, tags: Maybe<Array<Maybe<Pick<TagType, 'name'>>>>, giftCards: Maybe<Array<Maybe<(
     Pick<GiftCard, 'displayCode'>
     & { currentBalance: Maybe<Pick<Money, 'amount'>> }
   )>>>, totalPrice: Maybe<PriceFragment>, subtotalPrice: Maybe<PriceFragment>, billingAddress: Maybe<AddressFragment>, shippingAddress: Maybe<AddressFragment>, availableShippingMethods: Array<Maybe<ShippingMethodFragment>>, shippingMethod: Maybe<ShippingMethodFragment>, shippingPrice: Maybe<PriceFragment>, lines: Maybe<Array<Maybe<CheckoutLineFragment>>>, discount: Maybe<Pick<Money, 'currency' | 'amount'>>, availablePaymentGateways: Array<PaymentGatewayFragment> }
@@ -19146,7 +18918,6 @@ export type CheckoutCustomerAttachMutationVariables = Exact<{
 
 export type CheckoutCustomerAttachMutation = { checkoutCustomerAttach: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>> }> };
 
-
 export type AddCheckoutLineNextMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
@@ -19172,8 +18943,8 @@ export type CreateCheckoutNextMutation = { checkoutCreate: Maybe<{ errors: Array
     )> }> };
 
 export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
-  checkoutId?: Scalars['ID'];
-  shippingMethodId?: Scalars['ID'];
+  checkoutId: Scalars['ID'];
+  shippingMethodId: Scalars['ID'];
 }>;
 
 
@@ -19189,6 +18960,7 @@ export type UpdateCheckoutLineNextMutationVariables = Exact<{
 
 
 export type UpdateCheckoutLineNextMutation = { checkoutLinesUpdate: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>>, errors: Array<CheckoutErrorFragment> }> };
+
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -19346,7 +19118,6 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
-
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -19458,9 +19229,9 @@ export const CheckoutFragmentDoc = gql`
     value
   }
   tags {
-    name  
-}
-giftCards {
+    name
+  }
+  giftCards {
     displayCode
     currentBalance {
       amount
