@@ -16,7 +16,7 @@ export const useCheckoutState = () => {
 
   const { data } = res;
 
-  console.log("GetLocalCheckoutQuery", data);
+  //console.log("GetLocalCheckoutQuery", data);
   if (!data) {
     // throw new Error(
     //   "Cache query result is undefined. Invalid cache configuration."
