@@ -2153,7 +2153,8 @@ export type CheckoutCreateInput = {
   shippingAddress?: Maybe<AddressInput>;
   /** Billing address of the customer. */
   billingAddress?: Maybe<AddressInput>;
-  tags?: any;
+  /** Tags if any, associated with the Checkout */
+  tags?: Maybe<Array<Maybe<Scalars["String"]>>>;
 };
 
 /** Sets the customer as the owner of the checkout. */
@@ -7300,6 +7301,8 @@ export type Mutation = {
   emailTemplateUpdate: Maybe<EmailTemplateUpdate>;
   /** Delete a template instance */
   emailTemplateDelete: Maybe<EmailTemplateDelete>;
+  /** Conversion of COD order to prepaid. */
+  orderCodToPrepaid: Maybe<OrderCodToPrepaid>;
 };
 
 export type MutationWishlistAddProductArgs = {
@@ -9220,6 +9223,11 @@ export type MutationEmailTemplateDeleteArgs = {
   id: Scalars["ID"];
 };
 
+export type MutationOrderCodToPrepaidArgs = {
+  orderId?: Maybe<Scalars["ID"]>;
+  orderTotalAmount: Scalars["Float"];
+};
+
 export type NameTranslationInput = {
   name?: Maybe<Scalars["String"]>;
 };
@@ -9464,6 +9472,18 @@ export type OrderBulkCancel = {
   errors: Array<Error>;
   /** Returns how many objects were affected. */
   count: Scalars["Int"];
+  orderErrors: Array<OrderError>;
+};
+
+/** Conversion of COD order to prepaid. */
+export type OrderCodToPrepaid = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** checkout with checkout items */
+  order: Maybe<Order>;
   orderErrors: Array<OrderError>;
 };
 
@@ -18001,8 +18021,8 @@ export type OrderDetailFragment = Pick<
   | "id"
   | "token"
   | "number"
-  | "payments"
 > & {
+  payments: Maybe<Array<Maybe<Pick<Payment, "id" | "gateway">>>>;
   voucher: Maybe<Pick<Voucher, "code">>;
   metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
   shippingAddress: Maybe<AddressFragment>;
@@ -18045,7 +18065,7 @@ export type ProductFieldsFragment = Pick<
   variants: Maybe<
     Array<
       Maybe<
-        Pick<ProductVariant, "id" | "sku" | "name" | "quantityAvailable"> & {
+        Pick<ProductVariant, "id" | "sku" | "name"> & {
           images: Maybe<Array<Maybe<Pick<ProductImage, "id" | "url" | "alt">>>>;
           pricing: Maybe<
             Pick<VariantPricingInfo, "onSale"> & {
@@ -18502,6 +18522,96 @@ export type CreateCashfreeOrderMutation = {
   }>;
 };
 
+export type AddWishlistProductMutationVariables = Exact<{
+  productId: Scalars["ID"];
+}>;
+
+export type AddWishlistProductMutation = {
+  wishlistAddProduct: Maybe<{
+    wishlist: Maybe<
+      Array<
+        Maybe<
+          Pick<WishlistItem, "id"> & {
+            wishlist: Pick<Wishlist, "id" | "createdAt"> & {
+              items: {
+                edges: Array<{
+                  node: Pick<WishlistItem, "id"> & {
+                    product: Pick<
+                      Product,
+                      "id" | "name" | "isAvailableForPurchase"
+                    > & {
+                      metadata: Array<
+                        Maybe<Pick<MetadataItem, "key" | "value">>
+                      >;
+                      thumbnail: Maybe<Pick<Image, "url">>;
+                      images: Maybe<
+                        Array<Maybe<Pick<ProductImage, "id" | "alt" | "url">>>
+                      >;
+                      variants: Maybe<
+                        Array<
+                          Maybe<
+                            Pick<ProductVariant, "id" | "sku" | "name"> & {
+                              images: Maybe<
+                                Array<
+                                  Maybe<
+                                    Pick<ProductImage, "id" | "url" | "alt">
+                                  >
+                                >
+                              >;
+                              pricing: Maybe<
+                                Pick<VariantPricingInfo, "onSale"> & {
+                                  priceUndiscounted: Maybe<{
+                                    gross: Pick<Money, "amount" | "currency">;
+                                    net: Pick<Money, "amount" | "currency">;
+                                  }>;
+                                  price: Maybe<{
+                                    gross: Pick<Money, "amount" | "currency">;
+                                    net: Pick<Money, "amount" | "currency">;
+                                  }>;
+                                }
+                              >;
+                            }
+                          >
+                        >
+                      >;
+                      pricing: Maybe<{
+                        priceRangeUndiscounted: Maybe<{
+                          start: Maybe<{
+                            net: Pick<Money, "amount" | "currency">;
+                            gross: Pick<Money, "amount" | "currency">;
+                          }>;
+                          stop: Maybe<{
+                            net: Pick<Money, "amount" | "currency">;
+                            gross: Pick<Money, "amount" | "currency">;
+                          }>;
+                        }>;
+                        priceRange: Maybe<{
+                          start: Maybe<{
+                            net: Pick<Money, "amount" | "currency">;
+                            gross: Pick<Money, "amount" | "currency">;
+                          }>;
+                          stop: Maybe<{
+                            net: Pick<Money, "amount" | "currency">;
+                            gross: Pick<Money, "amount" | "currency">;
+                          }>;
+                        }>;
+                      }>;
+                    };
+                  };
+                }>;
+              };
+            };
+          }
+        >
+      >
+    >;
+  }>;
+};
+
+export type WishlistRemoveProductMutationVariables = Exact<{
+  productId: Scalars["ID"];
+}>;
+
 export type CheckoutCustomerAttachMutationVariables = Exact<{
   checkoutId: Scalars["ID"];
   customerId?: Maybe<Scalars["ID"]>;
@@ -18549,8 +18659,8 @@ export type CreateCheckoutNextMutation = {
 };
 
 export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
-  checkoutId?: Scalars["ID"];
-  shippingMethodId?: Scalars["ID"];
+  checkoutId: Scalars["ID"];
+  shippingMethodId: Scalars["ID"];
 }>;
 
 export type UpdateCheckoutShippingMethodNextMutation = {
@@ -18752,7 +18862,7 @@ export type WishlistQueryVariables = Exact<{
 
 export type WishlistQuery = {
   wishlist: Maybe<
-    Pick<Wishlist, "id"> & {
+    Pick<Wishlist, "id" | "createdAt"> & {
       items: {
         edges: Array<{
           node: Pick<WishlistItem, "id"> & {
@@ -18769,10 +18879,7 @@ export type WishlistQuery = {
               variants: Maybe<
                 Array<
                   Maybe<
-                    Pick<
-                      ProductVariant,
-                      "id" | "sku" | "name" | "quantityAvailable"
-                    > & {
+                    Pick<ProductVariant, "id" | "sku" | "name"> & {
                       metadata: Array<
                         Maybe<Pick<MetadataItem, "key" | "value">>
                       >;
@@ -18839,9 +18946,8 @@ export const AccountErrorFragmentDoc = gql`
     message
   }
 `;
-
 export const AddressFragmentDoc = gql`
-  fragment Address on Address {
+  fragment AddressFragment on Address {
     id
     firstName
     lastName
@@ -18849,6 +18955,7 @@ export const AddressFragmentDoc = gql`
     streetAddress1
     streetAddress2
     city
+    cityArea
     postalCode
     country {
       code
@@ -18860,7 +18967,6 @@ export const AddressFragmentDoc = gql`
     isDefaultShippingAddress
   }
 `;
-
 export const UserFragmentDoc = gql`
   fragment UserFragment on User {
     id
@@ -19086,6 +19192,10 @@ export const OrderDetailFragmentDoc = gql`
     userEmail
     paymentStatus
     paymentStatusDisplay
+    payments {
+      id
+      gateway
+    }
     status
     statusDisplay
     id
@@ -19177,7 +19287,6 @@ export const ProductFieldsFragmentDoc = gql`
       id
       sku
       name
-      quantityAvailable(countryCode: IN)
       images {
         id
         url
@@ -21132,6 +21241,339 @@ export type CreateCashfreeOrderMutationOptions = Apollo.BaseMutationOptions<
   CreateCashfreeOrderMutation,
   CreateCashfreeOrderMutationVariables
 >;
+export const AddWishlistProductDocument = gql`
+  mutation AddWishlistProduct($productId: ID!) {
+    wishlistAddProduct(productId: $productId) {
+      wishlist {
+        id
+        wishlist {
+          id
+          createdAt
+          items(first: 20) {
+            edges {
+              node {
+                id
+                product {
+                  id
+                  name
+                  isAvailableForPurchase
+                  metadata {
+                    key
+                    value
+                  }
+                  thumbnail {
+                    url
+                  }
+                  images {
+                    id
+                    alt
+                    url
+                  }
+                  variants {
+                    id
+                    sku
+                    name
+                    images {
+                      id
+                      url
+                      alt
+                    }
+                    pricing {
+                      onSale
+                      priceUndiscounted {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                      price {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                  pricing {
+                    priceRangeUndiscounted {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                    priceRange {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+export type AddWishlistProductMutationFn = Apollo.MutationFunction<
+  AddWishlistProductMutation,
+  AddWishlistProductMutationVariables
+>;
+
+/**
+ * __useAddWishlistProductMutation__
+ *
+ * To run a mutation, you first call `useAddWishlistProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddWishlistProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addWishlistProductMutation, { data, loading, error }] = useAddWishlistProductMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useAddWishlistProductMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AddWishlistProductMutation,
+    AddWishlistProductMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    AddWishlistProductMutation,
+    AddWishlistProductMutationVariables
+  >(AddWishlistProductDocument, options);
+}
+export type AddWishlistProductMutationHookResult = ReturnType<
+  typeof useAddWishlistProductMutation
+>;
+export type AddWishlistProductMutationResult = Apollo.MutationResult<
+  AddWishlistProductMutation
+>;
+export type AddWishlistProductMutationOptions = Apollo.BaseMutationOptions<
+  AddWishlistProductMutation,
+  AddWishlistProductMutationVariables
+>;
+export const WishlistRemoveProductDocument = gql`
+  mutation wishlistRemoveProduct($productId: ID!) {
+    WishlistRemoveProduct: wishlistRemoveProduct(productId: $productId) {
+      wishlist {
+        id
+        wishlist {
+          id
+          createdAt
+          items(first: 20) {
+            edges {
+              node {
+                id
+                product {
+                  id
+                  name
+                  isPublished
+                  slug
+                  isAvailableForPurchase
+                  metadata {
+                    key
+                    value
+                  }
+                  thumbnail {
+                    url
+                  }
+                  images {
+                    id
+                    alt
+                    url
+                  }
+                  variants {
+                    id
+                    sku
+                    name
+                    attributes {
+                      attribute {
+                        name
+                      }
+                      values {
+                        name
+                      }
+                    }
+                    images {
+                      id
+                      url
+                      alt
+                    }
+                    pricing {
+                      onSale
+                      priceUndiscounted {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                      price {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                  productType {
+                    name
+                  }
+                  pricing {
+                    priceRangeUndiscounted {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                    priceRange {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+export type WishlistRemoveProductMutationFn = Apollo.MutationFunction<
+  WishlistRemoveProductMutation,
+  WishlistRemoveProductMutationVariables
+>;
+
+/**
+ * __useWishlistRemoveProductMutation__
+ *
+ * To run a mutation, you first call `useWishlistRemoveProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWishlistRemoveProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [wishlistRemoveProductMutation, { data, loading, error }] = useWishlistRemoveProductMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useWishlistRemoveProductMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    WishlistRemoveProductMutation,
+    WishlistRemoveProductMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    WishlistRemoveProductMutation,
+    WishlistRemoveProductMutationVariables
+  >(WishlistRemoveProductDocument, options);
+}
+export type WishlistRemoveProductMutationHookResult = ReturnType<
+  typeof useWishlistRemoveProductMutation
+>;
+export type WishlistRemoveProductMutationResult = Apollo.MutationResult<
+  WishlistRemoveProductMutation
+>;
+export type WishlistRemoveProductMutationOptions = Apollo.BaseMutationOptions<
+  WishlistRemoveProductMutation,
+  WishlistRemoveProductMutationVariables
+>;
 export const CheckoutCustomerAttachDocument = gql`
   mutation CheckoutCustomerAttach($checkoutId: ID!, $customerId: ID) {
     checkoutCustomerAttach(checkoutId: $checkoutId, customerId: $customerId) {
@@ -22169,6 +22611,7 @@ export const WishlistDocument = gql`
   query Wishlist($first: Int!) {
     wishlist {
       id
+      createdAt
       items(first: $first) {
         edges {
           node {
@@ -22209,7 +22652,6 @@ export const WishlistDocument = gql`
                     name
                   }
                 }
-                quantityAvailable(countryCode: IN)
                 images {
                   id
                   url
