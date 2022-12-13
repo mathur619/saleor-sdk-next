@@ -34,8 +34,7 @@ export const useCartState = () => {
     // throw new Error(
     //   "Cache query result is undefined. Invalid cache configuration."
     // );
-    if(typeof window !== "undefined") {
-      console.log("cart hook reload");
+    if (typeof window !== "undefined") {
       window.localStorage?.clear();
       window.location?.reload();
     }
@@ -43,7 +42,7 @@ export const useCartState = () => {
 
   const mrp =
     data?.localCheckout?.lines?.reduce((total, curr) => {
-      const variantMetadata = curr?.variant.metadata;
+      const variantMetadata = curr?.variant?.metadata;
 
       const listPrice = getMetadataValue(variantMetadata, "listPrice");
 

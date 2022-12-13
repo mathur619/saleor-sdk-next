@@ -426,7 +426,12 @@ export const REQUEST_OTP_MUTATION = gql`
 
 export const CREATE_OTP_TOKEN_MUTATION = gql`
   ${userFragment}
-  mutation OTPAuthentication($phone: String, $email: String, $otp: String!, $checkoutId: ID) {
+  mutation OTPAuthentication(
+    $phone: String
+    $email: String
+    $otp: String!
+    $checkoutId: ID
+  ) {
     CreateTokenOTP: otpTokenCreate(
       otp: $otp
       phone: $phone
@@ -1075,6 +1080,93 @@ export const CHECKOUT_CUSTOMER_ATTACH = gql`
     checkoutCustomerAttach(checkoutId: $checkoutId, customerId: $customerId) {
       checkout {
         id
+      }
+    }
+  }
+`;
+
+export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutErrorFragment}
+  mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
+    checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
+      checkout {
+        id
+        availableShippingMethods {
+          id
+          name
+          price {
+            currency
+            amount
+          }
+        }
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const CREATE_CHECKOUT_MUTATION_NEXT = gql`
+  ${checkoutErrorFragment}
+  mutation CreateCheckoutNext($checkoutInput: CheckoutCreateInput!) {
+    checkoutCreate(input: $checkoutInput) {
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+      checkout {
+        id
+        token
+        availableShippingMethods {
+          id
+        }
+      }
+    }
+  }
+`;
+
+export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation UpdateCheckoutShippingMethodNext(
+    $checkoutId: ID!
+    $shippingMethodId: ID!
+  ) {
+    checkoutShippingMethodUpdate(
+      checkoutId: $checkoutId
+      shippingMethodId: $shippingMethodId
+    ) {
+      checkout {
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutErrorFragment}
+  mutation UpdateCheckoutLineNext(
+    $checkoutId: ID!
+    $lines: [CheckoutLineInput]!
+  ) {
+    checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
+      checkout {
+        id
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
       }
     }
   }
