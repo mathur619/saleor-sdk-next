@@ -18659,8 +18659,8 @@ export type CreateCheckoutNextMutation = {
 };
 
 export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
-  checkoutId: Scalars["ID"];
-  shippingMethodId: Scalars["ID"];
+  checkoutId?: Scalars["ID"];
+  shippingMethodId?: Scalars["ID"];
 }>;
 
 export type UpdateCheckoutShippingMethodNextMutation = {
