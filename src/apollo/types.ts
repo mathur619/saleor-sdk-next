@@ -18055,15 +18055,21 @@ export type PaymentErrorFragment = Pick<
 
 export type ProductFieldsFragment = Pick<
   Product,
-  "id" | "name" | "isAvailableForPurchase"
+  "id" | "name" | "slug" | "isAvailable" | "isAvailableForPurchase"
 > & {
   metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
-  thumbnail: Maybe<Pick<Image, "url" | "alt">>;
-  images: Maybe<Array<Maybe<Pick<ProductImage, "id" | "alt" | "url">>>>;
+  productType: Pick<ProductType, "name">;
+  thumbnail: Maybe<Pick<Image, "url">>;
+  images: Maybe<Array<Maybe<Pick<ProductImage, "id" | "url" | "alt">>>>;
   variants: Maybe<
     Array<
       Maybe<
         Pick<ProductVariant, "id" | "sku" | "name"> & {
+          metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
+          attributes: Array<{
+            attribute: Pick<Attribute, "name">;
+            values: Array<Maybe<Pick<AttributeValue, "name">>>;
+          }>;
           images: Maybe<Array<Maybe<Pick<ProductImage, "id" | "url" | "alt">>>>;
           pricing: Maybe<
             Pick<VariantPricingInfo, "onSale"> & {
@@ -18080,6 +18086,38 @@ export type ProductFieldsFragment = Pick<
         }
       >
     >
+  >;
+  defaultVariant: Maybe<
+    Pick<ProductVariant, "id" | "sku" | "name" | "quantityAvailable"> & {
+      metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
+      attributes: Array<{
+        attribute: Pick<Attribute, "id" | "name" | "slug"> & {
+          metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
+        };
+        values: Array<
+          Maybe<
+            Pick<AttributeValue, "id" | "name"> & {
+              value: AttributeValue["name"];
+            }
+          >
+        >;
+      }>;
+      images: Maybe<
+        Array<Maybe<Pick<ProductImage, "id" | "url" | "alt" | "sortOrder">>>
+      >;
+      pricing: Maybe<
+        Pick<VariantPricingInfo, "onSale"> & {
+          priceUndiscounted: Maybe<{
+            gross: Pick<Money, "amount" | "currency">;
+            net: Pick<Money, "amount" | "currency">;
+          }>;
+          price: Maybe<{
+            gross: Pick<Money, "amount" | "currency">;
+            net: Pick<Money, "amount" | "currency">;
+          }>;
+        }
+      >;
+    }
   >;
   pricing: Maybe<{
     priceRangeUndiscounted: Maybe<{
@@ -18567,8 +18605,8 @@ export type CreateCheckoutNextMutation = {
 };
 
 export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
-  checkoutId?: Scalars["ID"];
-  shippingMethodId?: Scalars["ID"];
+  checkoutId: Scalars["ID"];
+  shippingMethodId: Scalars["ID"];
 }>;
 
 export type UpdateCheckoutShippingMethodNextMutation = {
@@ -19107,28 +19145,99 @@ export const ProductFieldsFragmentDoc = gql`
   fragment productFields on Product {
     id
     name
+    slug
+    isAvailable
     isAvailableForPurchase
     metadata {
       key
       value
     }
+    productType {
+      name
+    }
     thumbnail {
       url
-      alt
     }
     images {
       id
-      alt
       url
+      alt
     }
     variants {
       id
       sku
       name
+      metadata {
+        key
+        value
+      }
+      attributes {
+        attribute {
+          name
+        }
+        values {
+          name
+        }
+      }
       images {
         id
         url
         alt
+      }
+      pricing {
+        onSale
+        priceUndiscounted {
+          gross {
+            amount
+            currency
+          }
+          net {
+            amount
+            currency
+          }
+        }
+        price {
+          gross {
+            amount
+            currency
+          }
+          net {
+            amount
+            currency
+          }
+        }
+      }
+    }
+    defaultVariant {
+      id
+      sku
+      name
+      metadata {
+        key
+        value
+      }
+      attributes {
+        attribute {
+          id
+          name
+          slug
+          metadata {
+            key
+            value
+          }
+        }
+        values {
+          id
+          name
+          value: name
+        }
+      }
+      quantityAvailable(countryCode: IN)
+      images {
+        id
+        url
+        alt
+        sortOrder
       }
       pricing {
         onSale

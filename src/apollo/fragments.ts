@@ -380,28 +380,99 @@ export const productFragment = gql`
   fragment productFields on Product {
     id
     name
+    slug
+    isAvailable
     isAvailableForPurchase
     metadata {
       key
       value
     }
+    productType {
+      name
+    }
     thumbnail {
       url
-      alt
     }
     images {
       id
-      alt
       url
+      alt
     }
     variants {
       id
       sku
       name
+      metadata {
+        key
+        value
+      }
+      attributes {
+        attribute {
+          name
+        }
+        values {
+          name
+        }
+      }
       images {
         id
         url
         alt
+      }
+      pricing {
+        onSale
+        priceUndiscounted {
+          gross {
+            amount
+            currency
+          }
+          net {
+            amount
+            currency
+          }
+        }
+        price {
+          gross {
+            amount
+            currency
+          }
+          net {
+            amount
+            currency
+          }
+        }
+      }
+    }
+    defaultVariant {
+      id
+      sku
+      name
+      metadata {
+        key
+        value
+      }
+      attributes {
+        attribute {
+          id
+          name
+          slug
+          metadata {
+            key
+            value
+          }
+        }
+        values {
+          id
+          name
+          value: name
+        }
+      }
+      quantityAvailable(countryCode: IN)
+      images {
+        id
+        url
+        alt
+        sortOrder
       }
       pricing {
         onSale
