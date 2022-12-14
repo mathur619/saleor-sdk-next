@@ -11,6 +11,7 @@ import {
   paymentErrorFragment,
   paymentFragment,
   userFragment,
+  wishlistFragment,
   // userFragment,
 } from "./fragments";
 
@@ -426,7 +427,12 @@ export const REQUEST_OTP_MUTATION = gql`
 
 export const CREATE_OTP_TOKEN_MUTATION = gql`
   ${userFragment}
-  mutation OTPAuthentication($phone: String, $email: String, $otp: String!, $checkoutId: ID) {
+  mutation OTPAuthentication(
+    $phone: String
+    $email: String
+    $otp: String!
+    $checkoutId: ID
+  ) {
     CreateTokenOTP: otpTokenCreate(
       otp: $otp
       phone: $phone
@@ -914,6 +920,34 @@ export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
       }
       errors: checkoutErrors {
         ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const WISHLIST_ADD_PRODUCT = gql`
+  ${wishlistFragment}
+  mutation AddWishlistProduct($productId: ID!) {
+    wishlistAddProduct(productId: $productId) {
+      wishlist {
+        id
+        wishlist {
+          ...Wishlist
+        }
+      }
+    }
+  }
+`;
+
+export const WISHLIST_REMOVE_PRODUCT = gql`
+  ${wishlistFragment}
+  mutation wishlistRemoveProduct($productId: ID!) {
+    WishlistRemoveProduct: wishlistRemoveProduct(productId: $productId) {
+      wishlist {
+        id
+        wishlist {
+          ...Wishlist
+        }
       }
     }
   }
