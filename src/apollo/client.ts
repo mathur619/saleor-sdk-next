@@ -212,10 +212,17 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
       wishlist: {
         read(existing) {
           if (!existing) {
+            const safeJsonParse = (value: any) => {
+              try {
+                return JSON.parse(value);
+              } catch {
+                return value;
+              }
+            };
             const wishlistString = storage.getWishlist();
             const wishlist =
               wishlistString && typeof wishlistString === "string"
-                ? JSON.parse(wishlistString)
+                ? safeJsonParse(wishlistString)
                 : wishlistString;
 
             if (wishlist) {
