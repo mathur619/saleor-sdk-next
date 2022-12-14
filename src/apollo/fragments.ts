@@ -392,6 +392,7 @@ export const productFragment = gql`
     }
     thumbnail {
       url
+      alt
     }
     images {
       id
