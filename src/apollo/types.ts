@@ -17896,6 +17896,23 @@ export type AccountErrorFragment = Pick<
   "code" | "field" | "message"
 >;
 
+export type AddressFragment = Pick<
+  Address,
+  | "id"
+  | "firstName"
+  | "lastName"
+  | "companyName"
+  | "streetAddress1"
+  | "streetAddress2"
+  | "city"
+  | "cityArea"
+  | "postalCode"
+  | "countryArea"
+  | "phone"
+  | "isDefaultBillingAddress"
+  | "isDefaultShippingAddress"
+> & { country: Pick<CountryDisplay, "code" | "country"> };
+
 export type UserFragment = Pick<
   User,
   "id" | "email" | "firstName" | "lastName" | "isStaff"
@@ -17911,22 +17928,6 @@ export type PriceFragment = {
   gross: Pick<Money, "amount" | "currency">;
   net: Pick<Money, "amount" | "currency">;
 };
-
-export type AddressFragment = Pick<
-  Address,
-  | "id"
-  | "firstName"
-  | "lastName"
-  | "companyName"
-  | "streetAddress1"
-  | "streetAddress2"
-  | "city"
-  | "postalCode"
-  | "countryArea"
-  | "phone"
-  | "isDefaultBillingAddress"
-  | "isDefaultShippingAddress"
-> & { country: Pick<CountryDisplay, "code" | "country"> };
 
 export type ProductVariantFragment = Pick<
   ProductVariant,
@@ -18057,7 +18058,7 @@ export type ProductFieldsFragment = Pick<
   "id" | "name" | "slug" | "isAvailable" | "isAvailableForPurchase"
 > & {
   metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
-  productType: Pick<ProductType, "name">;
+  productType: Pick<ProductType, "id" | "name" | "isShippingRequired">;
   thumbnail: Maybe<Pick<Image, "url" | "alt">>;
   images: Maybe<Array<Maybe<Pick<ProductImage, "id" | "url" | "alt">>>>;
   variants: Maybe<
@@ -19152,7 +19153,9 @@ export const ProductFieldsFragmentDoc = gql`
       value
     }
     productType {
+      id
       name
+      isShippingRequired
     }
     thumbnail {
       url

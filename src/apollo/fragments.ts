@@ -388,7 +388,9 @@ export const productFragment = gql`
       value
     }
     productType {
+      id
       name
+      isShippingRequired
     }
     thumbnail {
       url
