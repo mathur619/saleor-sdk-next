@@ -74,6 +74,7 @@ import {
   CHECKOUT_CUSTOMER_ATTACH,
 } from "../apollo/mutations";
 import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
+import { SALEOR_WISHLIST } from "./constants";
 import { storage } from "./storage";
 import {
   ConfirmAccountV2Result,
@@ -213,7 +214,11 @@ export interface AuthSDK {
    */
   // verifyExternalToken?: () => Promise<VerifyExternalTokenResult>;
 
-  signInMobile: (otp: string, phone?: string, email?: string) => SignInMobileResult;
+  signInMobile: (
+    otp: string,
+    phone?: string,
+    email?: string
+  ) => SignInMobileResult;
 
   requestOTP: (phone: string) => RequestOtpResult;
 
@@ -258,15 +263,17 @@ export const auth = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
-    const CreateTokenOTPVariables = phone ? {
-      otp,
-      phone,
-      checkoutId: checkout?.id,
-    } : {
-      otp,
-      email,
-      checkoutId: checkout?.id,
-    }
+    const CreateTokenOTPVariables = phone
+      ? {
+          otp,
+          phone,
+          checkoutId: checkout?.id,
+        }
+      : {
+          otp,
+          email,
+          checkoutId: checkout?.id,
+        };
 
     const res = await client.mutate<
       OtpAuthenticationMutation,
@@ -422,6 +429,11 @@ export const auth = ({
   };
 
   const signOut: AuthSDK["signOut"] = async () => {
+    try {
+      localStorage.removeItem(SALEOR_WISHLIST);
+    } catch (e) {
+      console.log("error", e);
+    }
     storage.clear();
     const res = await client.resetStore();
     return res;
