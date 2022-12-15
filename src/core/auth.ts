@@ -61,7 +61,6 @@ import {
   UserCheckoutDetailsQueryVariables,
   VerifyCheckoutOtpMutation,
   VerifyCheckoutOtpMutationVariables,
-  wishlistVar,
 } from "..";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
@@ -431,7 +430,6 @@ export const auth = ({
 
   const signOut: AuthSDK["signOut"] = async () => {
     try {
-      wishlistVar(null);
       localStorage.removeItem(SALEOR_WISHLIST);
     } catch (e) {
       console.log("error", e);
