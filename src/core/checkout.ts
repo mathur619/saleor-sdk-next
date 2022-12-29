@@ -8,6 +8,7 @@ import {
   CREATE_CHECKOUT_PAYMENT,
   CREATE_RAZORPAY_ORDER,
   GET_WALLET_AMOUNT,
+  JUSPAY_ORDER_STATUS,
   PAYTM_TXN_CREATE,
   REMOVE_CHECKOUT_PROMO_CODE,
   UPDATE_CHECKOUT_ADDRESS_TYPE,
@@ -56,7 +57,11 @@ import {
   CreateCashfreeOrderMutationVariables,
   UpdateCheckoutShippingMethodNextMutationVariables,
   UpdateCheckoutShippingMethodNextMutation,
-  CheckoutCreateInput
+  CheckoutCreateInput,
+  CreateJuspayOrderMutation,
+  CreateJuspayOrderMutationVariables,
+  CheckJuspayOrderStatusMutation,
+  CheckJuspayOrderStatusMutationVariables,
 } from "../apollo/types";
 
 import {
@@ -68,10 +73,12 @@ import {
 import { storage } from "./storage";
 import {
   AddPromoCodeResult,
+  CheckJuspayOrderStatusResult,
   CheckoutPaymentMethodUpdateResult,
   CompleteCheckoutResult,
   CreateCashfreeOrderResult,
   CreateCheckoutResult,
+  CreateJuspayOrderResult,
   CreatePaymentResult,
   CreatePaytmOrderResult,
   CreateRazorpayOrderResult,
@@ -131,6 +138,8 @@ export interface CheckoutSDK {
   completeCheckout?: (input?: CompleteCheckoutInput) => CompleteCheckoutResult;
   getCityStateFromPincode?: (pincode: string) => GetCityStateFromPincodeResult;
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
+  createJuspayOrder?: () => CreateJuspayOrderResult;
+  checkJuspayOrderStatus?: () => CheckJuspayOrderStatusResult;
   createPaytmOrder?: () => CreatePaytmOrderResult;
   getWalletAmount?: () => GetWalletAmountResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
@@ -142,7 +151,9 @@ export interface CheckoutSDK {
 export const checkout = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CheckoutSDK => {
-  const createCheckout: CheckoutSDK["createCheckout"] = async (tags?: string[]) => {
+  const createCheckout: CheckoutSDK["createCheckout"] = async (
+    tags?: string[]
+  ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -156,8 +167,7 @@ export const checkout = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     if (!(checkout && checkout?.id)) {
-
-      let checkoutInputVariables:CheckoutCreateInput;
+      let checkoutInputVariables: CheckoutCreateInput;
       if (tags) {
         checkoutInputVariables = {
           lines: [],
@@ -721,12 +731,9 @@ export const checkout = ({
       });
 
       if (
-        (res?.errors &&
-          res?.errors[0]?.message) ||
-        (res?.data?.razorpayOrderCreate
-          ?.razorpayErrors &&
-          res?.data?.razorpayOrderCreate
-            ?.razorpayErrors[0]?.message)
+        (res?.errors && res?.errors[0]?.message) ||
+        (res?.data?.razorpayOrderCreate?.razorpayErrors &&
+          res?.data?.razorpayOrderCreate?.razorpayErrors[0]?.message)
       ) {
         client.writeQuery({
           query: GET_LOCAL_CHECKOUT,
@@ -735,6 +742,104 @@ export const checkout = ({
           },
         });
       }
+      return res;
+    }
+
+    return { data: null };
+  };
+
+  const createJuspayOrder: CheckoutSDK["createJuspayOrder"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: CreateJuspayOrderMutationVariables = {
+        input: {
+          checkoutId: checkout?.id,
+        },
+      };
+      const res = await client.mutate<
+        CreateJuspayOrderMutation,
+        CreateJuspayOrderMutationVariables
+      >({
+        mutation: CREATE_RAZORPAY_ORDER,
+        variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: true,
+            },
+          });
+        },
+      });
+
+      if (
+        (res?.errors && res?.errors[0]?.message) ||
+        (res?.data?.juspayOrderCreate?.juspayErrors &&
+          res?.data?.juspayOrderCreate?.juspayErrors[0]?.message) ||
+        (res?.data?.juspayOrderCreate?.errors &&
+          res?.data?.juspayOrderCreate?.errors[0]?.message)
+      ) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
+      return res;
+    }
+
+    return { data: null };
+  };
+
+  const checkJuspayOrderStatus: CheckoutSDK["checkJuspayOrderStatus"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+        createPaytmOrder,
+      },
+    });
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: CheckJuspayOrderStatusMutationVariables = {
+        input: {
+          checkoutId: checkout?.id,
+        },
+      };
+      const res = await client.mutate<
+        CheckJuspayOrderStatusMutation,
+        CheckJuspayOrderStatusMutationVariables
+      >({
+        mutation: JUSPAY_ORDER_STATUS,
+        variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+        },
+      });
+
       return res;
     }
 
@@ -893,6 +998,8 @@ export const checkout = ({
     completeCheckout,
     getCityStateFromPincode,
     createRazorpayOrder,
+    createJuspayOrder,
+    checkJuspayOrderStatus,
     createPaytmOrder,
     getWalletAmount,
     getUserOrders,
