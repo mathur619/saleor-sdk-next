@@ -6,6 +6,7 @@ import {
   CREATE_CASHFREE_ORDER,
   CREATE_CHECKOUT_MUTATION,
   CREATE_CHECKOUT_PAYMENT,
+  CREATE_JUSPAY_ORDER,
   CREATE_RAZORPAY_ORDER,
   GET_WALLET_AMOUNT,
   JUSPAY_ORDER_STATUS,
@@ -772,7 +773,7 @@ export const checkout = ({
         CreateJuspayOrderMutation,
         CreateJuspayOrderMutationVariables
       >({
-        mutation: CREATE_RAZORPAY_ORDER,
+        mutation: CREATE_JUSPAY_ORDER,
         variables,
         update: async () => {
           client.writeQuery({
