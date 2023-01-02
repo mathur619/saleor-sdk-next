@@ -18020,6 +18020,7 @@ export type OrderDetailFragment = Pick<
   | "id"
   | "token"
   | "number"
+  | 'payments'
 > & {
   voucher: Maybe<Pick<Voucher, "code">>;
   metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
