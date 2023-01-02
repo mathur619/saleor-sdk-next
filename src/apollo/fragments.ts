@@ -290,6 +290,10 @@ export const orderDetailFragment = gql`
     userEmail
     paymentStatus
     paymentStatusDisplay
+    payments{
+      id
+      gateway
+    }
     status
     statusDisplay
     id
