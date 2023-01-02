@@ -20134,20 +20134,34 @@ export type CheckoutFragment = (
 export type CheckoutErrorFragment = Pick<CheckoutError, 'code' | 'field' | 'message'>;
 
 export type OrderPriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'>, tax: Pick<Money, 'amount' | 'currency'> };
-
-export type OrderDetailFragment = (
-  Pick<Order, 'userEmail' | 'paymentStatus' | 'paymentStatusDisplay' | 'status' | 'statusDisplay' | 'id' | 'token' | 'number'>
-  & { voucher: Maybe<Pick<Voucher, 'code'>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, shippingAddress: Maybe<AddressFragment>, lines: Array<Maybe<(
-    Pick<OrderLine, 'id' | 'productName' | 'quantity'>
-    & { variant: Maybe<ProductVariantFragment>, unitPrice: Maybe<(
-      Pick<TaxedMoney, 'currency'>
-      & OrderPriceFragment
-    )>, totalPrice: Maybe<(
-      Pick<TaxedMoney, 'currency'>
-      & OrderPriceFragment
-    )> }
-  )>>, subtotal: Maybe<OrderPriceFragment>, total: Maybe<OrderPriceFragment>, shippingPrice: Maybe<OrderPriceFragment> }
-);
+export type OrderDetailFragment = Pick<
+  Order,
+  | "userEmail"
+  | "paymentStatus"
+  | "paymentStatusDisplay"
+  | "status"
+  | "statusDisplay"
+  | "id"
+  | "token"
+  | "number"
+  | 'payments'
+> & {
+  voucher: Maybe<Pick<Voucher, "code">>;
+  metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
+  shippingAddress: Maybe<AddressFragment>;
+  lines: Array<
+    Maybe<
+      Pick<OrderLine, "id" | "productName" | "quantity"> & {
+        variant: Maybe<ProductVariantFragment>;
+        unitPrice: Maybe<Pick<TaxedMoney, "currency"> & OrderPriceFragment>;
+        totalPrice: Maybe<Pick<TaxedMoney, "currency"> & OrderPriceFragment>;
+      }
+    >
+  >;
+  subtotal: Maybe<OrderPriceFragment>;
+  total: Maybe<OrderPriceFragment>;
+  shippingPrice: Maybe<OrderPriceFragment>;
+};
 
 export type PaymentFragment = (
   Pick<Payment, 'id' | 'gateway' | 'token'>
