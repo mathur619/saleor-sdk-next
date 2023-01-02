@@ -4,6 +4,7 @@ import {
   checkoutLineFragment,
   orderDetailFragment,
   userFragment,
+  wishlistFragment,
 } from "./fragments";
 
 export const USER = gql`
@@ -222,6 +223,153 @@ export const USER_ORDER_DETAILS = gql`
               }
               thumbnail2x: thumbnail(size: 510) {
                 url
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_LOCAL_WISHLIST = gql`
+  ${wishlistFragment}
+  query getLocalWishlist {
+    localWishlist @client {
+      ...Wishlist
+    }
+  }
+`;
+
+export const GET_WISHLIST = gql`
+  query Wishlist($first: Int!) {
+    wishlist {
+      id
+      createdAt
+      items(first: $first) {
+        edges {
+          node {
+            id
+
+            product {
+              id
+              name
+              slug
+              isAvailableForPurchase
+              metadata {
+                key
+                value
+              }
+              productType {
+                name
+              }
+              thumbnail {
+                url
+              }
+              images {
+                id
+                url
+                alt
+              }
+              variants {
+                id
+                sku
+                name
+                metadata {
+                  key
+                  value
+                }
+                attributes {
+                  attribute {
+                    name
+                  }
+                  values {
+                    name
+                  }
+                }
+                images {
+                  id
+                  url
+                  alt
+                }
+                pricing {
+                  onSale
+                  priceUndiscounted {
+                    gross {
+                      amount
+                      currency
+                    }
+                    net {
+                      amount
+                      currency
+                    }
+                  }
+                  price {
+                    gross {
+                      amount
+                      currency
+                    }
+                    net {
+                      amount
+                      currency
+                    }
+                  }
+                }
+              }
+
+              pricing {
+                priceRangeUndiscounted {
+                  start {
+                    net {
+                      amount
+                      currency
+                    }
+                    gross {
+                      amount
+                      currency
+                    }
+                  }
+                  stop {
+                    net {
+                      amount
+                      currency
+                    }
+                    gross {
+                      amount
+                      currency
+                    }
+                  }
+                }
+                priceRange {
+                  start {
+                    net {
+                      amount
+                      currency
+                    }
+                    gross {
+                      amount
+                      currency
+                    }
+                  }
+                  stop {
+                    net {
+                      amount
+                      currency
+                    }
+                    gross {
+                      amount
+                      currency
+                    }
+                  }
+                }
+              }
+            }
+            variants(first: $first) {
+              edges {
+                node {
+                  id
+                  name
+                }
               }
             }
           }

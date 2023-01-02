@@ -30,7 +30,6 @@ export const useCartState = () => {
   >(GET_LOCAL_CHECKOUT);
 
   const { data } = res;
-
   if (!data) {
     // throw new Error(
     //   "Cache query result is undefined. Invalid cache configuration."

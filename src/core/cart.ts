@@ -149,6 +149,7 @@ export const cart = ({
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
+        console.log("cart reload 1");
         window.location?.reload();
       }
       if (
@@ -158,6 +159,7 @@ export const cart = ({
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
+        console.log("cart reload 2");
         window.location?.reload();
       }
       if (
@@ -167,6 +169,7 @@ export const cart = ({
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
+        console.log("cart reload 3");
         window.location?.reload();
       }
       if (
@@ -176,6 +179,7 @@ export const cart = ({
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
+        console.log("cart reload 4");
         window.location?.reload();
       }
       const returnObject = {
@@ -283,6 +287,7 @@ export const cart = ({
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
+        console.log("cart reload 5");
         window.location?.reload();
       }
       if (
@@ -292,6 +297,7 @@ export const cart = ({
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
+        console.log("cart reload 6");
         window.location?.reload();
       }
       if (
@@ -301,6 +307,7 @@ export const cart = ({
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
+        console.log("cart reload 8");
         window.location?.reload();
       }
       if (
@@ -310,6 +317,7 @@ export const cart = ({
         typeof window !== "undefined"
       ) {
         window.localStorage?.clear();
+        console.log("cart reload 9");
         window.location?.reload();
       }
 

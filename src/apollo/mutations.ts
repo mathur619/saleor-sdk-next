@@ -426,7 +426,12 @@ export const REQUEST_OTP_MUTATION = gql`
 
 export const CREATE_OTP_TOKEN_MUTATION = gql`
   ${userFragment}
-  mutation OTPAuthentication($phone: String, $email: String, $otp: String!, $checkoutId: ID) {
+  mutation OTPAuthentication(
+    $phone: String
+    $email: String
+    $otp: String!
+    $checkoutId: ID
+  ) {
     CreateTokenOTP: otpTokenCreate(
       otp: $otp
       phone: $phone
@@ -817,6 +822,254 @@ export const CREATE_CASHFREE_ORDER = gql`
       cashfreeOrder {
         paymentUrl
         token
+      }
+    }
+  }
+`;
+
+export const WISHLIST_ADD_PRODUCT = gql`
+  mutation AddWishlistProduct($productId: ID!) {
+    wishlistAddProduct(productId: $productId) {
+      wishlist {
+        id
+        wishlist {
+          id
+          createdAt
+          items(first: 20) {
+            edges {
+              node {
+                id
+                product {
+                  id
+                  name
+                  isAvailableForPurchase
+                  metadata {
+                    key
+                    value
+                  }
+                  thumbnail {
+                    url
+                  }
+                  images {
+                    id
+                    alt
+                    url
+                  }
+                  variants {
+                    id
+                    sku
+                    name
+                    images {
+                      id
+                      url
+                      alt
+                    }
+                    pricing {
+                      onSale
+                      priceUndiscounted {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                      price {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+
+                  pricing {
+                    priceRangeUndiscounted {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                    priceRange {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const WISHLIST_REMOVE_PRODUCT = gql`
+  mutation wishlistRemoveProduct($productId: ID!) {
+    WishlistRemoveProduct: wishlistRemoveProduct(productId: $productId) {
+      wishlist {
+        id
+        wishlist {
+          id
+          createdAt
+          items(first: 20) {
+            edges {
+              node {
+                id
+                product {
+                  id
+                  name
+                  isPublished
+                  slug
+                  isAvailableForPurchase
+                  metadata {
+                    key
+                    value
+                  }
+                  thumbnail {
+                    url
+                  }
+                  images {
+                    id
+                    alt
+                    url
+                  }
+                  variants {
+                    id
+                    sku
+                    name
+                    attributes {
+                      attribute {
+                        name
+                      }
+                      values {
+                        name
+                      }
+                    }
+                    images {
+                      id
+                      url
+                      alt
+                    }
+                    pricing {
+                      onSale
+                      priceUndiscounted {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                      price {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                  productType {
+                    name
+                  }
+                  pricing {
+                    priceRangeUndiscounted {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                    priceRange {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

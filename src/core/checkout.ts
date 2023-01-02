@@ -610,6 +610,7 @@ export const checkout = ({
             typeof window !== "undefined"
           ) {
             window.localStorage?.clear();
+            console.log("checkout core reload");
             window.location?.reload();
           }
           if (data?.checkoutPaymentCreate?.checkout?.id) {

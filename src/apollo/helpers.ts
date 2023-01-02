@@ -5,6 +5,7 @@ import {
   CHECKOUT_DETAILS_NEXT,
   GET_DISCOUNT_CASHBACK_QUERY,
   GET_LOCAL_CHECKOUT,
+  GET_LOCAL_WISHLIST,
 } from "./queries";
 import {
   CheckoutDetailsNextQuery,
@@ -186,6 +187,19 @@ export const setLocalCheckoutInCache = async (
     query: GET_LOCAL_CHECKOUT,
     data: {
       checkoutLoading: false,
+    },
+  });
+};
+
+export const setLocalWishlistInCache = async (
+  client: ApolloClient<NormalizedCacheObject>,
+  wishlist: any
+) => {
+  console.log("wishlist setLocalWishlistInCache", wishlist);
+  client.writeQuery({
+    query: GET_LOCAL_WISHLIST,
+    data: {
+      wishlist: wishlist,
     },
   });
 };
