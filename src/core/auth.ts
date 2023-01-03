@@ -73,7 +73,7 @@ import {
   VERIFY_CHECKOUT_OTP,
   CHECKOUT_CUSTOMER_ATTACH,
 } from "../apollo/mutations";
-import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
+import { GET_LOCAL_CHECKOUT, USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
 import { SALEOR_WISHLIST } from "./constants";
 import { storage } from "./storage";
 import {
@@ -459,6 +459,12 @@ export const auth = ({
       mutation: USER_CHECKOUT_DETAILS,
 
       update: (_, { data }) => {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: true,
+          },
+        });
         setLocalCheckoutInCache(client, data?.me?.checkout, true);
         if (data?.me?.checkout?.id) {
           storage.setCheckout(data?.me?.checkout);
