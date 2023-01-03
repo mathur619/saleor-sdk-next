@@ -351,41 +351,44 @@ export const auth = ({
       }
       wigzo_learner_id = getCookie("WIGZO_LEARNER_ID");
     }
-    const res =sendWigzoInHeader ? await client.mutate<
+    let res ;
+    if(sendWigzoInHeader) {
+    res= await client.mutate<
       AccountRegisterV2Mutation,
       AccountRegisterV2MutationVariables
-    >({
-      mutation: REGISTER_ACCOUNT,
-      variables: {
-        input: {
-          email,
-          phone,
-          firstName,
-          lastName,
+      >({
+        mutation: REGISTER_ACCOUNT,
+        variables: {
+          input: {
+            email,
+            phone,
+            firstName,
+            lastName,
+          },
         },
-      },
-      context: { 
-        headers: { 
-          "x-wigzo-learner-id": `${wigzo_learner_id}`  // this header will reach the server
-        } 
-      },
-    })
-    :
-      await client.mutate<
+        context: { 
+          headers: { 
+            "x-wigzo-learner-id": `${wigzo_learner_id}`  // this header will reach the server
+          } 
+        },
+      })
+    }else{
+      res= await client.mutate<
       AccountRegisterV2Mutation,
       AccountRegisterV2MutationVariables
-    >({
-      mutation: REGISTER_ACCOUNT,
-      variables: {
-        input: {
-          email,
-          phone,
-          firstName,
-          lastName,
+      >({
+        mutation: REGISTER_ACCOUNT,
+        variables: {
+          input: {
+            email,
+            phone,
+            firstName,
+            lastName,
+          },
         },
-      },
-    });
-
+      })
+    }
+     
     return res;
   };
 
