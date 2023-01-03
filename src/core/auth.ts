@@ -222,6 +222,7 @@ export interface AuthSDK {
     phone: string,
     firstName?: string,
     lastName?: string,
+    sendWigzoInHeader?: boolean,
   ) => RegisterAccountV2Result;
 
   confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
@@ -325,6 +326,7 @@ export const auth = ({
     phone: string,
     firstName?: string,
     lastName?: string,
+    sendWigzoInHeader?: boolean,
   ) => {
     let wigzo_learner_id;
     if (typeof window !== "undefined") {
@@ -349,7 +351,7 @@ export const auth = ({
       }
       wigzo_learner_id = getCookie("WIGZO_LEARNER_ID");
     }
-    const res = await client.mutate<
+    const res =sendWigzoInHeader ? await client.mutate<
       AccountRegisterV2Mutation,
       AccountRegisterV2MutationVariables
     >({
@@ -366,6 +368,21 @@ export const auth = ({
         headers: { 
           "x-wigzo-learner-id": `${wigzo_learner_id}`  // this header will reach the server
         } 
+      },
+    })
+    :
+      await client.mutate<
+      AccountRegisterV2Mutation,
+      AccountRegisterV2MutationVariables
+    >({
+      mutation: REGISTER_ACCOUNT,
+      variables: {
+        input: {
+          email,
+          phone,
+          firstName,
+          lastName,
+        },
       },
     });
 
