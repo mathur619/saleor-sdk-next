@@ -13,7 +13,7 @@ import {
   UPDATE_CHECKOUT_ADDRESS_TYPE,
   UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION,
   UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
-  UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
+  UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
 } from "../apollo/mutations";
 import {
   GET_CITY_STATE_FROM_PINCODE,
@@ -51,11 +51,11 @@ import {
   UpdateCheckoutBillingAddressMutationVariables,
   UpdateCheckoutShippingAddressMutation,
   UpdateCheckoutShippingAddressMutationVariables,
-  UpdateCheckoutShippingMethodMutation,
-  UpdateCheckoutShippingMethodMutationVariables,
   useOrdersByUserQuery,
   CreateCashfreeOrderMutation,
   CreateCashfreeOrderMutationVariables,
+  UpdateCheckoutShippingMethodNextMutationVariables,
+  UpdateCheckoutShippingMethodNextMutation,
   CheckoutCreateInput
 } from "../apollo/types";
 
@@ -402,16 +402,16 @@ export const checkout = ({
         : checkoutString;
 
     if (checkout && checkout?.id) {
-      const variables: UpdateCheckoutShippingMethodMutationVariables = {
+      const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
         checkoutId: checkout?.id,
         shippingMethodId,
       };
 
       const res = await client.mutate<
-        UpdateCheckoutShippingMethodMutation,
-        UpdateCheckoutShippingMethodMutationVariables
+        UpdateCheckoutShippingMethodNextMutation,
+        UpdateCheckoutShippingMethodNextMutationVariables
       >({
-        mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
+        mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
         variables,
         update: (_, { data }) => {
           if (data?.checkoutShippingMethodUpdate?.checkout?.id) {
@@ -420,7 +420,7 @@ export const checkout = ({
           setLocalCheckoutInCache(
             client,
             data?.checkoutShippingMethodUpdate?.checkout,
-            true
+            false
           );
         },
       });
