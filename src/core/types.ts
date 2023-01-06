@@ -67,6 +67,8 @@ import {
   VerifyCheckoutOtpMutation,
   PaytmTxnCreateMutation,
   CreateCashfreeOrderMutation,
+  CreateJuspayOrderAndCustomerMutation,
+  CheckJuspayOrderStatusMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -224,6 +226,14 @@ export type GetCityStateFromPincodeResult = Promise<FetchResult<
 > | null>;
 export type CreateRazorpayOrderResult = Promise<FetchResult<
   CreateRazorpayOrderMutation
+> | null>;
+
+export type JuspayOrderAndCustomerCreateResult = Promise<FetchResult<
+  CreateJuspayOrderAndCustomerMutation
+> | null>;
+
+export type CheckJuspayOrderStatusResult = Promise<FetchResult<
+  CheckJuspayOrderStatusMutation
 > | null>;
 
 export type CreateCashfreeOrderResult = Promise<FetchResult<

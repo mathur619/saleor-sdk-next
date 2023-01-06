@@ -426,7 +426,12 @@ export const REQUEST_OTP_MUTATION = gql`
 
 export const CREATE_OTP_TOKEN_MUTATION = gql`
   ${userFragment}
-  mutation OTPAuthentication($phone: String, $email: String, $otp: String!, $checkoutId: ID) {
+  mutation OTPAuthentication(
+    $phone: String
+    $email: String
+    $otp: String!
+    $checkoutId: ID
+  ) {
     CreateTokenOTP: otpTokenCreate(
       otp: $otp
       phone: $phone
@@ -777,6 +782,63 @@ export const CREATE_RAZORPAY_ORDER = gql`
         field
         code
         message
+      }
+    }
+  }
+`;
+
+export const CREATE_JUSPAY_CUSTOMER_AND_ORDER = gql`
+  mutation CreateJuspayOrderAndCustomer(
+    $input: JuspayCreateOrderAndCustomerInput!
+  ) {
+    juspayOrderAndCustomerCreate(input: $input) {
+      errors {
+        field
+        message
+      }
+      juspayResponse {
+        id
+        orderId
+        amount
+        status
+        paymentLinks {
+          web
+          iframe
+          mobile
+        }
+        clientJuspay {
+          clientAuthToken
+          clientAuthTokenExpiry
+        }
+        customerId
+      }
+      juspayErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
+export const CHECK_JUSPAY_ORDER_STATUS = gql`
+  mutation CheckJuspayOrderStatus($input: JuspayOrderStatusInput!) {
+    juspayOrderStatusCheck(input: $input) {
+      errors {
+        field
+        message
+      }
+      juspayOrder {
+        id
+        orderId
+        amount
+        status
+        paymentStatus
+      }
+      juspayErrors {
+        field
+        message
+        code
       }
     }
   }
