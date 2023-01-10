@@ -255,6 +255,8 @@ export type RemoveItemResult = Promise<CartMethodsReturn | null>;
 
 export type UpdateItemResult = Promise<CartMethodsReturn | null>;
 
+export type AddMultipleItemResult = Promise<CartMethodsReturn>;
+
 // Auth
 
 export type SignInMobileResult = Promise<
