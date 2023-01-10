@@ -1,5 +1,6 @@
 import {
   AddItemResult,
+  AddMultipleItemResult,
   RemoveItemResult,
   SaleorClientMethodsProps,
   UpdateItemResult,
@@ -96,12 +97,17 @@ export interface CartSDK {
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
   ) => UpdateItemResult;
   clearCart?: () => UpdateItemResult;
+  addMultipleItem: (
+    variantIds: string[],
+    quantity: number,
+    tags?: string[]
+  ) => AddMultipleItemResult;
 }
 
 export const cart = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CartSDK => {
-  let items = cartItemsVar();
+  const items = cartItemsVar();
 
   const addItem: CartSDK["addItem"] = async (
     variantId: string,
@@ -206,6 +212,151 @@ export const cart = ({
       } else {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
+          email: "dummy@dummy.com",
+          shippingAddress: {
+            city: "delhi",
+            companyName: "dummy",
+            country: "IN",
+            countryArea: "Delhi",
+            firstName: "dummy",
+            lastName: "dummy",
+            phone: "7894561230",
+            postalCode: "110006",
+            streetAddress1: "dummy",
+            streetAddress2: "dummy",
+          },
+        };
+      }
+      const res = await client.mutate<
+        CreateCheckoutMutation,
+        CreateCheckoutMutationVariables
+      >({
+        mutation: CREATE_CHECKOUT_MUTATION,
+        variables: {
+          checkoutInput: checkoutInputVariables,
+        },
+        update: (_, { data }) => {
+          setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout, true);
+          if (data?.checkoutCreate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutCreate?.checkout);
+          }
+        },
+      });
+      const returnObject = {
+        data: res.data?.checkoutCreate?.checkout,
+        errors: res.data?.checkoutCreate?.errors,
+      };
+      return returnObject;
+    }
+  };
+
+  const addMultipleItem: CartSDK["addMultipleItem"] = async (
+    variantIds: string[],
+    quantity: number,
+    tags?: string[]
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    const lineItems = variantIds?.map(variantId => {
+      return { quantity: quantity, variantId: variantId };
+    });
+
+    if (checkout && checkout?.token) {
+      const res = await client.mutate<
+        AddCheckoutLineMutation,
+        AddCheckoutLineMutationVariables
+      >({
+        mutation: ADD_CHECKOUT_LINE_MUTATION,
+        variables: {
+          checkoutId: checkout?.id,
+          lines: lineItems,
+        },
+        update: async (_, { data }) => {
+          if (data?.checkoutLinesAdd?.checkout?.id) {
+            storage.setCheckout(data?.checkoutLinesAdd?.checkout);
+          }
+          await setLocalCheckoutInCache(
+            client,
+            data?.checkoutLinesAdd?.checkout,
+            true
+          );
+        },
+      });
+      if (
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code === "NOT_FOUND" &&
+        res.data?.checkoutLinesAdd?.errors[0]?.field === "checkoutId" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+      if (
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code ===
+          "PRODUCT_NOT_PUBLISHED" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+      if (
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code ===
+          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+      if (
+        res.data?.checkoutLinesAdd?.errors &&
+        res.data?.checkoutLinesAdd?.errors[0]?.code === "GRAPHQL_ERROR" &&
+        res.data?.checkoutLinesAdd?.errors[0]?.field === "variantId" &&
+        typeof window !== "undefined"
+      ) {
+        window.localStorage?.clear();
+        window.location?.reload();
+      }
+      const returnObject = {
+        data: res.data?.checkoutLinesAdd?.checkout,
+        errors: res.data?.checkoutLinesAdd?.errors,
+      };
+      return returnObject;
+    } else {
+      let checkoutInputVariables: CheckoutCreateInput;
+      if (tags) {
+        checkoutInputVariables = {
+          lines: lineItems,
+          email: "dummy@dummy.com",
+          tags,
+          shippingAddress: {
+            city: "delhi",
+            companyName: "dummy",
+            country: "IN",
+            countryArea: "Delhi",
+            firstName: "dummy",
+            lastName: "dummy",
+            phone: "7894561230",
+            postalCode: "110006",
+            streetAddress1: "dummy",
+            streetAddress2: "dummy",
+          },
+        };
+      } else {
+        checkoutInputVariables = {
+          lines: lineItems,
           email: "dummy@dummy.com",
           shippingAddress: {
             city: "delhi",
@@ -611,10 +762,10 @@ export const cart = ({
         },
       });
       const checkout = res?.data?.checkoutCreate?.checkout;
-      if(!checkout?.id){
+      if (!checkout?.id) {
         return {
           data: undefined,
-          errors: res?.data?.checkoutCreate?.errors
+          errors: res?.data?.checkoutCreate?.errors,
         };
       }
       const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
@@ -846,7 +997,9 @@ export const cart = ({
         errors: res.data?.checkoutLinesUpdate?.errors,
       };
     } else {
-      let lineItemsInFormat = Array.isArray(updatedLines) ? updatedLines : [updatedLines]
+      const lineItemsInFormat = Array.isArray(updatedLines)
+        ? updatedLines
+        : [updatedLines];
       let checkoutInputVariables: CheckoutCreateInput;
       checkoutInputVariables = {
         lines: lineItemsInFormat,
@@ -940,5 +1093,6 @@ export const cart = ({
     updateItemNext,
     clearCart,
     updateItemWithLines,
+    addMultipleItem,
   };
 };
