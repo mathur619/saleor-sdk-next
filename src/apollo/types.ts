@@ -3977,6 +3977,8 @@ export type CrontabScheduleTimezone =
   | 'AMERICA_CHICAGO'
   /** America/Chihuahua */
   | 'AMERICA_CHIHUAHUA'
+  /** America/Ciudad Juarez */
+  | 'AMERICA_CIUDAD_JUAREZ'
   /** America/Costa Rica */
   | 'AMERICA_COSTA_RICA'
   /** America/Creston */
@@ -4103,8 +4105,6 @@ export type CrontabScheduleTimezone =
   | 'AMERICA_NASSAU'
   /** America/New York */
   | 'AMERICA_NEW_YORK'
-  /** America/Nipigon */
-  | 'AMERICA_NIPIGON'
   /** America/Nome */
   | 'AMERICA_NOME'
   /** America/Noronha */
@@ -4121,8 +4121,6 @@ export type CrontabScheduleTimezone =
   | 'AMERICA_OJINAGA'
   /** America/Panama */
   | 'AMERICA_PANAMA'
-  /** America/Pangnirtung */
-  | 'AMERICA_PANGNIRTUNG'
   /** America/Paramaribo */
   | 'AMERICA_PARAMARIBO'
   /** America/Phoenix */
@@ -4137,8 +4135,6 @@ export type CrontabScheduleTimezone =
   | 'AMERICA_PUERTO_RICO'
   /** America/Punta Arenas */
   | 'AMERICA_PUNTA_ARENAS'
-  /** America/Rainy River */
-  | 'AMERICA_RAINY_RIVER'
   /** America/Rankin Inlet */
   | 'AMERICA_RANKIN_INLET'
   /** America/Recife */
@@ -4179,8 +4175,6 @@ export type CrontabScheduleTimezone =
   | 'AMERICA_TEGUCIGALPA'
   /** America/Thule */
   | 'AMERICA_THULE'
-  /** America/Thunder Bay */
-  | 'AMERICA_THUNDER_BAY'
   /** America/Tijuana */
   | 'AMERICA_TIJUANA'
   /** America/Toronto */
@@ -4413,8 +4407,6 @@ export type CrontabScheduleTimezone =
   | 'AUSTRALIA_BRISBANE'
   /** Australia/Broken Hill */
   | 'AUSTRALIA_BROKEN_HILL'
-  /** Australia/Currie */
-  | 'AUSTRALIA_CURRIE'
   /** Australia/Darwin */
   | 'AUSTRALIA_DARWIN'
   /** Australia/Eucla */
@@ -4485,10 +4477,10 @@ export type CrontabScheduleTimezone =
   | 'EUROPE_JERSEY'
   /** Europe/Kaliningrad */
   | 'EUROPE_KALININGRAD'
-  /** Europe/Kiev */
-  | 'EUROPE_KIEV'
   /** Europe/Kirov */
   | 'EUROPE_KIROV'
+  /** Europe/Kyiv */
+  | 'EUROPE_KYIV'
   /** Europe/Lisbon */
   | 'EUROPE_LISBON'
   /** Europe/Ljubljana */
@@ -4543,8 +4535,6 @@ export type CrontabScheduleTimezone =
   | 'EUROPE_TIRANE'
   /** Europe/Ulyanovsk */
   | 'EUROPE_ULYANOVSK'
-  /** Europe/Uzhgorod */
-  | 'EUROPE_UZHGOROD'
   /** Europe/Vaduz */
   | 'EUROPE_VADUZ'
   /** Europe/Vatican */
@@ -4559,8 +4549,6 @@ export type CrontabScheduleTimezone =
   | 'EUROPE_WARSAW'
   /** Europe/Zagreb */
   | 'EUROPE_ZAGREB'
-  /** Europe/Zaporozhye */
-  | 'EUROPE_ZAPOROZHYE'
   /** Europe/Zurich */
   | 'EUROPE_ZURICH'
   /** GMT */
@@ -4601,8 +4589,6 @@ export type CrontabScheduleTimezone =
   | 'PACIFIC_EASTER'
   /** Pacific/Efate */
   | 'PACIFIC_EFATE'
-  /** Pacific/Enderbury */
-  | 'PACIFIC_ENDERBURY'
   /** Pacific/Fakaofo */
   | 'PACIFIC_FAKAOFO'
   /** Pacific/Fiji */
@@ -4619,6 +4605,8 @@ export type CrontabScheduleTimezone =
   | 'PACIFIC_GUAM'
   /** Pacific/Honolulu */
   | 'PACIFIC_HONOLULU'
+  /** Pacific/Kanton */
+  | 'PACIFIC_KANTON'
   /** Pacific/Kiritimati */
   | 'PACIFIC_KIRITIMATI'
   /** Pacific/Kosrae */
@@ -20430,6 +20418,16 @@ export type CheckJuspayOrderStatusMutationVariables = Exact<{
 
 export type CheckJuspayOrderStatusMutation = { juspayOrderStatusCheck: Maybe<{ errors: Array<Pick<Error, 'field' | 'message'>>, juspayOrder: Maybe<Pick<JuspayOrderStatusType, 'id' | 'orderId' | 'amount' | 'status' | 'paymentStatus'>>, juspayErrors: Array<Pick<JuspayError, 'field' | 'message' | 'code'>> }> };
 
+export type VerifyJuspayVpaMutationVariables = Exact<{
+  input: JuspayVerifyVpaInput;
+}>;
+
+
+export type VerifyJuspayVpaMutation = { juspayVerifyVpa: Maybe<{ juspayErrors: Array<Pick<JuspayError, 'message' | 'code'>>, juspayResponse: Maybe<(
+      Pick<JuspayVerifyVpaType, 'customerName' | 'status' | 'vpa'>
+      & { mandateDetails: Maybe<Pick<JuspayVpaMendate, 'isHandleSupported'>> }
+    )> }> };
+
 export type PaytmTxnCreateMutationVariables = Exact<{
   input: PaytmCreateOrderInput;
 }>;
@@ -20657,7 +20655,7 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
-    
+
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -22170,6 +22168,50 @@ export function useCheckJuspayOrderStatusMutation(baseOptions?: Apollo.MutationH
 export type CheckJuspayOrderStatusMutationHookResult = ReturnType<typeof useCheckJuspayOrderStatusMutation>;
 export type CheckJuspayOrderStatusMutationResult = Apollo.MutationResult<CheckJuspayOrderStatusMutation>;
 export type CheckJuspayOrderStatusMutationOptions = Apollo.BaseMutationOptions<CheckJuspayOrderStatusMutation, CheckJuspayOrderStatusMutationVariables>;
+export const VerifyJuspayVpaDocument = gql`
+    mutation VerifyJuspayVpa($input: JuspayVerifyVpaInput!) {
+  juspayVerifyVpa(input: $input) {
+    juspayErrors {
+      message
+      code
+    }
+    juspayResponse {
+      customerName
+      status
+      vpa
+      mandateDetails {
+        isHandleSupported
+      }
+    }
+  }
+}
+    `;
+export type VerifyJuspayVpaMutationFn = Apollo.MutationFunction<VerifyJuspayVpaMutation, VerifyJuspayVpaMutationVariables>;
+
+/**
+ * __useVerifyJuspayVpaMutation__
+ *
+ * To run a mutation, you first call `useVerifyJuspayVpaMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVerifyJuspayVpaMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [verifyJuspayVpaMutation, { data, loading, error }] = useVerifyJuspayVpaMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useVerifyJuspayVpaMutation(baseOptions?: Apollo.MutationHookOptions<VerifyJuspayVpaMutation, VerifyJuspayVpaMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<VerifyJuspayVpaMutation, VerifyJuspayVpaMutationVariables>(VerifyJuspayVpaDocument, options);
+      }
+export type VerifyJuspayVpaMutationHookResult = ReturnType<typeof useVerifyJuspayVpaMutation>;
+export type VerifyJuspayVpaMutationResult = Apollo.MutationResult<VerifyJuspayVpaMutation>;
+export type VerifyJuspayVpaMutationOptions = Apollo.BaseMutationOptions<VerifyJuspayVpaMutation, VerifyJuspayVpaMutationVariables>;
 export const PaytmTxnCreateDocument = gql`
     mutation PaytmTxnCreate($input: PaytmCreateOrderInput!) {
   paytmOrderCreate(input: $input) {

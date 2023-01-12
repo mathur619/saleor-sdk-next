@@ -844,6 +844,25 @@ export const CHECK_JUSPAY_ORDER_STATUS = gql`
   }
 `;
 
+export const CHECK_VPA_ADDRESS = gql`
+  mutation VerifyJuspayVpa($input: JuspayVerifyVpaInput!) {
+    juspayVerifyVpa(input: $input) {
+      juspayErrors {
+        message
+        code
+      }
+      juspayResponse {
+        customerName
+        status
+        vpa
+        mandateDetails {
+          isHandleSupported
+        }
+      }
+    }
+  }
+`;
+
 export const PAYTM_TXN_CREATE = gql`
   mutation PaytmTxnCreate($input: PaytmCreateOrderInput!) {
     paytmOrderCreate(input: $input) {

@@ -3,6 +3,7 @@ import {
   ADD_CHECKOUT_PROMO_CODE,
   CHECKOUT_PAYMENT_METHOD_UPDATE,
   CHECK_JUSPAY_ORDER_STATUS,
+  CHECK_VPA_ADDRESS,
   COMPLETE_CHECKOUT,
   CREATE_CASHFREE_ORDER,
   CREATE_CHECKOUT_MUTATION,
@@ -63,6 +64,8 @@ import {
   CreateJuspayOrderAndCustomerMutationVariables,
   CheckJuspayOrderStatusMutationVariables,
   CheckJuspayOrderStatusMutation,
+  VerifyJuspayVpaMutationVariables,
+  VerifyJuspayVpaMutation,
 } from "../apollo/types";
 
 import {
@@ -93,6 +96,7 @@ import {
   SetShippingAddressResult,
   SetShippingAndBillingAddressResult,
   SetShippingMethodResult,
+  VerifyJuspayVpaResult,
 } from "./types";
 
 export interface CheckoutSDK {
@@ -141,6 +145,7 @@ export interface CheckoutSDK {
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
   juspayOrderAndCustomerCreate?: () => JuspayOrderAndCustomerCreateResult;
   checkJuspayOrderStatus?: () => CheckJuspayOrderStatusResult;
+  juspayVpaVerify?: (vpa: string) => VerifyJuspayVpaResult;
   createPaytmOrder?: () => CreatePaytmOrderResult;
   getWalletAmount?: () => GetWalletAmountResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
@@ -873,6 +878,51 @@ export const checkout = ({
     return { data: null };
   };
 
+  const juspayVpaVerify: CheckoutSDK["juspayVpaVerify"] = async (
+    vpa: string
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    const variables: VerifyJuspayVpaMutationVariables = {
+      input: {
+        vpa: vpa,
+      },
+    };
+    const res = await client.mutate<
+      VerifyJuspayVpaMutation,
+      VerifyJuspayVpaMutationVariables
+    >({
+      mutation: CHECK_VPA_ADDRESS,
+      variables,
+      update: async () => {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      },
+    });
+
+    if (
+      (res?.errors && res?.errors[0]?.message) ||
+      (res?.data?.juspayVerifyVpa?.juspayErrors &&
+        res?.data?.juspayVerifyVpa?.juspayErrors[0]?.message)
+    ) {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
+    }
+    return res;
+  };
+
   const createPaytmOrder: CheckoutSDK["createPaytmOrder"] = async () => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -1027,6 +1077,7 @@ export const checkout = ({
     createRazorpayOrder,
     juspayOrderAndCustomerCreate,
     checkJuspayOrderStatus,
+    juspayVpaVerify,
     createPaytmOrder,
     getWalletAmount,
     getUserOrders,

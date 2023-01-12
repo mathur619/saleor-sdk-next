@@ -24210,6 +24210,12 @@
             "deprecationReason": null
           },
           {
+            "name": "AMERICA_CIUDAD_JUAREZ",
+            "description": "America/Ciudad Juarez",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "AMERICA_COSTA_RICA",
             "description": "America/Costa Rica",
             "isDeprecated": false,
@@ -24588,12 +24594,6 @@
             "deprecationReason": null
           },
           {
-            "name": "AMERICA_NIPIGON",
-            "description": "America/Nipigon",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "AMERICA_NOME",
             "description": "America/Nome",
             "isDeprecated": false,
@@ -24642,12 +24642,6 @@
             "deprecationReason": null
           },
           {
-            "name": "AMERICA_PANGNIRTUNG",
-            "description": "America/Pangnirtung",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "AMERICA_PARAMARIBO",
             "description": "America/Paramaribo",
             "isDeprecated": false,
@@ -24686,12 +24680,6 @@
           {
             "name": "AMERICA_PUNTA_ARENAS",
             "description": "America/Punta Arenas",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "AMERICA_RAINY_RIVER",
-            "description": "America/Rainy River",
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -24812,12 +24800,6 @@
           {
             "name": "AMERICA_THULE",
             "description": "America/Thule",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "AMERICA_THUNDER_BAY",
-            "description": "America/Thunder Bay",
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -25518,12 +25500,6 @@
             "deprecationReason": null
           },
           {
-            "name": "AUSTRALIA_CURRIE",
-            "description": "Australia/Currie",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "AUSTRALIA_DARWIN",
             "description": "Australia/Darwin",
             "isDeprecated": false,
@@ -25734,14 +25710,14 @@
             "deprecationReason": null
           },
           {
-            "name": "EUROPE_KIEV",
-            "description": "Europe/Kiev",
+            "name": "EUROPE_KIROV",
+            "description": "Europe/Kirov",
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "EUROPE_KIROV",
-            "description": "Europe/Kirov",
+            "name": "EUROPE_KYIV",
+            "description": "Europe/Kyiv",
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -25908,12 +25884,6 @@
             "deprecationReason": null
           },
           {
-            "name": "EUROPE_UZHGOROD",
-            "description": "Europe/Uzhgorod",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "EUROPE_VADUZ",
             "description": "Europe/Vaduz",
             "isDeprecated": false,
@@ -25952,12 +25922,6 @@
           {
             "name": "EUROPE_ZAGREB",
             "description": "Europe/Zagreb",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "EUROPE_ZAPOROZHYE",
-            "description": "Europe/Zaporozhye",
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -26082,12 +26046,6 @@
             "deprecationReason": null
           },
           {
-            "name": "PACIFIC_ENDERBURY",
-            "description": "Pacific/Enderbury",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "PACIFIC_FAKAOFO",
             "description": "Pacific/Fakaofo",
             "isDeprecated": false,
@@ -26132,6 +26090,12 @@
           {
             "name": "PACIFIC_HONOLULU",
             "description": "Pacific/Honolulu",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PACIFIC_KANTON",
+            "description": "Pacific/Kanton",
             "isDeprecated": false,
             "deprecationReason": null
           },

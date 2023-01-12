@@ -69,6 +69,7 @@ import {
   CreateCashfreeOrderMutation,
   CreateJuspayOrderAndCustomerMutation,
   CheckJuspayOrderStatusMutation,
+  VerifyJuspayVpaMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -235,6 +236,10 @@ export type JuspayOrderAndCustomerCreateResult = Promise<FetchResult<
 export type CheckJuspayOrderStatusResult = Promise<FetchResult<
   CheckJuspayOrderStatusMutation
 > | null>;
+
+export type VerifyJuspayVpaResult = Promise<
+  FetchResult<VerifyJuspayVpaMutation>
+>;
 
 export type CreateCashfreeOrderResult = Promise<FetchResult<
   CreateCashfreeOrderMutation
