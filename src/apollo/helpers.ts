@@ -249,7 +249,11 @@ export const setLocalWishlistInCache = async (
   client: ApolloClient<NormalizedCacheObject>,
   wishlist: any
 ) => {
-  wishlistVar(wishlist);
+  try {
+    wishlistVar(wishlist);
+  } catch (e) {
+    console.log("error while setting wishlist helper func", e);
+  }
   client.writeQuery({
     query: GET_WISHLIST,
     data: {

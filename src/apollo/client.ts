@@ -226,7 +226,11 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
                 : wishlistString;
 
             if (wishlist) {
-              wishlistVar(wishlist);
+              try {
+                wishlistVar(wishlist);
+              } catch (e) {
+                console.log("error while setting wishlist", e);
+              }
               return { ...wishlist?.items };
             }
 
