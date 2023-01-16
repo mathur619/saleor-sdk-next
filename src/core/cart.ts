@@ -41,6 +41,7 @@ import {
   UpdateCheckoutShippingMethodNextMutationVariables,
 } from "../apollo/types";
 import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
+import { SALEOR_CHECKOUT, SALEOR_CHECKOUT_DISCOUNTS } from "./constants";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -446,22 +447,15 @@ export const cart = ({
         },
       });
 
-      if (!res.data?.checkoutLinesAdd?.checkout?.id) {
-        await getLatestCheckout(client, checkout);
-        return {
-          data: null,
-          errors: res?.data?.checkoutLinesAdd?.errors,
-        };
-      }
-
       if (
         res.data?.checkoutLinesAdd?.errors &&
         res.data?.checkoutLinesAdd?.errors[0]?.code === "NOT_FOUND" &&
         res.data?.checkoutLinesAdd?.errors[0]?.field === "checkoutId" &&
         typeof window !== "undefined"
       ) {
-        window.localStorage?.clear();
-        window.location?.reload();
+        localStorage.removeItem(SALEOR_CHECKOUT);
+        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS);
+        window.location.reload();
       }
       if (
         res.data?.checkoutLinesAdd?.errors &&
@@ -469,8 +463,9 @@ export const cart = ({
           "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
-        window.localStorage?.clear();
-        window.location?.reload();
+        localStorage.removeItem(SALEOR_CHECKOUT);
+        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS);
+        window.location.reload();
       }
       if (
         res.data?.checkoutLinesAdd?.errors &&
@@ -478,8 +473,9 @@ export const cart = ({
           "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
-        window.localStorage?.clear();
-        window.location?.reload();
+        localStorage.removeItem(SALEOR_CHECKOUT);
+        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS);
+        window.location.reload();
       }
       if (
         res.data?.checkoutLinesAdd?.errors &&
@@ -487,8 +483,17 @@ export const cart = ({
         res.data?.checkoutLinesAdd?.errors[0]?.field === "variantId" &&
         typeof window !== "undefined"
       ) {
-        window.localStorage?.clear();
-        window.location?.reload();
+        localStorage.removeItem(SALEOR_CHECKOUT);
+        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS);
+        window.location.reload();
+      }
+
+      if (!res.data?.checkoutLinesAdd?.checkout?.id) {
+        await getLatestCheckout(client, checkout);
+        return {
+          data: null,
+          errors: res?.data?.checkoutLinesAdd?.errors,
+        };
       }
 
       const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
