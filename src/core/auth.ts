@@ -226,7 +226,8 @@ export interface AuthSDK {
     email: string,
     phone: string,
     firstName?: string,
-    lastName?: string
+    lastName?: string,
+    sendWigzoInHeader?: boolean,
   ) => RegisterAccountV2Result;
 
   confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
@@ -331,23 +332,70 @@ export const auth = ({
     email: string,
     phone: string,
     firstName?: string,
-    lastName?: string
+    lastName?: string,
+    sendWigzoInHeader?: boolean,
   ) => {
-    const res = await client.mutate<
+    let res ;
+    if(sendWigzoInHeader) {
+      let wigzo_learner_id;
+      if (typeof window !== "undefined") {
+        const getCookie=(name:any)=> {
+          // Split cookie string and get all individual name=value pairs in an array
+          var cookieArr = document.cookie.split(";");
+
+          // Loop through the array elements
+          for (var i = 0; i < cookieArr.length; i++) {
+            var cookiePair:any = cookieArr[i].split("=");
+
+            /* Removing whitespace at the beginning of the cookie name
+            and compare it with the given string */
+            if (name == cookiePair[0].trim()) {
+              // Decode the cookie value and return
+              return decodeURIComponent(cookiePair[1]);
+            }
+          }
+
+          // Return null if not found
+          return null;
+        }
+        wigzo_learner_id = getCookie("WIGZO_LEARNER_ID");
+      }
+    res= await client.mutate<
       AccountRegisterV2Mutation,
       AccountRegisterV2MutationVariables
-    >({
-      mutation: REGISTER_ACCOUNT,
-      variables: {
-        input: {
-          email,
-          phone,
-          firstName,
-          lastName,
+      >({
+        mutation: REGISTER_ACCOUNT,
+        variables: {
+          input: {
+            email,
+            phone,
+            firstName,
+            lastName,
+          },
         },
-      },
-    });
-
+        context: { 
+          headers: { 
+            "x-wigzo-learner-id": `${wigzo_learner_id}`  // this header will reach the server
+          } 
+        },
+      })
+    }else{
+      res= await client.mutate<
+      AccountRegisterV2Mutation,
+      AccountRegisterV2MutationVariables
+      >({
+        mutation: REGISTER_ACCOUNT,
+        variables: {
+          input: {
+            email,
+            phone,
+            firstName,
+            lastName,
+          },
+        },
+      })
+    }
+     
     return res;
   };
 
