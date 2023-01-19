@@ -17913,16 +17913,10 @@ export type AddressFragment = Pick<
   | "isDefaultShippingAddress"
 > & { country: Pick<CountryDisplay, "code" | "country"> };
 
-export type UserFragment = Pick<
-  User,
-  "id" | "email" | "firstName" | "lastName" | "isStaff"
-> & {
-  tags: Array<Maybe<Pick<TagType, "name">>>;
-  metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
-  defaultShippingAddress: Maybe<AddressFragment>;
-  defaultBillingAddress: Maybe<AddressFragment>;
-  addresses: Maybe<Array<Maybe<AddressFragment>>>;
-};
+export type UserFragment = (
+  Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'phone' | 'isStaff'>
+  & { tags: Array<Maybe<Pick<TagType, 'name'>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, defaultShippingAddress: Maybe<AddressFragment>, defaultBillingAddress: Maybe<AddressFragment>, addresses: Maybe<Array<Maybe<AddressFragment>>> }
+);
 
 export type PriceFragment = {
   gross: Pick<Money, "amount" | "currency">;
