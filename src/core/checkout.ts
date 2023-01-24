@@ -1,4 +1,4 @@
-import { setLocalCheckoutInCache } from "../apollo/helpers";
+import { getLatestCheckout, setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   ADD_CHECKOUT_PROMO_CODE,
   CHECKOUT_PAYMENT_METHOD_UPDATE,
@@ -627,6 +627,12 @@ export const checkout = ({
             localStorage.removeItem(SALEOR_CHECKOUT);
             localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS);
             window.location.reload();
+          }
+          if (
+            data?.checkoutPaymentCreate?.errors &&
+            data?.checkoutPaymentCreate?.errors[0]?.code === "INVALID"
+          ) {
+            getLatestCheckout(client, checkout);
           }
           if (data?.checkoutPaymentCreate?.checkout?.id) {
             storage.setCheckout(data?.checkoutPaymentCreate?.checkout);
