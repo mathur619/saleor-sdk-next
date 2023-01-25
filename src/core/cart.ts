@@ -102,7 +102,7 @@ export interface CartSDK {
 export const cart = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CartSDK => {
-  let items = cartItemsVar();
+  const items = cartItemsVar();
 
   const addItem: CartSDK["addItem"] = async (
     variantId: string,
@@ -504,6 +504,15 @@ export const cart = ({
       };
 
       try {
+        if (
+          res?.data?.checkoutLinesAdd?.checkout?.availableShippingMethods &&
+          !res?.data?.checkoutLinesAdd?.checkout?.availableShippingMethods[0]
+            ?.id
+        ) {
+          throw new Error(
+            "UpdateCheckoutShippingMethodNext failed, id not available"
+          );
+        }
         const resShipping = await client.mutate<
           UpdateCheckoutShippingMethodNextMutation,
           UpdateCheckoutShippingMethodNextMutationVariables
@@ -616,10 +625,10 @@ export const cart = ({
         },
       });
       const checkout = res?.data?.checkoutCreate?.checkout;
-      if(!checkout?.id){
+      if (!checkout?.id) {
         return {
           data: undefined,
-          errors: res?.data?.checkoutCreate?.errors
+          errors: res?.data?.checkoutCreate?.errors,
         };
       }
       const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
@@ -851,7 +860,9 @@ export const cart = ({
         errors: res.data?.checkoutLinesUpdate?.errors,
       };
     } else {
-      let lineItemsInFormat = Array.isArray(updatedLines) ? updatedLines : [updatedLines]
+      const lineItemsInFormat = Array.isArray(updatedLines)
+        ? updatedLines
+        : [updatedLines];
       let checkoutInputVariables: CheckoutCreateInput;
       checkoutInputVariables = {
         lines: lineItemsInFormat,
