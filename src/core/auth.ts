@@ -213,7 +213,12 @@ export interface AuthSDK {
    */
   // verifyExternalToken?: () => Promise<VerifyExternalTokenResult>;
 
-  signInMobile: (otp: string, phone?: string, email?: string) => SignInMobileResult;
+  signInMobile: (
+    otp: string,
+    phone?: string,
+    email?: string,
+    customCheckoutId?: string
+  ) => SignInMobileResult;
 
   requestOTP: (phone: string) => RequestOtpResult;
 
@@ -222,7 +227,7 @@ export interface AuthSDK {
     phone: string,
     firstName?: string,
     lastName?: string,
-    sendWigzoInHeader?: boolean,
+    sendWigzoInHeader?: boolean
   ) => RegisterAccountV2Result;
 
   confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
@@ -244,7 +249,8 @@ export const auth = ({
   const signInMobile: AuthSDK["signInMobile"] = async (
     otp: string,
     phone?: string,
-    email?: string
+    email?: string,
+    customCheckoutId?: string
   ) => {
     client.writeQuery({
       query: USER,
@@ -259,15 +265,17 @@ export const auth = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
-    const CreateTokenOTPVariables = phone ? {
-      otp,
-      phone,
-      checkoutId: checkout?.id,
-    } : {
-      otp,
-      email,
-      checkoutId: checkout?.id,
-    }
+    const CreateTokenOTPVariables = phone
+      ? {
+          otp,
+          phone,
+          checkoutId: checkout?.id,
+        }
+      : {
+          otp,
+          email,
+          checkoutId: checkout?.id,
+        };
 
     const res = await client.mutate<
       OtpAuthenticationMutation,
@@ -293,12 +301,12 @@ export const auth = ({
         }
       },
     });
-
-    if (checkout?.id && res.data?.CreateTokenOTP?.user?.id) {
+    const checkoutId = customCheckoutId || checkout?.id;
+    if (checkoutId && res.data?.CreateTokenOTP?.user?.id) {
       client.mutate({
         mutation: CHECKOUT_CUSTOMER_ATTACH,
         variables: {
-          checkoutId: checkout.id,
+          checkoutId: checkoutId,
           customerId: res.data.CreateTokenOTP.user.id,
         },
       });
@@ -326,19 +334,19 @@ export const auth = ({
     phone: string,
     firstName?: string,
     lastName?: string,
-    sendWigzoInHeader?: boolean,
+    sendWigzoInHeader?: boolean
   ) => {
-    let res ;
-    if(sendWigzoInHeader) {
+    let res;
+    if (sendWigzoInHeader) {
       let wigzo_learner_id;
       if (typeof window !== "undefined") {
-        const getCookie=(name:any)=> {
+        const getCookie = (name: any) => {
           // Split cookie string and get all individual name=value pairs in an array
-          var cookieArr = document.cookie.split(";");
+          const cookieArr = document.cookie.split(";");
 
           // Loop through the array elements
-          for (var i = 0; i < cookieArr.length; i++) {
-            var cookiePair:any = cookieArr[i].split("=");
+          for (let i = 0; i < cookieArr.length; i++) {
+            const cookiePair: any = cookieArr[i].split("=");
 
             /* Removing whitespace at the beginning of the cookie name
             and compare it with the given string */
@@ -350,12 +358,12 @@ export const auth = ({
 
           // Return null if not found
           return null;
-        }
+        };
         wigzo_learner_id = getCookie("WIGZO_LEARNER_ID");
       }
-    res= await client.mutate<
-      AccountRegisterV2Mutation,
-      AccountRegisterV2MutationVariables
+      res = await client.mutate<
+        AccountRegisterV2Mutation,
+        AccountRegisterV2MutationVariables
       >({
         mutation: REGISTER_ACCOUNT,
         variables: {
@@ -366,16 +374,16 @@ export const auth = ({
             lastName,
           },
         },
-        context: { 
-          headers: { 
-            "x-wigzo-learner-id": `${wigzo_learner_id}`  // this header will reach the server
-          } 
+        context: {
+          headers: {
+            "x-wigzo-learner-id": `${wigzo_learner_id}`, // this header will reach the server
+          },
         },
-      })
-    }else{
-      res= await client.mutate<
-      AccountRegisterV2Mutation,
-      AccountRegisterV2MutationVariables
+      });
+    } else {
+      res = await client.mutate<
+        AccountRegisterV2Mutation,
+        AccountRegisterV2MutationVariables
       >({
         mutation: REGISTER_ACCOUNT,
         variables: {
@@ -386,9 +394,9 @@ export const auth = ({
             lastName,
           },
         },
-      })
+      });
     }
-     
+
     return res;
   };
 
