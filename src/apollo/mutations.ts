@@ -426,7 +426,12 @@ export const REQUEST_OTP_MUTATION = gql`
 
 export const CREATE_OTP_TOKEN_MUTATION = gql`
   ${userFragment}
-  mutation OTPAuthentication($phone: String, $email: String, $otp: String!, $checkoutId: ID) {
+  mutation OTPAuthentication(
+    $phone: String
+    $email: String
+    $otp: String!
+    $checkoutId: ID
+  ) {
     CreateTokenOTP: otpTokenCreate(
       otp: $otp
       phone: $phone
@@ -827,6 +832,26 @@ export const CHECKOUT_CUSTOMER_ATTACH = gql`
     checkoutCustomerAttach(checkoutId: $checkoutId, customerId: $customerId) {
       checkout {
         id
+      }
+    }
+  }
+`;
+
+export const CHECKOUT_CUSTOMER_ATTACH_NEW = gql`
+  ${checkoutFragment}
+  mutation CheckoutCustomerAttachNew($checkoutId: ID!, $customerId: ID) {
+    checkoutCustomerAttach(checkoutId: $checkoutId, customerId: $customerId) {
+      checkout {
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
     }
   }

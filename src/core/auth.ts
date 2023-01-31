@@ -47,6 +47,8 @@
 import {
   AccountRegisterV2Mutation,
   AccountRegisterV2MutationVariables,
+  CheckoutCustomerAttachNewMutation,
+  CheckoutCustomerAttachNewMutationVariables,
   ConfirmAccountV2Mutation,
   ConfirmAccountV2MutationVariables,
   OtpAuthenticationMutation,
@@ -72,10 +74,12 @@ import {
   REQUEST_OTP_MUTATION,
   VERIFY_CHECKOUT_OTP,
   CHECKOUT_CUSTOMER_ATTACH,
+  CHECKOUT_CUSTOMER_ATTACH_NEW,
 } from "../apollo/mutations";
 import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
 import { storage } from "./storage";
 import {
+  CheckoutCustomerAttachResult,
   ConfirmAccountV2Result,
   GetUserCheckoutResult,
   // ChangePasswordResult,
@@ -213,7 +217,11 @@ export interface AuthSDK {
    */
   // verifyExternalToken?: () => Promise<VerifyExternalTokenResult>;
 
-  signInMobile: (otp: string, phone?: string, email?: string) => SignInMobileResult;
+  signInMobile: (
+    otp: string,
+    phone?: string,
+    email?: string
+  ) => SignInMobileResult;
 
   requestOTP: (phone: string) => RequestOtpResult;
 
@@ -222,10 +230,15 @@ export interface AuthSDK {
     phone: string,
     firstName?: string,
     lastName?: string,
-    sendWigzoInHeader?: boolean,
+    sendWigzoInHeader?: boolean
   ) => RegisterAccountV2Result;
 
   confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
+
+  checkoutCustomerAttach: (
+    checkoutId: string,
+    userId: string
+  ) => CheckoutCustomerAttachResult;
 
   verifyCheckoutOTP: (otp: string, phone: string) => VerifyCheckoutOTPResult;
 
@@ -259,15 +272,17 @@ export const auth = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
-    const CreateTokenOTPVariables = phone ? {
-      otp,
-      phone,
-      checkoutId: checkout?.id,
-    } : {
-      otp,
-      email,
-      checkoutId: checkout?.id,
-    }
+    const CreateTokenOTPVariables = phone
+      ? {
+          otp,
+          phone,
+          checkoutId: checkout?.id,
+        }
+      : {
+          otp,
+          email,
+          checkoutId: checkout?.id,
+        };
 
     const res = await client.mutate<
       OtpAuthenticationMutation,
@@ -326,19 +341,19 @@ export const auth = ({
     phone: string,
     firstName?: string,
     lastName?: string,
-    sendWigzoInHeader?: boolean,
+    sendWigzoInHeader?: boolean
   ) => {
-    let res ;
-    if(sendWigzoInHeader) {
+    let res;
+    if (sendWigzoInHeader) {
       let wigzo_learner_id;
       if (typeof window !== "undefined") {
-        const getCookie=(name:any)=> {
+        const getCookie = (name: any) => {
           // Split cookie string and get all individual name=value pairs in an array
-          var cookieArr = document.cookie.split(";");
+          const cookieArr = document.cookie.split(";");
 
           // Loop through the array elements
-          for (var i = 0; i < cookieArr.length; i++) {
-            var cookiePair:any = cookieArr[i].split("=");
+          for (let i = 0; i < cookieArr.length; i++) {
+            const cookiePair: any = cookieArr[i].split("=");
 
             /* Removing whitespace at the beginning of the cookie name
             and compare it with the given string */
@@ -350,12 +365,12 @@ export const auth = ({
 
           // Return null if not found
           return null;
-        }
+        };
         wigzo_learner_id = getCookie("WIGZO_LEARNER_ID");
       }
-    res= await client.mutate<
-      AccountRegisterV2Mutation,
-      AccountRegisterV2MutationVariables
+      res = await client.mutate<
+        AccountRegisterV2Mutation,
+        AccountRegisterV2MutationVariables
       >({
         mutation: REGISTER_ACCOUNT,
         variables: {
@@ -366,16 +381,16 @@ export const auth = ({
             lastName,
           },
         },
-        context: { 
-          headers: { 
-            "x-wigzo-learner-id": `${wigzo_learner_id}`  // this header will reach the server
-          } 
+        context: {
+          headers: {
+            "x-wigzo-learner-id": `${wigzo_learner_id}`, // this header will reach the server
+          },
         },
-      })
-    }else{
-      res= await client.mutate<
-      AccountRegisterV2Mutation,
-      AccountRegisterV2MutationVariables
+      });
+    } else {
+      res = await client.mutate<
+        AccountRegisterV2Mutation,
+        AccountRegisterV2MutationVariables
       >({
         mutation: REGISTER_ACCOUNT,
         variables: {
@@ -386,9 +401,9 @@ export const auth = ({
             lastName,
           },
         },
-      })
+      });
     }
-     
+
     return res;
   };
 
@@ -449,6 +464,40 @@ export const auth = ({
     }
 
     return res;
+  };
+
+  const checkoutCustomerAttach: AuthSDK["checkoutCustomerAttach"] = async (
+    token: string,
+    userId: string
+  ) => {
+    //Convert token to id
+    const checkoutId = token && btoa(`Checkout:${token}`);
+
+    if (checkoutId && userId) {
+      const res = await client.mutate<
+        CheckoutCustomerAttachNewMutation,
+        CheckoutCustomerAttachNewMutationVariables
+      >({
+        mutation: CHECKOUT_CUSTOMER_ATTACH_NEW,
+        variables: {
+          checkoutId: checkoutId,
+          customerId: userId,
+        },
+        update: (_, { data }) => {
+          setLocalCheckoutInCache(
+            client,
+            data?.checkoutCustomerAttach?.checkout,
+            true
+          );
+          if (data?.checkoutCustomerAttach?.checkout?.id) {
+            storage.setCheckout(data?.checkoutCustomerAttach?.checkout);
+          }
+        },
+      });
+
+      return res;
+    }
+    return null;
   };
 
   const verifyCheckoutOTP: AuthSDK["verifyCheckoutOTP"] = async (
@@ -801,6 +850,7 @@ export const auth = ({
     registerAccountV2,
     confirmAccountV2,
     signOut,
+    checkoutCustomerAttach,
     setToken,
     getUserCheckout,
     verifyCheckoutOTP,
