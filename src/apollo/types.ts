@@ -18578,7 +18578,7 @@ export type AddressFragment = (
 );
 
 export type UserFragment = (
-  Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'isStaff'>
+  Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'phone' | 'isStaff'>
   & { tags: Array<Maybe<Pick<TagType, 'name'>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, defaultShippingAddress: Maybe<AddressFragment>, defaultBillingAddress: Maybe<AddressFragment>, addresses: Maybe<Array<Maybe<AddressFragment>>> }
 );
 
@@ -19096,6 +19096,7 @@ export const UserFragmentDoc = gql`
   email
   firstName
   lastName
+  phone
   tags {
     name
   }
