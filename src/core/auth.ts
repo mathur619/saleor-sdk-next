@@ -236,7 +236,7 @@ export interface AuthSDK {
   confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
 
   checkoutCustomerAttach: (
-    checkoutId: string,
+    token: string,
     userId: string
   ) => CheckoutCustomerAttachResult;
 
