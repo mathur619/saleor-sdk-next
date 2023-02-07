@@ -48,6 +48,8 @@ export type FetchConfig = Partial<{
   refreshOnUnauthorized: boolean;
 }>;
 
+let renewTimeQueue:any=[];
+
 export const createFetch = ({
   autoTokenRefresh = true,
   tokenRefreshTimeSkew = 120,
@@ -56,7 +58,19 @@ export const createFetch = ({
   input: RequestInfo,
   init: RequestInit = {}
 ): Promise<Response> => {
-  let count=0;
+
+  function shouldThrottleRenew(renewTimeQueue:any) {
+    let shoudlThrottleRenew = false;
+    renewTimeQueue.push(Date.now()); 
+    if (renewTimeQueue.length >= 10) {
+      // get and remove first item from queue
+      const firstTime = renewTimeQueue.shift();
+      const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
+      shoudlThrottleRenew = lastTime - firstTime < 30 * 1000;
+    }
+    return shoudlThrottleRenew;
+  };
+
   if (!client) {
     throw new Error(
       "Could not find Saleor's client instance. Did you forget to call createSaleorClient()?"
@@ -88,10 +102,13 @@ export const createFetch = ({
         await refreshPromise;
       } else if (Date.now() >= expirationTime) {
         // refreshToken automatically updates token in storage
-        console.log("UPDATING AGAIN! count",count)
-        refreshPromise = authClient.refreshToken();
-        count++;
-        await refreshPromise;
+        if (shouldThrottleRenew(renewTimeQueue)) {
+          //THROW ERROR
+          console.log("ERROR: System clock error")
+        } else {
+          refreshPromise = authClient.refreshToken();
+          await refreshPromise;
+        }
       }
     } catch (e) {
     } finally {
