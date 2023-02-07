@@ -104,8 +104,10 @@ export const createFetch = ({
         // refreshToken automatically updates token in storage
         if (shouldThrottleRenew(renewTimeQueue)) {
           console.log("renewTimeQueue",renewTimeQueue)
+          if(renewTimeQueue?.length <= 5){
           //THROW ERROR
           alert("Incorrect system time detected. Please update your time settings.")
+          }
         } else {
           refreshPromise = authClient.refreshToken();
           await refreshPromise;
