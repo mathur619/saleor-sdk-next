@@ -56,6 +56,7 @@ export const createFetch = ({
   input: RequestInfo,
   init: RequestInit = {}
 ): Promise<Response> => {
+  let count=0;
   if (!client) {
     throw new Error(
       "Could not find Saleor's client instance. Did you forget to call createSaleorClient()?"
@@ -87,7 +88,9 @@ export const createFetch = ({
         await refreshPromise;
       } else if (Date.now() >= expirationTime) {
         // refreshToken automatically updates token in storage
+        console.log("UPDATING AGAIN! count",count)
         refreshPromise = authClient.refreshToken();
+        count++;
         await refreshPromise;
       }
     } catch (e) {
