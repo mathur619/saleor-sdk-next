@@ -64,7 +64,7 @@ export const createFetch = ({
     renewTimeQueue.push(Date.now()); 
     if (renewTimeQueue.length >= 5) {
       // get and remove first item from queue
-      const firstTime = renewTimeQueue.shift();
+      const firstTime = renewTimeQueue[0];
       const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
       shoudlThrottleRenew = lastTime - firstTime < 20 * 1000;
     }
