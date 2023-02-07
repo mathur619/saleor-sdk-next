@@ -62,11 +62,11 @@ export const createFetch = ({
   function shouldThrottleRenew(renewTimeQueue:any) {
     let shoudlThrottleRenew = false;
     renewTimeQueue.push(Date.now()); 
-    if (renewTimeQueue.length >= 10) {
+    if (renewTimeQueue.length >= 5) {
       // get and remove first item from queue
       const firstTime = renewTimeQueue.shift();
       const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
-      shoudlThrottleRenew = lastTime - firstTime < 30 * 1000;
+      shoudlThrottleRenew = lastTime - firstTime < 20 * 1000;
     }
     return shoudlThrottleRenew;
   };
@@ -104,7 +104,7 @@ export const createFetch = ({
         // refreshToken automatically updates token in storage
         if (shouldThrottleRenew(renewTimeQueue)) {
           //THROW ERROR
-          console.log("ERROR: System clock error")
+          alert("Incorrect system time detected. Please update your time settings.")
         } else {
           refreshPromise = authClient.refreshToken();
           await refreshPromise;
