@@ -107,9 +107,6 @@ export const createFetch = ({
           if (renewTimeQueue?.length <= 5) {
             //THROW ERROR
             alert("Incorrect system time detected. Please update your time settings.");
-            setTimeout(() => {
-              renewTimeQueue = [];
-            }, 1000)
           }
         } else {
           refreshPromise = authClient.refreshToken();
