@@ -72,7 +72,9 @@ export const createFetch = ({
       const firstTime = renewTimeQueue[0];
       const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
       if (lastTime - firstTime > 20 * 1000) {
-        renewTimeQueue = [];
+        console.log("1renewTimeQueue",renewTimeQueue)
+        renewTimeQueue.splice(0,renewTimeQueue.length);
+        console.log("2renewTimeQueue",renewTimeQueue)
         shoudlThrottleRenew=false;
       }else{
         shoudlThrottleRenew=true;
