@@ -67,6 +67,7 @@ import {
   VerifyCheckoutOtpMutation,
   PaytmTxnCreateMutation,
   CreateCashfreeOrderMutation,
+  CheckoutCustomerAttachNewMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -284,6 +285,10 @@ export type ConfirmAccountV2Result = Promise<
     Record<string, any>
   >
 >;
+
+export type CheckoutCustomerAttachResult = Promise<FetchResult<
+  CheckoutCustomerAttachNewMutation
+> | null>;
 
 export type VerifyCheckoutOTPResult = Promise<
   FetchResult<
