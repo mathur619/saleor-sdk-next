@@ -655,6 +655,15 @@ export const cart = ({
       };
 
       try {
+        if (
+          res?.data?.checkoutLinesAdd?.checkout?.availableShippingMethods &&
+          !res?.data?.checkoutLinesAdd?.checkout?.availableShippingMethods[0]
+            ?.id
+        ) {
+          throw new Error(
+            "UpdateCheckoutShippingMethodNext failed, id not available"
+          );
+        }
         const resShipping = await client.mutate<
           UpdateCheckoutShippingMethodNextMutation,
           UpdateCheckoutShippingMethodNextMutationVariables

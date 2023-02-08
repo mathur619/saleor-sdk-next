@@ -67,6 +67,7 @@ import {
   VerifyCheckoutOtpMutation,
   PaytmTxnCreateMutation,
   CreateCashfreeOrderMutation,
+  PayuOrderCreateMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -228,6 +229,10 @@ export type CreateRazorpayOrderResult = Promise<FetchResult<
 
 export type CreateCashfreeOrderResult = Promise<FetchResult<
   CreateCashfreeOrderMutation
+> | null>;
+
+export type PayuOrderCreateMutationResult = Promise<FetchResult<
+  PayuOrderCreateMutation
 > | null>;
 
 export type CreatePaytmOrderResult = Promise<

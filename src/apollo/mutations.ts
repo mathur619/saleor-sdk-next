@@ -925,6 +925,17 @@ export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
   }
 `;
 
+export const CREATE_PAYU_ORDER = gql`
+  mutation payuOrderCreate($checkoutId: ID!) {
+    payuOrderCreate(checkoutId: $checkoutId) {
+      payuOrder{
+        token
+        paymentUrl
+        payload
+      }
+    }
+  }
+`;
 export const WISHLIST_ADD_PRODUCT = gql`
   ${wishlistFragment}
   mutation AddWishlistProduct($productId: ID!) {
