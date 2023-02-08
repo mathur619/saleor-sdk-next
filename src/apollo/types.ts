@@ -20090,7 +20090,7 @@ export type AddressFragment = (
 );
 
 export type UserFragment = (
-  Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'isStaff'>
+  Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'phone' | 'isStaff'>
   & { tags: Array<Maybe<Pick<TagType, 'name'>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, defaultShippingAddress: Maybe<AddressFragment>, defaultBillingAddress: Maybe<AddressFragment>, addresses: Maybe<Array<Maybe<AddressFragment>>> }
 );
 
@@ -20455,6 +20455,17 @@ export type CheckoutCustomerAttachMutationVariables = Exact<{
 
 export type CheckoutCustomerAttachMutation = { checkoutCustomerAttach: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>> }> };
 
+export type CheckoutCustomerAttachNewMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+  customerId?: Maybe<Scalars['ID']>;
+}>;
+
+
+export type CheckoutCustomerAttachNewMutation = { checkoutCustomerAttach: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )> }> };
+
 export type AddCheckoutLineNextMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
@@ -20624,6 +20635,7 @@ export const UserFragmentDoc = gql`
   email
   firstName
   lastName
+  phone
   tags {
     name
   }
@@ -20655,7 +20667,7 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
-
+    
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -22364,6 +22376,51 @@ export function useCheckoutCustomerAttachMutation(baseOptions?: Apollo.MutationH
 export type CheckoutCustomerAttachMutationHookResult = ReturnType<typeof useCheckoutCustomerAttachMutation>;
 export type CheckoutCustomerAttachMutationResult = Apollo.MutationResult<CheckoutCustomerAttachMutation>;
 export type CheckoutCustomerAttachMutationOptions = Apollo.BaseMutationOptions<CheckoutCustomerAttachMutation, CheckoutCustomerAttachMutationVariables>;
+export const CheckoutCustomerAttachNewDocument = gql`
+    mutation CheckoutCustomerAttachNew($checkoutId: ID!, $customerId: ID) {
+  checkoutCustomerAttach(checkoutId: $checkoutId, customerId: $customerId) {
+    checkout {
+      ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
+    }
+  }
+}
+    ${CheckoutFragmentDoc}`;
+export type CheckoutCustomerAttachNewMutationFn = Apollo.MutationFunction<CheckoutCustomerAttachNewMutation, CheckoutCustomerAttachNewMutationVariables>;
+
+/**
+ * __useCheckoutCustomerAttachNewMutation__
+ *
+ * To run a mutation, you first call `useCheckoutCustomerAttachNewMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCheckoutCustomerAttachNewMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [checkoutCustomerAttachNewMutation, { data, loading, error }] = useCheckoutCustomerAttachNewMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      customerId: // value for 'customerId'
+ *   },
+ * });
+ */
+export function useCheckoutCustomerAttachNewMutation(baseOptions?: Apollo.MutationHookOptions<CheckoutCustomerAttachNewMutation, CheckoutCustomerAttachNewMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CheckoutCustomerAttachNewMutation, CheckoutCustomerAttachNewMutationVariables>(CheckoutCustomerAttachNewDocument, options);
+      }
+export type CheckoutCustomerAttachNewMutationHookResult = ReturnType<typeof useCheckoutCustomerAttachNewMutation>;
+export type CheckoutCustomerAttachNewMutationResult = Apollo.MutationResult<CheckoutCustomerAttachNewMutation>;
+export type CheckoutCustomerAttachNewMutationOptions = Apollo.BaseMutationOptions<CheckoutCustomerAttachNewMutation, CheckoutCustomerAttachNewMutationVariables>;
 export const AddCheckoutLineNextDocument = gql`
     mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
   checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {

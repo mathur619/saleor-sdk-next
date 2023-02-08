@@ -1,4 +1,4 @@
-import { setLocalCheckoutInCache } from "../apollo/helpers";
+import { getLatestCheckout, setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   ADD_CHECKOUT_PROMO_CODE,
   CHECKOUT_PAYMENT_METHOD_UPDATE,
@@ -74,6 +74,7 @@ import {
   IAddress,
   PaymentMethodUpdateInput,
 } from "../apollo/types/checkout";
+import { SALEOR_CHECKOUT, SALEOR_CHECKOUT_DISCOUNTS } from "./constants";
 import { storage } from "./storage";
 import {
   AddPromoCodeResult,
@@ -441,6 +442,19 @@ export const checkout = ({
         },
       });
 
+      if (
+        res.data?.checkoutShippingMethodUpdate?.errors &&
+        res.data?.checkoutShippingMethodUpdate?.errors[0]?.code ===
+          "NOT_FOUND" &&
+          res.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
+          "checkoutId" &&
+        typeof window !== "undefined"
+      ) {
+        localStorage.removeItem(SALEOR_CHECKOUT)
+        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS)
+        window.location.reload();
+      }
+
       return res;
     }
 
@@ -621,12 +635,20 @@ export const checkout = ({
           );
           if (
             data?.checkoutPaymentCreate?.errors &&
-            data?.checkoutPaymentCreate?.errors[0]?.code === "NOT_FOUND" &&
+            (data?.checkoutPaymentCreate?.errors[0]?.code === "NOT_FOUND" ||
+              data?.checkoutPaymentCreate?.errors[0]?.code === "INVALID") &&
             data?.checkoutPaymentCreate?.errors[0]?.field === "checkoutId" &&
             typeof window !== "undefined"
           ) {
-            window.localStorage?.clear();
-            window.location?.reload();
+            localStorage.removeItem(SALEOR_CHECKOUT);
+            localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS);
+            window.location.reload();
+          }
+          if (
+            data?.checkoutPaymentCreate?.errors &&
+            data?.checkoutPaymentCreate?.errors[0]?.code === "INVALID"
+          ) {
+            getLatestCheckout(client, checkout);
           }
           if (data?.checkoutPaymentCreate?.checkout?.id) {
             storage.setCheckout(data?.checkoutPaymentCreate?.checkout);
