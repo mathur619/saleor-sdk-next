@@ -22477,7 +22477,7 @@ export function usePayuOrderCreateMutation(baseOptions?: Apollo.MutationHookOpti
         return Apollo.useMutation<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>(PayuOrderCreateDocument, options);
       }
 export type PayuOrderCreateMutationHookResult = ReturnType<typeof usePayuOrderCreateMutation>;
-export type PayuOrderCreateMutationResult = Apollo.MutationResult<PayuOrderCreateMutation>;
+
 export type PayuOrderCreateMutationOptions = Apollo.BaseMutationOptions<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>;
 export const AddWishlistProductDocument = gql`
     mutation AddWishlistProduct($productId: ID!) {
