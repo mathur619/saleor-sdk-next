@@ -1627,6 +1627,58 @@ export type BluedartShipmentCreate = {
   orders: Maybe<Order>;
 };
 
+export type BulkActionCsvLogsFilterInput = {
+  apiName?: Maybe<Scalars['String']>;
+  userEmail?: Maybe<Scalars['String']>;
+  actionPerformed?: Maybe<Scalars['String']>;
+  created?: Maybe<DateRangeInput>;
+  search?: Maybe<Scalars['String']>;
+};
+
+export type BulkActionCsvLogsSort =
+  | 'API_NAME'
+  | 'ACTION_PERFORMED'
+  | 'USER_EMAIL'
+  | 'DESCRIPTION'
+  | 'CREATED';
+
+export type BulkActionCsvLogsSortType = {
+  /** Specifies the direction in which to sort products. */
+  direction: OrderDirection;
+  /** Sort ApiCalls by the selected field. */
+  field?: Maybe<BulkActionCsvLogsSort>;
+};
+
+export type BulkActionCsvLogsType = Node & {
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  created: Scalars['DateTime'];
+  userEmail: Scalars['String'];
+  description: Maybe<Scalars['String']>;
+  apiName: Scalars['String'];
+  user: Maybe<User>;
+  actionPerformed: Scalars['String'];
+  status: Maybe<Scalars['String']>;
+  contentFile: Maybe<Scalars['String']>;
+  /** The URL of field to download. */
+  url: Maybe<Scalars['String']>;
+};
+
+export type BulkActionCsvLogsTypeCountableConnection = {
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  edges: Array<BulkActionCsvLogsTypeCountableEdge>;
+  /** A total count of items in the collection. */
+  totalCount: Maybe<Scalars['Int']>;
+};
+
+export type BulkActionCsvLogsTypeCountableEdge = {
+  /** The item at the end of the edge. */
+  node: BulkActionCsvLogsType;
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String'];
+};
+
 /** Bulk Upload Price CSV */
 export type BulkPriceUpdateCsv = {
   /**
@@ -2247,7 +2299,9 @@ export type CheckoutErrorCode =
   | 'TAX_ERROR'
   | 'UNIQUE'
   | 'VOUCHER_NOT_APPLICABLE'
-  | 'ZERO_QUANTITY';
+  | 'ZERO_QUANTITY'
+  | 'RTO_CUSTOMER_FOUND'
+  | 'COD_NOT_APPLICABLE_FOR_PRODUCT_IN_CART';
 
 export type CheckoutEvent = Node & {
   /** The ID of the object. */
@@ -3707,6 +3761,932 @@ export type CreditCard = {
   expYear: Maybe<Scalars['Int']>;
 };
 
+export type CronInput = {
+  /** minute when cron should run */
+  minute?: Maybe<Scalars['String']>;
+  /** hour when cron should run */
+  hour?: Maybe<Scalars['String']>;
+  /** day of the week when cron should run */
+  dayOfWeek?: Maybe<Scalars['String']>;
+  /** day of the  month when cron should run */
+  dayOfMonth?: Maybe<Scalars['String']>;
+  /** month of the year when cron should run */
+  monthOfYear?: Maybe<Scalars['String']>;
+};
+
+/** An enumeration. */
+export type CrontabScheduleTimezone =
+  /** Africa/Abidjan */
+  | 'AFRICA_ABIDJAN'
+  /** Africa/Accra */
+  | 'AFRICA_ACCRA'
+  /** Africa/Addis Ababa */
+  | 'AFRICA_ADDIS_ABABA'
+  /** Africa/Algiers */
+  | 'AFRICA_ALGIERS'
+  /** Africa/Asmara */
+  | 'AFRICA_ASMARA'
+  /** Africa/Bamako */
+  | 'AFRICA_BAMAKO'
+  /** Africa/Bangui */
+  | 'AFRICA_BANGUI'
+  /** Africa/Banjul */
+  | 'AFRICA_BANJUL'
+  /** Africa/Bissau */
+  | 'AFRICA_BISSAU'
+  /** Africa/Blantyre */
+  | 'AFRICA_BLANTYRE'
+  /** Africa/Brazzaville */
+  | 'AFRICA_BRAZZAVILLE'
+  /** Africa/Bujumbura */
+  | 'AFRICA_BUJUMBURA'
+  /** Africa/Cairo */
+  | 'AFRICA_CAIRO'
+  /** Africa/Casablanca */
+  | 'AFRICA_CASABLANCA'
+  /** Africa/Ceuta */
+  | 'AFRICA_CEUTA'
+  /** Africa/Conakry */
+  | 'AFRICA_CONAKRY'
+  /** Africa/Dakar */
+  | 'AFRICA_DAKAR'
+  /** Africa/Dar es Salaam */
+  | 'AFRICA_DAR_ES_SALAAM'
+  /** Africa/Djibouti */
+  | 'AFRICA_DJIBOUTI'
+  /** Africa/Douala */
+  | 'AFRICA_DOUALA'
+  /** Africa/El Aaiun */
+  | 'AFRICA_EL_AAIUN'
+  /** Africa/Freetown */
+  | 'AFRICA_FREETOWN'
+  /** Africa/Gaborone */
+  | 'AFRICA_GABORONE'
+  /** Africa/Harare */
+  | 'AFRICA_HARARE'
+  /** Africa/Johannesburg */
+  | 'AFRICA_JOHANNESBURG'
+  /** Africa/Juba */
+  | 'AFRICA_JUBA'
+  /** Africa/Kampala */
+  | 'AFRICA_KAMPALA'
+  /** Africa/Khartoum */
+  | 'AFRICA_KHARTOUM'
+  /** Africa/Kigali */
+  | 'AFRICA_KIGALI'
+  /** Africa/Kinshasa */
+  | 'AFRICA_KINSHASA'
+  /** Africa/Lagos */
+  | 'AFRICA_LAGOS'
+  /** Africa/Libreville */
+  | 'AFRICA_LIBREVILLE'
+  /** Africa/Lome */
+  | 'AFRICA_LOME'
+  /** Africa/Luanda */
+  | 'AFRICA_LUANDA'
+  /** Africa/Lubumbashi */
+  | 'AFRICA_LUBUMBASHI'
+  /** Africa/Lusaka */
+  | 'AFRICA_LUSAKA'
+  /** Africa/Malabo */
+  | 'AFRICA_MALABO'
+  /** Africa/Maputo */
+  | 'AFRICA_MAPUTO'
+  /** Africa/Maseru */
+  | 'AFRICA_MASERU'
+  /** Africa/Mbabane */
+  | 'AFRICA_MBABANE'
+  /** Africa/Mogadishu */
+  | 'AFRICA_MOGADISHU'
+  /** Africa/Monrovia */
+  | 'AFRICA_MONROVIA'
+  /** Africa/Nairobi */
+  | 'AFRICA_NAIROBI'
+  /** Africa/Ndjamena */
+  | 'AFRICA_NDJAMENA'
+  /** Africa/Niamey */
+  | 'AFRICA_NIAMEY'
+  /** Africa/Nouakchott */
+  | 'AFRICA_NOUAKCHOTT'
+  /** Africa/Ouagadougou */
+  | 'AFRICA_OUAGADOUGOU'
+  /** Africa/Porto-Novo */
+  | 'AFRICA_PORTO_NOVO'
+  /** Africa/Sao Tome */
+  | 'AFRICA_SAO_TOME'
+  /** Africa/Tripoli */
+  | 'AFRICA_TRIPOLI'
+  /** Africa/Tunis */
+  | 'AFRICA_TUNIS'
+  /** Africa/Windhoek */
+  | 'AFRICA_WINDHOEK'
+  /** America/Adak */
+  | 'AMERICA_ADAK'
+  /** America/Anchorage */
+  | 'AMERICA_ANCHORAGE'
+  /** America/Anguilla */
+  | 'AMERICA_ANGUILLA'
+  /** America/Antigua */
+  | 'AMERICA_ANTIGUA'
+  /** America/Araguaina */
+  | 'AMERICA_ARAGUAINA'
+  /** America/Argentina/Buenos Aires */
+  | 'AMERICA_ARGENTINA_BUENOS_AIRES'
+  /** America/Argentina/Catamarca */
+  | 'AMERICA_ARGENTINA_CATAMARCA'
+  /** America/Argentina/Cordoba */
+  | 'AMERICA_ARGENTINA_CORDOBA'
+  /** America/Argentina/Jujuy */
+  | 'AMERICA_ARGENTINA_JUJUY'
+  /** America/Argentina/La Rioja */
+  | 'AMERICA_ARGENTINA_LA_RIOJA'
+  /** America/Argentina/Mendoza */
+  | 'AMERICA_ARGENTINA_MENDOZA'
+  /** America/Argentina/Rio Gallegos */
+  | 'AMERICA_ARGENTINA_RIO_GALLEGOS'
+  /** America/Argentina/Salta */
+  | 'AMERICA_ARGENTINA_SALTA'
+  /** America/Argentina/San Juan */
+  | 'AMERICA_ARGENTINA_SAN_JUAN'
+  /** America/Argentina/San Luis */
+  | 'AMERICA_ARGENTINA_SAN_LUIS'
+  /** America/Argentina/Tucuman */
+  | 'AMERICA_ARGENTINA_TUCUMAN'
+  /** America/Argentina/Ushuaia */
+  | 'AMERICA_ARGENTINA_USHUAIA'
+  /** America/Aruba */
+  | 'AMERICA_ARUBA'
+  /** America/Asuncion */
+  | 'AMERICA_ASUNCION'
+  /** America/Atikokan */
+  | 'AMERICA_ATIKOKAN'
+  /** America/Bahia */
+  | 'AMERICA_BAHIA'
+  /** America/Bahia Banderas */
+  | 'AMERICA_BAHIA_BANDERAS'
+  /** America/Barbados */
+  | 'AMERICA_BARBADOS'
+  /** America/Belem */
+  | 'AMERICA_BELEM'
+  /** America/Belize */
+  | 'AMERICA_BELIZE'
+  /** America/Blanc-Sablon */
+  | 'AMERICA_BLANC_SABLON'
+  /** America/Boa Vista */
+  | 'AMERICA_BOA_VISTA'
+  /** America/Bogota */
+  | 'AMERICA_BOGOTA'
+  /** America/Boise */
+  | 'AMERICA_BOISE'
+  /** America/Cambridge Bay */
+  | 'AMERICA_CAMBRIDGE_BAY'
+  /** America/Campo Grande */
+  | 'AMERICA_CAMPO_GRANDE'
+  /** America/Cancun */
+  | 'AMERICA_CANCUN'
+  /** America/Caracas */
+  | 'AMERICA_CARACAS'
+  /** America/Cayenne */
+  | 'AMERICA_CAYENNE'
+  /** America/Cayman */
+  | 'AMERICA_CAYMAN'
+  /** America/Chicago */
+  | 'AMERICA_CHICAGO'
+  /** America/Chihuahua */
+  | 'AMERICA_CHIHUAHUA'
+  /** America/Ciudad Juarez */
+  | 'AMERICA_CIUDAD_JUAREZ'
+  /** America/Costa Rica */
+  | 'AMERICA_COSTA_RICA'
+  /** America/Creston */
+  | 'AMERICA_CRESTON'
+  /** America/Cuiaba */
+  | 'AMERICA_CUIABA'
+  /** America/Curacao */
+  | 'AMERICA_CURACAO'
+  /** America/Danmarkshavn */
+  | 'AMERICA_DANMARKSHAVN'
+  /** America/Dawson */
+  | 'AMERICA_DAWSON'
+  /** America/Dawson Creek */
+  | 'AMERICA_DAWSON_CREEK'
+  /** America/Denver */
+  | 'AMERICA_DENVER'
+  /** America/Detroit */
+  | 'AMERICA_DETROIT'
+  /** America/Dominica */
+  | 'AMERICA_DOMINICA'
+  /** America/Edmonton */
+  | 'AMERICA_EDMONTON'
+  /** America/Eirunepe */
+  | 'AMERICA_EIRUNEPE'
+  /** America/El Salvador */
+  | 'AMERICA_EL_SALVADOR'
+  /** America/Fort Nelson */
+  | 'AMERICA_FORT_NELSON'
+  /** America/Fortaleza */
+  | 'AMERICA_FORTALEZA'
+  /** America/Glace Bay */
+  | 'AMERICA_GLACE_BAY'
+  /** America/Goose Bay */
+  | 'AMERICA_GOOSE_BAY'
+  /** America/Grand Turk */
+  | 'AMERICA_GRAND_TURK'
+  /** America/Grenada */
+  | 'AMERICA_GRENADA'
+  /** America/Guadeloupe */
+  | 'AMERICA_GUADELOUPE'
+  /** America/Guatemala */
+  | 'AMERICA_GUATEMALA'
+  /** America/Guayaquil */
+  | 'AMERICA_GUAYAQUIL'
+  /** America/Guyana */
+  | 'AMERICA_GUYANA'
+  /** America/Halifax */
+  | 'AMERICA_HALIFAX'
+  /** America/Havana */
+  | 'AMERICA_HAVANA'
+  /** America/Hermosillo */
+  | 'AMERICA_HERMOSILLO'
+  /** America/Indiana/Indianapolis */
+  | 'AMERICA_INDIANA_INDIANAPOLIS'
+  /** America/Indiana/Knox */
+  | 'AMERICA_INDIANA_KNOX'
+  /** America/Indiana/Marengo */
+  | 'AMERICA_INDIANA_MARENGO'
+  /** America/Indiana/Petersburg */
+  | 'AMERICA_INDIANA_PETERSBURG'
+  /** America/Indiana/Tell City */
+  | 'AMERICA_INDIANA_TELL_CITY'
+  /** America/Indiana/Vevay */
+  | 'AMERICA_INDIANA_VEVAY'
+  /** America/Indiana/Vincennes */
+  | 'AMERICA_INDIANA_VINCENNES'
+  /** America/Indiana/Winamac */
+  | 'AMERICA_INDIANA_WINAMAC'
+  /** America/Inuvik */
+  | 'AMERICA_INUVIK'
+  /** America/Iqaluit */
+  | 'AMERICA_IQALUIT'
+  /** America/Jamaica */
+  | 'AMERICA_JAMAICA'
+  /** America/Juneau */
+  | 'AMERICA_JUNEAU'
+  /** America/Kentucky/Louisville */
+  | 'AMERICA_KENTUCKY_LOUISVILLE'
+  /** America/Kentucky/Monticello */
+  | 'AMERICA_KENTUCKY_MONTICELLO'
+  /** America/Kralendijk */
+  | 'AMERICA_KRALENDIJK'
+  /** America/La Paz */
+  | 'AMERICA_LA_PAZ'
+  /** America/Lima */
+  | 'AMERICA_LIMA'
+  /** America/Los Angeles */
+  | 'AMERICA_LOS_ANGELES'
+  /** America/Lower Princes */
+  | 'AMERICA_LOWER_PRINCES'
+  /** America/Maceio */
+  | 'AMERICA_MACEIO'
+  /** America/Managua */
+  | 'AMERICA_MANAGUA'
+  /** America/Manaus */
+  | 'AMERICA_MANAUS'
+  /** America/Marigot */
+  | 'AMERICA_MARIGOT'
+  /** America/Martinique */
+  | 'AMERICA_MARTINIQUE'
+  /** America/Matamoros */
+  | 'AMERICA_MATAMOROS'
+  /** America/Mazatlan */
+  | 'AMERICA_MAZATLAN'
+  /** America/Menominee */
+  | 'AMERICA_MENOMINEE'
+  /** America/Merida */
+  | 'AMERICA_MERIDA'
+  /** America/Metlakatla */
+  | 'AMERICA_METLAKATLA'
+  /** America/Mexico City */
+  | 'AMERICA_MEXICO_CITY'
+  /** America/Miquelon */
+  | 'AMERICA_MIQUELON'
+  /** America/Moncton */
+  | 'AMERICA_MONCTON'
+  /** America/Monterrey */
+  | 'AMERICA_MONTERREY'
+  /** America/Montevideo */
+  | 'AMERICA_MONTEVIDEO'
+  /** America/Montserrat */
+  | 'AMERICA_MONTSERRAT'
+  /** America/Nassau */
+  | 'AMERICA_NASSAU'
+  /** America/New York */
+  | 'AMERICA_NEW_YORK'
+  /** America/Nome */
+  | 'AMERICA_NOME'
+  /** America/Noronha */
+  | 'AMERICA_NORONHA'
+  /** America/North Dakota/Beulah */
+  | 'AMERICA_NORTH_DAKOTA_BEULAH'
+  /** America/North Dakota/Center */
+  | 'AMERICA_NORTH_DAKOTA_CENTER'
+  /** America/North Dakota/New Salem */
+  | 'AMERICA_NORTH_DAKOTA_NEW_SALEM'
+  /** America/Nuuk */
+  | 'AMERICA_NUUK'
+  /** America/Ojinaga */
+  | 'AMERICA_OJINAGA'
+  /** America/Panama */
+  | 'AMERICA_PANAMA'
+  /** America/Paramaribo */
+  | 'AMERICA_PARAMARIBO'
+  /** America/Phoenix */
+  | 'AMERICA_PHOENIX'
+  /** America/Port-au-Prince */
+  | 'AMERICA_PORT_AU_PRINCE'
+  /** America/Port of Spain */
+  | 'AMERICA_PORT_OF_SPAIN'
+  /** America/Porto Velho */
+  | 'AMERICA_PORTO_VELHO'
+  /** America/Puerto Rico */
+  | 'AMERICA_PUERTO_RICO'
+  /** America/Punta Arenas */
+  | 'AMERICA_PUNTA_ARENAS'
+  /** America/Rankin Inlet */
+  | 'AMERICA_RANKIN_INLET'
+  /** America/Recife */
+  | 'AMERICA_RECIFE'
+  /** America/Regina */
+  | 'AMERICA_REGINA'
+  /** America/Resolute */
+  | 'AMERICA_RESOLUTE'
+  /** America/Rio Branco */
+  | 'AMERICA_RIO_BRANCO'
+  /** America/Santarem */
+  | 'AMERICA_SANTAREM'
+  /** America/Santiago */
+  | 'AMERICA_SANTIAGO'
+  /** America/Santo Domingo */
+  | 'AMERICA_SANTO_DOMINGO'
+  /** America/Sao Paulo */
+  | 'AMERICA_SAO_PAULO'
+  /** America/Scoresbysund */
+  | 'AMERICA_SCORESBYSUND'
+  /** America/Sitka */
+  | 'AMERICA_SITKA'
+  /** America/St Barthelemy */
+  | 'AMERICA_ST_BARTHELEMY'
+  /** America/St Johns */
+  | 'AMERICA_ST_JOHNS'
+  /** America/St Kitts */
+  | 'AMERICA_ST_KITTS'
+  /** America/St Lucia */
+  | 'AMERICA_ST_LUCIA'
+  /** America/St Thomas */
+  | 'AMERICA_ST_THOMAS'
+  /** America/St Vincent */
+  | 'AMERICA_ST_VINCENT'
+  /** America/Swift Current */
+  | 'AMERICA_SWIFT_CURRENT'
+  /** America/Tegucigalpa */
+  | 'AMERICA_TEGUCIGALPA'
+  /** America/Thule */
+  | 'AMERICA_THULE'
+  /** America/Tijuana */
+  | 'AMERICA_TIJUANA'
+  /** America/Toronto */
+  | 'AMERICA_TORONTO'
+  /** America/Tortola */
+  | 'AMERICA_TORTOLA'
+  /** America/Vancouver */
+  | 'AMERICA_VANCOUVER'
+  /** America/Whitehorse */
+  | 'AMERICA_WHITEHORSE'
+  /** America/Winnipeg */
+  | 'AMERICA_WINNIPEG'
+  /** America/Yakutat */
+  | 'AMERICA_YAKUTAT'
+  /** America/Yellowknife */
+  | 'AMERICA_YELLOWKNIFE'
+  /** Antarctica/Casey */
+  | 'ANTARCTICA_CASEY'
+  /** Antarctica/Davis */
+  | 'ANTARCTICA_DAVIS'
+  /** Antarctica/DumontDUrville */
+  | 'ANTARCTICA_DUMONTDURVILLE'
+  /** Antarctica/Macquarie */
+  | 'ANTARCTICA_MACQUARIE'
+  /** Antarctica/Mawson */
+  | 'ANTARCTICA_MAWSON'
+  /** Antarctica/McMurdo */
+  | 'ANTARCTICA_MCMURDO'
+  /** Antarctica/Palmer */
+  | 'ANTARCTICA_PALMER'
+  /** Antarctica/Rothera */
+  | 'ANTARCTICA_ROTHERA'
+  /** Antarctica/Syowa */
+  | 'ANTARCTICA_SYOWA'
+  /** Antarctica/Troll */
+  | 'ANTARCTICA_TROLL'
+  /** Antarctica/Vostok */
+  | 'ANTARCTICA_VOSTOK'
+  /** Arctic/Longyearbyen */
+  | 'ARCTIC_LONGYEARBYEN'
+  /** Asia/Aden */
+  | 'ASIA_ADEN'
+  /** Asia/Almaty */
+  | 'ASIA_ALMATY'
+  /** Asia/Amman */
+  | 'ASIA_AMMAN'
+  /** Asia/Anadyr */
+  | 'ASIA_ANADYR'
+  /** Asia/Aqtau */
+  | 'ASIA_AQTAU'
+  /** Asia/Aqtobe */
+  | 'ASIA_AQTOBE'
+  /** Asia/Ashgabat */
+  | 'ASIA_ASHGABAT'
+  /** Asia/Atyrau */
+  | 'ASIA_ATYRAU'
+  /** Asia/Baghdad */
+  | 'ASIA_BAGHDAD'
+  /** Asia/Bahrain */
+  | 'ASIA_BAHRAIN'
+  /** Asia/Baku */
+  | 'ASIA_BAKU'
+  /** Asia/Bangkok */
+  | 'ASIA_BANGKOK'
+  /** Asia/Barnaul */
+  | 'ASIA_BARNAUL'
+  /** Asia/Beirut */
+  | 'ASIA_BEIRUT'
+  /** Asia/Bishkek */
+  | 'ASIA_BISHKEK'
+  /** Asia/Brunei */
+  | 'ASIA_BRUNEI'
+  /** Asia/Chita */
+  | 'ASIA_CHITA'
+  /** Asia/Choibalsan */
+  | 'ASIA_CHOIBALSAN'
+  /** Asia/Colombo */
+  | 'ASIA_COLOMBO'
+  /** Asia/Damascus */
+  | 'ASIA_DAMASCUS'
+  /** Asia/Dhaka */
+  | 'ASIA_DHAKA'
+  /** Asia/Dili */
+  | 'ASIA_DILI'
+  /** Asia/Dubai */
+  | 'ASIA_DUBAI'
+  /** Asia/Dushanbe */
+  | 'ASIA_DUSHANBE'
+  /** Asia/Famagusta */
+  | 'ASIA_FAMAGUSTA'
+  /** Asia/Gaza */
+  | 'ASIA_GAZA'
+  /** Asia/Hebron */
+  | 'ASIA_HEBRON'
+  /** Asia/Ho Chi Minh */
+  | 'ASIA_HO_CHI_MINH'
+  /** Asia/Hong Kong */
+  | 'ASIA_HONG_KONG'
+  /** Asia/Hovd */
+  | 'ASIA_HOVD'
+  /** Asia/Irkutsk */
+  | 'ASIA_IRKUTSK'
+  /** Asia/Jakarta */
+  | 'ASIA_JAKARTA'
+  /** Asia/Jayapura */
+  | 'ASIA_JAYAPURA'
+  /** Asia/Jerusalem */
+  | 'ASIA_JERUSALEM'
+  /** Asia/Kabul */
+  | 'ASIA_KABUL'
+  /** Asia/Kamchatka */
+  | 'ASIA_KAMCHATKA'
+  /** Asia/Karachi */
+  | 'ASIA_KARACHI'
+  /** Asia/Kathmandu */
+  | 'ASIA_KATHMANDU'
+  /** Asia/Khandyga */
+  | 'ASIA_KHANDYGA'
+  /** Asia/Kolkata */
+  | 'ASIA_KOLKATA'
+  /** Asia/Krasnoyarsk */
+  | 'ASIA_KRASNOYARSK'
+  /** Asia/Kuala Lumpur */
+  | 'ASIA_KUALA_LUMPUR'
+  /** Asia/Kuching */
+  | 'ASIA_KUCHING'
+  /** Asia/Kuwait */
+  | 'ASIA_KUWAIT'
+  /** Asia/Macau */
+  | 'ASIA_MACAU'
+  /** Asia/Magadan */
+  | 'ASIA_MAGADAN'
+  /** Asia/Makassar */
+  | 'ASIA_MAKASSAR'
+  /** Asia/Manila */
+  | 'ASIA_MANILA'
+  /** Asia/Muscat */
+  | 'ASIA_MUSCAT'
+  /** Asia/Nicosia */
+  | 'ASIA_NICOSIA'
+  /** Asia/Novokuznetsk */
+  | 'ASIA_NOVOKUZNETSK'
+  /** Asia/Novosibirsk */
+  | 'ASIA_NOVOSIBIRSK'
+  /** Asia/Omsk */
+  | 'ASIA_OMSK'
+  /** Asia/Oral */
+  | 'ASIA_ORAL'
+  /** Asia/Phnom Penh */
+  | 'ASIA_PHNOM_PENH'
+  /** Asia/Pontianak */
+  | 'ASIA_PONTIANAK'
+  /** Asia/Pyongyang */
+  | 'ASIA_PYONGYANG'
+  /** Asia/Qatar */
+  | 'ASIA_QATAR'
+  /** Asia/Qostanay */
+  | 'ASIA_QOSTANAY'
+  /** Asia/Qyzylorda */
+  | 'ASIA_QYZYLORDA'
+  /** Asia/Riyadh */
+  | 'ASIA_RIYADH'
+  /** Asia/Sakhalin */
+  | 'ASIA_SAKHALIN'
+  /** Asia/Samarkand */
+  | 'ASIA_SAMARKAND'
+  /** Asia/Seoul */
+  | 'ASIA_SEOUL'
+  /** Asia/Shanghai */
+  | 'ASIA_SHANGHAI'
+  /** Asia/Singapore */
+  | 'ASIA_SINGAPORE'
+  /** Asia/Srednekolymsk */
+  | 'ASIA_SREDNEKOLYMSK'
+  /** Asia/Taipei */
+  | 'ASIA_TAIPEI'
+  /** Asia/Tashkent */
+  | 'ASIA_TASHKENT'
+  /** Asia/Tbilisi */
+  | 'ASIA_TBILISI'
+  /** Asia/Tehran */
+  | 'ASIA_TEHRAN'
+  /** Asia/Thimphu */
+  | 'ASIA_THIMPHU'
+  /** Asia/Tokyo */
+  | 'ASIA_TOKYO'
+  /** Asia/Tomsk */
+  | 'ASIA_TOMSK'
+  /** Asia/Ulaanbaatar */
+  | 'ASIA_ULAANBAATAR'
+  /** Asia/Urumqi */
+  | 'ASIA_URUMQI'
+  /** Asia/Ust-Nera */
+  | 'ASIA_UST_NERA'
+  /** Asia/Vientiane */
+  | 'ASIA_VIENTIANE'
+  /** Asia/Vladivostok */
+  | 'ASIA_VLADIVOSTOK'
+  /** Asia/Yakutsk */
+  | 'ASIA_YAKUTSK'
+  /** Asia/Yangon */
+  | 'ASIA_YANGON'
+  /** Asia/Yekaterinburg */
+  | 'ASIA_YEKATERINBURG'
+  /** Asia/Yerevan */
+  | 'ASIA_YEREVAN'
+  /** Atlantic/Azores */
+  | 'ATLANTIC_AZORES'
+  /** Atlantic/Bermuda */
+  | 'ATLANTIC_BERMUDA'
+  /** Atlantic/Canary */
+  | 'ATLANTIC_CANARY'
+  /** Atlantic/Cape Verde */
+  | 'ATLANTIC_CAPE_VERDE'
+  /** Atlantic/Faroe */
+  | 'ATLANTIC_FAROE'
+  /** Atlantic/Madeira */
+  | 'ATLANTIC_MADEIRA'
+  /** Atlantic/Reykjavik */
+  | 'ATLANTIC_REYKJAVIK'
+  /** Atlantic/South Georgia */
+  | 'ATLANTIC_SOUTH_GEORGIA'
+  /** Atlantic/St Helena */
+  | 'ATLANTIC_ST_HELENA'
+  /** Atlantic/Stanley */
+  | 'ATLANTIC_STANLEY'
+  /** Australia/Adelaide */
+  | 'AUSTRALIA_ADELAIDE'
+  /** Australia/Brisbane */
+  | 'AUSTRALIA_BRISBANE'
+  /** Australia/Broken Hill */
+  | 'AUSTRALIA_BROKEN_HILL'
+  /** Australia/Darwin */
+  | 'AUSTRALIA_DARWIN'
+  /** Australia/Eucla */
+  | 'AUSTRALIA_EUCLA'
+  /** Australia/Hobart */
+  | 'AUSTRALIA_HOBART'
+  /** Australia/Lindeman */
+  | 'AUSTRALIA_LINDEMAN'
+  /** Australia/Lord Howe */
+  | 'AUSTRALIA_LORD_HOWE'
+  /** Australia/Melbourne */
+  | 'AUSTRALIA_MELBOURNE'
+  /** Australia/Perth */
+  | 'AUSTRALIA_PERTH'
+  /** Australia/Sydney */
+  | 'AUSTRALIA_SYDNEY'
+  /** Canada/Atlantic */
+  | 'CANADA_ATLANTIC'
+  /** Canada/Central */
+  | 'CANADA_CENTRAL'
+  /** Canada/Eastern */
+  | 'CANADA_EASTERN'
+  /** Canada/Mountain */
+  | 'CANADA_MOUNTAIN'
+  /** Canada/Newfoundland */
+  | 'CANADA_NEWFOUNDLAND'
+  /** Canada/Pacific */
+  | 'CANADA_PACIFIC'
+  /** Europe/Amsterdam */
+  | 'EUROPE_AMSTERDAM'
+  /** Europe/Andorra */
+  | 'EUROPE_ANDORRA'
+  /** Europe/Astrakhan */
+  | 'EUROPE_ASTRAKHAN'
+  /** Europe/Athens */
+  | 'EUROPE_ATHENS'
+  /** Europe/Belgrade */
+  | 'EUROPE_BELGRADE'
+  /** Europe/Berlin */
+  | 'EUROPE_BERLIN'
+  /** Europe/Bratislava */
+  | 'EUROPE_BRATISLAVA'
+  /** Europe/Brussels */
+  | 'EUROPE_BRUSSELS'
+  /** Europe/Bucharest */
+  | 'EUROPE_BUCHAREST'
+  /** Europe/Budapest */
+  | 'EUROPE_BUDAPEST'
+  /** Europe/Busingen */
+  | 'EUROPE_BUSINGEN'
+  /** Europe/Chisinau */
+  | 'EUROPE_CHISINAU'
+  /** Europe/Copenhagen */
+  | 'EUROPE_COPENHAGEN'
+  /** Europe/Dublin */
+  | 'EUROPE_DUBLIN'
+  /** Europe/Gibraltar */
+  | 'EUROPE_GIBRALTAR'
+  /** Europe/Guernsey */
+  | 'EUROPE_GUERNSEY'
+  /** Europe/Helsinki */
+  | 'EUROPE_HELSINKI'
+  /** Europe/Isle of Man */
+  | 'EUROPE_ISLE_OF_MAN'
+  /** Europe/Istanbul */
+  | 'EUROPE_ISTANBUL'
+  /** Europe/Jersey */
+  | 'EUROPE_JERSEY'
+  /** Europe/Kaliningrad */
+  | 'EUROPE_KALININGRAD'
+  /** Europe/Kirov */
+  | 'EUROPE_KIROV'
+  /** Europe/Kyiv */
+  | 'EUROPE_KYIV'
+  /** Europe/Lisbon */
+  | 'EUROPE_LISBON'
+  /** Europe/Ljubljana */
+  | 'EUROPE_LJUBLJANA'
+  /** Europe/London */
+  | 'EUROPE_LONDON'
+  /** Europe/Luxembourg */
+  | 'EUROPE_LUXEMBOURG'
+  /** Europe/Madrid */
+  | 'EUROPE_MADRID'
+  /** Europe/Malta */
+  | 'EUROPE_MALTA'
+  /** Europe/Mariehamn */
+  | 'EUROPE_MARIEHAMN'
+  /** Europe/Minsk */
+  | 'EUROPE_MINSK'
+  /** Europe/Monaco */
+  | 'EUROPE_MONACO'
+  /** Europe/Moscow */
+  | 'EUROPE_MOSCOW'
+  /** Europe/Oslo */
+  | 'EUROPE_OSLO'
+  /** Europe/Paris */
+  | 'EUROPE_PARIS'
+  /** Europe/Podgorica */
+  | 'EUROPE_PODGORICA'
+  /** Europe/Prague */
+  | 'EUROPE_PRAGUE'
+  /** Europe/Riga */
+  | 'EUROPE_RIGA'
+  /** Europe/Rome */
+  | 'EUROPE_ROME'
+  /** Europe/Samara */
+  | 'EUROPE_SAMARA'
+  /** Europe/San Marino */
+  | 'EUROPE_SAN_MARINO'
+  /** Europe/Sarajevo */
+  | 'EUROPE_SARAJEVO'
+  /** Europe/Saratov */
+  | 'EUROPE_SARATOV'
+  /** Europe/Simferopol */
+  | 'EUROPE_SIMFEROPOL'
+  /** Europe/Skopje */
+  | 'EUROPE_SKOPJE'
+  /** Europe/Sofia */
+  | 'EUROPE_SOFIA'
+  /** Europe/Stockholm */
+  | 'EUROPE_STOCKHOLM'
+  /** Europe/Tallinn */
+  | 'EUROPE_TALLINN'
+  /** Europe/Tirane */
+  | 'EUROPE_TIRANE'
+  /** Europe/Ulyanovsk */
+  | 'EUROPE_ULYANOVSK'
+  /** Europe/Vaduz */
+  | 'EUROPE_VADUZ'
+  /** Europe/Vatican */
+  | 'EUROPE_VATICAN'
+  /** Europe/Vienna */
+  | 'EUROPE_VIENNA'
+  /** Europe/Vilnius */
+  | 'EUROPE_VILNIUS'
+  /** Europe/Volgograd */
+  | 'EUROPE_VOLGOGRAD'
+  /** Europe/Warsaw */
+  | 'EUROPE_WARSAW'
+  /** Europe/Zagreb */
+  | 'EUROPE_ZAGREB'
+  /** Europe/Zurich */
+  | 'EUROPE_ZURICH'
+  /** GMT */
+  | 'GMT'
+  /** Indian/Antananarivo */
+  | 'INDIAN_ANTANANARIVO'
+  /** Indian/Chagos */
+  | 'INDIAN_CHAGOS'
+  /** Indian/Christmas */
+  | 'INDIAN_CHRISTMAS'
+  /** Indian/Cocos */
+  | 'INDIAN_COCOS'
+  /** Indian/Comoro */
+  | 'INDIAN_COMORO'
+  /** Indian/Kerguelen */
+  | 'INDIAN_KERGUELEN'
+  /** Indian/Mahe */
+  | 'INDIAN_MAHE'
+  /** Indian/Maldives */
+  | 'INDIAN_MALDIVES'
+  /** Indian/Mauritius */
+  | 'INDIAN_MAURITIUS'
+  /** Indian/Mayotte */
+  | 'INDIAN_MAYOTTE'
+  /** Indian/Reunion */
+  | 'INDIAN_REUNION'
+  /** Pacific/Apia */
+  | 'PACIFIC_APIA'
+  /** Pacific/Auckland */
+  | 'PACIFIC_AUCKLAND'
+  /** Pacific/Bougainville */
+  | 'PACIFIC_BOUGAINVILLE'
+  /** Pacific/Chatham */
+  | 'PACIFIC_CHATHAM'
+  /** Pacific/Chuuk */
+  | 'PACIFIC_CHUUK'
+  /** Pacific/Easter */
+  | 'PACIFIC_EASTER'
+  /** Pacific/Efate */
+  | 'PACIFIC_EFATE'
+  /** Pacific/Fakaofo */
+  | 'PACIFIC_FAKAOFO'
+  /** Pacific/Fiji */
+  | 'PACIFIC_FIJI'
+  /** Pacific/Funafuti */
+  | 'PACIFIC_FUNAFUTI'
+  /** Pacific/Galapagos */
+  | 'PACIFIC_GALAPAGOS'
+  /** Pacific/Gambier */
+  | 'PACIFIC_GAMBIER'
+  /** Pacific/Guadalcanal */
+  | 'PACIFIC_GUADALCANAL'
+  /** Pacific/Guam */
+  | 'PACIFIC_GUAM'
+  /** Pacific/Honolulu */
+  | 'PACIFIC_HONOLULU'
+  /** Pacific/Kanton */
+  | 'PACIFIC_KANTON'
+  /** Pacific/Kiritimati */
+  | 'PACIFIC_KIRITIMATI'
+  /** Pacific/Kosrae */
+  | 'PACIFIC_KOSRAE'
+  /** Pacific/Kwajalein */
+  | 'PACIFIC_KWAJALEIN'
+  /** Pacific/Majuro */
+  | 'PACIFIC_MAJURO'
+  /** Pacific/Marquesas */
+  | 'PACIFIC_MARQUESAS'
+  /** Pacific/Midway */
+  | 'PACIFIC_MIDWAY'
+  /** Pacific/Nauru */
+  | 'PACIFIC_NAURU'
+  /** Pacific/Niue */
+  | 'PACIFIC_NIUE'
+  /** Pacific/Norfolk */
+  | 'PACIFIC_NORFOLK'
+  /** Pacific/Noumea */
+  | 'PACIFIC_NOUMEA'
+  /** Pacific/Pago Pago */
+  | 'PACIFIC_PAGO_PAGO'
+  /** Pacific/Palau */
+  | 'PACIFIC_PALAU'
+  /** Pacific/Pitcairn */
+  | 'PACIFIC_PITCAIRN'
+  /** Pacific/Pohnpei */
+  | 'PACIFIC_POHNPEI'
+  /** Pacific/Port Moresby */
+  | 'PACIFIC_PORT_MORESBY'
+  /** Pacific/Rarotonga */
+  | 'PACIFIC_RAROTONGA'
+  /** Pacific/Saipan */
+  | 'PACIFIC_SAIPAN'
+  /** Pacific/Tahiti */
+  | 'PACIFIC_TAHITI'
+  /** Pacific/Tarawa */
+  | 'PACIFIC_TARAWA'
+  /** Pacific/Tongatapu */
+  | 'PACIFIC_TONGATAPU'
+  /** Pacific/Wake */
+  | 'PACIFIC_WAKE'
+  /** Pacific/Wallis */
+  | 'PACIFIC_WALLIS'
+  /** US/Alaska */
+  | 'US_ALASKA'
+  /** US/Arizona */
+  | 'US_ARIZONA'
+  /** US/Central */
+  | 'US_CENTRAL'
+  /** US/Eastern */
+  | 'US_EASTERN'
+  /** US/Hawaii */
+  | 'US_HAWAII'
+  /** US/Mountain */
+  | 'US_MOUNTAIN'
+  /** US/Pacific */
+  | 'US_PACIFIC'
+  /** UTC */
+  | 'UTC';
+
+export type CrontabScheduleType = Node & ObjectWithMetadata & {
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  /** Cron Minutes to Run. Use "*" for "all". (Example: "0,30") */
+  minute: Scalars['String'];
+  /** Cron Hours to Run. Use "*" for "all". (Example: "8,20") */
+  hour: Scalars['String'];
+  /** Cron Days Of The Week to Run. Use "*" for "all". (Example: "0,5") */
+  dayOfWeek: Scalars['String'];
+  /** Cron Days Of The Month to Run. Use "*" for "all". (Example: "1,15") */
+  dayOfMonth: Scalars['String'];
+  /** Cron Months Of The Year to Run. Use "*" for "all". (Example: "0,6") */
+  monthOfYear: Scalars['String'];
+  /** Timezone to Run the Cron Schedule on. Default is UTC. */
+  timezone: CrontabScheduleTimezone;
+  /** Crontab Schedule to run the task on.  Set only one schedule type, leave the others null. */
+  periodictaskSet: PeriodicTaskTypeConnection;
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItem>>;
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItem>>;
+  /**
+   * List of privately stored metadata namespaces.
+   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
+   */
+  privateMeta: Array<Maybe<MetaStore>>;
+  /**
+   * List of publicly stored metadata namespaces.
+   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
+   */
+  meta: Array<Maybe<MetaStore>>;
+};
+
+
+export type CrontabScheduleTypePeriodictaskSetArgs = {
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+  id?: Maybe<Scalars['ID']>;
+};
+
 export type CustomBannerType = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
@@ -4358,6 +5338,18 @@ export type DraftOrderCreate = {
   errors: Array<Error>;
   orderErrors: Array<OrderError>;
   order: Maybe<Order>;
+};
+
+/** Creates a new draft order. */
+export type DraftOrderCreateFromOrderId = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance. */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
 };
 
 export type DraftOrderCreateInput = {
@@ -5385,6 +6377,13 @@ export type GiftCardUpdateInput = {
   userEmail?: Maybe<Scalars['String']>;
 };
 
+export type GlobalSearchShopMetaType = {
+  /** Shopmeta Field name */
+  fieldName: Maybe<Scalars['String']>;
+  /** Shopmeta Field Value */
+  fieldValue: Maybe<Scalars['String']>;
+};
+
 export type GokwikType = {
   /** risk flag */
   isHighRisk: Scalars['Boolean'];
@@ -5589,6 +6588,53 @@ export type IntRangeInput = {
   gte?: Maybe<Scalars['Int']>;
   /** Value less than or equal to. */
   lte?: Maybe<Scalars['Int']>;
+};
+
+/** An enumeration. */
+export type IntervalSchedulePeriod =
+  /** Days */
+  | 'DAYS'
+  /** Hours */
+  | 'HOURS'
+  /** Minutes */
+  | 'MINUTES'
+  /** Seconds */
+  | 'SECONDS'
+  /** Microseconds */
+  | 'MICROSECONDS';
+
+export type IntervalScheduleType = Node & ObjectWithMetadata & {
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  /** Number of interval periods to wait before running the task again */
+  every: Scalars['Int'];
+  /** The type of period between task runs (Example: days) */
+  period: IntervalSchedulePeriod;
+  /** Interval Schedule to run the task on.  Set only one schedule type, leave the others null. */
+  periodictaskSet: PeriodicTaskTypeConnection;
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItem>>;
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItem>>;
+  /**
+   * List of privately stored metadata namespaces.
+   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
+   */
+  privateMeta: Array<Maybe<MetaStore>>;
+  /**
+   * List of publicly stored metadata namespaces.
+   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
+   */
+  meta: Array<Maybe<MetaStore>>;
+};
+
+
+export type IntervalScheduleTypePeriodictaskSetArgs = {
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+  id?: Maybe<Scalars['ID']>;
 };
 
 /** Represents an Invoice. */
@@ -7337,6 +8383,8 @@ export type Mutation = {
   draftOrderAddPromoCode: Maybe<DraftOrderAddPromoCode>;
   /** Create a new voucher for draft order */
   draftOrderRemovePromoCode: Maybe<DraftOrderRemovePromoCode>;
+  /** Creates a new draft order. */
+  draftOrderCreateFromOrderId: Maybe<DraftOrderCreateFromOrderId>;
   /** Adds COD charges to an order's total */
   draftOrderApplyCod: Maybe<DraftOrderApplyCod>;
   /** Removes COD charges from an orders total */
@@ -7357,12 +8405,22 @@ export type Mutation = {
   archiveOrderUpdate: Maybe<UpdateArchiveOrder>;
   /** Delete an archive order. */
   archiveOrderDelete: Maybe<DeleteArchiveOrder>;
+  /** Create a Periodic Task. */
+  periodicTaskCreate: Maybe<PeriodicTaskCreate>;
+  /** Update a Periodic Task. */
+  periodicTaskUpdate: Maybe<PeriodicTaskUpdate>;
+  /** Delete a Periodic Task. */
+  periodicTaskDelete: Maybe<PeriodicTaskDelete>;
   /** Create a new email template instance */
   emailTemplateCreate: Maybe<EmailTemplateCreate>;
   /** Update an email template instance */
   emailTemplateUpdate: Maybe<EmailTemplateUpdate>;
   /** Delete a template instance */
   emailTemplateDelete: Maybe<EmailTemplateDelete>;
+  /** Upload list of RTO customers. */
+  uploadRtoCustomersList: Maybe<UploadRtoCustomersListCsv>;
+  /** Remove list of RTO customers. */
+  removeRtoCustomersList: Maybe<RemoveRtoCustomersListCsv>;
 };
 
 
@@ -9636,6 +10694,11 @@ export type MutationDraftOrderRemovePromoCodeArgs = {
 };
 
 
+export type MutationDraftOrderCreateFromOrderIdArgs = {
+  orderId: Scalars['ID'];
+};
+
+
 export type MutationDraftOrderApplyCodArgs = {
   orderId: Scalars['ID'];
 };
@@ -9687,6 +10750,22 @@ export type MutationArchiveOrderDeleteArgs = {
 };
 
 
+export type MutationPeriodicTaskCreateArgs = {
+  input?: Maybe<PeriodicTaskCreateInput>;
+};
+
+
+export type MutationPeriodicTaskUpdateArgs = {
+  id: Scalars['ID'];
+  input?: Maybe<PeriodicTaskCreateInput>;
+};
+
+
+export type MutationPeriodicTaskDeleteArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type MutationEmailTemplateCreateArgs = {
   input?: Maybe<EmailTemplateInput>;
 };
@@ -9700,6 +10779,16 @@ export type MutationEmailTemplateUpdateArgs = {
 
 export type MutationEmailTemplateDeleteArgs = {
   id: Scalars['ID'];
+};
+
+
+export type MutationUploadRtoCustomersListArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
+export type MutationRemoveRtoCustomersListArgs = {
+  csvFile: Scalars['Upload'];
 };
 
 export type NameTranslationInput = {
@@ -11259,6 +12348,161 @@ export type PayuOrderType = {
   payload: Maybe<Scalars['JSONString']>;
 };
 
+/** Create a Periodic Task. */
+export type PeriodicTaskCreate = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  periodicTask: Maybe<PeriodicTaskType>;
+  periodicTaskErrors: Array<PeriodicTaskError>;
+};
+
+export type PeriodicTaskCreateInput = {
+  /** name of task */
+  name: Scalars['String'];
+  /** description of task */
+  description: Scalars['String'];
+  /** name of task with full path */
+  task: Scalars['String'];
+  /** interval */
+  interval?: Maybe<Scalars['Int']>;
+  /** Period */
+  period?: Maybe<PeriodsForPeriodicTask>;
+  /** toggle for task */
+  enable?: Maybe<Scalars['Boolean']>;
+  /** arguments of the tasks if any */
+  args?: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** key word arguments of the tasks if any */
+  kwargs?: Maybe<Scalars['JSONString']>;
+  /** Fields required to cron */
+  cronInput?: Maybe<CronInput>;
+};
+
+/** Delete a Periodic Task. */
+export type PeriodicTaskDelete = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  periodicTask: Maybe<PeriodicTaskType>;
+  periodicTaskErrors: Array<PeriodicTaskError>;
+};
+
+export type PeriodicTaskError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: PeriodicTaskErrorCode;
+};
+
+/** An enumeration. */
+export type PeriodicTaskErrorCode =
+  | 'INVALID'
+  | 'TASK_NAME_NOT_FOUND'
+  | 'TASK_NAME_ALREADY_EXISTS';
+
+export type PeriodicTaskSortOrders =
+  | 'ID_ASC'
+  | 'ID_DESC';
+
+export type PeriodicTaskType = Node & ObjectWithMetadata & {
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  /** Short Description For This Task */
+  name: Scalars['String'];
+  /** The Name of the Celery Task that Should be Run.  (Example: "proj.tasks.import_contacts") */
+  task: Scalars['String'];
+  /** Interval Schedule to run the task on.  Set only one schedule type, leave the others null. */
+  interval: Maybe<IntervalScheduleType>;
+  /** Crontab Schedule to run the task on.  Set only one schedule type, leave the others null. */
+  crontab: Maybe<CrontabScheduleType>;
+  /** JSON encoded positional arguments (Example: ["arg1", "arg2"]) */
+  args: Scalars['String'];
+  /** JSON encoded keyword arguments (Example: {"argument": "value"}) */
+  kwargs: Scalars['String'];
+  /** Queue defined in CELERY_TASK_QUEUES. Leave None for default queuing. */
+  queue: Maybe<Scalars['String']>;
+  /** Override Exchange for low-level AMQP routing */
+  exchange: Maybe<Scalars['String']>;
+  /** Override Routing Key for low-level AMQP routing */
+  routingKey: Maybe<Scalars['String']>;
+  /** JSON encoded message headers for the AMQP message. */
+  headers: Scalars['String'];
+  /** Priority Number between 0 and 255. Supported by: RabbitMQ, Redis (priority reversed, 0 is highest). */
+  priority: Maybe<Scalars['Int']>;
+  /** Datetime after which the schedule will no longer trigger the task to run */
+  expires: Maybe<Scalars['DateTime']>;
+  /** Timedelta with seconds which the schedule will no longer trigger the task to run */
+  expireSeconds: Maybe<Scalars['Int']>;
+  /** If True, the schedule will only run the task a single time */
+  oneOff: Scalars['Boolean'];
+  /** Datetime when the schedule should begin triggering the task to run */
+  startTime: Maybe<Scalars['DateTime']>;
+  /** Set to False to disable the schedule */
+  enabled: Scalars['Boolean'];
+  /** Datetime that the schedule last triggered the task to run. Reset to None if enabled is set to False. */
+  lastRunAt: Maybe<Scalars['DateTime']>;
+  /** Running count of how many times the schedule has triggered the task */
+  totalRunCount: Scalars['Int'];
+  /** Datetime that this PeriodicTask was last modified */
+  dateChanged: Scalars['DateTime'];
+  /** Detailed description about the details of this Periodic Task */
+  description: Scalars['String'];
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItem>>;
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItem>>;
+  /**
+   * List of privately stored metadata namespaces.
+   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
+   */
+  privateMeta: Array<Maybe<MetaStore>>;
+  /**
+   * List of publicly stored metadata namespaces.
+   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
+   */
+  meta: Array<Maybe<MetaStore>>;
+};
+
+export type PeriodicTaskTypeConnection = {
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<PeriodicTaskTypeEdge>>;
+};
+
+/** A Relay edge containing a `PeriodicTaskType` and its cursor. */
+export type PeriodicTaskTypeEdge = {
+  /** The item at the end of the edge */
+  node: Maybe<PeriodicTaskType>;
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
+};
+
+/** Update a Periodic Task. */
+export type PeriodicTaskUpdate = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  periodicTask: Maybe<PeriodicTaskType>;
+  periodicTaskErrors: Array<PeriodicTaskError>;
+};
+
+/** An enumeration. */
+export type PeriodsForPeriodicTask =
+  | 'DAYS'
+  | 'HOURS'
+  | 'MINUTES'
+  | 'SECONDS'
+  | 'MICROSECONDS';
+
 /** Represents a permission object in a friendly form. */
 export type Permission = {
   /** Internal code for permission. */
@@ -11802,6 +13046,7 @@ export type ProductFilterInput = {
   rating?: Maybe<IntRangeInput>;
   minimalPrice?: Maybe<PriceRangeInput>;
   productTypes?: Maybe<Array<Maybe<Scalars['ID']>>>;
+  searchAdmin?: Maybe<Scalars['String']>;
   ids?: Maybe<Array<Maybe<Scalars['ID']>>>;
 };
 
@@ -12011,6 +13256,7 @@ export type ProductReviewErrorCode =
 
 export type ProductReviewFilterInput = {
   product?: Maybe<Scalars['String']>;
+  productId?: Maybe<Scalars['String']>;
   customer?: Maybe<Scalars['String']>;
   created?: Maybe<DateRangeInput>;
   isPublished?: Maybe<Scalars['Boolean']>;
@@ -13032,6 +14278,7 @@ export type Query = {
   authenticated: Scalars['Boolean'];
   authenticating: Scalars['Boolean'];
   banners: Maybe<CustomBannerTypeConnection>;
+  bulkAction: Maybe<BulkActionCsvLogsTypeCountableConnection>;
   cartItems: Maybe<CheckoutLine>;
   cashback: Maybe<CashbackType>;
   /** List of the shop's categories. */
@@ -13096,6 +14343,8 @@ export type Query = {
   giftCard: Maybe<GiftCard>;
   /** List of gift cards. */
   giftCards: Maybe<GiftCardCountableConnection>;
+  /** Search Value for global search. */
+  globalSearch: Maybe<GlobalSearchType>;
   gokwikRtoPredict: Maybe<GokwikType>;
   headers: Maybe<HeaderTypeConnection>;
   /** List of activity events to display on homepage (at the moment it only contains order-events). */
@@ -13138,6 +14387,8 @@ export type Query = {
   ordersV2: Maybe<OrderCountableConnection>;
   /** Look up a page by ID or slug. */
   page: Maybe<Page>;
+  /** Look up a page by ID or slug. */
+  pageSlugs: Maybe<Array<Maybe<Page>>>;
   /** List of the shop's pages. */
   pages: Maybe<PageCountableConnection>;
   /** Look up a Partner by ID. */
@@ -13153,6 +14404,9 @@ export type Query = {
   payment: Maybe<Payment>;
   /** List of payments. */
   payments: Maybe<PaymentCountableConnection>;
+  /** Look up a Periodic Task by ID. */
+  periodicTask: Maybe<PeriodicTaskType>;
+  periodicTasks: Maybe<PeriodicTaskTypeConnection>;
   /** Look up permission group by ID. */
   permissionGroup: Maybe<Group>;
   /** List of permission groups. */
@@ -13170,6 +14424,8 @@ export type Query = {
   productReview: Maybe<ProductReviewType>;
   productReviews: Maybe<ProductReviewTypeCountableConnection>;
   productReviewsAll: Maybe<ProductReviewTypeCountableConnection>;
+  /** Look up a productVariant by sku. */
+  productSkus: Maybe<Array<Maybe<ProductVariant>>>;
   /** Look up a product type by ID. */
   productType: Maybe<ProductType>;
   /** List of the shop's product types. */
@@ -13362,6 +14618,16 @@ export type QueryBannersArgs = {
   link?: Maybe<Scalars['String']>;
   position?: Maybe<Scalars['Int']>;
   slug?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryBulkActionArgs = {
+  filter?: Maybe<BulkActionCsvLogsFilterInput>;
+  sortBy?: Maybe<BulkActionCsvLogsSortType>;
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
 };
 
 
@@ -13657,6 +14923,11 @@ export type QueryGiftCardsArgs = {
 };
 
 
+export type QueryGlobalSearchArgs = {
+  search?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryGokwikRtoPredictArgs = {
   checkoutId?: Maybe<Scalars['String']>;
 };
@@ -13825,6 +15096,11 @@ export type QueryPageArgs = {
 };
 
 
+export type QueryPageSlugsArgs = {
+  slug: Array<Maybe<Scalars['String']>>;
+};
+
+
 export type QueryPagesArgs = {
   sortBy?: Maybe<PageSortingInput>;
   filter?: Maybe<PageFilterInput>;
@@ -13888,6 +15164,20 @@ export type QueryPaymentArgs = {
 
 
 export type QueryPaymentsArgs = {
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryPeriodicTaskArgs = {
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryPeriodicTasksArgs = {
+  sort?: Maybe<PeriodicTaskSortOrders>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -13982,6 +15272,11 @@ export type QueryProductReviewsAllArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryProductSkusArgs = {
+  sku: Array<Maybe<Scalars['String']>>;
 };
 
 
@@ -14429,6 +15724,18 @@ export type RefreshToken = {
   /** A user instance. */
   user: Maybe<User>;
   accountErrors: Array<AccountError>;
+};
+
+/** Remove list of RTO customers. */
+export type RemoveRtoCustomersListCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+  sectionErrors: Array<SectionError>;
 };
 
 /** Updates tags of the object. */
@@ -16705,7 +18012,8 @@ export type TemplateMailType =
   | 'WALLET'
   | 'NOTIFICATION'
   | 'INVOICE'
-  | 'CONTACT_US';
+  | 'CONTACT_US'
+  | 'MEMBERSHIP_ACTIVATE';
 
 /** Requests for Token for registered user. */
 export type TokenCreateWithAdmin = {
@@ -17154,6 +18462,18 @@ export type UploadProductImageCsv = {
   errors: Array<Error>;
   /** A Product instance. */
   product: Maybe<Product>;
+};
+
+/** Upload list of RTO customers. */
+export type UploadRtoCustomersListCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+  sectionErrors: Array<SectionError>;
 };
 
 /** Represents user data. */
@@ -18570,6 +19890,19 @@ export type CheckoutRemovePromoCodeShopify = {
   checkout: Maybe<Checkout>;
 };
 
+export type GlobalSearchType = {
+  /** Search Order */
+  orders: Maybe<Array<Maybe<Order>>>;
+  /** Search Products */
+  products: Maybe<Array<Maybe<Product>>>;
+  /** Customer search */
+  customers: Maybe<Array<Maybe<User>>>;
+  /** Voucher Search */
+  vouchers: Maybe<Array<Maybe<VoucherRuleLinkType>>>;
+  /** Shopmeta data */
+  shopmeta: Maybe<Array<Maybe<GlobalSearchShopMetaType>>>;
+};
+
 export type AccountErrorFragment = Pick<AccountError, 'code' | 'field' | 'message'>;
 
 export type AddressFragment = (
@@ -18958,6 +20291,13 @@ export type UpdateCheckoutLineNextMutationVariables = Exact<{
 
 
 export type UpdateCheckoutLineNextMutation = { checkoutLinesUpdate: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>>, errors: Array<CheckoutErrorFragment> }> };
+
+export type PayuOrderCreateMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+}>;
+
+
+export type PayuOrderCreateMutation = { payuOrderCreate: Maybe<{ payuOrder: Maybe<Pick<PayuOrderType, 'token' | 'paymentUrl' | 'payload'>> }> };
 
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -20857,6 +22197,43 @@ export function useUpdateCheckoutLineNextMutation(baseOptions?: Apollo.MutationH
 export type UpdateCheckoutLineNextMutationHookResult = ReturnType<typeof useUpdateCheckoutLineNextMutation>;
 export type UpdateCheckoutLineNextMutationResult = Apollo.MutationResult<UpdateCheckoutLineNextMutation>;
 export type UpdateCheckoutLineNextMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>;
+export const PayuOrderCreateDocument = gql`
+    mutation payuOrderCreate($checkoutId: ID!) {
+  payuOrderCreate(checkoutId: $checkoutId) {
+    payuOrder {
+      token
+      paymentUrl
+      payload
+    }
+  }
+}
+    `;
+export type PayuOrderCreateMutationFn = Apollo.MutationFunction<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>;
+
+/**
+ * __usePayuOrderCreateMutation__
+ *
+ * To run a mutation, you first call `usePayuOrderCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePayuOrderCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [payuOrderCreateMutation, { data, loading, error }] = usePayuOrderCreateMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *   },
+ * });
+ */
+export function usePayuOrderCreateMutation(baseOptions?: Apollo.MutationHookOptions<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>(PayuOrderCreateDocument, options);
+      }
+export type PayuOrderCreateMutationHookResult = ReturnType<typeof usePayuOrderCreateMutation>;
+export type PayuOrderCreateMutationResult = Apollo.MutationResult<PayuOrderCreateMutation>;
+export type PayuOrderCreateMutationOptions = Apollo.BaseMutationOptions<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>;
 export const UserDetailsDocument = gql`
     query UserDetails {
   user: me {
