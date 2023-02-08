@@ -62,11 +62,21 @@ export const createFetch = ({
   function shouldThrottleRenew(renewTimeQueue:any) {
     let shoudlThrottleRenew = false;
     renewTimeQueue.push(Date.now()); 
-    if (renewTimeQueue.length >= 5) {
+    if (renewTimeQueue.length == 5) {
       // get and remove first item from queue
       const firstTime = renewTimeQueue[0];
       const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
       shoudlThrottleRenew = lastTime - firstTime < 20 * 1000;
+    } else if (renewTimeQueue.length > 5) {
+      //empty if interval is more than 20s
+      const firstTime = renewTimeQueue[0];
+      const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
+      if (lastTime - firstTime > 20 * 1000) {
+        renewTimeQueue = [];
+        shoudlThrottleRenew=false;
+      }else{
+        shoudlThrottleRenew=true;
+      } 
     }
     return shoudlThrottleRenew;
   };
@@ -101,10 +111,10 @@ export const createFetch = ({
       if (refreshPromise) {
         await refreshPromise;
       } else if (Date.now() >= expirationTime) {
+        console.log("renewTimeQueue",renewTimeQueue)
         // refreshToken automatically updates token in storage
         if (shouldThrottleRenew(renewTimeQueue)) {
-          console.log("renewTimeQueue",renewTimeQueue)
-          if (renewTimeQueue?.length <= 5) {
+          if (renewTimeQueue?.length == 5) {
             //THROW ERROR
             alert("Incorrect system time detected. Please update your time settings.");
           }
