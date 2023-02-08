@@ -19,6 +19,7 @@ import {
   // ExternalRefreshMutation,
   Maybe,
   RefreshTokenMutation,
+  WishlistFragment,
 } from "./types";
 // import { UpdateCheckoutLine_checkoutLinesUpdate_checkout_lines } from "./cartTypes";
 import { setContext } from "@apollo/client/link/context";
@@ -174,6 +175,7 @@ export const createFetch = ({
 };
 
 export const cartItemsVar = makeVar<Maybe<CheckoutLineFragment>[]>([]);
+export const wishlistVar = makeVar<Maybe<WishlistFragment>>(null);
 
 const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
   Query: {
@@ -227,6 +229,41 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
           const cartItems = cartItemsVar();
 
           return cartItems;
+        },
+      },
+      wishlist: {
+        read(existing) {
+          if (!existing) {
+            const safeJsonParse = (value: any) => {
+              try {
+                return JSON.parse(value);
+              } catch {
+                return value;
+              }
+            };
+            const wishlistString = storage.getWishlist();
+            const wishlist =
+              wishlistString && typeof wishlistString === "string"
+                ? safeJsonParse(wishlistString)
+                : wishlistString;
+
+            if (wishlist) {
+              try {
+                wishlistVar(wishlist);
+              } catch (e) {
+                console.log("error while setting wishlist", e);
+              }
+              return { ...wishlist?.items };
+            }
+
+            return {
+              items: [],
+            };
+          } else {
+            return {
+              items: [],
+            };
+          }
         },
       },
       localCheckout: {
@@ -396,13 +433,13 @@ export const createApolloClient = (
   const authLink = setContext(async (_, { headers }) => {
     let ip, fbp, fbc;
     if (typeof window !== "undefined") {
-      function getCookie(name:any) {
+      const getCookie = (name: any) => {
         // Split cookie string and get all individual name=value pairs in an array
         var cookieArr = document.cookie.split(";");
 
         // Loop through the array elements
         for (var i = 0; i < cookieArr.length; i++) {
-          var cookiePair:any = cookieArr[i].split("=");
+          var cookiePair: any = cookieArr[i].split("=");
 
           /* Removing whitespace at the beginning of the cookie name
           and compare it with the given string */
@@ -414,12 +451,12 @@ export const createApolloClient = (
 
         // Return null if not found
         return null;
-      }
+      };
       ip = sessionStorage.getItem("ip");
       fbp = getCookie("_fbp");
       fbc = getCookie("_fbc");
     }
-  
+
     return {
       headers: {
         ...headers,

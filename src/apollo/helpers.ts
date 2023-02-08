@@ -1,10 +1,11 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
-import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT } from ".";
+import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT, wishlistVar } from ".";
 import { storage } from "../core/storage";
 import {
   CHECKOUT_DETAILS_NEXT,
   GET_DISCOUNT_CASHBACK_QUERY,
   GET_LOCAL_CHECKOUT,
+  GET_WISHLIST,
 } from "./queries";
 import {
   CheckoutDetailsNextQuery,
@@ -242,4 +243,21 @@ export const getLatestCheckout = async (
   };
 
   return returnObject;
+};
+
+export const setLocalWishlistInCache = async (
+  client: ApolloClient<NormalizedCacheObject>,
+  wishlist: any
+) => {
+  try {
+    wishlistVar(wishlist);
+  } catch (e) {
+    console.log("error while setting wishlist helper func", e);
+  }
+  client.writeQuery({
+    query: GET_WISHLIST,
+    data: {
+      wishlist: wishlist,
+    },
+  });
 };

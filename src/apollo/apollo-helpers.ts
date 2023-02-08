@@ -3188,6 +3188,12 @@ export type OrderBulkCancelFieldPolicy = {
 	count?: FieldPolicy<any> | FieldReadFunction<any>,
 	orderErrors?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type OrderCODToPrepaidKeySpecifier = ('errors' | 'order' | 'orderErrors' | OrderCODToPrepaidKeySpecifier)[];
+export type OrderCODToPrepaidFieldPolicy = {
+	errors?: FieldPolicy<any> | FieldReadFunction<any>,
+	order?: FieldPolicy<any> | FieldReadFunction<any>,
+	orderErrors?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type OrderCancelKeySpecifier = ('errors' | 'order' | 'orderErrors' | OrderCancelKeySpecifier)[];
 export type OrderCancelFieldPolicy = {
 	errors?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -7846,6 +7852,10 @@ export type TypedTypePolicies = TypePolicies & {
 	OrderBulkCancel?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | OrderBulkCancelKeySpecifier | (() => undefined | OrderBulkCancelKeySpecifier),
 		fields?: OrderBulkCancelFieldPolicy,
+	},
+	OrderCODToPrepaid?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | OrderCODToPrepaidKeySpecifier | (() => undefined | OrderCODToPrepaidKeySpecifier),
+		fields?: OrderCODToPrepaidFieldPolicy,
 	},
 	OrderCancel?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | OrderCancelKeySpecifier | (() => undefined | OrderCancelKeySpecifier),

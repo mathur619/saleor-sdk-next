@@ -4,6 +4,7 @@ import {
   checkoutLineFragment,
   orderDetailFragment,
   userFragment,
+  wishlistFragment,
 } from "./fragments";
 
 export const USER = gql`
@@ -227,6 +228,15 @@ export const USER_ORDER_DETAILS = gql`
           }
         }
       }
+    }
+  }
+`;
+
+export const GET_WISHLIST = gql`
+  ${wishlistFragment}
+  query wishlist {
+    wishlist {
+      ...Wishlist
     }
   }
 `;

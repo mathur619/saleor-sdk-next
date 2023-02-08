@@ -133,7 +133,7 @@ export interface CheckoutSDK {
     input: PaymentMethodUpdateInput
   ) => CheckoutPaymentMethodUpdateResult;
   createPayment?: (input: CreatePaymentInput) => CreatePaymentResult;
-  completeCheckout?: (input?: CompleteCheckoutInput) => CompleteCheckoutResult;
+  completeCheckout?: (input?: CompleteCheckoutInput, checkoutId?: string) => CompleteCheckoutResult;
   getCityStateFromPincode?: (pincode: string) => GetCityStateFromPincodeResult;
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
   createPaytmOrder?: () => CreatePaytmOrderResult;
@@ -652,7 +652,8 @@ export const checkout = ({
   };
 
   const completeCheckout: CheckoutSDK["completeCheckout"] = async (
-    input: CompleteCheckoutInput | undefined
+    input: CompleteCheckoutInput | undefined,
+    checkoutId?: string 
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -666,12 +667,13 @@ export const checkout = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
-    if (checkout && checkout?.id) {
+    if (checkoutId || checkout?.id) {
       const paymentDataString =
         input?.paymentData && JSON.stringify(input?.paymentData);
 
       const variables: CompleteCheckoutMutationVariables = {
-        checkoutId: checkout?.id,
+        // @ts-ignore
+        checkoutId: checkoutId || checkout?.id,
         paymentData: paymentDataString,
         redirectUrl: input?.redirectUrl,
         storeSource: input?.storeSource,
