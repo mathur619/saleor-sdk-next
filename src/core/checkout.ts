@@ -19,6 +19,7 @@ import {
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
 } from "../apollo/mutations";
 import {
+  GET_CHECKOUT_TOTALS,
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
 } from "../apollo/queries";
@@ -66,6 +67,8 @@ import {
   CheckJuspayOrderStatusMutation,
   VerifyJuspayVpaMutationVariables,
   VerifyJuspayVpaMutation,
+  CheckoutTotalsQuery,
+  CheckoutTotalsQueryVariables,
 } from "../apollo/types";
 
 import {
@@ -80,6 +83,7 @@ import {
   AddPromoCodeResult,
   CheckJuspayOrderStatusResult,
   CheckoutPaymentMethodUpdateResult,
+  CheckoutTotalsResult,
   CompleteCheckoutResult,
   CreateCashfreeOrderResult,
   CreateCheckoutResult,
@@ -149,6 +153,7 @@ export interface CheckoutSDK {
   juspayVpaVerify?: (vpa: string) => VerifyJuspayVpaResult;
   createPaytmOrder?: () => CreatePaytmOrderResult;
   getWalletAmount?: () => GetWalletAmountResult;
+  getCheckoutTotals?: () => CheckoutTotalsResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
@@ -446,12 +451,12 @@ export const checkout = ({
         res.data?.checkoutShippingMethodUpdate?.errors &&
         res.data?.checkoutShippingMethodUpdate?.errors[0]?.code ===
           "NOT_FOUND" &&
-          res.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
+        res.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
           "checkoutId" &&
         typeof window !== "undefined"
       ) {
-        localStorage.removeItem(SALEOR_CHECKOUT)
-        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS)
+        localStorage.removeItem(SALEOR_CHECKOUT);
+        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS);
         window.location.reload();
       }
 
@@ -1004,6 +1009,52 @@ export const checkout = ({
     return res;
   };
 
+  const getCheckoutTotals: CheckoutSDK["getCheckoutTotals"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.token) {
+      const res = await client.query<
+        CheckoutTotalsQuery,
+        CheckoutTotalsQueryVariables
+      >({
+        query: GET_CHECKOUT_TOTALS,
+        variables: {
+          token: checkout?.token,
+        },
+        fetchPolicy: "no-cache",
+      });
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
+
+      return res;
+    }
+
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: false,
+      },
+    });
+
+    return null;
+  };
+
   const getUserOrders: CheckoutSDK["getUserOrders"] = async (
     opts: OrdersByUserQueryVariables
   ) => {
@@ -1106,5 +1157,6 @@ export const checkout = ({
     setUseCashback,
     setCheckout,
     createCashfreeOrder,
+    getCheckoutTotals,
   };
 };

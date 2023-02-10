@@ -20601,6 +20601,19 @@ export type OrdersByUserQuery = { me: Maybe<(
         ) }> }> }
   )> };
 
+export type CheckoutTotalsQueryVariables = Exact<{
+  token?: Maybe<Scalars['UUID']>;
+}>;
+
+
+export type CheckoutTotalsQuery = { checkoutTotals: Maybe<{ codTotal: Maybe<(
+      Pick<TaxedMoney, 'currency'>
+      & { gross: Pick<Money, 'currency' | 'amount'>, net: Pick<Money, 'currency' | 'amount'> }
+    )>, prepaidTotal: Maybe<(
+      Pick<TaxedMoney, 'currency'>
+      & { net: Pick<Money, 'currency' | 'amount'>, gross: Pick<Money, 'currency' | 'amount'> }
+    )> }> };
+
 export const AccountErrorFragmentDoc = gql`
     fragment AccountErrorFragment on AccountError {
   code
@@ -20667,7 +20680,7 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
-    
+
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -23059,3 +23072,59 @@ export function useOrdersByUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type OrdersByUserQueryHookResult = ReturnType<typeof useOrdersByUserQuery>;
 export type OrdersByUserLazyQueryHookResult = ReturnType<typeof useOrdersByUserLazyQuery>;
 export type OrdersByUserQueryResult = Apollo.QueryResult<OrdersByUserQuery, OrdersByUserQueryVariables>;
+export const CheckoutTotalsDocument = gql`
+    query CheckoutTotals($token: UUID) {
+  checkoutTotals(token: $token) {
+    codTotal {
+      currency
+      gross {
+        currency
+        amount
+      }
+      net {
+        currency
+        amount
+      }
+    }
+    prepaidTotal {
+      currency
+      net {
+        currency
+        amount
+      }
+      gross {
+        currency
+        amount
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCheckoutTotalsQuery__
+ *
+ * To run a query within a React component, call `useCheckoutTotalsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckoutTotalsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckoutTotalsQuery({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useCheckoutTotalsQuery(baseOptions?: Apollo.QueryHookOptions<CheckoutTotalsQuery, CheckoutTotalsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CheckoutTotalsQuery, CheckoutTotalsQueryVariables>(CheckoutTotalsDocument, options);
+      }
+export function useCheckoutTotalsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CheckoutTotalsQuery, CheckoutTotalsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CheckoutTotalsQuery, CheckoutTotalsQueryVariables>(CheckoutTotalsDocument, options);
+        }
+export type CheckoutTotalsQueryHookResult = ReturnType<typeof useCheckoutTotalsQuery>;
+export type CheckoutTotalsLazyQueryHookResult = ReturnType<typeof useCheckoutTotalsLazyQuery>;
+export type CheckoutTotalsQueryResult = Apollo.QueryResult<CheckoutTotalsQuery, CheckoutTotalsQueryVariables>;

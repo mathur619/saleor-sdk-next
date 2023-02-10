@@ -230,3 +230,32 @@ export const USER_ORDER_DETAILS = gql`
     }
   }
 `;
+
+export const GET_CHECKOUT_TOTALS = gql`
+  query CheckoutTotals($token: UUID) {
+    checkoutTotals(token: $token) {
+      codTotal {
+        currency
+        gross {
+          currency
+          amount
+        }
+        net {
+          currency
+          amount
+        }
+      }
+      prepaidTotal {
+        currency
+        net {
+          currency
+          amount
+        }
+        gross {
+          currency
+          amount
+        }
+      }
+    }
+  }
+`;

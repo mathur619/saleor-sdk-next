@@ -71,6 +71,7 @@ import {
   CheckJuspayOrderStatusMutation,
   VerifyJuspayVpaMutation,
   CheckoutCustomerAttachNewMutation,
+  CheckoutTotalsQuery,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -257,6 +258,10 @@ export type GetUserOrdersResult = Promise<
     Exact<{ perPage: number; after?: Maybe<string> | undefined }>
   >
 >;
+
+export type CheckoutTotalsResult = Promise<FetchResult<
+  CheckoutTotalsQuery
+> | null>;
 
 // Cart
 
