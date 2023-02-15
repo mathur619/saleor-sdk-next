@@ -671,26 +671,37 @@ export const checkout = ({
         redirectUrl: input?.redirectUrl,
         storeSource: input?.storeSource,
       };
-      const res = await client.mutate<
-        CompleteCheckoutMutation,
-        CompleteCheckoutMutationVariables
-      >({
-        mutation: COMPLETE_CHECKOUT,
-        variables,
-        update: async (_, { data }) => {
-          if (data?.checkoutComplete?.order?.id) {
-            if (!data?.checkoutComplete.confirmationNeeded) {
-              await setLocalCheckoutInCache(client, {}, false, data);
-              storage.setCheckout({});
+      try {
+        const res = await client.mutate<
+          CompleteCheckoutMutation,
+          CompleteCheckoutMutationVariables
+        >({
+          mutation: COMPLETE_CHECKOUT,
+          variables,
+          update: async (_, { data }) => {
+            if (data?.checkoutComplete?.order?.id) {
+              if (!data?.checkoutComplete.confirmationNeeded) {
+                await setLocalCheckoutInCache(client, {}, false, data);
+                storage.setCheckout({});
+              }
             }
-          }
-        },
-      });
+          },
+        });
 
-      if (
-        res?.data?.checkoutComplete?.errors &&
-        res?.data?.checkoutComplete?.errors[0]?.code
-      ) {
+        if (
+          res?.data?.checkoutComplete?.errors &&
+          res?.data?.checkoutComplete?.errors[0]?.code
+        ) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+        }
+
+        return res;
+      } catch {
         client.writeQuery({
           query: GET_LOCAL_CHECKOUT,
           data: {
@@ -698,8 +709,7 @@ export const checkout = ({
           },
         });
       }
-
-      return res;
+      
     }
 
     return null;
