@@ -72,6 +72,7 @@ import {
   VerifyJuspayVpaMutation,
   CheckoutCustomerAttachNewMutation,
   CheckoutTotalsQuery,
+  CreateJuspayPaymentMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -233,6 +234,10 @@ export type CreateRazorpayOrderResult = Promise<FetchResult<
 
 export type JuspayOrderAndCustomerCreateResult = Promise<FetchResult<
   CreateJuspayOrderAndCustomerMutation
+> | null>;
+
+export type JuspayPaymentCreateResult = Promise<FetchResult<
+  CreateJuspayPaymentMutation
 > | null>;
 
 export type CheckJuspayOrderStatusResult = Promise<FetchResult<

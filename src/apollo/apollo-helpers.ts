@@ -1781,6 +1781,12 @@ export type DraftOrderCreateFieldPolicy = {
 	orderErrors?: FieldPolicy<any> | FieldReadFunction<any>,
 	order?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type DraftOrderCreateFromOrderIdKeySpecifier = ('errors' | 'order' | 'orderErrors' | DraftOrderCreateFromOrderIdKeySpecifier)[];
+export type DraftOrderCreateFromOrderIdFieldPolicy = {
+	errors?: FieldPolicy<any> | FieldReadFunction<any>,
+	order?: FieldPolicy<any> | FieldReadFunction<any>,
+	orderErrors?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type DraftOrderDeleteKeySpecifier = ('errors' | 'orderErrors' | 'order' | DraftOrderDeleteKeySpecifier)[];
 export type DraftOrderDeleteFieldPolicy = {
 	errors?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -2201,6 +2207,11 @@ export type GiftCardUpdateFieldPolicy = {
 	giftCardErrors?: FieldPolicy<any> | FieldReadFunction<any>,
 	giftCard?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type GlobalSearchShopMetaTypeKeySpecifier = ('fieldName' | 'fieldValue' | GlobalSearchShopMetaTypeKeySpecifier)[];
+export type GlobalSearchShopMetaTypeFieldPolicy = {
+	fieldName?: FieldPolicy<any> | FieldReadFunction<any>,
+	fieldValue?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type GokwikTypeKeySpecifier = ('isHighRisk' | 'isDataValid' | GokwikTypeKeySpecifier)[];
 export type GokwikTypeFieldPolicy = {
 	isHighRisk?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -2411,7 +2422,7 @@ export type JuspayErrorFieldPolicy = {
 	message?: FieldPolicy<any> | FieldReadFunction<any>,
 	code?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type JuspayOrderAndCustomerTypeKeySpecifier = ('id' | 'orderId' | 'amount' | 'status' | 'paymentLinks' | 'clientJuspay' | 'customerId' | JuspayOrderAndCustomerTypeKeySpecifier)[];
+export type JuspayOrderAndCustomerTypeKeySpecifier = ('id' | 'orderId' | 'amount' | 'status' | 'paymentLinks' | 'clientJuspay' | 'customerId' | 'deepLink' | JuspayOrderAndCustomerTypeKeySpecifier)[];
 export type JuspayOrderAndCustomerTypeFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	orderId?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -2419,7 +2430,8 @@ export type JuspayOrderAndCustomerTypeFieldPolicy = {
 	status?: FieldPolicy<any> | FieldReadFunction<any>,
 	paymentLinks?: FieldPolicy<any> | FieldReadFunction<any>,
 	clientJuspay?: FieldPolicy<any> | FieldReadFunction<any>,
-	customerId?: FieldPolicy<any> | FieldReadFunction<any>
+	customerId?: FieldPolicy<any> | FieldReadFunction<any>,
+	deepLink?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type JuspayOrderStatusTypeKeySpecifier = ('id' | 'orderId' | 'amount' | 'status' | 'paymentStatus' | JuspayOrderStatusTypeKeySpecifier)[];
 export type JuspayOrderStatusTypeFieldPolicy = {
@@ -2435,13 +2447,25 @@ export type JuspayPaymentFieldPolicy = {
 	juspayResponse?: FieldPolicy<any> | FieldReadFunction<any>,
 	juspayErrors?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type JuspayPaymentTypeKeySpecifier = ('status' | 'orderId' | 'paymentAuthentication' | 'paymentParams' | 'paymentTxnId' | JuspayPaymentTypeKeySpecifier)[];
+export type JuspayPaymentTypeKeySpecifier = ('status' | 'orderId' | 'paymentAuthentication' | 'paymentParams' | 'paymentTxnId' | 'paymentTxnUuid' | 'sdkParams' | JuspayPaymentTypeKeySpecifier)[];
 export type JuspayPaymentTypeFieldPolicy = {
 	status?: FieldPolicy<any> | FieldReadFunction<any>,
 	orderId?: FieldPolicy<any> | FieldReadFunction<any>,
 	paymentAuthentication?: FieldPolicy<any> | FieldReadFunction<any>,
 	paymentParams?: FieldPolicy<any> | FieldReadFunction<any>,
-	paymentTxnId?: FieldPolicy<any> | FieldReadFunction<any>
+	paymentTxnId?: FieldPolicy<any> | FieldReadFunction<any>,
+	paymentTxnUuid?: FieldPolicy<any> | FieldReadFunction<any>,
+	sdkParams?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type JuspaySdkParamsKeySpecifier = ('amount' | 'customerLastName' | 'customerFirstName' | 'merchantVpa' | 'merchantName' | 'mcc' | 'tr' | JuspaySdkParamsKeySpecifier)[];
+export type JuspaySdkParamsFieldPolicy = {
+	amount?: FieldPolicy<any> | FieldReadFunction<any>,
+	customerLastName?: FieldPolicy<any> | FieldReadFunction<any>,
+	customerFirstName?: FieldPolicy<any> | FieldReadFunction<any>,
+	merchantVpa?: FieldPolicy<any> | FieldReadFunction<any>,
+	merchantName?: FieldPolicy<any> | FieldReadFunction<any>,
+	mcc?: FieldPolicy<any> | FieldReadFunction<any>,
+	tr?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type JuspayTxnAuthenticationKeySpecifier = ('url' | 'method' | JuspayTxnAuthenticationKeySpecifier)[];
 export type JuspayTxnAuthenticationFieldPolicy = {
@@ -2735,7 +2759,7 @@ export type MoneyRangeFieldPolicy = {
 	start?: FieldPolicy<any> | FieldReadFunction<any>,
 	stop?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MutationKeySpecifier = ('wishlistAddProduct' | 'wishlistRemoveProduct' | 'wishlistAddVariant' | 'wishlistRemoveVariant' | 'addTags' | 'removeTags' | 'webhookCreate' | 'webhookDelete' | 'webhookUpdate' | 'createWarehouse' | 'updateWarehouse' | 'deleteWarehouse' | 'assignWarehouseShippingZone' | 'unassignWarehouseShippingZone' | 'authorizationKeyAdd' | 'authorizationKeyDelete' | 'staffNotificationRecipientCreate' | 'staffNotificationRecipientUpdate' | 'staffNotificationRecipientDelete' | 'homepageCollectionUpdate' | 'shopDomainUpdate' | 'shopSettingsUpdate' | 'shopFetchTaxRates' | 'shopSettingsTranslate' | 'shopAddressUpdate' | 'shippingPriceCreate' | 'shippingPriceDelete' | 'shippingPriceBulkDelete' | 'shippingPriceUpdate' | 'shippingPriceTranslate' | 'shippingZoneCreate' | 'shippingZoneDelete' | 'shippingZoneBulkDelete' | 'shippingZoneUpdate' | 'attributeCreate' | 'attributeDelete' | 'attributeBulkDelete' | 'attributeAssign' | 'attributeUnassign' | 'attributeUpdate' | 'attributeTranslate' | 'attributeUpdateMetadata' | 'attributeClearMetadata' | 'attributeUpdatePrivateMetadata' | 'attributeClearPrivateMetadata' | 'attributeValueCreate' | 'attributeValueDelete' | 'attributeValueBulkDelete' | 'attributeValueUpdate' | 'attributeValueTranslate' | 'attributeReorderValues' | 'categoryCreate' | 'categoryDelete' | 'categoryBulkDelete' | 'categoryUpdate' | 'categoryTranslate' | 'categoryUpdateMetadata' | 'categoryClearMetadata' | 'categoryUpdatePrivateMetadata' | 'categoryClearPrivateMetadata' | 'collectionAddProducts' | 'collectionCreate' | 'collectionDuplicate' | 'collectionDelete' | 'collectionReorderProducts' | 'collectionBulkDelete' | 'collectionBulkPublish' | 'collectionRemoveProducts' | 'collectionUpdate' | 'collectionTranslate' | 'collectionUpdateMetadata' | 'collectionClearMetadata' | 'collectionUpdatePrivateMetadata' | 'collectionClearPrivateMetadata' | 'productCreate' | 'productDelete' | 'productBulkDelete' | 'productBulkPublish' | 'productUpdate' | 'productTranslate' | 'productUpdateMetadata' | 'productClearMetadata' | 'productUpdatePrivateMetadata' | 'productClearPrivateMetadata' | 'productSetAvailabilityForPurchase' | 'productImageCreate' | 'productVariantReorder' | 'productImageDelete' | 'productImageBulkDelete' | 'productImageReorder' | 'productImageUpdate' | 'productTypeCreate' | 'productTypeDelete' | 'productTypeBulkDelete' | 'productTypeUpdate' | 'productTypeReorderAttributes' | 'productTypeUpdateMetadata' | 'productTypeClearMetadata' | 'productTypeUpdatePrivateMetadata' | 'productTypeClearPrivateMetadata' | 'digitalContentCreate' | 'digitalContentDelete' | 'digitalContentUpdate' | 'digitalContentUrlCreate' | 'productVariantCreate' | 'productVariantDelete' | 'productVariantBulkCreate' | 'productVariantBulkDelete' | 'productVariantStocksCreate' | 'productVariantStocksDelete' | 'productVariantStocksUpdate' | 'productVariantUpdate' | 'productVariantSetDefault' | 'productVariantTranslate' | 'productVariantUpdateMetadata' | 'productVariantClearMetadata' | 'productVariantUpdatePrivateMetadata' | 'productVariantClearPrivateMetadata' | 'variantImageAssign' | 'variantImageUnassign' | 'paymentCapture' | 'paymentRefund' | 'paymentVoid' | 'paymentInitialize' | 'stripePaymentIntentCreate' | 'pageCreate' | 'pageDelete' | 'pageBulkDelete' | 'pageBulkPublish' | 'pageUpdate' | 'pageTranslate' | 'draftOrderComplete' | 'draftOrderCreate' | 'draftOrderDelete' | 'draftOrderBulkDelete' | 'draftOrderLinesBulkDelete' | 'draftOrderLinesCreate' | 'draftOrderLineDelete' | 'draftOrderLineUpdate' | 'draftOrderUpdate' | 'orderAddNote' | 'orderCancel' | 'orderCapture' | 'orderClearPrivateMeta' | 'orderClearMeta' | 'orderFulfill' | 'orderFulfillmentCancel' | 'orderFulfillmentUpdateTracking' | 'orderFulfillmentClearMeta' | 'orderFulfillmentClearPrivateMeta' | 'orderFulfillmentUpdateMeta' | 'orderFulfillmentUpdatePrivateMeta' | 'orderMarkAsPaid' | 'orderRefund' | 'orderUpdate' | 'orderUpdateMeta' | 'orderUpdatePrivateMeta' | 'orderUpdateShipping' | 'orderVoid' | 'orderBulkCancel' | 'deleteMetadata' | 'deletePrivateMetadata' | 'updateMetadata' | 'updatePrivateMetadata' | 'assignNavigation' | 'menuCreate' | 'menuDelete' | 'menuBulkDelete' | 'menuUpdate' | 'menuItemCreate' | 'menuItemDelete' | 'menuItemBulkDelete' | 'menuItemUpdate' | 'menuItemTranslate' | 'menuItemMove' | 'invoiceRequest' | 'invoiceRequestDelete' | 'invoiceCreate' | 'invoiceDelete' | 'invoiceUpdate' | 'invoiceSendEmail' | 'giftCardActivate' | 'giftCardCreate' | 'giftCardDeactivate' | 'giftCardUpdate' | 'pluginUpdate' | 'saleCreate' | 'saleDelete' | 'saleBulkDelete' | 'saleUpdate' | 'saleCataloguesAdd' | 'saleCataloguesRemove' | 'saleTranslate' | 'voucherCreate' | 'voucherDelete' | 'voucherBulkDelete' | 'voucherUpdate' | 'voucherCataloguesAdd' | 'voucherCataloguesRemove' | 'voucherTranslate' | 'exportProducts' | 'checkoutAddPromoCode' | 'checkoutBillingAddressUpdate' | 'checkoutComplete' | 'checkoutCreate' | 'checkoutCustomerAttach' | 'checkoutCustomerDetach' | 'checkoutEmailUpdate' | 'checkoutLineDelete' | 'checkoutLinesAdd' | 'checkoutLinesUpdate' | 'checkoutRemovePromoCode' | 'checkoutPaymentCreate' | 'checkoutShippingAddressUpdate' | 'checkoutShippingMethodUpdate' | 'checkoutUpdateMetadata' | 'checkoutClearMetadata' | 'checkoutUpdatePrivateMetadata' | 'checkoutClearPrivateMetadata' | 'appCreate' | 'appUpdate' | 'appDelete' | 'appTokenCreate' | 'appTokenDelete' | 'appTokenVerify' | 'appInstall' | 'appRetryInstall' | 'appDeleteFailedInstallation' | 'appFetchManifest' | 'appActivate' | 'appDeactivate' | 'tokenCreate' | 'tokenRefresh' | 'tokenVerify' | 'tokensDeactivateAll' | 'requestPasswordReset' | 'confirmAccount' | 'setPassword' | 'passwordChange' | 'requestEmailChange' | 'confirmEmailChange' | 'accountAddressCreate' | 'accountAddressUpdate' | 'accountAddressDelete' | 'accountSetDefaultAddress' | 'accountRegister' | 'accountUpdate' | 'accountRequestDeletion' | 'accountDelete' | 'accountUpdateMeta' | 'addressCreate' | 'addressUpdate' | 'addressDelete' | 'addressSetDefault' | 'customerCreate' | 'customerUpdate' | 'customerDelete' | 'customerBulkDelete' | 'staffCreate' | 'staffUpdate' | 'staffDelete' | 'staffBulkDelete' | 'userAvatarUpdate' | 'userAvatarDelete' | 'userBulkSetActive' | 'userUpdateMetadata' | 'userClearMetadata' | 'userUpdatePrivateMetadata' | 'userClearPrivateMetadata' | 'serviceAccountCreate' | 'serviceAccountUpdate' | 'serviceAccountDelete' | 'serviceAccountUpdatePrivateMetadata' | 'serviceAccountClearPrivateMetadata' | 'serviceAccountTokenCreate' | 'serviceAccountTokenDelete' | 'permissionGroupCreate' | 'permissionGroupUpdate' | 'permissionGroupDelete' | 'exportProductsV2' | 'createHostingFile' | 'createHostingFileNoAuth' | 'deleteHostingFile' | 'createNotification' | 'requestOtp' | 'otpTokenCreate' | 'verifyCheckoutOtp' | 'tokenCreateWithAdmin' | 'accountCreate' | 'accountRegisterV2' | 'confirmAccountV2' | 'productReviewCreate' | 'productReviewRate' | 'productReviewUpdateReply' | 'productReviewEdit' | 'productReviewDelete' | 'productImageCreateV2' | 'productReviewImageCreate' | 'productReviewImageUpdate' | 'productReviewImageDelete' | 'productReviewVideoCreate' | 'productReviewVideoDelete' | 'productDuplicate' | 'razorpayOrderCreate' | 'juspayOrderAndCustomerCreate' | 'juspayOrderStatusCheck' | 'juspayCustomer' | 'juspayPayment' | 'juspayVerifyVpa' | 'paytmOrderCreate' | 'cashfreeOrderCreate' | 'cashfreeOrderCreateSdk' | 'payuOrderCreate' | 'sezzleOrderCreate' | 'bannerCreate' | 'bannerUpdate' | 'bannerDelete' | 'headerCreate' | 'voucherRuleCreate' | 'voucherRuleUpdate' | 'voucherRuleDelete' | 'voucherRuleBulkDelete' | 'voucherRuleLinkCreate' | 'voucherRuleLinkUpdate' | 'checkoutPaymentMethodUpdate' | 'invoiceUpload' | 'addressTypeUpdate' | 'checkoutAddNote' | 'pushToWareiq' | 'partnerCreate' | 'partnerUpdate' | 'partnerDelete' | 'partnerCouponCsvCreate' | 'partnerCouponUpdate' | 'partnerCouponDelete' | 'partnerCouponCustomerCreate' | 'partnerCouponCustomerUpdate' | 'partnerCouponCustomerDelete' | 'walletBalanceUpdate' | 'walletBalancePhoneUpdate' | 'pushAllToWareiq' | 'contactUsCreate' | 'genericFormCreate' | 'pincode' | 'comboCreate' | 'comboUpdate' | 'comboDelete' | 'comboAddProductVariants' | 'comboRemoveProductVariants' | 'bluedartShipmentCreate' | 'surveyCreate' | 'surveyDelete' | 'surveyFill' | 'surveyOptionsfill' | 'syncWareiqInventory' | 'subscriptionCreate' | 'subscriptionUpdate' | 'subscriptionDelete' | 'createInfluencer' | 'updateInfluencer' | 'deleteInfluencer' | 'shopifyUserCreate' | 'shopifyUserUpdate' | 'shopifyUserDelete' | 'sectionCreate' | 'sectionUpdate' | 'sectionDelete' | 'sectionBulkDelete' | 'sectionAddProducts' | 'sectionRemoveProducts' | 'sectionReorderProducts' | 'sectionImageCreate' | 'sectionImageDelete' | 'sectionImageReorder' | 'updateMetadataV2' | 'deleteMetadataV2' | 'updatePrivateMetadataV2' | 'deletePrivateMetadataV2' | 'checkoutAddPromoCodeShopify' | 'checkoutRemovePromoCodeShopify' | 'userAvatarUpdateV2' | 'updateCustomerNoAuth' | 'userAvatarDeleteV2' | 'dtcOrderCancel' | 'dtcOrderReturn' | 'menuItemImageCreate' | 'menuItemMoveV2' | 'createProductCsv' | 'updateProductCsv' | 'createReviewCsv' | 'updateCollectionMetadata' | 'updateProductvariantMetadata' | 'bulkPriceUpdateCsv' | 'updateProductsMetadataCsv' | 'createProductVariantCsv' | 'updateManufacturingDetailsCsv' | 'updateShopifyProductPriceCsv' | 'updateShopifyProductTagsCsv' | 'productVariantBulkUpdate' | 'farziWalletBalanceSubCsv' | 'farziWalletBalanceAddCsv' | 'farziWalletBalanceEmailUpdate' | 'getUserHash' | 'exportOrders' | 'referAFriend' | 'getReferalDiscount' | 'walletBalanceAddCsv' | 'walletExport' | 'uploadProductImageCsv' | 'uploadCollectionidCsv' | 'reOrder' | 'createTokenOauth' | 'nutritionFormCreate' | 'triggerCron' | 'draftOrderAddPromoCode' | 'draftOrderRemovePromoCode' | 'draftOrderApplyCod' | 'draftOrderRemoveCod' | 'draftOrderApplyPrepaid' | 'draftOrderRemovePrepaid' | 'sendOrderEmail' | 'deleteProductReviewByProductId' | 'addBulkTags' | 'archiveOrderCreate' | 'archiveOrderUpdate' | 'archiveOrderDelete' | 'periodicTaskCreate' | 'periodicTaskUpdate' | 'periodicTaskDelete' | 'emailTemplateCreate' | 'emailTemplateUpdate' | 'emailTemplateDelete' | MutationKeySpecifier)[];
+export type MutationKeySpecifier = ('wishlistAddProduct' | 'wishlistRemoveProduct' | 'wishlistAddVariant' | 'wishlistRemoveVariant' | 'addTags' | 'removeTags' | 'webhookCreate' | 'webhookDelete' | 'webhookUpdate' | 'createWarehouse' | 'updateWarehouse' | 'deleteWarehouse' | 'assignWarehouseShippingZone' | 'unassignWarehouseShippingZone' | 'authorizationKeyAdd' | 'authorizationKeyDelete' | 'staffNotificationRecipientCreate' | 'staffNotificationRecipientUpdate' | 'staffNotificationRecipientDelete' | 'homepageCollectionUpdate' | 'shopDomainUpdate' | 'shopSettingsUpdate' | 'shopFetchTaxRates' | 'shopSettingsTranslate' | 'shopAddressUpdate' | 'shippingPriceCreate' | 'shippingPriceDelete' | 'shippingPriceBulkDelete' | 'shippingPriceUpdate' | 'shippingPriceTranslate' | 'shippingZoneCreate' | 'shippingZoneDelete' | 'shippingZoneBulkDelete' | 'shippingZoneUpdate' | 'attributeCreate' | 'attributeDelete' | 'attributeBulkDelete' | 'attributeAssign' | 'attributeUnassign' | 'attributeUpdate' | 'attributeTranslate' | 'attributeUpdateMetadata' | 'attributeClearMetadata' | 'attributeUpdatePrivateMetadata' | 'attributeClearPrivateMetadata' | 'attributeValueCreate' | 'attributeValueDelete' | 'attributeValueBulkDelete' | 'attributeValueUpdate' | 'attributeValueTranslate' | 'attributeReorderValues' | 'categoryCreate' | 'categoryDelete' | 'categoryBulkDelete' | 'categoryUpdate' | 'categoryTranslate' | 'categoryUpdateMetadata' | 'categoryClearMetadata' | 'categoryUpdatePrivateMetadata' | 'categoryClearPrivateMetadata' | 'collectionAddProducts' | 'collectionCreate' | 'collectionDuplicate' | 'collectionDelete' | 'collectionReorderProducts' | 'collectionBulkDelete' | 'collectionBulkPublish' | 'collectionRemoveProducts' | 'collectionUpdate' | 'collectionTranslate' | 'collectionUpdateMetadata' | 'collectionClearMetadata' | 'collectionUpdatePrivateMetadata' | 'collectionClearPrivateMetadata' | 'productCreate' | 'productDelete' | 'productBulkDelete' | 'productBulkPublish' | 'productUpdate' | 'productTranslate' | 'productUpdateMetadata' | 'productClearMetadata' | 'productUpdatePrivateMetadata' | 'productClearPrivateMetadata' | 'productSetAvailabilityForPurchase' | 'productImageCreate' | 'productVariantReorder' | 'productImageDelete' | 'productImageBulkDelete' | 'productImageReorder' | 'productImageUpdate' | 'productTypeCreate' | 'productTypeDelete' | 'productTypeBulkDelete' | 'productTypeUpdate' | 'productTypeReorderAttributes' | 'productTypeUpdateMetadata' | 'productTypeClearMetadata' | 'productTypeUpdatePrivateMetadata' | 'productTypeClearPrivateMetadata' | 'digitalContentCreate' | 'digitalContentDelete' | 'digitalContentUpdate' | 'digitalContentUrlCreate' | 'productVariantCreate' | 'productVariantDelete' | 'productVariantBulkCreate' | 'productVariantBulkDelete' | 'productVariantStocksCreate' | 'productVariantStocksDelete' | 'productVariantStocksUpdate' | 'productVariantUpdate' | 'productVariantSetDefault' | 'productVariantTranslate' | 'productVariantUpdateMetadata' | 'productVariantClearMetadata' | 'productVariantUpdatePrivateMetadata' | 'productVariantClearPrivateMetadata' | 'variantImageAssign' | 'variantImageUnassign' | 'paymentCapture' | 'paymentRefund' | 'paymentVoid' | 'paymentInitialize' | 'stripePaymentIntentCreate' | 'pageCreate' | 'pageDelete' | 'pageBulkDelete' | 'pageBulkPublish' | 'pageUpdate' | 'pageTranslate' | 'draftOrderComplete' | 'draftOrderCreate' | 'draftOrderDelete' | 'draftOrderBulkDelete' | 'draftOrderLinesBulkDelete' | 'draftOrderLinesCreate' | 'draftOrderLineDelete' | 'draftOrderLineUpdate' | 'draftOrderUpdate' | 'orderAddNote' | 'orderCancel' | 'orderCapture' | 'orderClearPrivateMeta' | 'orderClearMeta' | 'orderFulfill' | 'orderFulfillmentCancel' | 'orderFulfillmentUpdateTracking' | 'orderFulfillmentClearMeta' | 'orderFulfillmentClearPrivateMeta' | 'orderFulfillmentUpdateMeta' | 'orderFulfillmentUpdatePrivateMeta' | 'orderMarkAsPaid' | 'orderRefund' | 'orderUpdate' | 'orderUpdateMeta' | 'orderUpdatePrivateMeta' | 'orderUpdateShipping' | 'orderVoid' | 'orderBulkCancel' | 'deleteMetadata' | 'deletePrivateMetadata' | 'updateMetadata' | 'updatePrivateMetadata' | 'assignNavigation' | 'menuCreate' | 'menuDelete' | 'menuBulkDelete' | 'menuUpdate' | 'menuItemCreate' | 'menuItemDelete' | 'menuItemBulkDelete' | 'menuItemUpdate' | 'menuItemTranslate' | 'menuItemMove' | 'invoiceRequest' | 'invoiceRequestDelete' | 'invoiceCreate' | 'invoiceDelete' | 'invoiceUpdate' | 'invoiceSendEmail' | 'giftCardActivate' | 'giftCardCreate' | 'giftCardDeactivate' | 'giftCardUpdate' | 'pluginUpdate' | 'saleCreate' | 'saleDelete' | 'saleBulkDelete' | 'saleUpdate' | 'saleCataloguesAdd' | 'saleCataloguesRemove' | 'saleTranslate' | 'voucherCreate' | 'voucherDelete' | 'voucherBulkDelete' | 'voucherUpdate' | 'voucherCataloguesAdd' | 'voucherCataloguesRemove' | 'voucherTranslate' | 'exportProducts' | 'checkoutAddPromoCode' | 'checkoutBillingAddressUpdate' | 'checkoutComplete' | 'checkoutCreate' | 'checkoutCustomerAttach' | 'checkoutCustomerDetach' | 'checkoutEmailUpdate' | 'checkoutLineDelete' | 'checkoutLinesAdd' | 'checkoutLinesUpdate' | 'checkoutRemovePromoCode' | 'checkoutPaymentCreate' | 'checkoutShippingAddressUpdate' | 'checkoutShippingMethodUpdate' | 'checkoutUpdateMetadata' | 'checkoutClearMetadata' | 'checkoutUpdatePrivateMetadata' | 'checkoutClearPrivateMetadata' | 'appCreate' | 'appUpdate' | 'appDelete' | 'appTokenCreate' | 'appTokenDelete' | 'appTokenVerify' | 'appInstall' | 'appRetryInstall' | 'appDeleteFailedInstallation' | 'appFetchManifest' | 'appActivate' | 'appDeactivate' | 'tokenCreate' | 'tokenRefresh' | 'tokenVerify' | 'tokensDeactivateAll' | 'requestPasswordReset' | 'confirmAccount' | 'setPassword' | 'passwordChange' | 'requestEmailChange' | 'confirmEmailChange' | 'accountAddressCreate' | 'accountAddressUpdate' | 'accountAddressDelete' | 'accountSetDefaultAddress' | 'accountRegister' | 'accountUpdate' | 'accountRequestDeletion' | 'accountDelete' | 'accountUpdateMeta' | 'addressCreate' | 'addressUpdate' | 'addressDelete' | 'addressSetDefault' | 'customerCreate' | 'customerUpdate' | 'customerDelete' | 'customerBulkDelete' | 'staffCreate' | 'staffUpdate' | 'staffDelete' | 'staffBulkDelete' | 'userAvatarUpdate' | 'userAvatarDelete' | 'userBulkSetActive' | 'userUpdateMetadata' | 'userClearMetadata' | 'userUpdatePrivateMetadata' | 'userClearPrivateMetadata' | 'serviceAccountCreate' | 'serviceAccountUpdate' | 'serviceAccountDelete' | 'serviceAccountUpdatePrivateMetadata' | 'serviceAccountClearPrivateMetadata' | 'serviceAccountTokenCreate' | 'serviceAccountTokenDelete' | 'permissionGroupCreate' | 'permissionGroupUpdate' | 'permissionGroupDelete' | 'exportProductsV2' | 'createHostingFile' | 'createHostingFileNoAuth' | 'deleteHostingFile' | 'createNotification' | 'requestOtp' | 'otpTokenCreate' | 'verifyCheckoutOtp' | 'tokenCreateWithAdmin' | 'accountCreate' | 'accountRegisterV2' | 'confirmAccountV2' | 'productReviewCreate' | 'productReviewRate' | 'productReviewUpdateReply' | 'productReviewEdit' | 'productReviewDelete' | 'productImageCreateV2' | 'productReviewImageCreate' | 'productReviewImageUpdate' | 'productReviewImageDelete' | 'productReviewVideoCreate' | 'productReviewVideoDelete' | 'productDuplicate' | 'razorpayOrderCreate' | 'juspayOrderAndCustomerCreate' | 'juspayOrderStatusCheck' | 'juspayCustomer' | 'juspayPayment' | 'juspayVerifyVpa' | 'paytmOrderCreate' | 'cashfreeOrderCreate' | 'cashfreeOrderCreateSdk' | 'payuOrderCreate' | 'sezzleOrderCreate' | 'bannerCreate' | 'bannerUpdate' | 'bannerDelete' | 'headerCreate' | 'voucherRuleCreate' | 'voucherRuleUpdate' | 'voucherRuleDelete' | 'voucherRuleBulkDelete' | 'voucherRuleLinkCreate' | 'voucherRuleLinkUpdate' | 'checkoutPaymentMethodUpdate' | 'invoiceUpload' | 'addressTypeUpdate' | 'checkoutAddNote' | 'pushToWareiq' | 'partnerCreate' | 'partnerUpdate' | 'partnerDelete' | 'partnerCouponCsvCreate' | 'partnerCouponUpdate' | 'partnerCouponDelete' | 'partnerCouponCustomerCreate' | 'partnerCouponCustomerUpdate' | 'partnerCouponCustomerDelete' | 'walletBalanceUpdate' | 'walletBalancePhoneUpdate' | 'pushAllToWareiq' | 'contactUsCreate' | 'genericFormCreate' | 'pincode' | 'comboCreate' | 'comboUpdate' | 'comboDelete' | 'comboAddProductVariants' | 'comboRemoveProductVariants' | 'bluedartShipmentCreate' | 'surveyCreate' | 'surveyDelete' | 'surveyFill' | 'surveyOptionsfill' | 'syncWareiqInventory' | 'subscriptionCreate' | 'subscriptionUpdate' | 'subscriptionDelete' | 'createInfluencer' | 'updateInfluencer' | 'deleteInfluencer' | 'shopifyUserCreate' | 'shopifyUserUpdate' | 'shopifyUserDelete' | 'sectionCreate' | 'sectionUpdate' | 'sectionDelete' | 'sectionBulkDelete' | 'sectionAddProducts' | 'sectionRemoveProducts' | 'sectionReorderProducts' | 'sectionImageCreate' | 'sectionImageDelete' | 'sectionImageReorder' | 'updateMetadataV2' | 'deleteMetadataV2' | 'updatePrivateMetadataV2' | 'deletePrivateMetadataV2' | 'checkoutAddPromoCodeShopify' | 'checkoutRemovePromoCodeShopify' | 'userAvatarUpdateV2' | 'updateCustomerNoAuth' | 'userAvatarDeleteV2' | 'dtcOrderCancel' | 'dtcOrderReturn' | 'menuItemImageCreate' | 'menuItemMoveV2' | 'createProductCsv' | 'updateProductCsv' | 'createReviewCsv' | 'updateCollectionMetadata' | 'updateProductvariantMetadata' | 'bulkPriceUpdateCsv' | 'updateProductsMetadataCsv' | 'createProductVariantCsv' | 'updateManufacturingDetailsCsv' | 'updateShopifyProductPriceCsv' | 'updateShopifyProductTagsCsv' | 'productVariantBulkUpdate' | 'farziWalletBalanceSubCsv' | 'farziWalletBalanceAddCsv' | 'farziWalletBalanceEmailUpdate' | 'getUserHash' | 'exportOrders' | 'referAFriend' | 'getReferalDiscount' | 'walletBalanceAddCsv' | 'walletExport' | 'uploadProductImageCsv' | 'uploadCollectionidCsv' | 'reOrder' | 'createTokenOauth' | 'nutritionFormCreate' | 'triggerCron' | 'draftOrderAddPromoCode' | 'draftOrderRemovePromoCode' | 'draftOrderCreateFromOrderId' | 'draftOrderApplyCod' | 'draftOrderRemoveCod' | 'draftOrderApplyPrepaid' | 'draftOrderRemovePrepaid' | 'sendOrderEmail' | 'deleteProductReviewByProductId' | 'addBulkTags' | 'archiveOrderCreate' | 'archiveOrderUpdate' | 'archiveOrderDelete' | 'periodicTaskCreate' | 'periodicTaskUpdate' | 'periodicTaskDelete' | 'emailTemplateCreate' | 'emailTemplateUpdate' | 'emailTemplateDelete' | 'uploadRtoCustomersList' | 'removeRtoCustomersList' | 'pushRiskOrdersCsv' | MutationKeySpecifier)[];
 export type MutationFieldPolicy = {
 	wishlistAddProduct?: FieldPolicy<any> | FieldReadFunction<any>,
 	wishlistRemoveProduct?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3153,6 +3177,7 @@ export type MutationFieldPolicy = {
 	triggerCron?: FieldPolicy<any> | FieldReadFunction<any>,
 	draftOrderAddPromoCode?: FieldPolicy<any> | FieldReadFunction<any>,
 	draftOrderRemovePromoCode?: FieldPolicy<any> | FieldReadFunction<any>,
+	draftOrderCreateFromOrderId?: FieldPolicy<any> | FieldReadFunction<any>,
 	draftOrderApplyCod?: FieldPolicy<any> | FieldReadFunction<any>,
 	draftOrderRemoveCod?: FieldPolicy<any> | FieldReadFunction<any>,
 	draftOrderApplyPrepaid?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3168,7 +3193,10 @@ export type MutationFieldPolicy = {
 	periodicTaskDelete?: FieldPolicy<any> | FieldReadFunction<any>,
 	emailTemplateCreate?: FieldPolicy<any> | FieldReadFunction<any>,
 	emailTemplateUpdate?: FieldPolicy<any> | FieldReadFunction<any>,
-	emailTemplateDelete?: FieldPolicy<any> | FieldReadFunction<any>
+	emailTemplateDelete?: FieldPolicy<any> | FieldReadFunction<any>,
+	uploadRtoCustomersList?: FieldPolicy<any> | FieldReadFunction<any>,
+	removeRtoCustomersList?: FieldPolicy<any> | FieldReadFunction<any>,
+	pushRiskOrdersCsv?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type NavigationKeySpecifier = ('main' | 'secondary' | NavigationKeySpecifier)[];
 export type NavigationFieldPolicy = {
@@ -4508,6 +4536,12 @@ export type PushAllToWareIqFieldPolicy = {
 	failedOrders?: FieldPolicy<any> | FieldReadFunction<any>,
 	orderErrors?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type PushRiskOrderCSVKeySpecifier = ('errors' | 'message' | 'sectionErrors' | PushRiskOrderCSVKeySpecifier)[];
+export type PushRiskOrderCSVFieldPolicy = {
+	errors?: FieldPolicy<any> | FieldReadFunction<any>,
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	sectionErrors?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type PushToWareIqKeySpecifier = ('errors' | 'order' | 'action' | 'orderErrors' | PushToWareIqKeySpecifier)[];
 export type PushToWareIqFieldPolicy = {
 	errors?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -4515,7 +4549,7 @@ export type PushToWareIqFieldPolicy = {
 	action?: FieldPolicy<any> | FieldReadFunction<any>,
 	orderErrors?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type QueryKeySpecifier = ('_entities' | '_service' | 'address' | 'addressByPhone' | 'addressType' | 'addressValidationRules' | 'apiCalls' | 'app' | 'apps' | 'appsInstallations' | 'archiveOrder' | 'archiveOrders' | 'attribute' | 'attributes' | 'authenticated' | 'authenticating' | 'banners' | 'bulkAction' | 'cartItems' | 'cashback' | 'categories' | 'category' | 'checkout' | 'checkoutDiscounts' | 'checkoutLine' | 'checkoutLines' | 'checkoutLoading' | 'checkoutTotals' | 'checkoutUpdated' | 'checkouts' | 'collection' | 'collections' | 'combos' | 'contactUs' | 'couponDiscount' | 'customers' | 'deliveryDate' | 'deliverySchedule' | 'deliverySchedules' | 'deliverySchedulesByPincode' | 'digitalContent' | 'digitalContents' | 'draftOrders' | 'dtcCancelReason' | 'dtcEligibleForCancelOrReturn' | 'dtcReturnProduct' | 'dtcReturnReason' | 'dtcTracking' | 'emailTemplate' | 'emailTemplates' | 'exportFile' | 'exportFiles' | 'exportOrders' | 'failedOrders' | 'filterCheckouts' | 'freeCheckoutLines' | 'genericFormName' | 'genericForms' | 'giftCard' | 'giftCards' | 'gokwikRtoPredict' | 'headers' | 'homepageEvents' | 'hostings' | 'influencer' | 'localCashback' | 'localCheckout' | 'localCheckoutDiscounts' | 'me' | 'menu' | 'menuItem' | 'menuItemV2' | 'menuItems' | 'menuItemsV2' | 'menuV2' | 'menus' | 'menusV2' | 'order' | 'orderByToken' | 'orderStatus' | 'orders' | 'ordersTotal' | 'ordersTotalv2' | 'ordersV2' | 'page' | 'pages' | 'partner' | 'partnerCoupon' | 'partnerCouponCustomer' | 'partnerCouponCustomers' | 'partnerCoupons' | 'partners' | 'payment' | 'payments' | 'periodicTask' | 'periodicTasks' | 'permissionGroup' | 'permissionGroups' | 'pincode' | 'pincodes' | 'plugin' | 'plugins' | 'product' | 'productOffers' | 'productReview' | 'productReviews' | 'productReviewsAll' | 'productType' | 'productTypes' | 'productVariant' | 'productVariants' | 'products' | 'recentOrder' | 'reportProductSales' | 'sale' | 'sales' | 'searchWithSearchtap' | 'section' | 'sections' | 'serviceAccount' | 'serviceAccounts' | 'shipment' | 'shipments' | 'shippingZone' | 'shippingZones' | 'shop' | 'shopifyGiftCard' | 'shopifyUser' | 'shopifyUserOrders' | 'shopmeta' | 'staffUsers' | 'stock' | 'stocks' | 'subscriptions' | 'survey' | 'surveyFill' | 'surveys' | 'taxTypes' | 'translation' | 'translations' | 'useCashback' | 'user' | 'userExists' | 'userWalletBalance' | 'users' | 'voucher' | 'voucherRule' | 'voucherRuleLink' | 'vouchers' | 'wallet' | 'warehouse' | 'warehouses' | 'webhook' | 'webhookEvents' | 'webhookSamplePayload' | 'webhooks' | 'wishlist' | QueryKeySpecifier)[];
+export type QueryKeySpecifier = ('_entities' | '_service' | 'address' | 'addressByPhone' | 'addressType' | 'addressValidationRules' | 'apiCalls' | 'app' | 'apps' | 'appsInstallations' | 'archiveOrder' | 'archiveOrders' | 'attribute' | 'attributes' | 'authenticated' | 'authenticating' | 'banners' | 'bulkAction' | 'cartItems' | 'cashback' | 'categories' | 'category' | 'checkout' | 'checkoutDiscounts' | 'checkoutLine' | 'checkoutLines' | 'checkoutLoading' | 'checkoutTotals' | 'checkoutUpdated' | 'checkouts' | 'collection' | 'collections' | 'combos' | 'contactUs' | 'couponDiscount' | 'customers' | 'deliveryDate' | 'deliverySchedule' | 'deliverySchedules' | 'deliverySchedulesByPincode' | 'digitalContent' | 'digitalContents' | 'draftOrders' | 'dtcCancelReason' | 'dtcEligibleForCancelOrReturn' | 'dtcReturnProduct' | 'dtcReturnReason' | 'dtcTracking' | 'emailTemplate' | 'emailTemplates' | 'exportFile' | 'exportFiles' | 'exportOrders' | 'failedOrders' | 'filterCheckouts' | 'freeCheckoutLines' | 'genericFormName' | 'genericForms' | 'giftCard' | 'giftCards' | 'globalSearch' | 'gokwikRtoPredict' | 'headers' | 'homepageEvents' | 'hostings' | 'influencer' | 'localCashback' | 'localCheckout' | 'localCheckoutDiscounts' | 'me' | 'menu' | 'menuItem' | 'menuItemV2' | 'menuItems' | 'menuItemsV2' | 'menuV2' | 'menus' | 'menusV2' | 'order' | 'orderByToken' | 'orderStatus' | 'orders' | 'ordersTotal' | 'ordersTotalv2' | 'ordersV2' | 'page' | 'pageSlugs' | 'pages' | 'partner' | 'partnerCoupon' | 'partnerCouponCustomer' | 'partnerCouponCustomers' | 'partnerCoupons' | 'partners' | 'payment' | 'payments' | 'periodicTask' | 'periodicTasks' | 'permissionGroup' | 'permissionGroups' | 'pincode' | 'pincodes' | 'plugin' | 'plugins' | 'product' | 'productOffers' | 'productReview' | 'productReviews' | 'productReviewsAll' | 'productSkus' | 'productType' | 'productTypes' | 'productVariant' | 'productVariants' | 'products' | 'recentOrder' | 'reportProductSales' | 'sale' | 'sales' | 'searchWithSearchtap' | 'section' | 'sections' | 'serviceAccount' | 'serviceAccounts' | 'shipment' | 'shipments' | 'shippingZone' | 'shippingZones' | 'shop' | 'shopifyGiftCard' | 'shopifyUser' | 'shopifyUserOrders' | 'shopmeta' | 'staffUsers' | 'stock' | 'stocks' | 'subscriptions' | 'survey' | 'surveyFill' | 'surveys' | 'taxTypes' | 'translation' | 'translations' | 'useCashback' | 'user' | 'userExists' | 'userWalletBalance' | 'users' | 'voucher' | 'voucherRule' | 'voucherRuleLink' | 'vouchers' | 'wallet' | 'warehouse' | 'warehouses' | 'webhook' | 'webhookEvents' | 'webhookSamplePayload' | 'webhooks' | 'wishlist' | QueryKeySpecifier)[];
 export type QueryFieldPolicy = {
 	_entities?: FieldPolicy<any> | FieldReadFunction<any>,
 	_service?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -4577,6 +4611,7 @@ export type QueryFieldPolicy = {
 	genericForms?: FieldPolicy<any> | FieldReadFunction<any>,
 	giftCard?: FieldPolicy<any> | FieldReadFunction<any>,
 	giftCards?: FieldPolicy<any> | FieldReadFunction<any>,
+	globalSearch?: FieldPolicy<any> | FieldReadFunction<any>,
 	gokwikRtoPredict?: FieldPolicy<any> | FieldReadFunction<any>,
 	headers?: FieldPolicy<any> | FieldReadFunction<any>,
 	homepageEvents?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -4602,6 +4637,7 @@ export type QueryFieldPolicy = {
 	ordersTotalv2?: FieldPolicy<any> | FieldReadFunction<any>,
 	ordersV2?: FieldPolicy<any> | FieldReadFunction<any>,
 	page?: FieldPolicy<any> | FieldReadFunction<any>,
+	pageSlugs?: FieldPolicy<any> | FieldReadFunction<any>,
 	pages?: FieldPolicy<any> | FieldReadFunction<any>,
 	partner?: FieldPolicy<any> | FieldReadFunction<any>,
 	partnerCoupon?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -4624,6 +4660,7 @@ export type QueryFieldPolicy = {
 	productReview?: FieldPolicy<any> | FieldReadFunction<any>,
 	productReviews?: FieldPolicy<any> | FieldReadFunction<any>,
 	productReviewsAll?: FieldPolicy<any> | FieldReadFunction<any>,
+	productSkus?: FieldPolicy<any> | FieldReadFunction<any>,
 	productType?: FieldPolicy<any> | FieldReadFunction<any>,
 	productTypes?: FieldPolicy<any> | FieldReadFunction<any>,
 	productVariant?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -4719,6 +4756,12 @@ export type RefreshTokenFieldPolicy = {
 	token?: FieldPolicy<any> | FieldReadFunction<any>,
 	user?: FieldPolicy<any> | FieldReadFunction<any>,
 	accountErrors?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type RemoveRtoCustomersListCSVKeySpecifier = ('errors' | 'message' | 'sectionErrors' | RemoveRtoCustomersListCSVKeySpecifier)[];
+export type RemoveRtoCustomersListCSVFieldPolicy = {
+	errors?: FieldPolicy<any> | FieldReadFunction<any>,
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	sectionErrors?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type RemoveTagsKeySpecifier = ('errors' | 'message' | 'tagErrors' | RemoveTagsKeySpecifier)[];
 export type RemoveTagsFieldPolicy = {
@@ -5828,6 +5871,12 @@ export type UploadProductImageCSVFieldPolicy = {
 	errors?: FieldPolicy<any> | FieldReadFunction<any>,
 	product?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type UploadRtoCustomersListCSVKeySpecifier = ('errors' | 'message' | 'sectionErrors' | UploadRtoCustomersListCSVKeySpecifier)[];
+export type UploadRtoCustomersListCSVFieldPolicy = {
+	errors?: FieldPolicy<any> | FieldReadFunction<any>,
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	sectionErrors?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type UserKeySpecifier = ('id' | 'lastLogin' | 'email' | 'firstName' | 'lastName' | 'isStaff' | 'isActive' | 'note' | 'dateJoined' | 'defaultShippingAddress' | 'defaultBillingAddress' | 'privateMetadata' | 'metadata' | 'privateMeta' | 'meta' | 'phone' | 'addresses' | 'checkout' | 'giftCards' | 'orders' | 'permissions' | 'userPermissions' | 'permissionGroups' | 'editableGroups' | 'avatar' | 'events' | 'storedPaymentSources' | 'tags' | UserKeySpecifier)[];
 export type UserFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -6337,6 +6386,14 @@ export type checkoutRemovePromoCodeShopifyKeySpecifier = ('errors' | 'checkout' 
 export type checkoutRemovePromoCodeShopifyFieldPolicy = {
 	errors?: FieldPolicy<any> | FieldReadFunction<any>,
 	checkout?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type globalSearchTypeKeySpecifier = ('orders' | 'products' | 'customers' | 'vouchers' | 'shopmeta' | globalSearchTypeKeySpecifier)[];
+export type globalSearchTypeFieldPolicy = {
+	orders?: FieldPolicy<any> | FieldReadFunction<any>,
+	products?: FieldPolicy<any> | FieldReadFunction<any>,
+	customers?: FieldPolicy<any> | FieldReadFunction<any>,
+	vouchers?: FieldPolicy<any> | FieldReadFunction<any>,
+	shopmeta?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type TypedTypePolicies = TypePolicies & {
 	AccountAddressCreate?: Omit<TypePolicy, "fields" | "keyFields"> & {
@@ -7343,6 +7400,10 @@ export type TypedTypePolicies = TypePolicies & {
 		keyFields?: false | DraftOrderCreateKeySpecifier | (() => undefined | DraftOrderCreateKeySpecifier),
 		fields?: DraftOrderCreateFieldPolicy,
 	},
+	DraftOrderCreateFromOrderId?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | DraftOrderCreateFromOrderIdKeySpecifier | (() => undefined | DraftOrderCreateFromOrderIdKeySpecifier),
+		fields?: DraftOrderCreateFromOrderIdFieldPolicy,
+	},
 	DraftOrderDelete?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | DraftOrderDeleteKeySpecifier | (() => undefined | DraftOrderDeleteKeySpecifier),
 		fields?: DraftOrderDeleteFieldPolicy,
@@ -7603,6 +7664,10 @@ export type TypedTypePolicies = TypePolicies & {
 		keyFields?: false | GiftCardUpdateKeySpecifier | (() => undefined | GiftCardUpdateKeySpecifier),
 		fields?: GiftCardUpdateFieldPolicy,
 	},
+	GlobalSearchShopMetaType?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | GlobalSearchShopMetaTypeKeySpecifier | (() => undefined | GlobalSearchShopMetaTypeKeySpecifier),
+		fields?: GlobalSearchShopMetaTypeFieldPolicy,
+	},
 	GokwikType?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | GokwikTypeKeySpecifier | (() => undefined | GokwikTypeKeySpecifier),
 		fields?: GokwikTypeFieldPolicy,
@@ -7746,6 +7811,10 @@ export type TypedTypePolicies = TypePolicies & {
 	JuspayPaymentType?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | JuspayPaymentTypeKeySpecifier | (() => undefined | JuspayPaymentTypeKeySpecifier),
 		fields?: JuspayPaymentTypeFieldPolicy,
+	},
+	JuspaySdkParams?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | JuspaySdkParamsKeySpecifier | (() => undefined | JuspaySdkParamsKeySpecifier),
+		fields?: JuspaySdkParamsFieldPolicy,
 	},
 	JuspayTxnAuthentication?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | JuspayTxnAuthenticationKeySpecifier | (() => undefined | JuspayTxnAuthenticationKeySpecifier),
@@ -8643,6 +8712,10 @@ export type TypedTypePolicies = TypePolicies & {
 		keyFields?: false | PushAllToWareIqKeySpecifier | (() => undefined | PushAllToWareIqKeySpecifier),
 		fields?: PushAllToWareIqFieldPolicy,
 	},
+	PushRiskOrderCSV?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | PushRiskOrderCSVKeySpecifier | (() => undefined | PushRiskOrderCSVKeySpecifier),
+		fields?: PushRiskOrderCSVFieldPolicy,
+	},
 	PushToWareIq?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | PushToWareIqKeySpecifier | (() => undefined | PushToWareIqKeySpecifier),
 		fields?: PushToWareIqFieldPolicy,
@@ -8678,6 +8751,10 @@ export type TypedTypePolicies = TypePolicies & {
 	RefreshToken?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | RefreshTokenKeySpecifier | (() => undefined | RefreshTokenKeySpecifier),
 		fields?: RefreshTokenFieldPolicy,
+	},
+	RemoveRtoCustomersListCSV?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | RemoveRtoCustomersListCSVKeySpecifier | (() => undefined | RemoveRtoCustomersListCSVKeySpecifier),
+		fields?: RemoveRtoCustomersListCSVFieldPolicy,
 	},
 	RemoveTags?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | RemoveTagsKeySpecifier | (() => undefined | RemoveTagsKeySpecifier),
@@ -9335,6 +9412,10 @@ export type TypedTypePolicies = TypePolicies & {
 		keyFields?: false | UploadProductImageCSVKeySpecifier | (() => undefined | UploadProductImageCSVKeySpecifier),
 		fields?: UploadProductImageCSVFieldPolicy,
 	},
+	UploadRtoCustomersListCSV?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | UploadRtoCustomersListCSVKeySpecifier | (() => undefined | UploadRtoCustomersListCSVKeySpecifier),
+		fields?: UploadRtoCustomersListCSVFieldPolicy,
+	},
 	User?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | UserKeySpecifier | (() => undefined | UserKeySpecifier),
 		fields?: UserFieldPolicy,
@@ -9630,5 +9711,9 @@ export type TypedTypePolicies = TypePolicies & {
 	checkoutRemovePromoCodeShopify?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | checkoutRemovePromoCodeShopifyKeySpecifier | (() => undefined | checkoutRemovePromoCodeShopifyKeySpecifier),
 		fields?: checkoutRemovePromoCodeShopifyFieldPolicy,
+	},
+	globalSearchType?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | globalSearchTypeKeySpecifier | (() => undefined | globalSearchTypeKeySpecifier),
+		fields?: globalSearchTypeFieldPolicy,
 	}
 };

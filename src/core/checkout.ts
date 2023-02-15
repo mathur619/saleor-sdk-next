@@ -9,6 +9,7 @@ import {
   CREATE_CHECKOUT_MUTATION,
   CREATE_CHECKOUT_PAYMENT,
   CREATE_JUSPAY_CUSTOMER_AND_ORDER,
+  CREATE_JUSPAY_PAYMENT,
   CREATE_RAZORPAY_ORDER,
   GET_WALLET_AMOUNT,
   PAYTM_TXN_CREATE,
@@ -69,6 +70,8 @@ import {
   VerifyJuspayVpaMutation,
   CheckoutTotalsQuery,
   CheckoutTotalsQueryVariables,
+  CreateJuspayPaymentMutationVariables,
+  CreateJuspayPaymentMutation,
 } from "../apollo/types";
 
 import {
@@ -94,6 +97,7 @@ import {
   GetUserOrdersResult,
   GetWalletAmountResult,
   JuspayOrderAndCustomerCreateResult,
+  JuspayPaymentCreateResult,
   RemovePromoCodeResult,
   SaleorClientMethodsProps,
   SetAddressTypeResult,
@@ -149,6 +153,13 @@ export interface CheckoutSDK {
   getCityStateFromPincode?: (pincode: string) => GetCityStateFromPincodeResult;
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
   juspayOrderAndCustomerCreate?: () => JuspayOrderAndCustomerCreateResult;
+  juspayPaymentCreate?: (
+    paymentMethod: string,
+    paymentMethodType: string,
+    juspayCustomerId: string,
+    txnType?: string | undefined,
+    sdkParams?: boolean | undefined
+  ) => JuspayPaymentCreateResult;
   checkJuspayOrderStatus?: () => CheckJuspayOrderStatusResult;
   juspayVpaVerify?: (vpa: string) => VerifyJuspayVpaResult;
   createPaytmOrder?: () => CreatePaytmOrderResult;
@@ -950,6 +961,73 @@ export const checkout = ({
     return res;
   };
 
+  const juspayPaymentCreate: CheckoutSDK["juspayPaymentCreate"] = async (
+    juspayCustomerId: string,
+    paymentMethod: string,
+    paymentMethodType: string,
+    txnType: string | undefined,
+    sdkParams: boolean | undefined
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: CreateJuspayPaymentMutationVariables = {
+        input: {
+          checkoutId: checkout?.id,
+          customerId: juspayCustomerId,
+          paymentMethod: paymentMethod,
+          paymentMethodType: paymentMethodType,
+          txnType: txnType,
+          sdkParams: sdkParams,
+        },
+      };
+      const res = await client.mutate<
+        CreateJuspayPaymentMutation,
+        CreateJuspayPaymentMutationVariables
+      >({
+        mutation: CREATE_JUSPAY_PAYMENT,
+        variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: true,
+            },
+          });
+        },
+      });
+
+      if (
+        (res?.errors && res?.errors[0]?.message) ||
+        (res?.data?.juspayPayment?.errors &&
+          res?.data?.juspayPayment?.errors[0]?.message) ||
+        (res?.data?.juspayPayment?.juspayErrors &&
+          res?.data?.juspayPayment?.juspayErrors[0]?.message)
+      ) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
+      return res;
+    }
+
+    return { data: null };
+  };
+
   const createPaytmOrder: CheckoutSDK["createPaytmOrder"] = async () => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -1158,5 +1236,6 @@ export const checkout = ({
     setCheckout,
     createCashfreeOrder,
     getCheckoutTotals,
+    juspayPaymentCreate,
   };
 };

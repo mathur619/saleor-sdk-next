@@ -821,6 +821,46 @@ export const CREATE_JUSPAY_CUSTOMER_AND_ORDER = gql`
   }
 `;
 
+export const CREATE_JUSPAY_PAYMENT = gql`
+  mutation CreateJuspayPayment($input: JuspayPaymentInput!) {
+    juspayPayment(input: $input) {
+      errors {
+        field
+        message
+      }
+      juspayResponse {
+        orderId
+        paymentAuthentication {
+          method
+          url
+        }
+        sdkParams {
+          amount
+          customerFirstName
+          customerLastName
+          mcc
+          merchantName
+          merchantVpa
+          tr
+        }
+        paymentParams {
+          key1
+          key2
+          key3
+        }
+        paymentTxnId
+        status
+        paymentTxnUuid
+      }
+      juspayErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
 export const CHECK_JUSPAY_ORDER_STATUS = gql`
   mutation CheckJuspayOrderStatus($input: JuspayOrderStatusInput!) {
     juspayOrderStatusCheck(input: $input) {
