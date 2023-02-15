@@ -72,6 +72,7 @@ import {
   CheckoutTotalsQueryVariables,
   CreateJuspayPaymentMutationVariables,
   CreateJuspayPaymentMutation,
+  JuspayPaymentInput,
 } from "../apollo/types";
 
 import {
@@ -154,11 +155,7 @@ export interface CheckoutSDK {
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
   juspayOrderAndCustomerCreate?: () => JuspayOrderAndCustomerCreateResult;
   juspayPaymentCreate?: (
-    paymentMethod: string,
-    paymentMethodType: string,
-    juspayCustomerId: string,
-    txnType?: string | undefined,
-    sdkParams?: boolean | undefined
+    input: JuspayPaymentInput
   ) => JuspayPaymentCreateResult;
   checkJuspayOrderStatus?: () => CheckJuspayOrderStatusResult;
   juspayVpaVerify?: (vpa: string) => VerifyJuspayVpaResult;
@@ -962,11 +959,7 @@ export const checkout = ({
   };
 
   const juspayPaymentCreate: CheckoutSDK["juspayPaymentCreate"] = async (
-    juspayCustomerId: string,
-    paymentMethod: string,
-    paymentMethodType: string,
-    txnType: string | undefined,
-    sdkParams: boolean | undefined
+    input: JuspayPaymentInput
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -984,12 +977,8 @@ export const checkout = ({
     if (checkout && checkout?.id) {
       const variables: CreateJuspayPaymentMutationVariables = {
         input: {
+          ...input,
           checkoutId: checkout?.id,
-          customerId: juspayCustomerId,
-          paymentMethod: paymentMethod,
-          paymentMethodType: paymentMethodType,
-          txnType: txnType,
-          sdkParams: sdkParams,
         },
       };
       const res = await client.mutate<
