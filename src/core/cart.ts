@@ -491,6 +491,12 @@ export const cart = ({
 
         if (!res.data?.checkoutLinesAdd?.checkout?.id) {
           await getLatestCheckout(client, checkout);
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
           return {
             data: null,
             errors: res?.data?.checkoutLinesAdd?.errors,
@@ -542,6 +548,12 @@ export const cart = ({
         return returnObject;
       } catch {
         await getLatestCheckout(client, checkout);
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
         return {
           data: null,
           errors: undefined,
@@ -598,6 +610,12 @@ export const cart = ({
         });
         const checkout = res?.data?.checkoutCreate?.checkout;
         if (!checkout?.id) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
           return {
             data: undefined,
             errors: res?.data?.checkoutCreate?.errors,
@@ -649,6 +667,12 @@ export const cart = ({
         return returnObject;
       } catch {
         await getLatestCheckout(client, checkout);
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
         return {
           data: null,
           errors: undefined,
