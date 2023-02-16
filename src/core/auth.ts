@@ -290,14 +290,32 @@ export const auth = ({
     >({
       mutation: CREATE_OTP_TOKEN_MUTATION,
       variables: CreateTokenOTPVariables,
-      update: (_, { data }) => {
+      update: async (_, { data }) => {
         if (data?.CreateTokenOTP?.token) {
           storage.setTokens({
             accessToken: data.CreateTokenOTP.token,
             csrfToken: data.CreateTokenOTP.csrfToken,
             refreshToken: data.CreateTokenOTP.refreshToken,
           });
-          getUserCheckout();
+          const userCheckoutRes = await getUserCheckout();
+
+          const checkoutString = storage.getCheckout();
+          const checkout =
+            checkoutString && typeof checkoutString === "string"
+              ? JSON.parse(checkoutString)
+              : checkoutString;
+          const checkoutIdToAttach =
+            userCheckoutRes?.data?.me?.checkout?.id || checkout?.id;
+
+          if (checkoutIdToAttach && res.data?.CreateTokenOTP?.user?.id) {
+            client.mutate({
+              mutation: CHECKOUT_CUSTOMER_ATTACH,
+              variables: {
+                checkoutId: checkoutIdToAttach,
+                customerId: res.data.CreateTokenOTP.user.id,
+              },
+            });
+          }
         } else {
           client.writeQuery({
             query: USER,
@@ -308,16 +326,6 @@ export const auth = ({
         }
       },
     });
-
-    if (checkout?.id && res.data?.CreateTokenOTP?.user?.id) {
-      client.mutate({
-        mutation: CHECKOUT_CUSTOMER_ATTACH,
-        variables: {
-          checkoutId: checkout.id,
-          customerId: res.data.CreateTokenOTP.user.id,
-        },
-      });
-    }
 
     return res;
   };
@@ -434,14 +442,32 @@ export const auth = ({
         phone,
         checkoutId: checkout?.id,
       },
-      update: (_, { data }) => {
+      update: async (_, { data }) => {
         if (data?.confirmAccountV2?.token) {
           storage.setTokens({
             accessToken: data.confirmAccountV2.token,
             csrfToken: data.confirmAccountV2.csrfToken,
             refreshToken: data.confirmAccountV2.refreshToken,
           });
-          getUserCheckout();
+          const userCheckoutRes = await getUserCheckout();
+
+          const checkoutString = storage.getCheckout();
+          const checkout =
+            checkoutString && typeof checkoutString === "string"
+              ? JSON.parse(checkoutString)
+              : checkoutString;
+          const checkoutIdToAttach =
+            userCheckoutRes?.data?.me?.checkout?.id || checkout?.id;
+
+          if (checkoutIdToAttach && res.data?.confirmAccountV2?.user?.id) {
+            client.mutate({
+              mutation: CHECKOUT_CUSTOMER_ATTACH,
+              variables: {
+                checkoutId: checkoutIdToAttach,
+                customerId: res.data.confirmAccountV2.user.id,
+              },
+            });
+          }
         } else {
           client.writeQuery({
             query: USER,
@@ -452,16 +478,6 @@ export const auth = ({
         }
       },
     });
-
-    if (checkout?.id && res.data?.confirmAccountV2?.user?.id) {
-      client.mutate({
-        mutation: CHECKOUT_CUSTOMER_ATTACH,
-        variables: {
-          checkoutId: checkout.id,
-          customerId: res.data.confirmAccountV2.user.id,
-        },
-      });
-    }
 
     return res;
   };
