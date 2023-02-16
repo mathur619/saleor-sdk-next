@@ -858,18 +858,20 @@ export const CHECKOUT_CUSTOMER_ATTACH_NEW = gql`
 `;
 
 export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutFragment}
   ${checkoutErrorFragment}
   mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
     checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
       checkout {
-        id
-        availableShippingMethods {
-          id
-          name
-          price {
-            currency
-            amount
-          }
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
         }
       }
       errors: checkoutErrors {
@@ -880,6 +882,7 @@ export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
 `;
 
 export const CREATE_CHECKOUT_MUTATION_NEXT = gql`
+  ${checkoutFragment}
   ${checkoutErrorFragment}
   mutation CreateCheckoutNext($checkoutInput: CheckoutCreateInput!) {
     checkoutCreate(input: $checkoutInput) {
@@ -887,10 +890,15 @@ export const CREATE_CHECKOUT_MUTATION_NEXT = gql`
         ...CheckoutError
       }
       checkout {
-        id
-        token
-        availableShippingMethods {
-          id
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
         }
       }
     }
