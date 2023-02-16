@@ -544,7 +544,7 @@ export const cart = ({
         await getLatestCheckout(client, checkout);
         return {
           data: null,
-          errors: null,
+          errors: undefined,
         };
       }
     } else {
@@ -651,7 +651,7 @@ export const cart = ({
         await getLatestCheckout(client, checkout);
         return {
           data: null,
-          errors: null,
+          errors: undefined,
         };
       }
     }
