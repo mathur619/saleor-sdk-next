@@ -600,7 +600,8 @@ export const cart = ({
         };
       }else {
         checkoutInputVariables = {
-          lines: [{ quantity: quantity, variantId: variantId }]
+          lines: [{ quantity: quantity, variantId: variantId }],
+          email: "dummy@dummy.com",
         };
       }
 
