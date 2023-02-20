@@ -73,6 +73,7 @@ import {
   CheckoutCustomerAttachNewMutation,
   CheckoutTotalsQuery,
   CreateJuspayPaymentMutation,
+  UpdateUserMetaMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -180,6 +181,8 @@ export type CreateAccountAddressResult = FetchResult<
 export type UpdateAccountAddressResult = FetchResult<
   UpdateAccountAddressMutation
 >;
+
+export type UpdateUserMetaMutationResult = FetchResult<UpdateUserMetaMutation>;
 
 // export type ConfirmAccountOpts = AccountConfirmMutationVariables;
 

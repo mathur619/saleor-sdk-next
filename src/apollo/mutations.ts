@@ -492,6 +492,27 @@ export const CONFIRM_ACCOUNT = gql`
   }
 `;
 
+export const UPDATE_USER_META = gql`
+  mutation UpdateUserMeta($id: ID!, $input: [MetadataInput!]!) {
+    updateMetadata(id: $id, input: $input) {
+      metadataErrors {
+        field
+        message
+        __typename
+      }
+      item {
+        metadata {
+          key
+          value
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+
 export const VERIFY_CHECKOUT_OTP = gql`
   mutation VerifyCheckoutOtp($otp: String!, $phone: String!) {
     verifyCheckoutOtp(otp: $otp, phone: $phone) {

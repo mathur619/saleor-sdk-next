@@ -20419,6 +20419,152 @@ export type ConfirmAccountV2Mutation = { confirmAccountV2: Maybe<(
     & { user: Maybe<UserFragment>, accountErrors: Array<Pick<AccountError, 'field' | 'message'>>, errors: Array<Pick<Error, 'field' | 'message'>> }
   )> };
 
+export type UpdateUserMetaMutationVariables = Exact<{
+  id: Scalars['ID'];
+  input: Array<MetadataInput> | MetadataInput;
+}>;
+
+
+export type UpdateUserMetaMutation = { updateMetadata: Maybe<(
+    { __typename: 'UpdateMetadata' }
+    & { metadataErrors: Array<(
+      { __typename: 'MetadataError' }
+      & Pick<MetadataError, 'field' | 'message'>
+    )>, item: Maybe<(
+      { __typename: 'App' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'Attribute' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'Category' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'Checkout' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'CheckoutType' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'Collection' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'CrontabScheduleType' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'DigitalContent' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'Fulfillment' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'IntervalScheduleType' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'Invoice' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'Order' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'Page' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'PaymentMethodType' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'PeriodicTaskType' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'Product' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'ProductType' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'ProductVariant' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'ServiceAccount' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'ShipmentItemType' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'ShipmentType' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'User' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    )> }
+  )> };
+
 export type VerifyCheckoutOtpMutationVariables = Exact<{
   otp: Scalars['String'];
   phone: Scalars['String'];
@@ -21599,6 +21745,53 @@ export function useConfirmAccountV2Mutation(baseOptions?: Apollo.MutationHookOpt
 export type ConfirmAccountV2MutationHookResult = ReturnType<typeof useConfirmAccountV2Mutation>;
 export type ConfirmAccountV2MutationResult = Apollo.MutationResult<ConfirmAccountV2Mutation>;
 export type ConfirmAccountV2MutationOptions = Apollo.BaseMutationOptions<ConfirmAccountV2Mutation, ConfirmAccountV2MutationVariables>;
+export const UpdateUserMetaDocument = gql`
+    mutation UpdateUserMeta($id: ID!, $input: [MetadataInput!]!) {
+  updateMetadata(id: $id, input: $input) {
+    metadataErrors {
+      field
+      message
+      __typename
+    }
+    item {
+      metadata {
+        key
+        value
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+    `;
+export type UpdateUserMetaMutationFn = Apollo.MutationFunction<UpdateUserMetaMutation, UpdateUserMetaMutationVariables>;
+
+/**
+ * __useUpdateUserMetaMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMetaMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMetaMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMetaMutation, { data, loading, error }] = useUpdateUserMetaMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserMetaMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMetaMutation, UpdateUserMetaMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserMetaMutation, UpdateUserMetaMutationVariables>(UpdateUserMetaDocument, options);
+      }
+export type UpdateUserMetaMutationHookResult = ReturnType<typeof useUpdateUserMetaMutation>;
+export type UpdateUserMetaMutationResult = Apollo.MutationResult<UpdateUserMetaMutation>;
+export type UpdateUserMetaMutationOptions = Apollo.BaseMutationOptions<UpdateUserMetaMutation, UpdateUserMetaMutationVariables>;
 export const VerifyCheckoutOtpDocument = gql`
     mutation VerifyCheckoutOtp($otp: String!, $phone: String!) {
   verifyCheckoutOtp(otp: $otp, phone: $phone) {
