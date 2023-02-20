@@ -75,7 +75,7 @@ import {
   UpdateAccountAddressResult,
   UpdateAccountOpts,
   UpdateAccountResult,
-  UpdateUserMetaMutationResult,
+  UpdateUserMetaDataMutationResult,
   // SetAccountDefaultAddressResult,
   // UpdateAccountAddressResult,
   // UpdateAccountResult,
@@ -175,7 +175,7 @@ export interface UserSDK {
   updateUserMeta: (
     userId: string,
     input: MetadataItem
-  ) => Promise<UpdateUserMetaMutationResult>;
+  ) => Promise<UpdateUserMetaDataMutationResult>;
 }
 
 export const user = ({

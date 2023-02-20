@@ -182,7 +182,9 @@ export type UpdateAccountAddressResult = FetchResult<
   UpdateAccountAddressMutation
 >;
 
-export type UpdateUserMetaMutationResult = FetchResult<UpdateUserMetaMutation>;
+export type UpdateUserMetaDataMutationResult = FetchResult<
+  UpdateUserMetaMutation
+>;
 
 // export type ConfirmAccountOpts = AccountConfirmMutationVariables;
 
