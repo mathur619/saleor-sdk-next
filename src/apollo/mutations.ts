@@ -756,6 +756,15 @@ export const CHECKOUT_PAYMENT_METHOD_UPDATE = gql`
     ) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       checkoutErrors {
         field

@@ -8333,6 +8333,8 @@ export type Mutation = {
   createReviewCsv: Maybe<CreateReviewCsv>;
   /** Create Product. */
   updateCollectionMetadata: Maybe<UpdateCollectionMetadata>;
+  /** Update Collection Banner. */
+  updateCollectionBanner: Maybe<UpdateCollectionBanner>;
   /** Update ProductVariant metadata. */
   updateProductvariantMetadata: Maybe<UpdateProductvariantMetadata>;
   /** Bulk Upload Price CSV */
@@ -8421,6 +8423,8 @@ export type Mutation = {
   uploadRtoCustomersList: Maybe<UploadRtoCustomersListCsv>;
   /** Remove list of RTO customers. */
   removeRtoCustomersList: Maybe<RemoveRtoCustomersListCsv>;
+  /** Upload list of risk orders. */
+  pushRiskOrdersCsv: Maybe<PushRiskOrderCsv>;
 };
 
 
@@ -10564,6 +10568,11 @@ export type MutationUpdateCollectionMetadataArgs = {
 };
 
 
+export type MutationUpdateCollectionBannerArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
 export type MutationUpdateProductvariantMetadataArgs = {
   csvFile: Scalars['Upload'];
 };
@@ -10788,6 +10797,11 @@ export type MutationUploadRtoCustomersListArgs = {
 
 
 export type MutationRemoveRtoCustomersListArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
+export type MutationPushRiskOrdersCsvArgs = {
   csvFile: Scalars['Upload'];
 };
 
@@ -14238,6 +14252,18 @@ export type PushAllToWareIq = {
   orderErrors: Array<OrderError>;
 };
 
+/** Upload list of risk orders. */
+export type PushRiskOrderCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+  sectionErrors: Array<SectionError>;
+};
+
 /** Push or sync an order to wareiq */
 export type PushToWareIq = {
   /**
@@ -15763,6 +15789,7 @@ export type ReportingPeriod =
 
 export type ReportingPeriodV2 =
   | 'TODAY'
+  | 'YESTERDAY'
   | 'THIS_WEEK'
   | 'THIS_MONTH'
   | 'THIS_QUARTER'
@@ -16032,10 +16059,12 @@ export type SaleUpdate = {
 };
 
 export type SaleorVoucherInput = {
+  /** boolean value for coupon code */
+  discountWithoutCoupon?: Maybe<Scalars['Boolean']>;
   /** id of the draft order */
   orderId: Scalars['ID'];
   /** voucher code */
-  code: Scalars['String'];
+  code?: Maybe<Scalars['String']>;
   /** type of discount */
   discountType?: Maybe<DiscountAmountType>;
   discountAmount: Scalars['Int'];
@@ -18200,6 +18229,32 @@ export type UpdateBanner = {
   bannerErrors: Array<BannerError>;
 };
 
+/** Update Collection Banner. */
+export type UpdateCollectionBanner = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+  updateCollectionBannerError: Array<UpdateCollectionBannerError>;
+};
+
+export type UpdateCollectionBannerError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code.. */
+  code: UpdateCollectionBannerErrorCode;
+};
+
+/** An enumeration. */
+export type UpdateCollectionBannerErrorCode =
+  | 'INVALID_FILE_FORMAT'
+  | 'INVALID';
+
 /** Create Product. */
 export type UpdateCollectionMetadata = {
   /**
@@ -20213,7 +20268,10 @@ export type CheckoutPaymentMethodUpdateMutationVariables = Exact<{
 }>;
 
 
-export type CheckoutPaymentMethodUpdateMutation = { checkoutPaymentMethodUpdate: Maybe<{ checkout: Maybe<CheckoutFragment>, checkoutErrors: Array<Pick<CheckoutError, 'field' | 'message' | 'code'>> }> };
+export type CheckoutPaymentMethodUpdateMutation = { checkoutPaymentMethodUpdate: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, checkoutErrors: Array<Pick<CheckoutError, 'field' | 'message' | 'code'>> }> };
 
 export type CreateRazorpayOrderMutationVariables = Exact<{
   input: RazorpayCreateOrderInput;
@@ -21782,6 +21840,15 @@ export const CheckoutPaymentMethodUpdateDocument = gql`
   ) {
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     checkoutErrors {
       field

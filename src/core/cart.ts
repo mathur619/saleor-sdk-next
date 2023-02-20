@@ -86,7 +86,8 @@ export interface CartSDK {
     variantId: string,
     quantity: number,
     tags?: string[],
-    line_item?: any
+    line_item?: any,
+    useDummyAddress?: boolean
   ) => AddItemResult;
   updateItemNext: (
     variantId: string,
@@ -383,7 +384,8 @@ export const cart = ({
     variantId: string,
     quantity: number,
     tags?: string[],
-    line_item?: any
+    line_item?: any,
+    useDummyAddress: boolean=true
   ) => {
     const checkoutString = storage.getCheckout();
     const checkout =
@@ -561,7 +563,7 @@ export const cart = ({
       }
     } else {
       let checkoutInputVariables: CheckoutCreateInput;
-      if (tags) {
+      if (tags && useDummyAddress) {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
           email: "dummy@dummy.com",
@@ -579,7 +581,7 @@ export const cart = ({
             streetAddress2: "dummy",
           },
         };
-      } else {
+      } else if(useDummyAddress) {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
           email: "dummy@dummy.com",
@@ -595,6 +597,10 @@ export const cart = ({
             streetAddress1: "dummy",
             streetAddress2: "dummy",
           },
+        };
+      }else {
+        checkoutInputVariables = {
+          lines: [{ quantity: quantity, variantId: variantId }]
         };
       }
 
