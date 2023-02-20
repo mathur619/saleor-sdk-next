@@ -118,15 +118,17 @@ export interface CheckoutSDK {
   ) => SetShippingAddressResult;
   setShippingAndBillingAddress?: (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod?: boolean
   ) => SetShippingAndBillingAddressResult;
 
-  setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
+  setBillingAddress?: (billingAddress: IAddress, updateShippingMethod?: boolean) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
   addPromoCode?: (promoCode: string) => AddPromoCodeResult;
   removePromoCode?: (promoCode: string) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
-    input: PaymentMethodUpdateInput
+    input: PaymentMethodUpdateInput,
+    updateShippingMethod?: boolean
   ) => CheckoutPaymentMethodUpdateResult;
   createPayment?: (input: CreatePaymentInput) => CreatePaymentResult;
   completeCheckout?: (input?: CompleteCheckoutInput) => CompleteCheckoutResult;
@@ -273,7 +275,8 @@ export const checkout = ({
   };
 
   const setBillingAddress: CheckoutSDK["setBillingAddress"] = async (
-    billingAddress: IAddress
+    billingAddress: IAddress,
+    updateShippingMethod: boolean=false,
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -312,7 +315,8 @@ export const checkout = ({
         update: (_, { data }) => {
           setLocalCheckoutInCache(
             client,
-            data?.checkoutBillingAddressUpdate?.checkout
+            data?.checkoutBillingAddressUpdate?.checkout,
+            updateShippingMethod
           );
           if (data?.checkoutBillingAddressUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutBillingAddressUpdate?.checkout);
@@ -326,7 +330,8 @@ export const checkout = ({
 
   const setShippingAndBillingAddress: CheckoutSDK["setShippingAndBillingAddress"] = async (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod: boolean=false,
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -336,7 +341,7 @@ export const checkout = ({
     });
 
     const resShipping = await setShippingAddress(shippingAddress, email);
-    const resBilling = await setBillingAddress(shippingAddress);
+    const resBilling = await setBillingAddress(shippingAddress, updateShippingMethod);
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -537,7 +542,8 @@ export const checkout = ({
   };
 
   const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] = async (
-    input: PaymentMethodUpdateInput
+    input: PaymentMethodUpdateInput,
+    updateShippingMethod: boolean=true,
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -572,7 +578,7 @@ export const checkout = ({
           setLocalCheckoutInCache(
             client,
             data?.checkoutPaymentMethodUpdate?.checkout,
-            true
+            updateShippingMethod
           );
           if (data?.checkoutPaymentMethodUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutPaymentMethodUpdate?.checkout);
