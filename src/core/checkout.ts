@@ -831,7 +831,7 @@ export const checkout = ({
           client.writeQuery({
             query: GET_LOCAL_CHECKOUT,
             data: {
-              checkoutLoading: true,
+              checkoutLoading: false,
             },
           });
         },
@@ -887,7 +887,7 @@ export const checkout = ({
           client.writeQuery({
             query: GET_LOCAL_CHECKOUT,
             data: {
-              checkoutLoading: true,
+              checkoutLoading: false,
             },
           });
         },
@@ -991,7 +991,7 @@ export const checkout = ({
           client.writeQuery({
             query: GET_LOCAL_CHECKOUT,
             data: {
-              checkoutLoading: true,
+              checkoutLoading: false,
             },
           });
         },
