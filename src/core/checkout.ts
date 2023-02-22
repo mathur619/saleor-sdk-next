@@ -858,13 +858,6 @@ export const checkout = ({
   };
 
   const checkJuspayOrderStatus: CheckoutSDK["checkJuspayOrderStatus"] = async () => {
-    client.writeQuery({
-      query: GET_LOCAL_CHECKOUT,
-      data: {
-        checkoutLoading: true,
-      },
-    });
-
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null | undefined =
       checkoutString && typeof checkoutString === "string"
@@ -883,30 +876,7 @@ export const checkout = ({
       >({
         mutation: CHECK_JUSPAY_ORDER_STATUS,
         variables,
-        update: async () => {
-          client.writeQuery({
-            query: GET_LOCAL_CHECKOUT,
-            data: {
-              checkoutLoading: false,
-            },
-          });
-        },
       });
-
-      if (
-        (res?.errors && res?.errors[0]?.message) ||
-        (res?.data?.juspayOrderStatusCheck?.errors &&
-          res?.data?.juspayOrderStatusCheck?.errors[0]?.message) ||
-        (res?.data?.juspayOrderStatusCheck?.juspayErrors &&
-          res?.data?.juspayOrderStatusCheck?.juspayErrors[0]?.message)
-      ) {
-        client.writeQuery({
-          query: GET_LOCAL_CHECKOUT,
-          data: {
-            checkoutLoading: false,
-          },
-        });
-      }
       return res;
     }
 
