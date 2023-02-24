@@ -263,47 +263,6 @@ export const cart = ({
           checkoutId: checkout?.id,
           lineId: lineToRemoveId,
         },
-        update: async (_, { data }) => {
-          if (data?.checkoutLineDelete?.checkout?.id) {
-            storage.setCheckout(data?.checkoutLineDelete?.checkout);
-
-            const resDiscount = {
-              data: {
-                __typename: "DiscountsType",
-                checkoutDiscounts: {
-                  prepaidDiscount:
-                    res?.data?.checkoutLineDelete?.checkout?.paymentMethod
-                      ?.prepaidDiscountAmount,
-                  couponDiscount:
-                    res?.data?.checkoutLineDelete?.checkout?.paymentMethod
-                      ?.couponDiscount,
-                  cashbackDiscount:
-                    res?.data?.checkoutLineDelete?.checkout?.paymentMethod
-                      ?.cashbackDiscountAmount,
-                },
-                cashback: res?.data?.checkoutLineDelete?.checkout?.cashback,
-              },
-            };
-
-            storage.setDiscounts(resDiscount.data);
-
-            client.writeQuery({
-              query: GET_LOCAL_CHECKOUT,
-              data: {
-                localCheckout: res?.data?.checkoutLineDelete?.checkout,
-                localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
-                localCashback: resDiscount.data.cashback,
-              },
-            });
-
-            client.writeQuery({
-              query: GET_LOCAL_CHECKOUT,
-              data: {
-                checkoutLoading: false,
-              },
-            });
-          }
-        },
       });
 
       if (
@@ -343,10 +302,49 @@ export const cart = ({
         window.location?.reload();
       }
 
-      return {
-        data: res.data?.checkoutLineDelete?.checkout,
-        errors: res.data?.checkoutLineDelete?.errors,
-      };
+      if (res?.data?.checkoutLineDelete?.checkout?.id) {
+        storage.setCheckout(res?.data?.checkoutLineDelete?.checkout);
+        const resDiscount = {
+          data: {
+            __typename: "DiscountsType",
+            checkoutDiscounts: {
+              prepaidDiscount:
+                res?.data?.checkoutLineDelete?.checkout?.paymentMethod
+                  ?.prepaidDiscountAmount,
+              couponDiscount:
+                res?.data?.checkoutLineDelete?.checkout?.paymentMethod
+                  ?.couponDiscount,
+              cashbackDiscount:
+                res?.data?.checkoutLineDelete?.checkout?.paymentMethod
+                  ?.cashbackDiscountAmount,
+            },
+            cashback: res?.data?.checkoutLineDelete?.checkout?.cashback,
+          },
+        };
+
+        storage.setDiscounts(resDiscount.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: res?.data?.checkoutLineDelete?.checkout,
+            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+            localCashback: resDiscount.data.cashback,
+          },
+        });
+
+        return {
+          data: res.data?.checkoutLineDelete?.checkout,
+          errors: res.data?.checkoutLineDelete?.errors,
+        };
+      }
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
     }
     return null;
   };
