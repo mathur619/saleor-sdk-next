@@ -694,6 +694,18 @@ export const checkout = ({
         },
       });
 
+      if (
+        res?.data?.checkoutComplete?.errors &&
+        res?.data?.checkoutComplete?.errors[0]?.code
+      ) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
+
       return res;
     }
 

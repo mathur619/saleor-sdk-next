@@ -838,6 +838,26 @@ export const CHECKOUT_CUSTOMER_ATTACH = gql`
   }
 `;
 
+export const CHECKOUT_CUSTOMER_ATTACH_NEW = gql`
+  ${checkoutFragment}
+  mutation CheckoutCustomerAttachNew($checkoutId: ID!, $customerId: ID) {
+    checkoutCustomerAttach(checkoutId: $checkoutId, customerId: $customerId) {
+      checkout {
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
+      }
+    }
+  }
+`;
+
 export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
   ${checkoutErrorFragment}
   mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
