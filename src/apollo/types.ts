@@ -22648,7 +22648,6 @@ export function usePayuOrderCreateMutation(baseOptions?: Apollo.MutationHookOpti
         return Apollo.useMutation<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>(PayuOrderCreateDocument, options);
       }
 export type PayuOrderCreateMutationHookResult = ReturnType<typeof usePayuOrderCreateMutation>;
-export type PayuOrderCreateMutationResult = Apollo.MutationResult<PayuOrderCreateMutation>;
 export type PayuOrderCreateMutationOptions = Apollo.BaseMutationOptions<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>;
 export const AddWishlistProductDocument = gql`
     mutation AddWishlistProduct($productId: ID!) {
@@ -22764,7 +22763,6 @@ export function useCcAvenueOrderCreateMutation(baseOptions?: Apollo.MutationHook
         return Apollo.useMutation<CcAvenueOrderCreateMutation, CcAvenueOrderCreateMutationVariables>(CcAvenueOrderCreateDocument, options);
       }
 export type CcAvenueOrderCreateMutationHookResult = ReturnType<typeof useCcAvenueOrderCreateMutation>;
-export type CcAvenueOrderCreateMutationResult = Apollo.MutationResult<CcAvenueOrderCreateMutation>;
 export type CcAvenueOrderCreateMutationOptions = Apollo.BaseMutationOptions<CcAvenueOrderCreateMutation, CcAvenueOrderCreateMutationVariables>;
 export const UserDetailsDocument = gql`
     query UserDetails {
