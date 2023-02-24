@@ -1735,6 +1735,24 @@ export type BulkStockError = {
   index: Maybe<Scalars['Int']>;
 };
 
+export type CcAvenueCreateOrderInput = {
+  /** Checkout ID. */
+  checkoutId: Scalars['ID'];
+};
+
+export type CcAvenueError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: CcAvenueErrorCode;
+};
+
+/** An enumeration. */
+export type CcAvenueErrorCode =
+  | 'INVALID';
+
 export type CashbackType = {
   amount: Maybe<Scalars['Decimal']>;
   willAddOn: Maybe<Scalars['DateTime']>;
@@ -3462,6 +3480,22 @@ export type CreateBanner = {
   /** A banner instance. */
   banner: Maybe<CustomBannerType>;
   bannerErrors: Array<BannerError>;
+};
+
+/** Creates an order on CCAvenue. */
+export type CreateCcAvenueOrder = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Enc Type Checkout Data. */
+  encData: Maybe<Scalars['String']>;
+  /** CC Avenue Order ID. */
+  ccAvenueOrderId: Maybe<Scalars['String']>;
+  /** Access code for form data. */
+  accessCode: Maybe<Scalars['String']>;
+  ccAvenueErrors: Array<CcAvenueError>;
 };
 
 /** Creates an order on Cashfree. */
@@ -8333,6 +8367,8 @@ export type Mutation = {
   createReviewCsv: Maybe<CreateReviewCsv>;
   /** Create Product. */
   updateCollectionMetadata: Maybe<UpdateCollectionMetadata>;
+  /** Update Collection Banner. */
+  updateCollectionBanner: Maybe<UpdateCollectionBanner>;
   /** Update ProductVariant metadata. */
   updateProductvariantMetadata: Maybe<UpdateProductvariantMetadata>;
   /** Bulk Upload Price CSV */
@@ -8421,6 +8457,10 @@ export type Mutation = {
   uploadRtoCustomersList: Maybe<UploadRtoCustomersListCsv>;
   /** Remove list of RTO customers. */
   removeRtoCustomersList: Maybe<RemoveRtoCustomersListCsv>;
+  /** Upload list of risk orders. */
+  pushRiskOrdersCsv: Maybe<PushRiskOrderCsv>;
+  /** Creates an order on CCAvenue. */
+  createCcAvenueOrder: Maybe<CreateCcAvenueOrder>;
 };
 
 
@@ -10564,6 +10604,11 @@ export type MutationUpdateCollectionMetadataArgs = {
 };
 
 
+export type MutationUpdateCollectionBannerArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
 export type MutationUpdateProductvariantMetadataArgs = {
   csvFile: Scalars['Upload'];
 };
@@ -10789,6 +10834,16 @@ export type MutationUploadRtoCustomersListArgs = {
 
 export type MutationRemoveRtoCustomersListArgs = {
   csvFile: Scalars['Upload'];
+};
+
+
+export type MutationPushRiskOrdersCsvArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
+export type MutationCreateCcAvenueOrderArgs = {
+  input: CcAvenueCreateOrderInput;
 };
 
 export type NameTranslationInput = {
@@ -14238,6 +14293,18 @@ export type PushAllToWareIq = {
   orderErrors: Array<OrderError>;
 };
 
+/** Upload list of risk orders. */
+export type PushRiskOrderCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+  sectionErrors: Array<SectionError>;
+};
+
 /** Push or sync an order to wareiq */
 export type PushToWareIq = {
   /**
@@ -14439,6 +14506,8 @@ export type Query = {
   recentOrder: Maybe<Order>;
   /** List of top selling products. */
   reportProductSales: Maybe<ProductVariantCountableConnection>;
+  /** Look up a product review by User ID. */
+  reviewByUser: Maybe<ProductReviewTypeCountableConnection>;
   /** Look up a sale by ID. */
   sale: Maybe<Sale>;
   /** List of the shop's sales. */
@@ -15331,6 +15400,15 @@ export type QueryReportProductSalesArgs = {
 };
 
 
+export type QueryReviewByUserArgs = {
+  user?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
 export type QuerySaleArgs = {
   id: Scalars['ID'];
 };
@@ -15763,6 +15841,7 @@ export type ReportingPeriod =
 
 export type ReportingPeriodV2 =
   | 'TODAY'
+  | 'YESTERDAY'
   | 'THIS_WEEK'
   | 'THIS_MONTH'
   | 'THIS_QUARTER'
@@ -16032,10 +16111,12 @@ export type SaleUpdate = {
 };
 
 export type SaleorVoucherInput = {
+  /** boolean value for coupon code */
+  discountWithoutCoupon?: Maybe<Scalars['Boolean']>;
   /** id of the draft order */
   orderId: Scalars['ID'];
   /** voucher code */
-  code: Scalars['String'];
+  code?: Maybe<Scalars['String']>;
   /** type of discount */
   discountType?: Maybe<DiscountAmountType>;
   discountAmount: Scalars['Int'];
@@ -18200,6 +18281,32 @@ export type UpdateBanner = {
   bannerErrors: Array<BannerError>;
 };
 
+/** Update Collection Banner. */
+export type UpdateCollectionBanner = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+  updateCollectionBannerError: Array<UpdateCollectionBannerError>;
+};
+
+export type UpdateCollectionBannerError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code.. */
+  code: UpdateCollectionBannerErrorCode;
+};
+
+/** An enumeration. */
+export type UpdateCollectionBannerErrorCode =
+  | 'INVALID_FILE_FORMAT'
+  | 'INVALID';
+
 /** Create Product. */
 export type UpdateCollectionMetadata = {
   /**
@@ -19918,7 +20025,6 @@ export type UserFragment = (
 export type PriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> };
 
 
-
 export type ProductVariantFragment = (
   Pick<ProductVariant, 'id' | 'name' | 'sku' | 'quantityAvailable'>
   & { images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'sortOrder' | 'alt' | 'url'>>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, pricing: Maybe<(
@@ -20317,8 +20423,8 @@ export type CreateCheckoutNextMutation = { checkoutCreate: Maybe<{ errors: Array
     )> }> };
 
 export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
-  checkoutId?: Scalars['ID'];
-  shippingMethodId?: Scalars['ID'];
+  checkoutId: Scalars['ID'];
+  shippingMethodId: Scalars['ID'];
 }>;
 
 
@@ -20356,6 +20462,16 @@ export type WishlistRemoveProductMutationVariables = Exact<{
   productId: Scalars['ID'];
 }>;
 
+
+export type CcAvenueOrderCreateMutationVariables = Exact<{
+  input: CcAvenueCreateOrderInput;
+}>;
+
+
+export type CcAvenueOrderCreateMutation = { createCcAvenueOrder: Maybe<(
+    Pick<CreateCcAvenueOrder, 'encData' | 'ccAvenueOrderId' | 'accessCode'>
+    & { ccAvenueErrors: Array<Pick<CcAvenueError, 'field' | 'message' | 'code'>> }
+  )> };
 
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -20520,7 +20636,6 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
-    
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -22533,7 +22648,7 @@ export function usePayuOrderCreateMutation(baseOptions?: Apollo.MutationHookOpti
         return Apollo.useMutation<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>(PayuOrderCreateDocument, options);
       }
 export type PayuOrderCreateMutationHookResult = ReturnType<typeof usePayuOrderCreateMutation>;
-
+export type PayuOrderCreateMutationResult = Apollo.MutationResult<PayuOrderCreateMutation>;
 export type PayuOrderCreateMutationOptions = Apollo.BaseMutationOptions<PayuOrderCreateMutation, PayuOrderCreateMutationVariables>;
 export const AddWishlistProductDocument = gql`
     mutation AddWishlistProduct($productId: ID!) {
@@ -22611,6 +22726,46 @@ export function useWishlistRemoveProductMutation(baseOptions?: Apollo.MutationHo
 export type WishlistRemoveProductMutationHookResult = ReturnType<typeof useWishlistRemoveProductMutation>;
 export type WishlistRemoveProductMutationResult = Apollo.MutationResult<WishlistRemoveProductMutation>;
 export type WishlistRemoveProductMutationOptions = Apollo.BaseMutationOptions<WishlistRemoveProductMutation, WishlistRemoveProductMutationVariables>;
+export const CcAvenueOrderCreateDocument = gql`
+    mutation CCAvenueOrderCreate($input: CCAvenueCreateOrderInput!) {
+  createCcAvenueOrder(input: $input) {
+    encData
+    ccAvenueOrderId
+    accessCode
+    ccAvenueErrors {
+      field
+      message
+      code
+    }
+  }
+}
+    `;
+export type CcAvenueOrderCreateMutationFn = Apollo.MutationFunction<CcAvenueOrderCreateMutation, CcAvenueOrderCreateMutationVariables>;
+
+/**
+ * __useCcAvenueOrderCreateMutation__
+ *
+ * To run a mutation, you first call `useCcAvenueOrderCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCcAvenueOrderCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [ccAvenueOrderCreateMutation, { data, loading, error }] = useCcAvenueOrderCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCcAvenueOrderCreateMutation(baseOptions?: Apollo.MutationHookOptions<CcAvenueOrderCreateMutation, CcAvenueOrderCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CcAvenueOrderCreateMutation, CcAvenueOrderCreateMutationVariables>(CcAvenueOrderCreateDocument, options);
+      }
+export type CcAvenueOrderCreateMutationHookResult = ReturnType<typeof useCcAvenueOrderCreateMutation>;
+export type CcAvenueOrderCreateMutationResult = Apollo.MutationResult<CcAvenueOrderCreateMutation>;
+export type CcAvenueOrderCreateMutationOptions = Apollo.BaseMutationOptions<CcAvenueOrderCreateMutation, CcAvenueOrderCreateMutationVariables>;
 export const UserDetailsDocument = gql`
     query UserDetails {
   user: me {

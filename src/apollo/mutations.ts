@@ -983,3 +983,17 @@ export const WISHLIST_REMOVE_PRODUCT = gql`
     }
   }
 `;
+export const CREATE_CCAVENUE_ORDER = gql`
+  mutation CCAvenueOrderCreate($input: CCAvenueCreateOrderInput!) {
+    createCcAvenueOrder(input: $input) {
+      encData
+      ccAvenueOrderId
+      accessCode
+      ccAvenueErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
