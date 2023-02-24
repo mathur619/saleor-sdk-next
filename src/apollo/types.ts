@@ -20423,8 +20423,8 @@ export type CreateCheckoutNextMutation = { checkoutCreate: Maybe<{ errors: Array
     )> }> };
 
 export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
-  checkoutId: Scalars['ID'];
-  shippingMethodId: Scalars['ID'];
+  checkoutId?: Scalars['ID'];
+  shippingMethodId?: Scalars['ID'];
 }>;
 
 
