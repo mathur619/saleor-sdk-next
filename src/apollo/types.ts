@@ -301,7 +301,7 @@ export type AddTags = {
 };
 
 /** Represents user address data. */
-export type Address = Node & {
+export type Address = Node & ObjectWithMetadata & {
   /** The ID of the object. */
   id: Scalars['ID'];
   firstName: Scalars['String'];
@@ -316,6 +316,20 @@ export type Address = Node & {
   country: CountryDisplay;
   countryArea: Scalars['String'];
   phone: Maybe<Scalars['String']>;
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItem>>;
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItem>>;
+  /**
+   * List of privately stored metadata namespaces.
+   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
+   */
+  privateMeta: Array<Maybe<MetaStore>>;
+  /**
+   * List of publicly stored metadata namespaces.
+   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
+   */
+  meta: Array<Maybe<MetaStore>>;
   /** Address is user's default shipping address. */
   isDefaultShippingAddress: Maybe<Scalars['Boolean']>;
   /** Address is user's default billing address. */
@@ -2046,6 +2060,18 @@ export type CategoryUpdatePrivateMeta = {
   category: Maybe<Category>;
 };
 
+/** Check Order status on Juspay. */
+export type CheckJuspayOrderStatus = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Juspay order object. */
+  juspayOrder: Maybe<JuspayOrderStatusType>;
+  juspayErrors: Array<JuspayError>;
+};
+
 /** Checkout object. */
 export type Checkout = Node & ObjectWithMetadata & {
   created: Scalars['DateTime'];
@@ -2300,8 +2326,8 @@ export type CheckoutErrorCode =
   | 'UNIQUE'
   | 'VOUCHER_NOT_APPLICABLE'
   | 'ZERO_QUANTITY'
-  | 'RTO_CUSTOMER_FOUND'
-  | 'COD_NOT_APPLICABLE_FOR_PRODUCT_IN_CART';
+  | 'COD_NOT_APPLICABLE_FOR_PRODUCT_IN_CART'
+  | 'RTO_CUSTOMER_FOUND';
 
 export type CheckoutEvent = Node & {
   /** The ID of the object. */
@@ -3528,6 +3554,18 @@ export type CreateInfluencer = {
   errors: Array<Error>;
   /** An Influencer instance. */
   influencer: Maybe<InfluencerType>;
+};
+
+/** Creates an order on Juspay. */
+export type CreateJusPayOrderAndCustomer = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Juspay order and Customer object. */
+  juspayResponse: Maybe<JuspayOrderAndCustomerType>;
+  juspayErrors: Array<JuspayError>;
 };
 
 /** Create a menu item image. This mutation must be sent as a `multipart` request. More detailed specs of the upload format can be found here: https://github.com/jaydenseric/graphql-multipart-request-spec */
@@ -6793,6 +6831,256 @@ export type JobStatusEnum =
   | 'FAILED'
   | 'DELETED';
 
+export type JuspayClient = {
+  /** Juspay Client Auth Token expiry */
+  clientAuthTokenExpiry: Maybe<Scalars['String']>;
+  /** Juspay Client Auth Token */
+  clientAuthToken: Maybe<Scalars['String']>;
+};
+
+export type JuspayCreateCustomerInput = {
+  /** Customer Email address */
+  emailAddress: Scalars['String'];
+  /** Customer Mobile number */
+  mobileNumber: Scalars['String'];
+  /** Customer First name */
+  firstName?: Maybe<Scalars['String']>;
+  /** Customer mobile country code */
+  mobileCountryCode: Scalars['String'];
+  /** Cutomer last name */
+  lastName?: Maybe<Scalars['String']>;
+};
+
+export type JuspayCreateOrderAndCustomerInput = {
+  /** Checkout ID. */
+  checkoutId: Scalars['ID'];
+  /** Customer Email address */
+  emailAddress: Scalars['String'];
+  /** Customer Mobile number */
+  mobileNumber: Scalars['String'];
+  /** Customer First name */
+  firstName?: Maybe<Scalars['String']>;
+  /** Customer mobile country code */
+  mobileCountryCode: Scalars['String'];
+  /** Cutomer last name */
+  lastName?: Maybe<Scalars['String']>;
+  /** Get UPI deep link */
+  getUpiDeepLinks?: Maybe<Scalars['Boolean']>;
+};
+
+/** Check Order status on Juspay. */
+export type JuspayCustomer = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Juspay Customer object. */
+  juspayCustomer: Maybe<JuspayCustomerType>;
+  juspayErrors: Array<JuspayError>;
+};
+
+export type JuspayCustomerType = {
+  /** Huspay Customer ID. */
+  id: Maybe<Scalars['String']>;
+  /** Customer Email address */
+  emailAddress: Maybe<Scalars['String']>;
+  /** Customer Mobile number */
+  mobileNumber: Maybe<Scalars['String']>;
+  /** Customer First name */
+  firstName: Maybe<Scalars['String']>;
+  /** Customer mobile country code */
+  mobileCountryCode: Maybe<Scalars['String']>;
+  /** Cutomer last name */
+  lastName: Maybe<Scalars['String']>;
+};
+
+export type JuspayError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: Maybe<JuspayErrorCodeEnum>;
+};
+
+/** An enumeration. */
+export type JuspayErrorCodeEnum =
+  | 'INVALID_AMOUNT'
+  | 'INVALID_CURRENCY'
+  | 'INVALID'
+  | 'NOT_FOUND';
+
+export type JuspayOrderAndCustomerType = {
+  /** Juspay Order ID. */
+  id: Maybe<Scalars['String']>;
+  /** Checkout Token */
+  orderId: Maybe<Scalars['String']>;
+  /** Total order amount. */
+  amount: Maybe<Scalars['Decimal']>;
+  /** Order status. */
+  status: Maybe<Scalars['String']>;
+  /** Juspay web payment link */
+  paymentLinks: Maybe<JustpaymentLink>;
+  /** Juspay web payment link */
+  clientJuspay: Maybe<JuspayClient>;
+  /** Juspay Customer id. */
+  customerId: Maybe<Scalars['String']>;
+  /** Get UPI deep link */
+  deepLink: Maybe<Scalars['String']>;
+};
+
+export type JuspayOrderStatusInput = {
+  /** Checkout ID. */
+  checkoutId: Scalars['ID'];
+};
+
+export type JuspayOrderStatusType = {
+  /** Juspay Order ID. */
+  id: Maybe<Scalars['String']>;
+  /** Checkout Token */
+  orderId: Maybe<Scalars['String']>;
+  /** Total order amount. */
+  amount: Maybe<Scalars['Decimal']>;
+  /** Order status. */
+  status: Maybe<Scalars['String']>;
+  /** Payment Status */
+  paymentStatus: Maybe<Scalars['Boolean']>;
+};
+
+/** Create order and payment on Juspay */
+export type JuspayPayment = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Juspay Customer object. */
+  juspayResponse: Maybe<JuspayPaymentType>;
+  juspayErrors: Array<JuspayError>;
+};
+
+export type JuspayPaymentInput = {
+  /** Checkout ID. */
+  checkoutId: Scalars['ID'];
+  /** Customer ID. */
+  customerId: Scalars['ID'];
+  /** Payment method Type */
+  paymentMethodType: Scalars['String'];
+  /** Payment method */
+  paymentMethod: Scalars['String'];
+  /** Payment UPI */
+  upiVpa?: Maybe<Scalars['String']>;
+  /** Payment wallet direct token */
+  directWalletToken?: Maybe<Scalars['String']>;
+  /** Payment card number */
+  cardNumber?: Maybe<Scalars['String']>;
+  /** Payment card expiry month */
+  cardExpMonth?: Maybe<Scalars['String']>;
+  /** Payment card expiry year */
+  cardExpYear?: Maybe<Scalars['String']>;
+  /** Name on card */
+  nameOnCard?: Maybe<Scalars['String']>;
+  /** Card Security code */
+  cardSecurityCode?: Maybe<Scalars['String']>;
+  /** TXN type */
+  txnType?: Maybe<Scalars['String']>;
+  /** SDK Params */
+  sdkParams?: Maybe<Scalars['Boolean']>;
+};
+
+export type JuspayPaymentType = {
+  /** Order status. */
+  status: Maybe<Scalars['String']>;
+  /** Checkout Token */
+  orderId: Maybe<Scalars['String']>;
+  /** Payment Authentication */
+  paymentAuthentication: Maybe<JuspayTxnAuthentication>;
+  /** Payment Params */
+  paymentParams: Maybe<JuspayTxnParams>;
+  /** Payment txn id */
+  paymentTxnId: Maybe<Scalars['String']>;
+  /** Payment txn uuid */
+  paymentTxnUuid: Maybe<Scalars['String']>;
+  /** SDK Params */
+  sdkParams: Maybe<JuspaySdkParams>;
+};
+
+export type JuspaySdkParams = {
+  /** amount  */
+  amount: Maybe<Scalars['String']>;
+  /** customer_last_name */
+  customerLastName: Maybe<Scalars['String']>;
+  /** customer_first_name */
+  customerFirstName: Maybe<Scalars['String']>;
+  /** merchant_vpa */
+  merchantVpa: Maybe<Scalars['String']>;
+  /** merchant_name */
+  merchantName: Maybe<Scalars['String']>;
+  /** mcc */
+  mcc: Maybe<Scalars['String']>;
+  /** tr */
+  tr: Maybe<Scalars['String']>;
+};
+
+export type JuspayTxnAuthentication = {
+  /** Authentication Url */
+  url: Maybe<Scalars['String']>;
+  /** Authentication Method */
+  method: Maybe<Scalars['String']>;
+};
+
+export type JuspayTxnParams = {
+  /** Payment params key1 */
+  key1: Maybe<Scalars['String']>;
+  /** Payment params key1 */
+  key2: Maybe<Scalars['String']>;
+  /** Payment params key1 */
+  key3: Maybe<Scalars['String']>;
+};
+
+/** Verify VPA on Juspay */
+export type JuspayVerifyVpa = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Juspay Verify VPA object. */
+  juspayResponse: Maybe<JuspayVerifyVpaType>;
+  juspayErrors: Array<JuspayError>;
+};
+
+export type JuspayVerifyVpaInput = {
+  /** Payment UPI VPA */
+  vpa: Scalars['String'];
+};
+
+export type JuspayVerifyVpaType = {
+  /** Vpa Verification status. */
+  status: Maybe<Scalars['String']>;
+  /** Payment UPI VPA */
+  vpa: Maybe<Scalars['String']>;
+  /** Details specific to mandate support */
+  mandateDetails: Maybe<JuspayVpaMendate>;
+  /** The name of the customer provided during VPA registration. The default value for a valid VPA will be verified */
+  customerName: Maybe<Scalars['String']>;
+};
+
+export type JuspayVpaMendate = {
+  /** VPA handle supported or not. */
+  isHandleSupported: Maybe<Scalars['Boolean']>;
+};
+
+export type JustpaymentLink = {
+  /** Juspay Payment Web Link */
+  web: Maybe<Scalars['String']>;
+  /** Juspay Payment Mobile Link */
+  mobile: Maybe<Scalars['String']>;
+  /** Juspay Payment Iframe Link */
+  iframe: Maybe<Scalars['String']>;
+};
+
 /** An enumeration. */
 export type LanguageCodeEnum =
   | 'AR'
@@ -8169,6 +8457,16 @@ export type Mutation = {
   productDuplicate: Maybe<ProductDuplicate>;
   /** Creates an order on Razorpay. */
   razorpayOrderCreate: Maybe<CreateRazorpayOrder>;
+  /** Creates an order on Juspay. */
+  juspayOrderAndCustomerCreate: Maybe<CreateJusPayOrderAndCustomer>;
+  /** Check Order status on Juspay. */
+  juspayOrderStatusCheck: Maybe<CheckJuspayOrderStatus>;
+  /** Check Order status on Juspay. */
+  juspayCustomer: Maybe<JuspayCustomer>;
+  /** Create order and payment on Juspay */
+  juspayPayment: Maybe<JuspayPayment>;
+  /** Verify VPA on Juspay */
+  juspayVerifyVpa: Maybe<JuspayVerifyVpa>;
   /** Creates an order on Paytm. */
   paytmOrderCreate: Maybe<PaytmOrderCreate>;
   /** Creates an order on Cashfree. */
@@ -10122,6 +10420,31 @@ export type MutationProductDuplicateArgs = {
 
 export type MutationRazorpayOrderCreateArgs = {
   input: RazorpayCreateOrderInput;
+};
+
+
+export type MutationJuspayOrderAndCustomerCreateArgs = {
+  input: JuspayCreateOrderAndCustomerInput;
+};
+
+
+export type MutationJuspayOrderStatusCheckArgs = {
+  input: JuspayOrderStatusInput;
+};
+
+
+export type MutationJuspayCustomerArgs = {
+  input: JuspayCreateCustomerInput;
+};
+
+
+export type MutationJuspayPaymentArgs = {
+  input: JuspayPaymentInput;
+};
+
+
+export type MutationJuspayVerifyVpaArgs = {
+  input: JuspayVerifyVpaInput;
 };
 
 
@@ -14365,6 +14688,7 @@ export type Query = {
   freeCheckoutLines: Maybe<Array<Maybe<CheckoutLine>>>;
   genericFormName: Maybe<Array<Maybe<FormNameType>>>;
   genericForms: Maybe<GenericFormTypeConnection>;
+  getOtp: Maybe<SkipOtpType>;
   /** Look up a gift card by ID. */
   giftCard: Maybe<GiftCard>;
   /** List of gift cards. */
@@ -14933,6 +15257,11 @@ export type QueryGenericFormsArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryGetOtpArgs = {
+  phone?: Maybe<Scalars['String']>;
 };
 
 
@@ -17314,6 +17643,11 @@ export type SiteDomainInput = {
   domain?: Maybe<Scalars['String']>;
   /** Shop site name. */
   name?: Maybe<Scalars['String']>;
+};
+
+export type SkipOtpType = {
+  /** otp */
+  otp: Maybe<Scalars['String']>;
 };
 
 export type SocialMedia =
@@ -20200,7 +20534,10 @@ export type RemoveCheckoutLineMutationVariables = Exact<{
 }>;
 
 
-export type RemoveCheckoutLineMutation = { checkoutLineDelete: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
+export type RemoveCheckoutLineMutation = { checkoutLineDelete: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type UpdateCheckoutShippingAddressMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
@@ -20370,7 +20707,10 @@ export type UpdateCheckoutLineNextMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCheckoutLineNextMutation = { checkoutLinesUpdate: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>>, errors: Array<CheckoutErrorFragment> }> };
+export type UpdateCheckoutLineNextMutation = { checkoutLinesUpdate: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -21451,6 +21791,15 @@ export const RemoveCheckoutLineDocument = gql`
   checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     errors: checkoutErrors {
       ...CheckoutError
@@ -22296,14 +22645,24 @@ export const UpdateCheckoutLineNextDocument = gql`
     mutation UpdateCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
   checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
     checkout {
-      id
+      ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     errors: checkoutErrors {
       ...CheckoutError
     }
   }
 }
-    ${CheckoutErrorFragmentDoc}`;
+    ${CheckoutFragmentDoc}
+${CheckoutErrorFragmentDoc}`;
 export type UpdateCheckoutLineNextMutationFn = Apollo.MutationFunction<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>;
 
 /**
