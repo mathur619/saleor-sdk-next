@@ -20567,7 +20567,10 @@ export type AddCheckoutPromoCodeMutationVariables = Exact<{
 }>;
 
 
-export type AddCheckoutPromoCodeMutation = { checkoutAddPromoCode: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
+export type AddCheckoutPromoCodeMutation = { checkoutAddPromoCode: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type RemoveCheckoutPromoCodeMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
@@ -20575,7 +20578,10 @@ export type RemoveCheckoutPromoCodeMutationVariables = Exact<{
 }>;
 
 
-export type RemoveCheckoutPromoCodeMutation = { checkoutRemovePromoCode: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
+export type RemoveCheckoutPromoCodeMutation = { checkoutRemovePromoCode: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type CreateCheckoutPaymentMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
@@ -22012,6 +22018,15 @@ export const AddCheckoutPromoCodeDocument = gql`
   checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     errors: checkoutErrors {
       ...CheckoutError
@@ -22052,6 +22067,15 @@ export const RemoveCheckoutPromoCodeDocument = gql`
   checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     errors: checkoutErrors {
       ...CheckoutError

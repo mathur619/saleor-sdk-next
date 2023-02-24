@@ -477,15 +477,44 @@ export const checkout = ({
       >({
         mutation: ADD_CHECKOUT_PROMO_CODE,
         variables,
-        update: (_, { data }) => {
-          if (data?.checkoutAddPromoCode?.checkout?.id) {
-            storage.setCheckout(data?.checkoutAddPromoCode?.checkout);
-          }
-          setLocalCheckoutInCache(
-            client,
-            data?.checkoutAddPromoCode?.checkout,
-            true
-          );
+      });
+
+      if (res?.data?.checkoutAddPromoCode?.checkout?.id) {
+        storage.setCheckout(res?.data?.checkoutAddPromoCode?.checkout);
+        const resDiscount = {
+          data: {
+            __typename: "DiscountsType",
+            checkoutDiscounts: {
+              prepaidDiscount:
+                res?.data?.checkoutAddPromoCode?.checkout?.paymentMethod
+                  ?.prepaidDiscountAmount,
+              couponDiscount:
+                res?.data?.checkoutAddPromoCode?.checkout?.paymentMethod
+                  ?.couponDiscount,
+              cashbackDiscount:
+                res?.data?.checkoutAddPromoCode?.checkout?.paymentMethod
+                  ?.cashbackDiscountAmount,
+            },
+            cashback: res?.data?.checkoutAddPromoCode?.checkout?.cashback,
+          },
+        };
+
+        storage.setDiscounts(resDiscount.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: res?.data?.checkoutAddPromoCode?.checkout,
+            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+            localCashback: resDiscount.data.cashback,
+          },
+        });
+      }
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
         },
       });
 
@@ -523,15 +552,44 @@ export const checkout = ({
       >({
         mutation: REMOVE_CHECKOUT_PROMO_CODE,
         variables,
-        update: (_, { data }) => {
-          if (data?.checkoutRemovePromoCode?.checkout?.id) {
-            storage.setCheckout(data?.checkoutRemovePromoCode?.checkout);
-          }
-          setLocalCheckoutInCache(
-            client,
-            data?.checkoutRemovePromoCode?.checkout,
-            true
-          );
+      });
+
+      if (res?.data?.checkoutRemovePromoCode?.checkout?.id) {
+        storage.setCheckout(res?.data?.checkoutRemovePromoCode?.checkout);
+        const resDiscount = {
+          data: {
+            __typename: "DiscountsType",
+            checkoutDiscounts: {
+              prepaidDiscount:
+                res?.data?.checkoutRemovePromoCode?.checkout?.paymentMethod
+                  ?.prepaidDiscountAmount,
+              couponDiscount:
+                res?.data?.checkoutRemovePromoCode?.checkout?.paymentMethod
+                  ?.couponDiscount,
+              cashbackDiscount:
+                res?.data?.checkoutRemovePromoCode?.checkout?.paymentMethod
+                  ?.cashbackDiscountAmount,
+            },
+            cashback: res?.data?.checkoutRemovePromoCode?.checkout?.cashback,
+          },
+        };
+
+        storage.setDiscounts(resDiscount.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: res?.data?.checkoutRemovePromoCode?.checkout,
+            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+            localCashback: resDiscount.data.cashback,
+          },
+        });
+      }
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
         },
       });
 
