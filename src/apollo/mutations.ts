@@ -581,6 +581,15 @@ export const REMOVE_CHECKOUT_LINE_MUTATION = gql`
     checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
@@ -690,6 +699,15 @@ export const ADD_CHECKOUT_PROMO_CODE = gql`
     checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
@@ -705,6 +723,15 @@ export const REMOVE_CHECKOUT_PROMO_CODE = gql`
     checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
@@ -777,6 +804,15 @@ export const CHECKOUT_PAYMENT_METHOD_UPDATE = gql`
     ) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       checkoutErrors {
         field
@@ -995,18 +1031,20 @@ export const CHECKOUT_CUSTOMER_ATTACH_NEW = gql`
 `;
 
 export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutFragment}
   ${checkoutErrorFragment}
   mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
     checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
       checkout {
-        id
-        availableShippingMethods {
-          id
-          name
-          price {
-            currency
-            amount
-          }
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
         }
       }
       errors: checkoutErrors {
@@ -1017,6 +1055,7 @@ export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
 `;
 
 export const CREATE_CHECKOUT_MUTATION_NEXT = gql`
+  ${checkoutFragment}
   ${checkoutErrorFragment}
   mutation CreateCheckoutNext($checkoutInput: CheckoutCreateInput!) {
     checkoutCreate(input: $checkoutInput) {
@@ -1024,10 +1063,15 @@ export const CREATE_CHECKOUT_MUTATION_NEXT = gql`
         ...CheckoutError
       }
       checkout {
-        id
-        token
-        availableShippingMethods {
-          id
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
         }
       }
     }
@@ -1065,6 +1109,7 @@ export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT = gql`
 `;
 
 export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutFragment}
   ${checkoutErrorFragment}
   mutation UpdateCheckoutLineNext(
     $checkoutId: ID!
@@ -1072,7 +1117,16 @@ export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
   ) {
     checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
       checkout {
-        id
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError

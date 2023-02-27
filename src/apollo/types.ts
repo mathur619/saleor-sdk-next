@@ -301,7 +301,7 @@ export type AddTags = {
 };
 
 /** Represents user address data. */
-export type Address = Node & {
+export type Address = Node & ObjectWithMetadata & {
   /** The ID of the object. */
   id: Scalars['ID'];
   firstName: Scalars['String'];
@@ -316,6 +316,20 @@ export type Address = Node & {
   country: CountryDisplay;
   countryArea: Scalars['String'];
   phone: Maybe<Scalars['String']>;
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItem>>;
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItem>>;
+  /**
+   * List of privately stored metadata namespaces.
+   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
+   */
+  privateMeta: Array<Maybe<MetaStore>>;
+  /**
+   * List of publicly stored metadata namespaces.
+   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
+   */
+  meta: Array<Maybe<MetaStore>>;
   /** Address is user's default shipping address. */
   isDefaultShippingAddress: Maybe<Scalars['Boolean']>;
   /** Address is user's default billing address. */
@@ -8617,6 +8631,8 @@ export type Mutation = {
   createReviewCsv: Maybe<CreateReviewCsv>;
   /** Create Product. */
   updateCollectionMetadata: Maybe<UpdateCollectionMetadata>;
+  /** Update Collection Banner. */
+  updateCollectionBanner: Maybe<UpdateCollectionBanner>;
   /** Update ProductVariant metadata. */
   updateProductvariantMetadata: Maybe<UpdateProductvariantMetadata>;
   /** Bulk Upload Price CSV */
@@ -10871,6 +10887,11 @@ export type MutationCreateReviewCsvArgs = {
 
 
 export type MutationUpdateCollectionMetadataArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
+export type MutationUpdateCollectionBannerArgs = {
   csvFile: Scalars['Upload'];
 };
 
@@ -14667,6 +14688,7 @@ export type Query = {
   freeCheckoutLines: Maybe<Array<Maybe<CheckoutLine>>>;
   genericFormName: Maybe<Array<Maybe<FormNameType>>>;
   genericForms: Maybe<GenericFormTypeConnection>;
+  getOtp: Maybe<SkipOtpType>;
   /** Look up a gift card by ID. */
   giftCard: Maybe<GiftCard>;
   /** List of gift cards. */
@@ -15235,6 +15257,11 @@ export type QueryGenericFormsArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryGetOtpArgs = {
+  phone?: Maybe<Scalars['String']>;
 };
 
 
@@ -16091,6 +16118,7 @@ export type ReportingPeriod =
 
 export type ReportingPeriodV2 =
   | 'TODAY'
+  | 'YESTERDAY'
   | 'THIS_WEEK'
   | 'THIS_MONTH'
   | 'THIS_QUARTER'
@@ -16360,10 +16388,12 @@ export type SaleUpdate = {
 };
 
 export type SaleorVoucherInput = {
+  /** boolean value for coupon code */
+  discountWithoutCoupon?: Maybe<Scalars['Boolean']>;
   /** id of the draft order */
   orderId: Scalars['ID'];
   /** voucher code */
-  code: Scalars['String'];
+  code?: Maybe<Scalars['String']>;
   /** type of discount */
   discountType?: Maybe<DiscountAmountType>;
   discountAmount: Scalars['Int'];
@@ -17615,6 +17645,11 @@ export type SiteDomainInput = {
   name?: Maybe<Scalars['String']>;
 };
 
+export type SkipOtpType = {
+  /** otp */
+  otp: Maybe<Scalars['String']>;
+};
+
 export type SocialMedia =
   | 'FACEBOOK'
   | 'GOOGLE'
@@ -18527,6 +18562,32 @@ export type UpdateBanner = {
   banner: Maybe<CustomBannerType>;
   bannerErrors: Array<BannerError>;
 };
+
+/** Update Collection Banner. */
+export type UpdateCollectionBanner = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+  updateCollectionBannerError: Array<UpdateCollectionBannerError>;
+};
+
+export type UpdateCollectionBannerError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code.. */
+  code: UpdateCollectionBannerErrorCode;
+};
+
+/** An enumeration. */
+export type UpdateCollectionBannerErrorCode =
+  | 'INVALID_FILE_FORMAT'
+  | 'INVALID';
 
 /** Create Product. */
 export type UpdateCollectionMetadata = {
@@ -20605,7 +20666,10 @@ export type RemoveCheckoutLineMutationVariables = Exact<{
 }>;
 
 
-export type RemoveCheckoutLineMutation = { checkoutLineDelete: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
+export type RemoveCheckoutLineMutation = { checkoutLineDelete: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type UpdateCheckoutShippingAddressMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
@@ -20649,7 +20713,10 @@ export type AddCheckoutPromoCodeMutationVariables = Exact<{
 }>;
 
 
-export type AddCheckoutPromoCodeMutation = { checkoutAddPromoCode: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
+export type AddCheckoutPromoCodeMutation = { checkoutAddPromoCode: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type RemoveCheckoutPromoCodeMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
@@ -20657,7 +20724,10 @@ export type RemoveCheckoutPromoCodeMutationVariables = Exact<{
 }>;
 
 
-export type RemoveCheckoutPromoCodeMutation = { checkoutRemovePromoCode: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
+export type RemoveCheckoutPromoCodeMutation = { checkoutRemovePromoCode: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type CreateCheckoutPaymentMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
@@ -20687,7 +20757,10 @@ export type CheckoutPaymentMethodUpdateMutationVariables = Exact<{
 }>;
 
 
-export type CheckoutPaymentMethodUpdateMutation = { checkoutPaymentMethodUpdate: Maybe<{ checkout: Maybe<CheckoutFragment>, checkoutErrors: Array<Pick<CheckoutError, 'field' | 'message' | 'code'>> }> };
+export type CheckoutPaymentMethodUpdateMutation = { checkoutPaymentMethodUpdate: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, checkoutErrors: Array<Pick<CheckoutError, 'field' | 'message' | 'code'>> }> };
 
 export type CreateRazorpayOrderMutationVariables = Exact<{
   input: RazorpayCreateOrderInput;
@@ -20778,11 +20851,8 @@ export type AddCheckoutLineNextMutationVariables = Exact<{
 
 
 export type AddCheckoutLineNextMutation = { checkoutLinesAdd: Maybe<{ checkout: Maybe<(
-      Pick<Checkout, 'id'>
-      & { availableShippingMethods: Array<Maybe<(
-        Pick<ShippingMethod, 'id' | 'name'>
-        & { price: Maybe<Pick<Money, 'currency' | 'amount'>> }
-      )>> }
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
     )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type CreateCheckoutNextMutationVariables = Exact<{
@@ -20791,13 +20861,13 @@ export type CreateCheckoutNextMutationVariables = Exact<{
 
 
 export type CreateCheckoutNextMutation = { checkoutCreate: Maybe<{ errors: Array<CheckoutErrorFragment>, checkout: Maybe<(
-      Pick<Checkout, 'id' | 'token'>
-      & { availableShippingMethods: Array<Maybe<Pick<ShippingMethod, 'id'>>> }
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
     )> }> };
 
 export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
-  checkoutId?: Scalars['ID'];
-  shippingMethodId?: Scalars['ID'];
+  checkoutId: Scalars['ID'];
+  shippingMethodId: Scalars['ID'];
 }>;
 
 
@@ -20812,7 +20882,10 @@ export type UpdateCheckoutLineNextMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCheckoutLineNextMutation = { checkoutLinesUpdate: Maybe<{ checkout: Maybe<Pick<Checkout, 'id'>>, errors: Array<CheckoutErrorFragment> }> };
+export type UpdateCheckoutLineNextMutation = { checkoutLinesUpdate: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -20985,7 +21058,6 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
-
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -21958,6 +22030,15 @@ export const RemoveCheckoutLineDocument = gql`
   checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     errors: checkoutErrors {
       ...CheckoutError
@@ -22184,6 +22265,15 @@ export const AddCheckoutPromoCodeDocument = gql`
   checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     errors: checkoutErrors {
       ...CheckoutError
@@ -22224,6 +22314,15 @@ export const RemoveCheckoutPromoCodeDocument = gql`
   checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     errors: checkoutErrors {
       ...CheckoutError
@@ -22361,6 +22460,15 @@ export const CheckoutPaymentMethodUpdateDocument = gql`
   ) {
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     checkoutErrors {
       field
@@ -22859,14 +22967,15 @@ export const AddCheckoutLineNextDocument = gql`
     mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
   checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
     checkout {
-      id
-      availableShippingMethods {
-        id
-        name
-        price {
-          currency
-          amount
-        }
+      ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
       }
     }
     errors: checkoutErrors {
@@ -22874,7 +22983,8 @@ export const AddCheckoutLineNextDocument = gql`
     }
   }
 }
-    ${CheckoutErrorFragmentDoc}`;
+    ${CheckoutFragmentDoc}
+${CheckoutErrorFragmentDoc}`;
 export type AddCheckoutLineNextMutationFn = Apollo.MutationFunction<AddCheckoutLineNextMutation, AddCheckoutLineNextMutationVariables>;
 
 /**
@@ -22909,15 +23019,21 @@ export const CreateCheckoutNextDocument = gql`
       ...CheckoutError
     }
     checkout {
-      id
-      token
-      availableShippingMethods {
-        id
+      ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
       }
     }
   }
 }
-    ${CheckoutErrorFragmentDoc}`;
+    ${CheckoutErrorFragmentDoc}
+${CheckoutFragmentDoc}`;
 export type CreateCheckoutNextMutationFn = Apollo.MutationFunction<CreateCheckoutNextMutation, CreateCheckoutNextMutationVariables>;
 
 /**
@@ -23000,14 +23116,24 @@ export const UpdateCheckoutLineNextDocument = gql`
     mutation UpdateCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
   checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
     checkout {
-      id
+      ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     errors: checkoutErrors {
       ...CheckoutError
     }
   }
 }
-    ${CheckoutErrorFragmentDoc}`;
+    ${CheckoutFragmentDoc}
+${CheckoutErrorFragmentDoc}`;
 export type UpdateCheckoutLineNextMutationFn = Apollo.MutationFunction<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>;
 
 /**

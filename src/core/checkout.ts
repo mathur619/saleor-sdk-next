@@ -139,15 +139,17 @@ export interface CheckoutSDK {
   ) => SetShippingAddressResult;
   setShippingAndBillingAddress?: (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod?: boolean
   ) => SetShippingAndBillingAddressResult;
 
-  setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
+  setBillingAddress?: (billingAddress: IAddress, updateShippingMethod?: boolean) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
   addPromoCode?: (promoCode: string) => AddPromoCodeResult;
   removePromoCode?: (promoCode: string) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
-    input: PaymentMethodUpdateInput
+    input: PaymentMethodUpdateInput,
+    updateShippingMethod?: boolean
   ) => CheckoutPaymentMethodUpdateResult;
   createPayment?: (input: CreatePaymentInput) => CreatePaymentResult;
   completeCheckout?: (input?: CompleteCheckoutInput) => CompleteCheckoutResult;
@@ -302,7 +304,8 @@ export const checkout = ({
   };
 
   const setBillingAddress: CheckoutSDK["setBillingAddress"] = async (
-    billingAddress: IAddress
+    billingAddress: IAddress,
+    updateShippingMethod: boolean=false,
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -341,7 +344,8 @@ export const checkout = ({
         update: (_, { data }) => {
           setLocalCheckoutInCache(
             client,
-            data?.checkoutBillingAddressUpdate?.checkout
+            data?.checkoutBillingAddressUpdate?.checkout,
+            updateShippingMethod
           );
           if (data?.checkoutBillingAddressUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutBillingAddressUpdate?.checkout);
@@ -355,7 +359,8 @@ export const checkout = ({
 
   const setShippingAndBillingAddress: CheckoutSDK["setShippingAndBillingAddress"] = async (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod: boolean=false,
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -365,7 +370,7 @@ export const checkout = ({
     });
 
     const resShipping = await setShippingAddress(shippingAddress, email);
-    const resBilling = await setBillingAddress(shippingAddress);
+    const resBilling = await setBillingAddress(shippingAddress, updateShippingMethod);
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -501,15 +506,44 @@ export const checkout = ({
       >({
         mutation: ADD_CHECKOUT_PROMO_CODE,
         variables,
-        update: (_, { data }) => {
-          if (data?.checkoutAddPromoCode?.checkout?.id) {
-            storage.setCheckout(data?.checkoutAddPromoCode?.checkout);
-          }
-          setLocalCheckoutInCache(
-            client,
-            data?.checkoutAddPromoCode?.checkout,
-            true
-          );
+      });
+
+      if (res?.data?.checkoutAddPromoCode?.checkout?.id) {
+        storage.setCheckout(res?.data?.checkoutAddPromoCode?.checkout);
+        const resDiscount = {
+          data: {
+            __typename: "DiscountsType",
+            checkoutDiscounts: {
+              prepaidDiscount:
+                res?.data?.checkoutAddPromoCode?.checkout?.paymentMethod
+                  ?.prepaidDiscountAmount,
+              couponDiscount:
+                res?.data?.checkoutAddPromoCode?.checkout?.paymentMethod
+                  ?.couponDiscount,
+              cashbackDiscount:
+                res?.data?.checkoutAddPromoCode?.checkout?.paymentMethod
+                  ?.cashbackDiscountAmount,
+            },
+            cashback: res?.data?.checkoutAddPromoCode?.checkout?.cashback,
+          },
+        };
+
+        storage.setDiscounts(resDiscount.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: res?.data?.checkoutAddPromoCode?.checkout,
+            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+            localCashback: resDiscount.data.cashback,
+          },
+        });
+      }
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
         },
       });
 
@@ -547,15 +581,44 @@ export const checkout = ({
       >({
         mutation: REMOVE_CHECKOUT_PROMO_CODE,
         variables,
-        update: (_, { data }) => {
-          if (data?.checkoutRemovePromoCode?.checkout?.id) {
-            storage.setCheckout(data?.checkoutRemovePromoCode?.checkout);
-          }
-          setLocalCheckoutInCache(
-            client,
-            data?.checkoutRemovePromoCode?.checkout,
-            true
-          );
+      });
+
+      if (res?.data?.checkoutRemovePromoCode?.checkout?.id) {
+        storage.setCheckout(res?.data?.checkoutRemovePromoCode?.checkout);
+        const resDiscount = {
+          data: {
+            __typename: "DiscountsType",
+            checkoutDiscounts: {
+              prepaidDiscount:
+                res?.data?.checkoutRemovePromoCode?.checkout?.paymentMethod
+                  ?.prepaidDiscountAmount,
+              couponDiscount:
+                res?.data?.checkoutRemovePromoCode?.checkout?.paymentMethod
+                  ?.couponDiscount,
+              cashbackDiscount:
+                res?.data?.checkoutRemovePromoCode?.checkout?.paymentMethod
+                  ?.cashbackDiscountAmount,
+            },
+            cashback: res?.data?.checkoutRemovePromoCode?.checkout?.cashback,
+          },
+        };
+
+        storage.setDiscounts(resDiscount.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: res?.data?.checkoutRemovePromoCode?.checkout,
+            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+            localCashback: resDiscount.data.cashback,
+          },
+        });
+      }
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
         },
       });
 
@@ -566,7 +629,8 @@ export const checkout = ({
   };
 
   const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] = async (
-    input: PaymentMethodUpdateInput
+    input: PaymentMethodUpdateInput,
+    updateShippingMethod: boolean=true,
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -601,7 +665,7 @@ export const checkout = ({
           setLocalCheckoutInCache(
             client,
             data?.checkoutPaymentMethodUpdate?.checkout,
-            true
+            updateShippingMethod
           );
           if (data?.checkoutPaymentMethodUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutPaymentMethodUpdate?.checkout);
@@ -700,26 +764,37 @@ export const checkout = ({
         redirectUrl: input?.redirectUrl,
         storeSource: input?.storeSource,
       };
-      const res = await client.mutate<
-        CompleteCheckoutMutation,
-        CompleteCheckoutMutationVariables
-      >({
-        mutation: COMPLETE_CHECKOUT,
-        variables,
-        update: async (_, { data }) => {
-          if (data?.checkoutComplete?.order?.id) {
-            if (!data?.checkoutComplete.confirmationNeeded) {
-              await setLocalCheckoutInCache(client, {}, false, data);
-              storage.setCheckout({});
+      try {
+        const res = await client.mutate<
+          CompleteCheckoutMutation,
+          CompleteCheckoutMutationVariables
+        >({
+          mutation: COMPLETE_CHECKOUT,
+          variables,
+          update: async (_, { data }) => {
+            if (data?.checkoutComplete?.order?.id) {
+              if (!data?.checkoutComplete.confirmationNeeded) {
+                await setLocalCheckoutInCache(client, {}, false, data);
+                storage.setCheckout({});
+              }
             }
-          }
-        },
-      });
+          },
+        });
 
-      if (
-        res?.data?.checkoutComplete?.errors &&
-        res?.data?.checkoutComplete?.errors[0]?.code
-      ) {
+        if (
+          res?.data?.checkoutComplete?.errors &&
+          res?.data?.checkoutComplete?.errors[0]?.code
+        ) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+        }
+
+        return res;
+      } catch {
         client.writeQuery({
           query: GET_LOCAL_CHECKOUT,
           data: {
@@ -727,8 +802,7 @@ export const checkout = ({
           },
         });
       }
-
-      return res;
+      
     }
 
     return null;
