@@ -68,6 +68,8 @@ import {
   PaytmTxnCreateMutation,
   CreateCashfreeOrderMutation,
   PayuOrderCreateMutation,
+  CheckoutCustomerAttachNewMutation,
+  CcAvenueOrderCreateMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -235,6 +237,10 @@ export type PayuOrderCreateMutationResult = Promise<FetchResult<
   PayuOrderCreateMutation
 > | null>;
 
+export type CcAvenueOrderCreateMutationResult = Promise<FetchResult<
+  CcAvenueOrderCreateMutation
+> | null>;
+
 export type CreatePaytmOrderResult = Promise<
   FetchResult<PaytmTxnCreateMutation, Record<string, any>, Record<string, any>>
 >;
@@ -291,6 +297,10 @@ export type ConfirmAccountV2Result = Promise<
     Record<string, any>
   >
 >;
+
+export type CheckoutCustomerAttachResult = Promise<FetchResult<
+  CheckoutCustomerAttachNewMutation
+> | null>;
 
 export type VerifyCheckoutOTPResult = Promise<
   FetchResult<

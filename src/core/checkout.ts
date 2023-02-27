@@ -15,6 +15,7 @@ import {
   UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
   CREATE_PAYU_ORDER,
+  CREATE_CCAVENUE_ORDER,
 } from "../apollo/mutations";
 import {
   GET_CITY_STATE_FROM_PINCODE,
@@ -60,6 +61,8 @@ import {
   CheckoutCreateInput,
   PayuOrderCreateMutation,
   PayuOrderCreateMutationVariables,
+  CcAvenueOrderCreateMutation,
+  CcAvenueOrderCreateMutationVariables,
 } from "../apollo/types";
 
 import {
@@ -90,6 +93,7 @@ import {
   SetShippingAndBillingAddressResult,
   SetShippingMethodResult,
   PayuOrderCreateMutationResult,
+  CcAvenueOrderCreateMutationResult,
 } from "./types";
 
 export interface CheckoutSDK {
@@ -143,6 +147,7 @@ export interface CheckoutSDK {
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
   createCashfreeOrder?: (returnURL?: string) => CreateCashfreeOrderResult;
   createPayuOrder?: () => PayuOrderCreateMutationResult;
+  createCCAvenueOrder?: () => CcAvenueOrderCreateMutationResult;
 }
 
 export const checkout = ({
@@ -694,6 +699,18 @@ export const checkout = ({
         },
       });
 
+      if (
+        res?.data?.checkoutComplete?.errors &&
+        res?.data?.checkoutComplete?.errors[0]?.code
+      ) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
+
       return res;
     }
 
@@ -948,6 +965,48 @@ export const checkout = ({
     return { data: null };
   };
 
+  const createCCAvenueOrder: CheckoutSDK["createCCAvenueOrder"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: CcAvenueOrderCreateMutationVariables = {
+        input: {
+          checkoutId: checkout?.id,
+        },
+      };
+      const res = await client.mutate<
+        CcAvenueOrderCreateMutation,
+        CcAvenueOrderCreateMutationVariables
+      >({
+        mutation: CREATE_CCAVENUE_ORDER,
+        variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: true,
+            },
+          });
+        },
+      });
+
+      return res;
+    }
+
+    return { data: null };
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -969,5 +1028,6 @@ export const checkout = ({
     setCheckout,
     createCashfreeOrder,
     createPayuOrder,
+    createCCAvenueOrder,
   };
 };
