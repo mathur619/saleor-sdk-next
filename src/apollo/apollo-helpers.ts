@@ -960,10 +960,12 @@ export type CheckoutShippingMethodUpdateFieldPolicy = {
 	checkout?: FieldPolicy<any> | FieldReadFunction<any>,
 	checkoutErrors?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type CheckoutTotalsTypeKeySpecifier = ('codTotal' | 'prepaidTotal' | CheckoutTotalsTypeKeySpecifier)[];
+export type CheckoutTotalsTypeKeySpecifier = ('codTotal' | 'prepaidTotal' | 'prepaidCashback' | 'codCashback' | CheckoutTotalsTypeKeySpecifier)[];
 export type CheckoutTotalsTypeFieldPolicy = {
 	codTotal?: FieldPolicy<any> | FieldReadFunction<any>,
-	prepaidTotal?: FieldPolicy<any> | FieldReadFunction<any>
+	prepaidTotal?: FieldPolicy<any> | FieldReadFunction<any>,
+	prepaidCashback?: FieldPolicy<any> | FieldReadFunction<any>,
+	codCashback?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type CheckoutTypeKeySpecifier = ('created' | 'lastChange' | 'user' | 'quantity' | 'billingAddress' | 'shippingAddress' | 'shippingMethod' | 'note' | 'discount' | 'discountName' | 'translatedDiscountName' | 'voucherCode' | 'giftCards' | 'payments' | 'id' | 'privateMetadata' | 'metadata' | 'privateMeta' | 'meta' | 'availableShippingMethods' | 'availablePaymentGateways' | 'email' | 'isShippingRequired' | 'lines' | 'shippingPrice' | 'subtotalPrice' | 'token' | 'totalPrice' | 'checkoutUrl' | 'events' | 'tags' | 'paymentMethod' | 'cashback' | CheckoutTypeKeySpecifier)[];
 export type CheckoutTypeFieldPolicy = {
