@@ -135,7 +135,8 @@ export interface CheckoutSDK {
   createCheckout?: (tags?: string[]) => CreateCheckoutResult;
   setShippingAddress?: (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod?: boolean
   ) => SetShippingAddressResult;
   setShippingAndBillingAddress?: (
     shippingAddress: IAddress,
@@ -248,7 +249,8 @@ export const checkout = ({
 
   const setShippingAddress: CheckoutSDK["setShippingAddress"] = async (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod: boolean = false
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -291,7 +293,8 @@ export const checkout = ({
       if (res?.data?.checkoutShippingAddressUpdate?.checkout?.id) {
         setLocalCheckoutInCache(
           client,
-          res?.data?.checkoutShippingAddressUpdate?.checkout
+          res?.data?.checkoutShippingAddressUpdate?.checkout,
+          updateShippingMethod
         );
         storage.setCheckout(res?.data?.checkoutShippingAddressUpdate?.checkout);
       }
