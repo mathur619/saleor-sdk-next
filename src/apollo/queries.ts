@@ -101,6 +101,15 @@ export const USER_CHECKOUT_DETAILS = gql`
       id
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
     }
   }

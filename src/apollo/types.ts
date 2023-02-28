@@ -2469,6 +2469,10 @@ export type CheckoutTotalsType = {
   codTotal: Maybe<TaxedMoney>;
   /** The sum of the checkout line price, taxes and discounts. */
   prepaidTotal: Maybe<TaxedMoney>;
+  /** Cashback for prepaid total. */
+  prepaidCashback: Maybe<TaxedMoney>;
+  /** Cashback for cod total. */
+  codCashback: Maybe<TaxedMoney>;
 };
 
 /** Checkout object. */
@@ -20492,6 +20496,12 @@ export type UpdateUserMetaMutation = { updateMetadata: Maybe<(
       { __typename: 'MetadataError' }
       & Pick<MetadataError, 'field' | 'message'>
     )>, item: Maybe<(
+      { __typename: 'Address' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
       { __typename: 'App' }
       & { metadata: Array<Maybe<(
         { __typename: 'MetadataItem' }
@@ -20943,7 +20953,10 @@ export type UserCheckoutDetailsQueryVariables = Exact<{ [key: string]: never; }>
 
 export type UserCheckoutDetailsQuery = { me: Maybe<(
     Pick<User, 'id'>
-    & { checkout: Maybe<CheckoutFragment> }
+    & { checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )> }
   )> };
 
 export type PincodeQueryVariables = Exact<{
@@ -23409,6 +23422,15 @@ export const UserCheckoutDetailsDocument = gql`
     id
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
   }
 }
