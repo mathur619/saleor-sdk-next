@@ -539,20 +539,24 @@ export const auth = ({
     return res;
   };
 
-  const getUserCheckout: AuthSDK["getUserCheckout"] = async (updateShippingMethod:boolean = true) => {
+  const getUserCheckout: AuthSDK["getUserCheckout"] = async (
+    updateShippingMethod: boolean = true
+  ) => {
     const res = await client.mutate<
       UserCheckoutDetailsQuery,
       UserCheckoutDetailsQueryVariables
     >({
       mutation: USER_CHECKOUT_DETAILS,
-
-      update: (_, { data }) => {
-        setLocalCheckoutInCache(client, data?.me?.checkout, updateShippingMethod);
-        if (data?.me?.checkout?.id) {
-          storage.setCheckout(data?.me?.checkout);
-        }
-      },
     });
+
+    if (res?.data?.me?.checkout?.id) {
+      setLocalCheckoutInCache(
+        client,
+        res?.data?.me?.checkout,
+        updateShippingMethod
+      );
+      storage.setCheckout(res?.data?.me?.checkout);
+    }
 
     return res;
   };

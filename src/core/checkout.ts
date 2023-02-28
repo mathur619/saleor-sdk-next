@@ -286,16 +286,15 @@ export const checkout = ({
       >({
         mutation: UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
         variables,
-        update: (_, { data }) => {
-          setLocalCheckoutInCache(
-            client,
-            data?.checkoutShippingAddressUpdate?.checkout
-          );
-          if (data?.checkoutShippingAddressUpdate?.checkout?.id) {
-            storage.setCheckout(data?.checkoutShippingAddressUpdate?.checkout);
-          }
-        },
       });
+
+      if (res?.data?.checkoutShippingAddressUpdate?.checkout?.id) {
+        setLocalCheckoutInCache(
+          client,
+          res?.data?.checkoutShippingAddressUpdate?.checkout
+        );
+        storage.setCheckout(res?.data?.checkoutShippingAddressUpdate?.checkout);
+      }
 
       return res;
     }
