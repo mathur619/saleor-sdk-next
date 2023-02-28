@@ -243,6 +243,28 @@ export const USER_ORDER_DETAILS = gql`
 export const GET_CHECKOUT_TOTALS = gql`
   query CheckoutTotals($token: UUID) {
     checkoutTotals(token: $token) {
+      prepaidCashback {
+        currency
+        gross {
+          currency
+          amount
+        }
+        net {
+          currency
+          amount
+        }
+      }
+      codCashback {
+        currency
+        gross {
+          currency
+          amount
+        }
+        net {
+          currency
+          amount
+        }
+      }
       codTotal {
         currency
         gross {

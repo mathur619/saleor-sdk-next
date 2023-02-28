@@ -155,7 +155,7 @@ export interface CheckoutSDK {
   completeCheckout?: (input?: CompleteCheckoutInput) => CompleteCheckoutResult;
   getCityStateFromPincode?: (pincode: string) => GetCityStateFromPincodeResult;
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
-  juspayOrderAndCustomerCreate?: () => JuspayOrderAndCustomerCreateResult;
+  juspayOrderAndCustomerCreate?: (createNew?: boolean) => JuspayOrderAndCustomerCreateResult;
   juspayPaymentCreate?: (
     input: JuspayPaymentInput
   ) => JuspayPaymentCreateResult;
@@ -874,7 +874,7 @@ export const checkout = ({
     return { data: null };
   };
 
-  const juspayOrderAndCustomerCreate: CheckoutSDK["juspayOrderAndCustomerCreate"] = async () => {
+  const juspayOrderAndCustomerCreate: CheckoutSDK["juspayOrderAndCustomerCreate"] = async (createNew?: boolean) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -904,6 +904,7 @@ export const checkout = ({
           mobileCountryCode: "91",
           firstName: checkout?.shippingAddress?.firstName,
           lastName: checkout?.shippingAddress?.lastName,
+          createNew: createNew
         },
       };
       const res = await client.mutate<

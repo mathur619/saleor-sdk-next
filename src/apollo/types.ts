@@ -6870,6 +6870,8 @@ export type JuspayCreateOrderAndCustomerInput = {
   lastName?: Maybe<Scalars['String']>;
   /** Get UPI deep link */
   getUpiDeepLinks?: Maybe<Scalars['Boolean']>;
+  /** Create new Juspay order id */
+  createNew?: Maybe<Scalars['Boolean']>;
 };
 
 /** Check Order status on Juspay. */
@@ -21000,7 +21002,13 @@ export type CheckoutTotalsQueryVariables = Exact<{
 }>;
 
 
-export type CheckoutTotalsQuery = { checkoutTotals: Maybe<{ codTotal: Maybe<(
+export type CheckoutTotalsQuery = { checkoutTotals: Maybe<{ prepaidCashback: Maybe<(
+      Pick<TaxedMoney, 'currency'>
+      & { gross: Pick<Money, 'currency' | 'amount'>, net: Pick<Money, 'currency' | 'amount'> }
+    )>, codCashback: Maybe<(
+      Pick<TaxedMoney, 'currency'>
+      & { gross: Pick<Money, 'currency' | 'amount'>, net: Pick<Money, 'currency' | 'amount'> }
+    )>, codTotal: Maybe<(
       Pick<TaxedMoney, 'currency'>
       & { gross: Pick<Money, 'currency' | 'amount'>, net: Pick<Money, 'currency' | 'amount'> }
     )>, prepaidTotal: Maybe<(
@@ -23656,6 +23664,28 @@ export type OrdersByUserQueryResult = Apollo.QueryResult<OrdersByUserQuery, Orde
 export const CheckoutTotalsDocument = gql`
     query CheckoutTotals($token: UUID) {
   checkoutTotals(token: $token) {
+    prepaidCashback {
+      currency
+      gross {
+        currency
+        amount
+      }
+      net {
+        currency
+        amount
+      }
+    }
+    codCashback {
+      currency
+      gross {
+        currency
+        amount
+      }
+      net {
+        currency
+        amount
+      }
+    }
     codTotal {
       currency
       gross {
