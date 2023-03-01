@@ -180,6 +180,27 @@ export const setLocalCheckoutInCache = async (
         },
       });
     }
+  } else if (checkout?.token && checkout?.paymentMethod && checkout?.cashback) {
+    const resDiscount = {
+      data: {
+        __typename: "DiscountsType",
+        checkoutDiscounts: {
+          prepaidDiscount: checkout?.paymentMethod?.prepaidDiscountAmount,
+          couponDiscount: checkout?.paymentMethod?.couponDiscount,
+          cashbackDiscount: checkout?.paymentMethod?.cashbackDiscountAmount,
+        },
+        cashback: checkout?.cashback,
+      },
+    };
+    storage.setDiscounts(resDiscount.data);
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        localCheckout: checkout,
+        localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+        localCashback: resDiscount.data.cashback,
+      },
+    });
   }
 
   client.writeQuery({

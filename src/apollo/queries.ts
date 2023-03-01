@@ -101,6 +101,15 @@ export const USER_CHECKOUT_DETAILS = gql`
       id
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
     }
   }
@@ -234,6 +243,28 @@ export const USER_ORDER_DETAILS = gql`
 export const GET_CHECKOUT_TOTALS = gql`
   query CheckoutTotals($token: UUID) {
     checkoutTotals(token: $token) {
+      prepaidCashback {
+        currency
+        gross {
+          currency
+          amount
+        }
+        net {
+          currency
+          amount
+        }
+      }
+      codCashback {
+        currency
+        gross {
+          currency
+          amount
+        }
+        net {
+          currency
+          amount
+        }
+      }
       codTotal {
         currency
         gross {

@@ -2469,6 +2469,10 @@ export type CheckoutTotalsType = {
   codTotal: Maybe<TaxedMoney>;
   /** The sum of the checkout line price, taxes and discounts. */
   prepaidTotal: Maybe<TaxedMoney>;
+  /** Cashback for prepaid total. */
+  prepaidCashback: Maybe<TaxedMoney>;
+  /** Cashback for cod total. */
+  codCashback: Maybe<TaxedMoney>;
 };
 
 /** Checkout object. */
@@ -3746,6 +3750,24 @@ export type CreateTokenOAuth = {
 
 /** Create JWT token via OTP. */
 export type CreateTokenOtp = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** JWT token, required to authenticate. */
+  token: Maybe<Scalars['String']>;
+  /** JWT refresh token, required to re-generate access token. */
+  refreshToken: Maybe<Scalars['String']>;
+  /** CSRF token required to re-generate access token. */
+  csrfToken: Maybe<Scalars['String']>;
+  /** A user instance. */
+  user: Maybe<User>;
+  otpErrors: Array<OtpError>;
+};
+
+/** Create JWT token without OTP. */
+export type CreateTokenWithoutOtp = {
   /**
    * List of errors that occurred executing the mutation.
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
@@ -6866,6 +6888,8 @@ export type JuspayCreateOrderAndCustomerInput = {
   lastName?: Maybe<Scalars['String']>;
   /** Get UPI deep link */
   getUpiDeepLinks?: Maybe<Scalars['Boolean']>;
+  /** Create new Juspay order id */
+  createNew?: Maybe<Scalars['Boolean']>;
 };
 
 /** Check Order status on Juspay. */
@@ -8723,6 +8747,8 @@ export type Mutation = {
   removeRtoCustomersList: Maybe<RemoveRtoCustomersListCsv>;
   /** Upload list of risk orders. */
   pushRiskOrdersCsv: Maybe<PushRiskOrderCsv>;
+  /** Create JWT token without OTP. */
+  createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
 };
 
 
@@ -11126,6 +11152,12 @@ export type MutationRemoveRtoCustomersListArgs = {
 
 export type MutationPushRiskOrdersCsvArgs = {
   csvFile: Scalars['Upload'];
+};
+
+
+export type MutationCreateTokenWithoutOtpArgs = {
+  checkoutId?: Maybe<Scalars['ID']>;
+  waid?: Maybe<Scalars['String']>;
 };
 
 export type NameTranslationInput = {
@@ -15280,6 +15312,7 @@ export type QueryGiftCardsArgs = {
 
 export type QueryGlobalSearchArgs = {
   search?: Maybe<Scalars['String']>;
+  outputType?: Maybe<Scalars['String']>;
 };
 
 
@@ -20492,6 +20525,12 @@ export type UpdateUserMetaMutation = { updateMetadata: Maybe<(
       { __typename: 'MetadataError' }
       & Pick<MetadataError, 'field' | 'message'>
     )>, item: Maybe<(
+      { __typename: 'Address' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
       { __typename: 'App' }
       & { metadata: Array<Maybe<(
         { __typename: 'MetadataItem' }
@@ -20678,7 +20717,10 @@ export type UpdateCheckoutShippingAddressMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCheckoutShippingAddressMutation = { checkoutShippingAddressUpdate: Maybe<{ errors: Array<CheckoutErrorFragment>, checkout: Maybe<CheckoutFragment> }>, checkoutEmailUpdate: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
+export type UpdateCheckoutShippingAddressMutation = { checkoutShippingAddressUpdate: Maybe<{ errors: Array<CheckoutErrorFragment>, checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )> }>, checkoutEmailUpdate: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
 
 export type UpdateCheckoutBillingAddressMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
@@ -20943,7 +20985,10 @@ export type UserCheckoutDetailsQueryVariables = Exact<{ [key: string]: never; }>
 
 export type UserCheckoutDetailsQuery = { me: Maybe<(
     Pick<User, 'id'>
-    & { checkout: Maybe<CheckoutFragment> }
+    & { checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )> }
   )> };
 
 export type PincodeQueryVariables = Exact<{
@@ -20984,7 +21029,13 @@ export type CheckoutTotalsQueryVariables = Exact<{
 }>;
 
 
-export type CheckoutTotalsQuery = { checkoutTotals: Maybe<{ codTotal: Maybe<(
+export type CheckoutTotalsQuery = { checkoutTotals: Maybe<{ prepaidCashback: Maybe<(
+      Pick<TaxedMoney, 'currency'>
+      & { gross: Pick<Money, 'currency' | 'amount'>, net: Pick<Money, 'currency' | 'amount'> }
+    )>, codCashback: Maybe<(
+      Pick<TaxedMoney, 'currency'>
+      & { gross: Pick<Money, 'currency' | 'amount'>, net: Pick<Money, 'currency' | 'amount'> }
+    )>, codTotal: Maybe<(
       Pick<TaxedMoney, 'currency'>
       & { gross: Pick<Money, 'currency' | 'amount'>, net: Pick<Money, 'currency' | 'amount'> }
     )>, prepaidTotal: Maybe<(
@@ -22085,6 +22136,15 @@ export const UpdateCheckoutShippingAddressDocument = gql`
     }
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
   }
   checkoutEmailUpdate(checkoutId: $checkoutId, email: $email) {
@@ -23409,6 +23469,15 @@ export const UserCheckoutDetailsDocument = gql`
     id
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
   }
 }
@@ -23622,6 +23691,28 @@ export type OrdersByUserQueryResult = Apollo.QueryResult<OrdersByUserQuery, Orde
 export const CheckoutTotalsDocument = gql`
     query CheckoutTotals($token: UUID) {
   checkoutTotals(token: $token) {
+    prepaidCashback {
+      currency
+      gross {
+        currency
+        amount
+      }
+      net {
+        currency
+        amount
+      }
+    }
+    codCashback {
+      currency
+      gross {
+        currency
+        amount
+      }
+      net {
+        currency
+        amount
+      }
+    }
     codTotal {
       currency
       gross {

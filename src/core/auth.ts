@@ -220,7 +220,8 @@ export interface AuthSDK {
   signInMobile: (
     otp: string,
     phone?: string,
-    email?: string
+    email?: string,
+    updateShippingMethod?: boolean
   ) => SignInMobileResult;
 
   requestOTP: (phone: string) => RequestOtpResult;
@@ -233,7 +234,7 @@ export interface AuthSDK {
     sendWigzoInHeader?: boolean
   ) => RegisterAccountV2Result;
 
-  confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
+  confirmAccountV2: (otp: string, phone: string, updateShippingMethod?:boolean) => ConfirmAccountV2Result;
 
   checkoutCustomerAttach: (
     token: string,
@@ -246,7 +247,7 @@ export interface AuthSDK {
 
   setToken: (authToken: string, csrfToken: string) => GetUserCheckoutResult;
 
-  getUserCheckout: () => GetUserCheckoutResult;
+  getUserCheckout: (updateShippingMethod?: boolean) => GetUserCheckoutResult;
 }
 
 export const auth = ({
@@ -257,7 +258,8 @@ export const auth = ({
   const signInMobile: AuthSDK["signInMobile"] = async (
     otp: string,
     phone?: string,
-    email?: string
+    email?: string,
+    updateShippingMethod:boolean = true
   ) => {
     client.writeQuery({
       query: USER,
@@ -297,7 +299,7 @@ export const auth = ({
             csrfToken: data.CreateTokenOTP.csrfToken,
             refreshToken: data.CreateTokenOTP.refreshToken,
           });
-          getUserCheckout();
+          getUserCheckout(updateShippingMethod);
         } else {
           client.writeQuery({
             query: USER,
@@ -409,7 +411,8 @@ export const auth = ({
 
   const confirmAccountV2: AuthSDK["confirmAccountV2"] = async (
     otp: string,
-    phone: string
+    phone: string,
+    updateShippingMethod:boolean = true
   ) => {
     client.writeQuery({
       query: USER,
@@ -441,7 +444,7 @@ export const auth = ({
             csrfToken: data.confirmAccountV2.csrfToken,
             refreshToken: data.confirmAccountV2.refreshToken,
           });
-          getUserCheckout();
+          getUserCheckout(updateShippingMethod);
         } else {
           client.writeQuery({
             query: USER,
@@ -536,20 +539,24 @@ export const auth = ({
     return res;
   };
 
-  const getUserCheckout: AuthSDK["getUserCheckout"] = async () => {
+  const getUserCheckout: AuthSDK["getUserCheckout"] = async (
+    updateShippingMethod: boolean = true
+  ) => {
     const res = await client.mutate<
       UserCheckoutDetailsQuery,
       UserCheckoutDetailsQueryVariables
     >({
       mutation: USER_CHECKOUT_DETAILS,
-
-      update: (_, { data }) => {
-        setLocalCheckoutInCache(client, data?.me?.checkout, true);
-        if (data?.me?.checkout?.id) {
-          storage.setCheckout(data?.me?.checkout);
-        }
-      },
     });
+
+    if (res?.data?.me?.checkout?.id) {
+      setLocalCheckoutInCache(
+        client,
+        res?.data?.me?.checkout,
+        updateShippingMethod
+      );
+      storage.setCheckout(res?.data?.me?.checkout);
+    }
 
     return res;
   };
