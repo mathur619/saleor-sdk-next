@@ -23,6 +23,10 @@ export const addressFragment = gql`
       code
       country
     }
+    metadata {
+      key
+      value
+    }
     countryArea
     phone
     isDefaultBillingAddress
