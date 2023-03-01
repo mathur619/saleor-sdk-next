@@ -135,6 +135,34 @@ export const checkoutProductVariantFragment = gql`
       name
       slug
       isAvailableForPurchase
+      variants {
+        attributes {
+          attribute {
+            id
+            name
+          }
+          values {
+            id
+            name
+            value: name
+          }
+        }
+        id
+        metadata {
+          key
+          value
+        }
+        pricing {
+          onSale
+          priceUndiscounted {
+            ...Price
+          }
+          price {
+            ...Price
+          }
+        }
+        quantityAvailable
+      }
       weight {
         unit
         value

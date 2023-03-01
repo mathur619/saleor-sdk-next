@@ -18595,7 +18595,16 @@ export type ProductVariantFragment = (
       & { value: AttributeValue['name'] }
     )>> }>, product: (
     Pick<Product, 'id' | 'name' | 'slug' | 'isAvailableForPurchase'>
-    & { weight: Maybe<Pick<Weight, 'unit' | 'value'>>, category: Maybe<Pick<Category, 'id' | 'name' | 'slug'>>, thumbnail: Maybe<Pick<Image, 'url' | 'alt'>>, productType: Pick<ProductType, 'id' | 'isShippingRequired'>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, tags: Maybe<Array<Maybe<Pick<TagType, 'name'>>>> }
+    & { variants: Maybe<Array<Maybe<(
+      Pick<ProductVariant, 'id' | 'quantityAvailable'>
+      & { attributes: Array<{ attribute: Pick<Attribute, 'id' | 'name'>, values: Array<Maybe<(
+          Pick<AttributeValue, 'id' | 'name'>
+          & { value: AttributeValue['name'] }
+        )>> }>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, pricing: Maybe<(
+        Pick<VariantPricingInfo, 'onSale'>
+        & { priceUndiscounted: Maybe<PriceFragment>, price: Maybe<PriceFragment> }
+      )> }
+    )>>>, weight: Maybe<Pick<Weight, 'unit' | 'value'>>, category: Maybe<Pick<Category, 'id' | 'name' | 'slug'>>, thumbnail: Maybe<Pick<Image, 'url' | 'alt'>>, productType: Pick<ProductType, 'id' | 'isShippingRequired'>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, tags: Maybe<Array<Maybe<Pick<TagType, 'name'>>>> }
   ) }
 );
 
@@ -19128,7 +19137,7 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
-    
+
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -19180,6 +19189,34 @@ export const ProductVariantFragmentDoc = gql`
     name
     slug
     isAvailableForPurchase
+    variants {
+      attributes {
+        attribute {
+          id
+          name
+        }
+        values {
+          id
+          name
+          value: name
+        }
+      }
+      id
+      metadata {
+        key
+        value
+      }
+      pricing {
+        onSale
+        priceUndiscounted {
+          ...Price
+        }
+        price {
+          ...Price
+        }
+      }
+      quantityAvailable
+    }
     weight {
       unit
       value
