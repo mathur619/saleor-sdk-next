@@ -74,6 +74,7 @@ import {
   CheckoutTotalsQuery,
   CreateJuspayPaymentMutation,
   UpdateUserMetaMutation,
+  CreateTokenWithoutOtpMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -291,6 +292,14 @@ export type UpdateItemResult = Promise<CartMethodsReturn | null>;
 export type SignInMobileResult = Promise<
   FetchResult<
     OtpAuthenticationMutation,
+    Record<string, any>,
+    Record<string, any>
+  >
+>;
+
+export type OtpLessLoginResult = Promise<
+  FetchResult<
+    CreateTokenWithoutOtpMutation,
     Record<string, any>,
     Record<string, any>
   >

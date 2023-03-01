@@ -20339,7 +20339,6 @@ export type UserFragment = (
 
 export type PriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> };
 
-
 export type ProductVariantFragment = (
   Pick<ProductVariant, 'id' | 'name' | 'sku' | 'quantityAvailable'>
   & { images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'sortOrder' | 'alt' | 'url'>>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, pricing: Maybe<(
@@ -20488,6 +20487,17 @@ export type OtpAuthenticationMutationVariables = Exact<{
 
 export type OtpAuthenticationMutation = { CreateTokenOTP: Maybe<(
     Pick<CreateTokenOtp, 'token' | 'refreshToken' | 'csrfToken'>
+    & { user: Maybe<UserFragment>, otpErrors: Array<Pick<OtpError, 'code' | 'field' | 'message'>> }
+  )> };
+
+export type CreateTokenWithoutOtpMutationVariables = Exact<{
+  waid?: Maybe<Scalars['String']>;
+  checkoutId?: Maybe<Scalars['ID']>;
+}>;
+
+
+export type CreateTokenWithoutOtpMutation = { CreateTokenWithoutOtp: Maybe<(
+    Pick<CreateTokenWithoutOtp, 'token' | 'refreshToken' | 'csrfToken'>
     & { user: Maybe<UserFragment>, otpErrors: Array<Pick<OtpError, 'code' | 'field' | 'message'>> }
   )> };
 
@@ -21778,6 +21788,53 @@ export function useOtpAuthenticationMutation(baseOptions?: Apollo.MutationHookOp
 export type OtpAuthenticationMutationHookResult = ReturnType<typeof useOtpAuthenticationMutation>;
 export type OtpAuthenticationMutationResult = Apollo.MutationResult<OtpAuthenticationMutation>;
 export type OtpAuthenticationMutationOptions = Apollo.BaseMutationOptions<OtpAuthenticationMutation, OtpAuthenticationMutationVariables>;
+export const CreateTokenWithoutOtpDocument = gql`
+    mutation CreateTokenWithoutOtp($waid: String, $checkoutId: ID) {
+  CreateTokenWithoutOtp: createTokenWithoutOtp(
+    waid: $waid
+    checkoutId: $checkoutId
+  ) {
+    token
+    refreshToken
+    csrfToken
+    user {
+      ...UserFragment
+    }
+    otpErrors {
+      code
+      field
+      message
+    }
+  }
+}
+    ${UserFragmentDoc}`;
+export type CreateTokenWithoutOtpMutationFn = Apollo.MutationFunction<CreateTokenWithoutOtpMutation, CreateTokenWithoutOtpMutationVariables>;
+
+/**
+ * __useCreateTokenWithoutOtpMutation__
+ *
+ * To run a mutation, you first call `useCreateTokenWithoutOtpMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTokenWithoutOtpMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTokenWithoutOtpMutation, { data, loading, error }] = useCreateTokenWithoutOtpMutation({
+ *   variables: {
+ *      waid: // value for 'waid'
+ *      checkoutId: // value for 'checkoutId'
+ *   },
+ * });
+ */
+export function useCreateTokenWithoutOtpMutation(baseOptions?: Apollo.MutationHookOptions<CreateTokenWithoutOtpMutation, CreateTokenWithoutOtpMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateTokenWithoutOtpMutation, CreateTokenWithoutOtpMutationVariables>(CreateTokenWithoutOtpDocument, options);
+      }
+export type CreateTokenWithoutOtpMutationHookResult = ReturnType<typeof useCreateTokenWithoutOtpMutation>;
+export type CreateTokenWithoutOtpMutationResult = Apollo.MutationResult<CreateTokenWithoutOtpMutation>;
+export type CreateTokenWithoutOtpMutationOptions = Apollo.BaseMutationOptions<CreateTokenWithoutOtpMutation, CreateTokenWithoutOtpMutationVariables>;
 export const AccountRegisterV2Document = gql`
     mutation AccountRegisterV2($input: AccountRegisterInputV2!) {
   accountRegisterV2(input: $input) {

@@ -1731,6 +1731,86 @@
             "deprecationReason": null
           },
           {
+            "name": "privateMetadata",
+            "description": "List of private metadata items.Requires proper staff permissions to access.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "MetadataItem",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "metadata",
+            "description": "List of public metadata items. Can be accessed without permissions.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "MetadataItem",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "privateMeta",
+            "description": "List of privately stored metadata namespaces.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "MetaStore",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use the `privetaMetadata` field. This field will be removed after 2020-07-31."
+          },
+          {
+            "name": "meta",
+            "description": "List of publicly stored metadata namespaces.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "MetaStore",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use the `metadata` field. This field will be removed after 2020-07-31."
+          },
+          {
             "name": "isDefaultShippingAddress",
             "description": "Address is user's default shipping address.",
             "args": [],
@@ -1760,6 +1840,11 @@
           {
             "kind": "INTERFACE",
             "name": "Node",
+            "ofType": null
+          },
+          {
+            "kind": "INTERFACE",
+            "name": "ObjectWithMetadata",
             "ofType": null
           }
         ],
@@ -15489,6 +15574,30 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "prepaidCashback",
+            "description": "Cashback for prepaid total.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "TaxedMoney",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "codCashback",
+            "description": "Cashback for cod total.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "TaxedMoney",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -23278,6 +23387,113 @@
         "kind": "OBJECT",
         "name": "CreateTokenOTP",
         "description": "Create JWT token via OTP.",
+        "fields": [
+          {
+            "name": "errors",
+            "description": "List of errors that occurred executing the mutation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Error",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use typed errors with error codes. This field will be removed after 2020-07-31."
+          },
+          {
+            "name": "token",
+            "description": "JWT token, required to authenticate.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "refreshToken",
+            "description": "JWT refresh token, required to re-generate access token.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "csrfToken",
+            "description": "CSRF token required to re-generate access token.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "user",
+            "description": "A user instance.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "User",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "otpErrors",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "OTPError",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "CreateTokenWithoutOTP",
+        "description": "Create JWT token without OTP.",
         "fields": [
           {
             "name": "errors",
@@ -40185,6 +40401,18 @@
           {
             "name": "getUpiDeepLinks",
             "description": "Get UPI deep link",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createNew",
+            "description": "Create new Juspay order id",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -60604,6 +60832,35 @@
             "deprecationReason": null
           },
           {
+            "name": "updateCollectionBanner",
+            "description": "Update Collection Banner.",
+            "args": [
+              {
+                "name": "csvFile",
+                "description": "Represents a CSV file in a multipart request.",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Upload",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "UpdateCollectionBanner",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "updateProductvariantMetadata",
             "description": "Update ProductVariant metadata.",
             "args": [
@@ -61999,6 +62256,43 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "createTokenWithoutOtp",
+            "description": "Create JWT token without OTP.",
+            "args": [
+              {
+                "name": "checkoutId",
+                "description": "Existing checkout id of the guest user, used to merge carts.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "waid",
+                "description": "WaID of user.",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "CreateTokenWithoutOTP",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -63374,6 +63668,11 @@
         "interfaces": [],
         "enumValues": null,
         "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "Address",
+            "ofType": null
+          },
           {
             "kind": "OBJECT",
             "name": "App",
@@ -85084,6 +85383,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "outputType",
+                "description": "Output type of elastic search",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
               }
             ],
             "type": {
@@ -86882,6 +87193,31 @@
             "type": {
               "kind": "OBJECT",
               "name": "UserExistsType",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "getOtp",
+            "description": null,
+            "args": [
+              {
+                "name": "phone",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "SkipOTPType",
               "ofType": null
             },
             "isDeprecated": false,
@@ -94558,6 +94894,12 @@
             "deprecationReason": null
           },
           {
+            "name": "YESTERDAY",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "THIS_WEEK",
             "description": null,
             "isDeprecated": false,
@@ -96195,6 +96537,18 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "discountWithoutCoupon",
+            "description": "boolean value for coupon code",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "orderId",
             "description": "id of the draft order",
             "type": {
@@ -96214,13 +96568,9 @@
             "name": "code",
             "description": "voucher code",
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
@@ -104345,6 +104695,29 @@
         "possibleTypes": null
       },
       {
+        "kind": "OBJECT",
+        "name": "SkipOTPType",
+        "description": null,
+        "fields": [
+          {
+            "name": "otp",
+            "description": "otp",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "ENUM",
         "name": "SocialMedia",
         "description": null,
@@ -110190,6 +110563,151 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "UpdateCollectionBanner",
+        "description": "Update Collection Banner.",
+        "fields": [
+          {
+            "name": "errors",
+            "description": "List of errors that occurred executing the mutation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Error",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use typed errors with error codes. This field will be removed after 2020-07-31."
+          },
+          {
+            "name": "message",
+            "description": "Success message",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updateCollectionBannerError",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "UpdateCollectionBannerError",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "UpdateCollectionBannerError",
+        "description": null,
+        "fields": [
+          {
+            "name": "field",
+            "description": "Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "message",
+            "description": "The error message.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "code",
+            "description": "The error code..",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "UpdateCollectionBannerErrorCode",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "UpdateCollectionBannerErrorCode",
+        "description": "An enumeration.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "INVALID_FILE_FORMAT",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "INVALID",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {

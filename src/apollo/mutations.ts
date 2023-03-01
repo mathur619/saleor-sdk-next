@@ -453,6 +453,28 @@ export const CREATE_OTP_TOKEN_MUTATION = gql`
   }
 `;
 
+export const CREATE_TOKEN_WITHOUT_OTP = gql`
+  ${userFragment}
+  mutation CreateTokenWithoutOtp($waid: String, $checkoutId: ID) {
+    CreateTokenWithoutOtp: createTokenWithoutOtp(
+      waid: $waid
+      checkoutId: $checkoutId
+    ) {
+      token
+      refreshToken
+      csrfToken
+      user {
+        ...UserFragment
+      }
+      otpErrors {
+        code
+        field
+        message
+      }
+    }
+  }
+`;
+
 export const REGISTER_ACCOUNT = gql`
   mutation AccountRegisterV2($input: AccountRegisterInputV2!) {
     accountRegisterV2(input: $input) {

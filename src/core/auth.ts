@@ -63,6 +63,8 @@ import {
   UserCheckoutDetailsQueryVariables,
   VerifyCheckoutOtpMutation,
   VerifyCheckoutOtpMutationVariables,
+  CreateTokenWithoutOtpMutation,
+  CreateTokenWithoutOtpMutationVariables,
 } from "..";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
@@ -75,6 +77,7 @@ import {
   VERIFY_CHECKOUT_OTP,
   CHECKOUT_CUSTOMER_ATTACH,
   CHECKOUT_CUSTOMER_ATTACH_NEW,
+  CREATE_TOKEN_WITHOUT_OTP,
 } from "../apollo/mutations";
 import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
 import { storage } from "./storage";
@@ -82,6 +85,7 @@ import {
   CheckoutCustomerAttachResult,
   ConfirmAccountV2Result,
   GetUserCheckoutResult,
+  OtpLessLoginResult,
   // ChangePasswordResult,
   // LogoutOpts,
   // GetExternalAccessTokenResult,
@@ -224,6 +228,11 @@ export interface AuthSDK {
     updateShippingMethod?: boolean
   ) => SignInMobileResult;
 
+  otpLessLogin: (
+    waid: string,
+    updateShippingMethod?: boolean
+  ) => OtpLessLoginResult;
+
   requestOTP: (phone: string) => RequestOtpResult;
 
   registerAccountV2: (
@@ -234,7 +243,11 @@ export interface AuthSDK {
     sendWigzoInHeader?: boolean
   ) => RegisterAccountV2Result;
 
-  confirmAccountV2: (otp: string, phone: string, updateShippingMethod?:boolean) => ConfirmAccountV2Result;
+  confirmAccountV2: (
+    otp: string,
+    phone: string,
+    updateShippingMethod?: boolean
+  ) => ConfirmAccountV2Result;
 
   checkoutCustomerAttach: (
     token: string,
@@ -259,7 +272,7 @@ export const auth = ({
     otp: string,
     phone?: string,
     email?: string,
-    updateShippingMethod:boolean = true
+    updateShippingMethod = true
   ) => {
     client.writeQuery({
       query: USER,
@@ -317,6 +330,68 @@ export const auth = ({
         variables: {
           checkoutId: checkout.id,
           customerId: res.data.CreateTokenOTP.user.id,
+        },
+      });
+    }
+
+    return res;
+  };
+
+  const otpLessLogin: AuthSDK["otpLessLogin"] = async (
+    waid: string,
+    updateShippingMethod = true
+  ) => {
+    client.writeQuery({
+      query: USER,
+      data: {
+        authenticating: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    const CreateTokenWithoutOtpVariables = checkout?.id
+      ? {
+          checkoutId: checkout?.id,
+          waid: waid,
+        }
+      : {
+          waid: waid,
+        };
+    const res = await client.mutate<
+      CreateTokenWithoutOtpMutation,
+      CreateTokenWithoutOtpMutationVariables
+    >({
+      mutation: CREATE_TOKEN_WITHOUT_OTP,
+      variables: CreateTokenWithoutOtpVariables,
+      update: (_, { data }) => {
+        if (data?.CreateTokenWithoutOtp?.token) {
+          storage.setTokens({
+            accessToken: data.CreateTokenWithoutOtp.token,
+            csrfToken: data.CreateTokenWithoutOtp.csrfToken,
+            refreshToken: data.CreateTokenWithoutOtp.refreshToken,
+          });
+          getUserCheckout(updateShippingMethod);
+        } else {
+          client.writeQuery({
+            query: USER,
+            data: {
+              authenticating: false,
+            },
+          });
+        }
+      },
+    });
+
+    if (checkout?.id && res.data?.CreateTokenWithoutOtp?.user?.id) {
+      client.mutate({
+        mutation: CHECKOUT_CUSTOMER_ATTACH,
+        variables: {
+          checkoutId: checkout.id,
+          customerId: res.data.CreateTokenWithoutOtp.user.id,
         },
       });
     }
@@ -412,7 +487,7 @@ export const auth = ({
   const confirmAccountV2: AuthSDK["confirmAccountV2"] = async (
     otp: string,
     phone: string,
-    updateShippingMethod:boolean = true
+    updateShippingMethod = true
   ) => {
     client.writeQuery({
       query: USER,
@@ -540,7 +615,7 @@ export const auth = ({
   };
 
   const getUserCheckout: AuthSDK["getUserCheckout"] = async (
-    updateShippingMethod: boolean = true
+    updateShippingMethod = true
   ) => {
     const res = await client.mutate<
       UserCheckoutDetailsQuery,
@@ -861,5 +936,6 @@ export const auth = ({
     setToken,
     getUserCheckout,
     verifyCheckoutOTP,
+    otpLessLogin,
   };
 };
