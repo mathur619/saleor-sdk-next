@@ -3766,6 +3766,24 @@ export type CreateTokenOtp = {
   otpErrors: Array<OtpError>;
 };
 
+/** Create JWT token without OTP. */
+export type CreateTokenWithoutOtp = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** JWT token, required to authenticate. */
+  token: Maybe<Scalars['String']>;
+  /** JWT refresh token, required to re-generate access token. */
+  refreshToken: Maybe<Scalars['String']>;
+  /** CSRF token required to re-generate access token. */
+  csrfToken: Maybe<Scalars['String']>;
+  /** A user instance. */
+  user: Maybe<User>;
+  otpErrors: Array<OtpError>;
+};
+
 /** Create a new voucher rule. */
 export type CreateVoucherRule = {
   /**
@@ -8729,6 +8747,8 @@ export type Mutation = {
   removeRtoCustomersList: Maybe<RemoveRtoCustomersListCsv>;
   /** Upload list of risk orders. */
   pushRiskOrdersCsv: Maybe<PushRiskOrderCsv>;
+  /** Create JWT token without OTP. */
+  createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
 };
 
 
@@ -11132,6 +11152,12 @@ export type MutationRemoveRtoCustomersListArgs = {
 
 export type MutationPushRiskOrdersCsvArgs = {
   csvFile: Scalars['Upload'];
+};
+
+
+export type MutationCreateTokenWithoutOtpArgs = {
+  checkoutId?: Maybe<Scalars['ID']>;
+  waid?: Maybe<Scalars['String']>;
 };
 
 export type NameTranslationInput = {
@@ -15286,6 +15312,7 @@ export type QueryGiftCardsArgs = {
 
 export type QueryGlobalSearchArgs = {
   search?: Maybe<Scalars['String']>;
+  outputType?: Maybe<Scalars['String']>;
 };
 
 
