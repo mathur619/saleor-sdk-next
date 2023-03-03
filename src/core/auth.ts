@@ -629,7 +629,7 @@ export const auth = ({
         update: (_, { data }) => {
           if (data?.tokenRefresh?.token) {
             storage.setAccessToken(data.tokenRefresh.token);
-            getUserCheckout();
+            getUserCheckout(false);
           } else {
             signOut();
           }
