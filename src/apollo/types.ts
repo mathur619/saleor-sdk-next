@@ -21042,9 +21042,6 @@ export type CheckoutTotalsQueryVariables = Exact<{
 export type CheckoutTotalsQuery = { checkoutTotals: Maybe<{ prepaidCashback: Maybe<(
       Pick<TaxedMoney, 'currency'>
       & { gross: Pick<Money, 'currency' | 'amount'>, net: Pick<Money, 'currency' | 'amount'> }
-    )>, codCashback: Maybe<(
-      Pick<TaxedMoney, 'currency'>
-      & { gross: Pick<Money, 'currency' | 'amount'>, net: Pick<Money, 'currency' | 'amount'> }
     )>, codTotal: Maybe<(
       Pick<TaxedMoney, 'currency'>
       & { gross: Pick<Money, 'currency' | 'amount'>, net: Pick<Money, 'currency' | 'amount'> }
@@ -23749,17 +23746,6 @@ export const CheckoutTotalsDocument = gql`
     query CheckoutTotals($token: UUID) {
   checkoutTotals(token: $token) {
     prepaidCashback {
-      currency
-      gross {
-        currency
-        amount
-      }
-      net {
-        currency
-        amount
-      }
-    }
-    codCashback {
       currency
       gross {
         currency

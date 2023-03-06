@@ -254,17 +254,6 @@ export const GET_CHECKOUT_TOTALS = gql`
           amount
         }
       }
-      codCashback {
-        currency
-        gross {
-          currency
-          amount
-        }
-        net {
-          currency
-          amount
-        }
-      }
       codTotal {
         currency
         gross {
