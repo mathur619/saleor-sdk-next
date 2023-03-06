@@ -580,6 +580,19 @@ export const checkout = ({
         },
       });
 
+      if (
+        res.data?.checkoutPaymentMethodUpdate?.checkoutErrors &&
+        res.data?.checkoutPaymentMethodUpdate?.checkoutErrors[0]?.code ===
+          "NOT_FOUND" &&
+        res.data?.checkoutPaymentMethodUpdate?.checkoutErrors[0]?.field ===
+          "checkoutId" &&
+        typeof window !== "undefined"
+      ) {
+        localStorage.removeItem(SALEOR_CHECKOUT);
+        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS);
+        window.location.reload();
+      }
+
       return res;
     }
 
@@ -671,26 +684,37 @@ export const checkout = ({
         redirectUrl: input?.redirectUrl,
         storeSource: input?.storeSource,
       };
-      const res = await client.mutate<
-        CompleteCheckoutMutation,
-        CompleteCheckoutMutationVariables
-      >({
-        mutation: COMPLETE_CHECKOUT,
-        variables,
-        update: async (_, { data }) => {
-          if (data?.checkoutComplete?.order?.id) {
-            if (!data?.checkoutComplete.confirmationNeeded) {
-              await setLocalCheckoutInCache(client, {}, false, data);
-              storage.setCheckout({});
+      try {
+        const res = await client.mutate<
+          CompleteCheckoutMutation,
+          CompleteCheckoutMutationVariables
+        >({
+          mutation: COMPLETE_CHECKOUT,
+          variables,
+          update: async (_, { data }) => {
+            if (data?.checkoutComplete?.order?.id) {
+              if (!data?.checkoutComplete.confirmationNeeded) {
+                await setLocalCheckoutInCache(client, {}, false, data);
+                storage.setCheckout({});
+              }
             }
-          }
-        },
-      });
+          },
+        });
 
-      if (
-        res?.data?.checkoutComplete?.errors &&
-        res?.data?.checkoutComplete?.errors[0]?.code
-      ) {
+        if (
+          res?.data?.checkoutComplete?.errors &&
+          res?.data?.checkoutComplete?.errors[0]?.code
+        ) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+        }
+
+        return res;
+      } catch {
         client.writeQuery({
           query: GET_LOCAL_CHECKOUT,
           data: {
@@ -698,8 +722,7 @@ export const checkout = ({
           },
         });
       }
-
-      return res;
+      
     }
 
     return null;
