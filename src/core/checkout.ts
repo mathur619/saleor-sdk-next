@@ -580,6 +580,19 @@ export const checkout = ({
         },
       });
 
+      if (
+        res.data?.checkoutPaymentMethodUpdate?.checkoutErrors &&
+        res.data?.checkoutPaymentMethodUpdate?.checkoutErrors[0]?.code ===
+          "NOT_FOUND" &&
+        res.data?.checkoutPaymentMethodUpdate?.checkoutErrors[0]?.field ===
+          "checkoutId" &&
+        typeof window !== "undefined"
+      ) {
+        localStorage.removeItem(SALEOR_CHECKOUT);
+        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS);
+        window.location.reload();
+      }
+
       return res;
     }
 
