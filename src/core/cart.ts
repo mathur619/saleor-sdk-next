@@ -72,7 +72,7 @@ export interface CartSDK {
     quantity: number,
     tags?: string[]
   ) => AddItemResult;
-  removeItem: (variantId: string) => RemoveItemResult;
+  removeItem: (variantId: string, updateShippingMethod?: boolean) => RemoveItemResult;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem: (
     variantId: string,
@@ -89,7 +89,8 @@ export interface CartSDK {
   updateItemNext: (
     variantId: string,
     quantity: number,
-    prevQuantity: number
+    prevQuantity: number,
+    updateShippingMethod?: boolean
   ) => UpdateItemResult;
   updateItemWithLines: (
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>
@@ -243,7 +244,10 @@ export const cart = ({
     }
   };
 
-  const removeItem: CartSDK["removeItem"] = async (variantId: string) => {
+  const removeItem: CartSDK["removeItem"] = async (
+    variantId: string,
+    updateShippingMethod: boolean = true
+  ) => {
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null =
       checkoutString && typeof checkoutString === "string"
@@ -332,6 +336,13 @@ export const cart = ({
             localCashback: resDiscount.data.cashback,
           },
         });
+        if (updateShippingMethod) {
+          await setLocalCheckoutInCache(
+            client,
+            res.data?.checkoutLineDelete?.checkout,
+            true
+          );
+        }
 
         return {
           data: res.data?.checkoutLineDelete?.checkout,
@@ -561,6 +572,18 @@ export const cart = ({
           },
         });
 
+        if (useDummyAddress) {
+          await setLocalCheckoutInCache(
+            client,
+            res.data?.checkoutLinesAdd?.checkout,
+            true
+          );
+          return {
+            data: res.data?.checkoutLinesAdd?.checkout,
+            errors: res?.data?.checkoutLinesAdd?.errors,
+          };
+        }
+
         let returnObject = {
           data: res.data?.checkoutLinesAdd?.checkout,
           errors: res?.data?.checkoutLinesAdd?.errors,
@@ -686,6 +709,18 @@ export const cart = ({
           },
         });
 
+        if (useDummyAddress) {
+          await setLocalCheckoutInCache(
+            client,
+            res.data?.checkoutCreate?.checkout,
+            true
+          );
+          return {
+            data: res.data?.checkoutCreate?.checkout,
+            errors: res?.data?.checkoutCreate?.errors,
+          };
+        }
+
         let returnObject = {
           data: res.data?.checkoutCreate?.checkout,
           errors: res?.data?.checkoutCreate?.errors,
@@ -717,7 +752,8 @@ export const cart = ({
   const updateItemNext: CartSDK["updateItemNext"] = async (
     variantId: string,
     quantity: number,
-    prevQuantity: number
+    prevQuantity: number,
+    updateShippingMethod: boolean = true
   ) => {
     const differenceQuantity = quantity - prevQuantity;
     if (differenceQuantity > 0) {
@@ -797,6 +833,14 @@ export const cart = ({
               localCashback: resDiscount.data.cashback,
             },
           });
+
+          if (updateShippingMethod) {
+            await setLocalCheckoutInCache(
+              client,
+              res.data?.checkoutLinesUpdate?.checkout,
+              true
+            );
+          }
         } else {
           throw new Error("UpdateCheckoutShippingMethodNext failed");
         }

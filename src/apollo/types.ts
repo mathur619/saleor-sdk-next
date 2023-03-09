@@ -2471,8 +2471,6 @@ export type CheckoutTotalsType = {
   prepaidTotal: Maybe<TaxedMoney>;
   /** Cashback for prepaid total. */
   prepaidCashback: Maybe<TaxedMoney>;
-  /** Cashback for cod total. */
-  codCashback: Maybe<TaxedMoney>;
 };
 
 /** Checkout object. */
@@ -4884,6 +4882,26 @@ export type CustomerEventsEnum =
   | 'EMAIL_ASSIGNED'
   | 'NOTE_ADDED';
 
+export type CustomerExportFilterInput = {
+  dateJoined?: Maybe<DateRangeInput>;
+  tags?: Maybe<TagsListInput>;
+};
+
+export type CustomerFieldEnum =
+  | 'FIRST_NAME'
+  | 'LAST_NAME'
+  | 'EMAIL'
+  | 'DATE_JOINED'
+  | 'IS_STAFF'
+  | 'IS_ACTIVE'
+  | 'PHONE'
+  | 'STREET_ADDRESS_1'
+  | 'STREET_ADDRESS_2'
+  | 'CITY'
+  | 'STATE'
+  | 'POSTAL_CODE'
+  | 'COUNTRY';
+
 export type CustomerFilterInput = {
   dateJoined?: Maybe<DateRangeInput>;
   moneySpent?: Maybe<PriceRangeInput>;
@@ -5740,6 +5758,36 @@ export type Error = {
   field: Maybe<Scalars['String']>;
   /** The error message. */
   message: Maybe<Scalars['String']>;
+};
+
+/** Export customers to csv file. */
+export type ExportCustomers = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** The newly created export file job which is responsible for export data. */
+  exportFile: Maybe<ExportFile>;
+  exportErrors: Array<ExportError>;
+};
+
+export type ExportCustomersInfoInput = {
+  /** List of customer fields which should be exported. */
+  fields?: Maybe<Array<CustomerFieldEnum>>;
+};
+
+export type ExportCustomersInput = {
+  /** Determine which customer should be exported. */
+  scope: ExportScope;
+  /** Filtering options for customers. */
+  filter?: Maybe<CustomerExportFilterInput>;
+  /** List of customer IDS to export. */
+  ids?: Maybe<Array<Scalars['ID']>>;
+  /** Input with info about fields which should be exported. */
+  exportInfo?: Maybe<ExportCustomersInfoInput>;
+  /** Type of exported file. */
+  fileType: FileTypesEnum;
 };
 
 export type ExportError = {
@@ -8681,6 +8729,8 @@ export type Mutation = {
   getUserHash: Maybe<GetUserHash>;
   /** Export orders to csv file. */
   exportOrders: Maybe<ExportOrders>;
+  /** Export customers to csv file. */
+  exportCustomer: Maybe<ExportCustomers>;
   /** Creates Refer Hash for user. */
   referAFriend: Maybe<ReferAFriend>;
   /** Creates Coupon Code for referd user. */
@@ -8747,6 +8797,8 @@ export type Mutation = {
   pushRiskOrdersCsv: Maybe<PushRiskOrderCsv>;
   /** Create JWT token without OTP. */
   createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
+  /** Deletes productReviews. */
+  productReviewBulkDelete: Maybe<ProductReviewsBulkDelete>;
 };
 
 
@@ -10985,6 +11037,11 @@ export type MutationExportOrdersArgs = {
 };
 
 
+export type MutationExportCustomerArgs = {
+  input: ExportCustomersInput;
+};
+
+
 export type MutationReferAFriendArgs = {
   email: Scalars['String'];
 };
@@ -11156,6 +11213,11 @@ export type MutationPushRiskOrdersCsvArgs = {
 export type MutationCreateTokenWithoutOtpArgs = {
   checkoutId?: Maybe<Scalars['ID']>;
   waid?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationProductReviewBulkDeleteArgs = {
+  ids: Array<Maybe<Scalars['ID']>>;
 };
 
 export type NameTranslationInput = {
@@ -11634,6 +11696,7 @@ export type OrderEventsEnum =
 
 export type OrderExportFilterInput = {
   created?: Maybe<DateRangeInput>;
+  tags?: Maybe<TagsListInput>;
 };
 
 export type OrderFieldEnum =
@@ -13893,6 +13956,18 @@ export type ProductReviewVideoTypeEdge = {
   cursor: Scalars['String'];
 };
 
+/** Deletes productReviews. */
+export type ProductReviewsBulkDelete = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Returns how many objects were affected. */
+  count: Scalars['Int'];
+  productErrors: Array<ProductError>;
+};
+
 /** Set product availability for purchase date. */
 export type ProductSetAvailabilityForPurchase = {
   /**
@@ -15756,6 +15831,7 @@ export type QuerySectionArgs = {
 
 export type QuerySectionsArgs = {
   filter?: Maybe<SectionFilterInput>;
+  sortBy?: Maybe<SectionsSortType>;
   level?: Maybe<Scalars['Int']>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
@@ -16534,9 +16610,10 @@ export type SectionErrorCode =
   | 'NOT_SECTIONS_IMAGE';
 
 export type SectionFilterInput = {
-  isPublished?: Maybe<Scalars['Boolean']>;
+  name?: Maybe<Scalars['String']>;
   collections?: Maybe<Array<Maybe<Scalars['ID']>>>;
   categories?: Maybe<Array<Maybe<Scalars['ID']>>>;
+  isPublished?: Maybe<Scalars['Boolean']>;
   search?: Maybe<Scalars['String']>;
   ids?: Maybe<Array<Maybe<Scalars['ID']>>>;
 };
@@ -16679,6 +16756,10 @@ export type SectionReorderProducts = {
   productErrors: Array<ProductError>;
 };
 
+export type SectionSort =
+  | 'NAME'
+  | 'IS_PUBLISHED';
+
 export type SectionType = Node & ObjectWithMetadataV2 & {
   /** List of public metadata items. Can be accessed without permissions. */
   metadata: Array<Maybe<MetadataItemV2>>;
@@ -16782,6 +16863,13 @@ export type SectionUpdate = {
   errors: Array<Error>;
   sectionErrors: Array<SectionError>;
   section: Maybe<SectionType>;
+};
+
+export type SectionsSortType = {
+  /** Specifies the direction in which to sort products. */
+  direction: OrderDirection;
+  /** Sort Section by the selected field. */
+  field?: Maybe<SectionSort>;
 };
 
 /** Represents a custom attribute. */
