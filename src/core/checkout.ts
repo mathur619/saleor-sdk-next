@@ -146,8 +146,8 @@ export interface CheckoutSDK {
 
   setBillingAddress?: (billingAddress: IAddress, updateShippingMethod?: boolean) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
-  addPromoCode?: (promoCode: string) => AddPromoCodeResult;
-  removePromoCode?: (promoCode: string) => RemovePromoCodeResult;
+  addPromoCode?: (promoCode: string, updateShippingMethod?: boolean) => AddPromoCodeResult;
+  removePromoCode?: (promoCode: string, updateShippingMethod?: boolean) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
     input: PaymentMethodUpdateInput,
     updateShippingMethod?: boolean
@@ -482,7 +482,8 @@ export const checkout = ({
   };
 
   const addPromoCode: CheckoutSDK["addPromoCode"] = async (
-    promoCode: string
+    promoCode: string,
+    updateShippingMethod: boolean = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -540,6 +541,15 @@ export const checkout = ({
             localCashback: resDiscount.data.cashback,
           },
         });
+
+        if (updateShippingMethod) {
+          await setLocalCheckoutInCache(
+            client,
+            res.data?.checkoutAddPromoCode?.checkout,
+            true
+          );
+        }
+
       }
 
       client.writeQuery({
@@ -556,7 +566,8 @@ export const checkout = ({
   };
 
   const removePromoCode: CheckoutSDK["removePromoCode"] = async (
-    promoCode: string
+    promoCode: string,
+    updateShippingMethod: boolean = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -615,6 +626,15 @@ export const checkout = ({
             localCashback: resDiscount.data.cashback,
           },
         });
+
+        if (updateShippingMethod) {
+          await setLocalCheckoutInCache(
+            client,
+            res.data?.checkoutRemovePromoCode?.checkout,
+            true
+          );
+        }
+
       }
 
       client.writeQuery({
