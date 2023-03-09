@@ -441,7 +441,7 @@ export const createApolloClient = (
   });
 
   const authLink = setContext(async (_, { headers }) => {
-    let ip, fbp, fbc;
+    let ip, fbp, fbc, additionalHeaders;
     if (typeof window !== "undefined") {
       const getCookie = (name: any) => {
         // Split cookie string and get all individual name=value pairs in an array
@@ -467,14 +467,34 @@ export const createApolloClient = (
       fbc = getCookie("_fbc");
     }
 
-    return {
-      headers: {
-        ...headers,
+    if (process.env.NEXT_PUBLIC_MOBILE) {
+      additionalHeaders = {
         "x-client-ip-address": ip || "",
         "x-client-user-agent":
           typeof window !== "undefined" ? window.navigator.userAgent : "",
         "x-fbp": fbp || "",
         "x-fbc": fbc || "",
+        appplatform: document?.referrer?.includes("android-app")
+          ? "android"
+          : // @ts-ignore: exists only on ios
+          window?.navigator?.standalone
+          ? "ios"
+          : "web",
+      };
+    } else {
+      additionalHeaders = {
+        "x-client-ip-address": ip || "",
+        "x-client-user-agent":
+          typeof window !== "undefined" ? window.navigator.userAgent : "",
+        "x-fbp": fbp || "",
+        "x-fbc": fbc || "",
+      };
+    }
+
+    return {
+      headers: {
+        ...headers,
+        ...additionalHeaders
       },
     };
   });
