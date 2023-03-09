@@ -757,7 +757,7 @@ export const cart = ({
   ) => {
     const differenceQuantity = quantity - prevQuantity;
     if (differenceQuantity > 0) {
-      const res = await addToCartNext(variantId, differenceQuantity);
+      const res = await addToCartNext(variantId, differenceQuantity, undefined, undefined, updateShippingMethod);
       return res;
     } else {
       const checkoutString = storage.getCheckout();
