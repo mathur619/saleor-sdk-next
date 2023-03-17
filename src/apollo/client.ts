@@ -433,6 +433,8 @@ export const createApolloClient = (
     return {
       headers: {
         ...headers,
+        event_source_url:
+          typeof window !== "undefined" ? window.location.href : "",
         "x-client-ip-address": ip || "",
         "x-client-user-agent":
           typeof window !== "undefined" ? window.navigator.userAgent : "",
