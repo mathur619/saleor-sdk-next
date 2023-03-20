@@ -1763,6 +1763,7 @@ export type CashfreeCreateOrderInput = {
   checkoutId: Scalars['ID'];
   /** Url to redirect to after payment. */
   returnUrl: Scalars['String'];
+  source: Scalars['String'];
 };
 
 export type CashfreeCreateOrderSdkInput = {
