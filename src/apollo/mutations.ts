@@ -875,6 +875,31 @@ export const CREATE_RAZORPAY_ORDER = gql`
   }
 `;
 
+export const CREATE_GOKWIK_ORDER = gql`
+  mutation CreateGokwikOrder($input: GokwikCreateOrderInput!) {
+    createGokwikOrder(input: $input) {
+      errors {
+        field
+        message
+      }
+      gokwickOrder {
+        id
+        requestId
+        orderId
+        amount
+        mid
+        orderType
+        status
+      }
+      gokwikErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
 export const CREATE_JUSPAY_CUSTOMER_AND_ORDER = gql`
   mutation CreateJuspayOrderAndCustomer(
     $input: JuspayCreateOrderAndCustomerInput!

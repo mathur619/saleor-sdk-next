@@ -75,6 +75,7 @@ import {
   CreateJuspayPaymentMutation,
   UpdateUserMetaMutation,
   CreateTokenWithoutOtpMutation,
+  CreateGokwikOrderMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -236,6 +237,9 @@ export type GetCityStateFromPincodeResult = Promise<FetchResult<
 > | null>;
 export type CreateRazorpayOrderResult = Promise<FetchResult<
   CreateRazorpayOrderMutation
+> | null>;
+export type CreateGokwikOrderResult = Promise<FetchResult<
+  CreateGokwikOrderMutation
 > | null>;
 
 export type JuspayOrderAndCustomerCreateResult = Promise<FetchResult<

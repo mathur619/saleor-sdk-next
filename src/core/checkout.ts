@@ -8,6 +8,7 @@ import {
   CREATE_CASHFREE_ORDER,
   CREATE_CHECKOUT_MUTATION,
   CREATE_CHECKOUT_PAYMENT,
+  CREATE_GOKWIK_ORDER,
   CREATE_JUSPAY_CUSTOMER_AND_ORDER,
   CREATE_JUSPAY_PAYMENT,
   CREATE_RAZORPAY_ORDER,
@@ -73,6 +74,8 @@ import {
   CreateJuspayPaymentMutationVariables,
   CreateJuspayPaymentMutation,
   JuspayPaymentInput,
+  CreateGokwikOrderMutationVariables,
+  CreateGokwikOrderMutation,
 } from "../apollo/types";
 
 import {
@@ -91,6 +94,7 @@ import {
   CompleteCheckoutResult,
   CreateCashfreeOrderResult,
   CreateCheckoutResult,
+  CreateGokwikOrderResult,
   CreatePaymentResult,
   CreatePaytmOrderResult,
   CreateRazorpayOrderResult,
@@ -144,10 +148,19 @@ export interface CheckoutSDK {
     updateShippingMethod?: boolean
   ) => SetShippingAndBillingAddressResult;
 
-  setBillingAddress?: (billingAddress: IAddress, updateShippingMethod?: boolean) => SetBillingAddressResult;
+  setBillingAddress?: (
+    billingAddress: IAddress,
+    updateShippingMethod?: boolean
+  ) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
-  addPromoCode?: (promoCode: string, updateShippingMethod?: boolean) => AddPromoCodeResult;
-  removePromoCode?: (promoCode: string, updateShippingMethod?: boolean) => RemovePromoCodeResult;
+  addPromoCode?: (
+    promoCode: string,
+    updateShippingMethod?: boolean
+  ) => AddPromoCodeResult;
+  removePromoCode?: (
+    promoCode: string,
+    updateShippingMethod?: boolean
+  ) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
     input: PaymentMethodUpdateInput,
     updateShippingMethod?: boolean
@@ -156,7 +169,10 @@ export interface CheckoutSDK {
   completeCheckout?: (input?: CompleteCheckoutInput) => CompleteCheckoutResult;
   getCityStateFromPincode?: (pincode: string) => GetCityStateFromPincodeResult;
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
-  juspayOrderAndCustomerCreate?: (createNew?: boolean) => JuspayOrderAndCustomerCreateResult;
+  createGokwikOrder?: () => CreateGokwikOrderResult;
+  juspayOrderAndCustomerCreate?: (
+    createNew?: boolean
+  ) => JuspayOrderAndCustomerCreateResult;
   juspayPaymentCreate?: (
     input: JuspayPaymentInput
   ) => JuspayPaymentCreateResult;
@@ -250,7 +266,7 @@ export const checkout = ({
   const setShippingAddress: CheckoutSDK["setShippingAddress"] = async (
     shippingAddress: IAddress,
     email: string,
-    updateShippingMethod: boolean = false
+    updateShippingMethod = false
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -307,7 +323,7 @@ export const checkout = ({
 
   const setBillingAddress: CheckoutSDK["setBillingAddress"] = async (
     billingAddress: IAddress,
-    updateShippingMethod: boolean=false,
+    updateShippingMethod = false
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -362,7 +378,7 @@ export const checkout = ({
   const setShippingAndBillingAddress: CheckoutSDK["setShippingAndBillingAddress"] = async (
     shippingAddress: IAddress,
     email: string,
-    updateShippingMethod: boolean=false,
+    updateShippingMethod = false
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -372,7 +388,10 @@ export const checkout = ({
     });
 
     const resShipping = await setShippingAddress(shippingAddress, email);
-    const resBilling = await setBillingAddress(shippingAddress, updateShippingMethod);
+    const resBilling = await setBillingAddress(
+      shippingAddress,
+      updateShippingMethod
+    );
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -483,7 +502,7 @@ export const checkout = ({
 
   const addPromoCode: CheckoutSDK["addPromoCode"] = async (
     promoCode: string,
-    updateShippingMethod: boolean = true
+    updateShippingMethod = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -549,7 +568,6 @@ export const checkout = ({
             true
           );
         }
-
       }
 
       client.writeQuery({
@@ -567,7 +585,7 @@ export const checkout = ({
 
   const removePromoCode: CheckoutSDK["removePromoCode"] = async (
     promoCode: string,
-    updateShippingMethod: boolean = true
+    updateShippingMethod = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -634,7 +652,6 @@ export const checkout = ({
             true
           );
         }
-
       }
 
       client.writeQuery({
@@ -652,7 +669,7 @@ export const checkout = ({
 
   const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] = async (
     input: PaymentMethodUpdateInput,
-    updateShippingMethod: boolean=true,
+    updateShippingMethod = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -837,7 +854,6 @@ export const checkout = ({
           },
         });
       }
-      
     }
 
     return null;
@@ -910,7 +926,9 @@ export const checkout = ({
     return { data: null };
   };
 
-  const juspayOrderAndCustomerCreate: CheckoutSDK["juspayOrderAndCustomerCreate"] = async (createNew?: boolean) => {
+  const juspayOrderAndCustomerCreate: CheckoutSDK["juspayOrderAndCustomerCreate"] = async (
+    createNew?: boolean
+  ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -940,7 +958,7 @@ export const checkout = ({
           mobileCountryCode: "91",
           firstName: checkout?.shippingAddress?.firstName,
           lastName: checkout?.shippingAddress?.lastName,
-          createNew: createNew
+          createNew: createNew,
         },
       };
       const res = await client.mutate<
@@ -1095,6 +1113,60 @@ export const checkout = ({
           res?.data?.juspayPayment?.errors[0]?.message) ||
         (res?.data?.juspayPayment?.juspayErrors &&
           res?.data?.juspayPayment?.juspayErrors[0]?.message)
+      ) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
+      return res;
+    }
+
+    return { data: null };
+  };
+
+  const createGokwikOrder: CheckoutSDK["createGokwikOrder"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: CreateGokwikOrderMutationVariables = {
+        input: {
+          checkoutId: checkout?.id,
+        },
+      };
+      const res = await client.mutate<
+        CreateGokwikOrderMutation,
+        CreateGokwikOrderMutationVariables
+      >({
+        mutation: CREATE_GOKWIK_ORDER,
+        variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: true,
+            },
+          });
+        },
+      });
+
+      if (
+        (res?.errors && res?.errors[0]?.message) ||
+        (res?.data?.createGokwikOrder?.gokwikErrors &&
+          res?.data?.createGokwikOrder?.gokwikErrors[0]?.message)
       ) {
         client.writeQuery({
           query: GET_LOCAL_CHECKOUT,
@@ -1317,5 +1389,6 @@ export const checkout = ({
     createCashfreeOrder,
     getCheckoutTotals,
     juspayPaymentCreate,
+    createGokwikOrder,
   };
 };

@@ -301,7 +301,7 @@ export type AddTags = {
 };
 
 /** Represents user address data. */
-export type Address = Node & ObjectWithMetadata & {
+export type Address = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
   firstName: Scalars['String'];
@@ -316,20 +316,6 @@ export type Address = Node & ObjectWithMetadata & {
   country: CountryDisplay;
   countryArea: Scalars['String'];
   phone: Maybe<Scalars['String']>;
-  /** List of private metadata items.Requires proper staff permissions to access. */
-  privateMetadata: Array<Maybe<MetadataItem>>;
-  /** List of public metadata items. Can be accessed without permissions. */
-  metadata: Array<Maybe<MetadataItem>>;
-  /**
-   * List of privately stored metadata namespaces.
-   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
-   */
-  privateMeta: Array<Maybe<MetaStore>>;
-  /**
-   * List of publicly stored metadata namespaces.
-   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
-   */
-  meta: Array<Maybe<MetaStore>>;
   /** Address is user's default shipping address. */
   isDefaultShippingAddress: Maybe<Scalars['Boolean']>;
   /** Address is user's default billing address. */
@@ -1749,6 +1735,24 @@ export type BulkStockError = {
   index: Maybe<Scalars['Int']>;
 };
 
+export type CcAvenueCreateOrderInput = {
+  /** Checkout ID. */
+  checkoutId: Scalars['ID'];
+};
+
+export type CcAvenueError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: CcAvenueErrorCode;
+};
+
+/** An enumeration. */
+export type CcAvenueErrorCode =
+  | 'INVALID';
+
 export type CashbackType = {
   amount: Maybe<Scalars['Decimal']>;
   willAddOn: Maybe<Scalars['DateTime']>;
@@ -2326,8 +2330,8 @@ export type CheckoutErrorCode =
   | 'UNIQUE'
   | 'VOUCHER_NOT_APPLICABLE'
   | 'ZERO_QUANTITY'
-  | 'COD_NOT_APPLICABLE_FOR_PRODUCT_IN_CART'
-  | 'RTO_CUSTOMER_FOUND';
+  | 'RTO_CUSTOMER_FOUND'
+  | 'COD_NOT_APPLICABLE_FOR_PRODUCT_IN_CART';
 
 export type CheckoutEvent = Node & {
   /** The ID of the object. */
@@ -3492,6 +3496,22 @@ export type CreateBanner = {
   bannerErrors: Array<BannerError>;
 };
 
+/** Creates an order on CCAvenue. */
+export type CreateCcAvenueOrder = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Enc Type Checkout Data. */
+  encData: Maybe<Scalars['String']>;
+  /** CC Avenue Order ID. */
+  ccAvenueOrderId: Maybe<Scalars['String']>;
+  /** Access code for form data. */
+  accessCode: Maybe<Scalars['String']>;
+  ccAvenueErrors: Array<CcAvenueError>;
+};
+
 /** Creates an order on Cashfree. */
 export type CreateCashfreeOrder = {
   /**
@@ -3512,6 +3532,18 @@ export type CreateCashfreeOrderSdk = {
   errors: Array<Error>;
   /** A Cashfree order object. */
   cashfreeOrder: Maybe<CashfreeOrderType>;
+};
+
+/** Creates an order on Gokwik. */
+export type CreateGokwikOrder = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Gokwik order object. */
+  gokwickOrder: Maybe<GokwikOrderType>;
+  gokwikErrors: Array<GokwikError>;
 };
 
 /** Create a new header */
@@ -4224,8 +4256,6 @@ export type CrontabScheduleTimezone =
   | 'AMERICA_WINNIPEG'
   /** America/Yakutat */
   | 'AMERICA_YAKUTAT'
-  /** America/Yellowknife */
-  | 'AMERICA_YELLOWKNIFE'
   /** Antarctica/Casey */
   | 'ANTARCTICA_CASEY'
   /** Antarctica/Davis */
@@ -4922,6 +4952,8 @@ export type CustomerInput = {
   lastName?: Maybe<Scalars['String']>;
   /** The unique email address of the user. */
   email?: Maybe<Scalars['String']>;
+  /** The unique phone number of the user. */
+  phone?: Maybe<Scalars['String']>;
   /** User account is active. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** A note about the user. */
@@ -6492,6 +6524,41 @@ export type GlobalSearchShopMetaType = {
   fieldValue: Maybe<Scalars['String']>;
 };
 
+export type GokwikCreateOrderInput = {
+  /** Checkout ID. */
+  checkoutId: Scalars['ID'];
+};
+
+export type GokwikError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: GokwikErrorCode;
+};
+
+/** An enumeration. */
+export type GokwikErrorCode =
+  | 'INVALID';
+
+export type GokwikOrderType = {
+  /** Gokwik ID. */
+  id: Maybe<Scalars['String']>;
+  /** Gokwik request id */
+  requestId: Maybe<Scalars['String']>;
+  /** Gokwik Order Id */
+  orderId: Maybe<Scalars['String']>;
+  /** Total order amount. */
+  amount: Maybe<Scalars['Decimal']>;
+  /** Gokwick Mid */
+  mid: Maybe<Scalars['String']>;
+  /** Gokwik Order type */
+  orderType: Maybe<Scalars['String']>;
+  /** Order status. */
+  status: Maybe<Scalars['String']>;
+};
+
 export type GokwikType = {
   /** risk flag */
   isHighRisk: Scalars['Boolean'];
@@ -6607,6 +6674,7 @@ export type HostingOrderField =
 export type HostingType = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
+  created: Maybe<Scalars['DateTime']>;
   name: Scalars['String'];
   image: Maybe<Scalars['String']>;
   /** The URL of the image */
@@ -8193,6 +8261,8 @@ export type Mutation = {
   orderVoid: Maybe<OrderVoid>;
   /** Cancels orders. */
   orderBulkCancel: Maybe<OrderBulkCancel>;
+  /** Capture list of order's. */
+  orderBulkCapture: Maybe<OrderBulkCapture>;
   /** Delete metadata of an object. */
   deleteMetadata: Maybe<DeleteMetadata>;
   /** Delete object's private metadata. */
@@ -8797,10 +8867,14 @@ export type Mutation = {
   removeRtoCustomersList: Maybe<RemoveRtoCustomersListCsv>;
   /** Upload list of risk orders. */
   pushRiskOrdersCsv: Maybe<PushRiskOrderCsv>;
-  /** Create JWT token without OTP. */
-  createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
+  /** Creates an order on CCAvenue. */
+  createCcAvenueOrder: Maybe<CreateCcAvenueOrder>;
   /** Deletes productReviews. */
   productReviewBulkDelete: Maybe<ProductReviewsBulkDelete>;
+  /** Creates an order on Gokwik. */
+  createGokwikOrder: Maybe<CreateGokwikOrder>;
+  /** Create JWT token without OTP. */
+  createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
 };
 
 
@@ -9703,6 +9777,11 @@ export type MutationOrderVoidArgs = {
 
 
 export type MutationOrderBulkCancelArgs = {
+  ids: Array<Maybe<Scalars['ID']>>;
+};
+
+
+export type MutationOrderBulkCaptureArgs = {
   ids: Array<Maybe<Scalars['ID']>>;
 };
 
@@ -11212,14 +11291,24 @@ export type MutationPushRiskOrdersCsvArgs = {
 };
 
 
-export type MutationCreateTokenWithoutOtpArgs = {
-  checkoutId?: Maybe<Scalars['ID']>;
-  waid?: Maybe<Scalars['String']>;
+export type MutationCreateCcAvenueOrderArgs = {
+  input: CcAvenueCreateOrderInput;
 };
 
 
 export type MutationProductReviewBulkDeleteArgs = {
   ids: Array<Maybe<Scalars['ID']>>;
+};
+
+
+export type MutationCreateGokwikOrderArgs = {
+  input: GokwikCreateOrderInput;
+};
+
+
+export type MutationCreateTokenWithoutOtpArgs = {
+  checkoutId?: Maybe<Scalars['ID']>;
+  waid?: Maybe<Scalars['String']>;
 };
 
 export type NameTranslationInput = {
@@ -11458,6 +11547,18 @@ export type OrderAddNoteInput = {
 
 /** Cancels orders. */
 export type OrderBulkCancel = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Returns how many objects were affected. */
+  count: Scalars['Int'];
+  orderErrors: Array<OrderError>;
+};
+
+/** Capture list of order's. */
+export type OrderBulkCapture = {
   /**
    * List of errors that occurred executing the mutation.
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
@@ -13832,7 +13933,9 @@ export type ProductReviewSortOrders =
   | 'MOST_HELPFUL'
   | 'LEAST_HELPFUL'
   | 'NEWEST'
-  | 'OLDEST';
+  | 'OLDEST'
+  | 'PUBLISHED_DATE_NEWEST'
+  | 'PUBLISHED_DATE_OLDEST';
 
 export type ProductReviewType = Node & {
   /** The ID of the object. */
@@ -14717,6 +14820,8 @@ export type Query = {
   addressType: Maybe<AddressLinkType>;
   /** Returns address validation rules. */
   addressValidationRules: Maybe<AddressValidationData>;
+  /** Look up a API call with id. */
+  apiCall: Maybe<ApiCallsType>;
   apiCalls: Maybe<ApiCallsTypeCountableConnection>;
   /** Look up a app by ID. */
   app: Maybe<App>;
@@ -14795,7 +14900,6 @@ export type Query = {
   freeCheckoutLines: Maybe<Array<Maybe<CheckoutLine>>>;
   genericFormName: Maybe<Array<Maybe<FormNameType>>>;
   genericForms: Maybe<GenericFormTypeConnection>;
-  getOtp: Maybe<SkipOtpType>;
   /** Look up a gift card by ID. */
   giftCard: Maybe<GiftCard>;
   /** List of gift cards. */
@@ -14896,6 +15000,8 @@ export type Query = {
   recentOrder: Maybe<Order>;
   /** List of top selling products. */
   reportProductSales: Maybe<ProductVariantCountableConnection>;
+  /** Look up a product review by User ID. */
+  reviewByUser: Maybe<ProductReviewTypeCountableConnection>;
   /** Look up a sale by ID. */
   sale: Maybe<Sale>;
   /** List of the shop's sales. */
@@ -15005,6 +15111,11 @@ export type QueryAddressValidationRulesArgs = {
   countryArea?: Maybe<Scalars['String']>;
   city?: Maybe<Scalars['String']>;
   cityArea?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryApiCallArgs = {
+  id?: Maybe<Scalars['ID']>;
 };
 
 
@@ -15364,11 +15475,6 @@ export type QueryGenericFormsArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-};
-
-
-export type QueryGetOtpArgs = {
-  phone?: Maybe<Scalars['String']>;
 };
 
 
@@ -15787,6 +15893,15 @@ export type QueryProductsArgs = {
 
 export type QueryReportProductSalesArgs = {
   period: ReportingPeriod;
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryReviewByUserArgs = {
+  user?: Maybe<Scalars['String']>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -17766,11 +17881,6 @@ export type SiteDomainInput = {
   name?: Maybe<Scalars['String']>;
 };
 
-export type SkipOtpType = {
-  /** otp */
-  otp: Maybe<Scalars['String']>;
-};
-
 export type SocialMedia =
   | 'FACEBOOK'
   | 'GOOGLE'
@@ -17806,6 +17916,8 @@ export type StaffCreateInput = {
   lastName?: Maybe<Scalars['String']>;
   /** The unique email address of the user. */
   email?: Maybe<Scalars['String']>;
+  /** The unique phone number of the user. */
+  phone?: Maybe<Scalars['String']>;
   /** User account is active. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** A note about the user. */
@@ -17918,6 +18030,8 @@ export type StaffUpdateInput = {
   lastName?: Maybe<Scalars['String']>;
   /** The unique email address of the user. */
   email?: Maybe<Scalars['String']>;
+  /** The unique phone number of the user. */
+  phone?: Maybe<Scalars['String']>;
   /** User account is active. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** A note about the user. */
@@ -19177,6 +19291,8 @@ export type UserCreateInput = {
   lastName?: Maybe<Scalars['String']>;
   /** The unique email address of the user. */
   email?: Maybe<Scalars['String']>;
+  /** The unique phone number of the user. */
+  phone?: Maybe<Scalars['String']>;
   /** User account is active. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** A note about the user. */
@@ -20623,12 +20739,6 @@ export type UpdateUserMetaMutation = { updateMetadata: Maybe<(
       { __typename: 'MetadataError' }
       & Pick<MetadataError, 'field' | 'message'>
     )>, item: Maybe<(
-      { __typename: 'Address' }
-      & { metadata: Array<Maybe<(
-        { __typename: 'MetadataItem' }
-        & Pick<MetadataItem, 'key' | 'value'>
-      )>> }
-    ) | (
       { __typename: 'App' }
       & { metadata: Array<Maybe<(
         { __typename: 'MetadataItem' }
@@ -20908,6 +21018,13 @@ export type CreateRazorpayOrderMutationVariables = Exact<{
 
 
 export type CreateRazorpayOrderMutation = { razorpayOrderCreate: Maybe<{ razorpayOrder: Maybe<Pick<RazorpayOrderType, 'id' | 'amount' | 'amountPaid' | 'amountDue' | 'currency' | 'status' | 'createdAt'>>, razorpayErrors: Array<Pick<RazorpayError, 'field' | 'code' | 'message'>> }> };
+
+export type CreateGokwikOrderMutationVariables = Exact<{
+  input: GokwikCreateOrderInput;
+}>;
+
+
+export type CreateGokwikOrderMutation = { createGokwikOrder: Maybe<{ errors: Array<Pick<Error, 'field' | 'message'>>, gokwickOrder: Maybe<Pick<GokwikOrderType, 'id' | 'requestId' | 'orderId' | 'amount' | 'mid' | 'orderType' | 'status'>>, gokwikErrors: Array<Pick<GokwikError, 'field' | 'message' | 'code'>> }> };
 
 export type CreateJuspayOrderAndCustomerMutationVariables = Exact<{
   input: JuspayCreateOrderAndCustomerInput;
@@ -22754,6 +22871,56 @@ export function useCreateRazorpayOrderMutation(baseOptions?: Apollo.MutationHook
 export type CreateRazorpayOrderMutationHookResult = ReturnType<typeof useCreateRazorpayOrderMutation>;
 export type CreateRazorpayOrderMutationResult = Apollo.MutationResult<CreateRazorpayOrderMutation>;
 export type CreateRazorpayOrderMutationOptions = Apollo.BaseMutationOptions<CreateRazorpayOrderMutation, CreateRazorpayOrderMutationVariables>;
+export const CreateGokwikOrderDocument = gql`
+    mutation CreateGokwikOrder($input: GokwikCreateOrderInput!) {
+  createGokwikOrder(input: $input) {
+    errors {
+      field
+      message
+    }
+    gokwickOrder {
+      id
+      requestId
+      orderId
+      amount
+      mid
+      orderType
+      status
+    }
+    gokwikErrors {
+      field
+      message
+      code
+    }
+  }
+}
+    `;
+export type CreateGokwikOrderMutationFn = Apollo.MutationFunction<CreateGokwikOrderMutation, CreateGokwikOrderMutationVariables>;
+
+/**
+ * __useCreateGokwikOrderMutation__
+ *
+ * To run a mutation, you first call `useCreateGokwikOrderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateGokwikOrderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createGokwikOrderMutation, { data, loading, error }] = useCreateGokwikOrderMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateGokwikOrderMutation(baseOptions?: Apollo.MutationHookOptions<CreateGokwikOrderMutation, CreateGokwikOrderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateGokwikOrderMutation, CreateGokwikOrderMutationVariables>(CreateGokwikOrderDocument, options);
+      }
+export type CreateGokwikOrderMutationHookResult = ReturnType<typeof useCreateGokwikOrderMutation>;
+export type CreateGokwikOrderMutationResult = Apollo.MutationResult<CreateGokwikOrderMutation>;
+export type CreateGokwikOrderMutationOptions = Apollo.BaseMutationOptions<CreateGokwikOrderMutation, CreateGokwikOrderMutationVariables>;
 export const CreateJuspayOrderAndCustomerDocument = gql`
     mutation CreateJuspayOrderAndCustomer($input: JuspayCreateOrderAndCustomerInput!) {
   juspayOrderAndCustomerCreate(input: $input) {
