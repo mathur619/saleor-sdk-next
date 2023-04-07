@@ -294,6 +294,7 @@ export const orderDetailFragment = gql`
     payments{
       id
       gateway
+      isActive
     }
     status
     statusDisplay
