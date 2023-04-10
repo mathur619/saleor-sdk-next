@@ -301,7 +301,7 @@ export type AddTags = {
 };
 
 /** Represents user address data. */
-export type Address = Node & ObjectWithMetadata & {
+export type Address = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
   firstName: Scalars['String'];
@@ -316,20 +316,6 @@ export type Address = Node & ObjectWithMetadata & {
   country: CountryDisplay;
   countryArea: Scalars['String'];
   phone: Maybe<Scalars['String']>;
-  /** List of private metadata items.Requires proper staff permissions to access. */
-  privateMetadata: Array<Maybe<MetadataItem>>;
-  /** List of public metadata items. Can be accessed without permissions. */
-  metadata: Array<Maybe<MetadataItem>>;
-  /**
-   * List of privately stored metadata namespaces.
-   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
-   */
-  privateMeta: Array<Maybe<MetaStore>>;
-  /**
-   * List of publicly stored metadata namespaces.
-   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
-   */
-  meta: Array<Maybe<MetaStore>>;
   /** Address is user's default shipping address. */
   isDefaultShippingAddress: Maybe<Scalars['Boolean']>;
   /** Address is user's default billing address. */
@@ -1749,6 +1735,24 @@ export type BulkStockError = {
   index: Maybe<Scalars['Int']>;
 };
 
+export type CcAvenueCreateOrderInput = {
+  /** Checkout ID. */
+  checkoutId: Scalars['ID'];
+};
+
+export type CcAvenueError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: CcAvenueErrorCode;
+};
+
+/** An enumeration. */
+export type CcAvenueErrorCode =
+  | 'INVALID';
+
 export type CashbackType = {
   amount: Maybe<Scalars['Decimal']>;
   willAddOn: Maybe<Scalars['DateTime']>;
@@ -2060,18 +2064,6 @@ export type CategoryUpdatePrivateMeta = {
   category: Maybe<Category>;
 };
 
-/** Check Order status on Juspay. */
-export type CheckJuspayOrderStatus = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** A Juspay order object. */
-  juspayOrder: Maybe<JuspayOrderStatusType>;
-  juspayErrors: Array<JuspayError>;
-};
-
 /** Checkout object. */
 export type Checkout = Node & ObjectWithMetadata & {
   created: Scalars['DateTime'];
@@ -2326,8 +2318,8 @@ export type CheckoutErrorCode =
   | 'UNIQUE'
   | 'VOUCHER_NOT_APPLICABLE'
   | 'ZERO_QUANTITY'
-  | 'COD_NOT_APPLICABLE_FOR_PRODUCT_IN_CART'
-  | 'RTO_CUSTOMER_FOUND';
+  | 'RTO_CUSTOMER_FOUND'
+  | 'COD_NOT_APPLICABLE_FOR_PRODUCT_IN_CART';
 
 export type CheckoutEvent = Node & {
   /** The ID of the object. */
@@ -2469,8 +2461,6 @@ export type CheckoutTotalsType = {
   codTotal: Maybe<TaxedMoney>;
   /** The sum of the checkout line price, taxes and discounts. */
   prepaidTotal: Maybe<TaxedMoney>;
-  /** Cashback for prepaid total. */
-  prepaidCashback: Maybe<TaxedMoney>;
 };
 
 /** Checkout object. */
@@ -3492,6 +3482,22 @@ export type CreateBanner = {
   bannerErrors: Array<BannerError>;
 };
 
+/** Creates an order on CCAvenue. */
+export type CreateCcAvenueOrder = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Enc Type Checkout Data. */
+  encData: Maybe<Scalars['String']>;
+  /** CC Avenue Order ID. */
+  ccAvenueOrderId: Maybe<Scalars['String']>;
+  /** Access code for form data. */
+  accessCode: Maybe<Scalars['String']>;
+  ccAvenueErrors: Array<CcAvenueError>;
+};
+
 /** Creates an order on Cashfree. */
 export type CreateCashfreeOrder = {
   /**
@@ -3512,6 +3518,18 @@ export type CreateCashfreeOrderSdk = {
   errors: Array<Error>;
   /** A Cashfree order object. */
   cashfreeOrder: Maybe<CashfreeOrderType>;
+};
+
+/** Creates an order on Gokwik. */
+export type CreateGokwikOrder = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A Gokwik order object. */
+  gokwickOrder: Maybe<GokwikOrderType>;
+  gokwikErrors: Array<GokwikError>;
 };
 
 /** Create a new header */
@@ -3556,18 +3574,6 @@ export type CreateInfluencer = {
   errors: Array<Error>;
   /** An Influencer instance. */
   influencer: Maybe<InfluencerType>;
-};
-
-/** Creates an order on Juspay. */
-export type CreateJusPayOrderAndCustomer = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** A Juspay order and Customer object. */
-  juspayResponse: Maybe<JuspayOrderAndCustomerType>;
-  juspayErrors: Array<JuspayError>;
 };
 
 /** Create a menu item image. This mutation must be sent as a `multipart` request. More detailed specs of the upload format can be found here: https://github.com/jaydenseric/graphql-multipart-request-spec */
@@ -4224,8 +4230,6 @@ export type CrontabScheduleTimezone =
   | 'AMERICA_WINNIPEG'
   /** America/Yakutat */
   | 'AMERICA_YAKUTAT'
-  /** America/Yellowknife */
-  | 'AMERICA_YELLOWKNIFE'
   /** Antarctica/Casey */
   | 'ANTARCTICA_CASEY'
   /** Antarctica/Davis */
@@ -4922,6 +4926,8 @@ export type CustomerInput = {
   lastName?: Maybe<Scalars['String']>;
   /** The unique email address of the user. */
   email?: Maybe<Scalars['String']>;
+  /** The unique phone number of the user. */
+  phone?: Maybe<Scalars['String']>;
   /** User account is active. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** A note about the user. */
@@ -5672,6 +5678,16 @@ export type EmailTemplateError = {
   message: Maybe<Scalars['String']>;
   /** The error code. */
   code: EmailTemplateCode;
+};
+
+export type EmailTemplateFilterInput = {
+  sender?: Maybe<Scalars['String']>;
+  subject?: Maybe<Scalars['String']>;
+  isEnabled?: Maybe<Scalars['Boolean']>;
+  mailType?: Maybe<Scalars['String']>;
+  search?: Maybe<Scalars['String']>;
+  created?: Maybe<DateRangeInput>;
+  updated?: Maybe<DateRangeInput>;
 };
 
 export type EmailTemplateInput = {
@@ -6492,6 +6508,41 @@ export type GlobalSearchShopMetaType = {
   fieldValue: Maybe<Scalars['String']>;
 };
 
+export type GokwikCreateOrderInput = {
+  /** Checkout ID. */
+  checkoutId: Scalars['ID'];
+};
+
+export type GokwikError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: GokwikErrorCode;
+};
+
+/** An enumeration. */
+export type GokwikErrorCode =
+  | 'INVALID';
+
+export type GokwikOrderType = {
+  /** Gokwik ID. */
+  id: Maybe<Scalars['String']>;
+  /** Gokwik request id */
+  requestId: Maybe<Scalars['String']>;
+  /** Gokwik Order Id */
+  orderId: Maybe<Scalars['String']>;
+  /** Total order amount. */
+  amount: Maybe<Scalars['Decimal']>;
+  /** Gokwick Mid */
+  mid: Maybe<Scalars['String']>;
+  /** Gokwik Order type */
+  orderType: Maybe<Scalars['String']>;
+  /** Order status. */
+  status: Maybe<Scalars['String']>;
+};
+
 export type GokwikType = {
   /** risk flag */
   isHighRisk: Scalars['Boolean'];
@@ -6607,6 +6658,7 @@ export type HostingOrderField =
 export type HostingType = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
+  created: Maybe<Scalars['DateTime']>;
   name: Scalars['String'];
   image: Maybe<Scalars['String']>;
   /** The URL of the image */
@@ -6900,256 +6952,6 @@ export type JobStatusEnum =
   | 'SUCCESS'
   | 'FAILED'
   | 'DELETED';
-
-export type JuspayClient = {
-  /** Juspay Client Auth Token expiry */
-  clientAuthTokenExpiry: Maybe<Scalars['String']>;
-  /** Juspay Client Auth Token */
-  clientAuthToken: Maybe<Scalars['String']>;
-};
-
-export type JuspayCreateCustomerInput = {
-  /** Customer Email address */
-  emailAddress: Scalars['String'];
-  /** Customer Mobile number */
-  mobileNumber: Scalars['String'];
-  /** Customer First name */
-  firstName?: Maybe<Scalars['String']>;
-  /** Customer mobile country code */
-  mobileCountryCode: Scalars['String'];
-  /** Cutomer last name */
-  lastName?: Maybe<Scalars['String']>;
-};
-
-export type JuspayCreateOrderAndCustomerInput = {
-  /** Checkout ID. */
-  checkoutId: Scalars['ID'];
-  /** Customer Email address */
-  emailAddress: Scalars['String'];
-  /** Customer Mobile number */
-  mobileNumber: Scalars['String'];
-  /** Customer First name */
-  firstName?: Maybe<Scalars['String']>;
-  /** Customer mobile country code */
-  mobileCountryCode: Scalars['String'];
-  /** Cutomer last name */
-  lastName?: Maybe<Scalars['String']>;
-  /** Get UPI deep link */
-  getUpiDeepLinks?: Maybe<Scalars['Boolean']>;
-};
-
-/** Check Order status on Juspay. */
-export type JuspayCustomer = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** A Juspay Customer object. */
-  juspayCustomer: Maybe<JuspayCustomerType>;
-  juspayErrors: Array<JuspayError>;
-};
-
-export type JuspayCustomerType = {
-  /** Huspay Customer ID. */
-  id: Maybe<Scalars['String']>;
-  /** Customer Email address */
-  emailAddress: Maybe<Scalars['String']>;
-  /** Customer Mobile number */
-  mobileNumber: Maybe<Scalars['String']>;
-  /** Customer First name */
-  firstName: Maybe<Scalars['String']>;
-  /** Customer mobile country code */
-  mobileCountryCode: Maybe<Scalars['String']>;
-  /** Cutomer last name */
-  lastName: Maybe<Scalars['String']>;
-};
-
-export type JuspayError = {
-  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
-  field: Maybe<Scalars['String']>;
-  /** The error message. */
-  message: Maybe<Scalars['String']>;
-  /** The error code. */
-  code: Maybe<JuspayErrorCodeEnum>;
-};
-
-/** An enumeration. */
-export type JuspayErrorCodeEnum =
-  | 'INVALID_AMOUNT'
-  | 'INVALID_CURRENCY'
-  | 'INVALID'
-  | 'NOT_FOUND';
-
-export type JuspayOrderAndCustomerType = {
-  /** Juspay Order ID. */
-  id: Maybe<Scalars['String']>;
-  /** Checkout Token */
-  orderId: Maybe<Scalars['String']>;
-  /** Total order amount. */
-  amount: Maybe<Scalars['Decimal']>;
-  /** Order status. */
-  status: Maybe<Scalars['String']>;
-  /** Juspay web payment link */
-  paymentLinks: Maybe<JustpaymentLink>;
-  /** Juspay web payment link */
-  clientJuspay: Maybe<JuspayClient>;
-  /** Juspay Customer id. */
-  customerId: Maybe<Scalars['String']>;
-  /** Get UPI deep link */
-  deepLink: Maybe<Scalars['String']>;
-};
-
-export type JuspayOrderStatusInput = {
-  /** Checkout ID. */
-  checkoutId: Scalars['ID'];
-};
-
-export type JuspayOrderStatusType = {
-  /** Juspay Order ID. */
-  id: Maybe<Scalars['String']>;
-  /** Checkout Token */
-  orderId: Maybe<Scalars['String']>;
-  /** Total order amount. */
-  amount: Maybe<Scalars['Decimal']>;
-  /** Order status. */
-  status: Maybe<Scalars['String']>;
-  /** Payment Status */
-  paymentStatus: Maybe<Scalars['Boolean']>;
-};
-
-/** Create order and payment on Juspay */
-export type JuspayPayment = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** A Juspay Customer object. */
-  juspayResponse: Maybe<JuspayPaymentType>;
-  juspayErrors: Array<JuspayError>;
-};
-
-export type JuspayPaymentInput = {
-  /** Checkout ID. */
-  checkoutId: Scalars['ID'];
-  /** Customer ID. */
-  customerId: Scalars['ID'];
-  /** Payment method Type */
-  paymentMethodType: Scalars['String'];
-  /** Payment method */
-  paymentMethod: Scalars['String'];
-  /** Payment UPI */
-  upiVpa?: Maybe<Scalars['String']>;
-  /** Payment wallet direct token */
-  directWalletToken?: Maybe<Scalars['String']>;
-  /** Payment card number */
-  cardNumber?: Maybe<Scalars['String']>;
-  /** Payment card expiry month */
-  cardExpMonth?: Maybe<Scalars['String']>;
-  /** Payment card expiry year */
-  cardExpYear?: Maybe<Scalars['String']>;
-  /** Name on card */
-  nameOnCard?: Maybe<Scalars['String']>;
-  /** Card Security code */
-  cardSecurityCode?: Maybe<Scalars['String']>;
-  /** TXN type */
-  txnType?: Maybe<Scalars['String']>;
-  /** SDK Params */
-  sdkParams?: Maybe<Scalars['Boolean']>;
-};
-
-export type JuspayPaymentType = {
-  /** Order status. */
-  status: Maybe<Scalars['String']>;
-  /** Checkout Token */
-  orderId: Maybe<Scalars['String']>;
-  /** Payment Authentication */
-  paymentAuthentication: Maybe<JuspayTxnAuthentication>;
-  /** Payment Params */
-  paymentParams: Maybe<JuspayTxnParams>;
-  /** Payment txn id */
-  paymentTxnId: Maybe<Scalars['String']>;
-  /** Payment txn uuid */
-  paymentTxnUuid: Maybe<Scalars['String']>;
-  /** SDK Params */
-  sdkParams: Maybe<JuspaySdkParams>;
-};
-
-export type JuspaySdkParams = {
-  /** amount  */
-  amount: Maybe<Scalars['String']>;
-  /** customer_last_name */
-  customerLastName: Maybe<Scalars['String']>;
-  /** customer_first_name */
-  customerFirstName: Maybe<Scalars['String']>;
-  /** merchant_vpa */
-  merchantVpa: Maybe<Scalars['String']>;
-  /** merchant_name */
-  merchantName: Maybe<Scalars['String']>;
-  /** mcc */
-  mcc: Maybe<Scalars['String']>;
-  /** tr */
-  tr: Maybe<Scalars['String']>;
-};
-
-export type JuspayTxnAuthentication = {
-  /** Authentication Url */
-  url: Maybe<Scalars['String']>;
-  /** Authentication Method */
-  method: Maybe<Scalars['String']>;
-};
-
-export type JuspayTxnParams = {
-  /** Payment params key1 */
-  key1: Maybe<Scalars['String']>;
-  /** Payment params key1 */
-  key2: Maybe<Scalars['String']>;
-  /** Payment params key1 */
-  key3: Maybe<Scalars['String']>;
-};
-
-/** Verify VPA on Juspay */
-export type JuspayVerifyVpa = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** A Juspay Verify VPA object. */
-  juspayResponse: Maybe<JuspayVerifyVpaType>;
-  juspayErrors: Array<JuspayError>;
-};
-
-export type JuspayVerifyVpaInput = {
-  /** Payment UPI VPA */
-  vpa: Scalars['String'];
-};
-
-export type JuspayVerifyVpaType = {
-  /** Vpa Verification status. */
-  status: Maybe<Scalars['String']>;
-  /** Payment UPI VPA */
-  vpa: Maybe<Scalars['String']>;
-  /** Details specific to mandate support */
-  mandateDetails: Maybe<JuspayVpaMendate>;
-  /** The name of the customer provided during VPA registration. The default value for a valid VPA will be verified */
-  customerName: Maybe<Scalars['String']>;
-};
-
-export type JuspayVpaMendate = {
-  /** VPA handle supported or not. */
-  isHandleSupported: Maybe<Scalars['Boolean']>;
-};
-
-export type JustpaymentLink = {
-  /** Juspay Payment Web Link */
-  web: Maybe<Scalars['String']>;
-  /** Juspay Payment Mobile Link */
-  mobile: Maybe<Scalars['String']>;
-  /** Juspay Payment Iframe Link */
-  iframe: Maybe<Scalars['String']>;
-};
 
 /** An enumeration. */
 export type LanguageCodeEnum =
@@ -8191,6 +7993,8 @@ export type Mutation = {
   orderVoid: Maybe<OrderVoid>;
   /** Cancels orders. */
   orderBulkCancel: Maybe<OrderBulkCancel>;
+  /** Capture list of order's. */
+  orderBulkCapture: Maybe<OrderBulkCapture>;
   /** Delete metadata of an object. */
   deleteMetadata: Maybe<DeleteMetadata>;
   /** Delete object's private metadata. */
@@ -8527,16 +8331,6 @@ export type Mutation = {
   productDuplicate: Maybe<ProductDuplicate>;
   /** Creates an order on Razorpay. */
   razorpayOrderCreate: Maybe<CreateRazorpayOrder>;
-  /** Creates an order on Juspay. */
-  juspayOrderAndCustomerCreate: Maybe<CreateJusPayOrderAndCustomer>;
-  /** Check Order status on Juspay. */
-  juspayOrderStatusCheck: Maybe<CheckJuspayOrderStatus>;
-  /** Check Order status on Juspay. */
-  juspayCustomer: Maybe<JuspayCustomer>;
-  /** Create order and payment on Juspay */
-  juspayPayment: Maybe<JuspayPayment>;
-  /** Verify VPA on Juspay */
-  juspayVerifyVpa: Maybe<JuspayVerifyVpa>;
   /** Creates an order on Paytm. */
   paytmOrderCreate: Maybe<PaytmOrderCreate>;
   /** Creates an order on Cashfree. */
@@ -8797,8 +8591,12 @@ export type Mutation = {
   pushRiskOrdersCsv: Maybe<PushRiskOrderCsv>;
   /** Create JWT token without OTP. */
   createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
+  /** Creates an order on CCAvenue. */
+  createCcAvenueOrder: Maybe<CreateCcAvenueOrder>;
   /** Deletes productReviews. */
   productReviewBulkDelete: Maybe<ProductReviewsBulkDelete>;
+  /** Creates an order on Gokwik. */
+  createGokwikOrder: Maybe<CreateGokwikOrder>;
 };
 
 
@@ -9705,6 +9503,11 @@ export type MutationOrderBulkCancelArgs = {
 };
 
 
+export type MutationOrderBulkCaptureArgs = {
+  ids: Array<Maybe<Scalars['ID']>>;
+};
+
+
 export type MutationDeleteMetadataArgs = {
   id: Scalars['ID'];
   keys: Array<Scalars['String']>;
@@ -10499,31 +10302,6 @@ export type MutationRazorpayOrderCreateArgs = {
 };
 
 
-export type MutationJuspayOrderAndCustomerCreateArgs = {
-  input: JuspayCreateOrderAndCustomerInput;
-};
-
-
-export type MutationJuspayOrderStatusCheckArgs = {
-  input: JuspayOrderStatusInput;
-};
-
-
-export type MutationJuspayCustomerArgs = {
-  input: JuspayCreateCustomerInput;
-};
-
-
-export type MutationJuspayPaymentArgs = {
-  input: JuspayPaymentInput;
-};
-
-
-export type MutationJuspayVerifyVpaArgs = {
-  input: JuspayVerifyVpaInput;
-};
-
-
 export type MutationPaytmOrderCreateArgs = {
   input: PaytmCreateOrderInput;
 };
@@ -11216,8 +10994,18 @@ export type MutationCreateTokenWithoutOtpArgs = {
 };
 
 
+export type MutationCreateCcAvenueOrderArgs = {
+  input: CcAvenueCreateOrderInput;
+};
+
+
 export type MutationProductReviewBulkDeleteArgs = {
   ids: Array<Maybe<Scalars['ID']>>;
+};
+
+
+export type MutationCreateGokwikOrderArgs = {
+  input: GokwikCreateOrderInput;
 };
 
 export type NameTranslationInput = {
@@ -11456,6 +11244,18 @@ export type OrderAddNoteInput = {
 
 /** Cancels orders. */
 export type OrderBulkCancel = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Returns how many objects were affected. */
+  count: Scalars['Int'];
+  orderErrors: Array<OrderError>;
+};
+
+/** Capture list of order's. */
+export type OrderBulkCapture = {
   /**
    * List of errors that occurred executing the mutation.
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
@@ -13830,7 +13630,9 @@ export type ProductReviewSortOrders =
   | 'MOST_HELPFUL'
   | 'LEAST_HELPFUL'
   | 'NEWEST'
-  | 'OLDEST';
+  | 'OLDEST'
+  | 'PUBLISHED_DATE_NEWEST'
+  | 'PUBLISHED_DATE_OLDEST';
 
 export type ProductReviewType = Node & {
   /** The ID of the object. */
@@ -14715,6 +14517,8 @@ export type Query = {
   addressType: Maybe<AddressLinkType>;
   /** Returns address validation rules. */
   addressValidationRules: Maybe<AddressValidationData>;
+  /** Look up a API call with id. */
+  apiCall: Maybe<ApiCallsType>;
   apiCalls: Maybe<ApiCallsTypeCountableConnection>;
   /** Look up a app by ID. */
   app: Maybe<App>;
@@ -14747,6 +14551,8 @@ export type Query = {
   /** List of checkout lines. */
   checkoutLines: Maybe<CheckoutLineCountableConnection>;
   checkoutLoading: Scalars['Boolean'];
+  /** Recalculating checkout */
+  checkoutRecalculation: Maybe<Checkout>;
   checkoutTotals: Maybe<CheckoutTotalsType>;
   checkoutUpdated: Scalars['Boolean'];
   /** List of checkouts. */
@@ -14793,7 +14599,6 @@ export type Query = {
   freeCheckoutLines: Maybe<Array<Maybe<CheckoutLine>>>;
   genericFormName: Maybe<Array<Maybe<FormNameType>>>;
   genericForms: Maybe<GenericFormTypeConnection>;
-  getOtp: Maybe<SkipOtpType>;
   /** Look up a gift card by ID. */
   giftCard: Maybe<GiftCard>;
   /** List of gift cards. */
@@ -14894,6 +14699,8 @@ export type Query = {
   recentOrder: Maybe<Order>;
   /** List of top selling products. */
   reportProductSales: Maybe<ProductVariantCountableConnection>;
+  /** Look up a product review by User ID. */
+  reviewByUser: Maybe<ProductReviewTypeCountableConnection>;
   /** Look up a sale by ID. */
   sale: Maybe<Sale>;
   /** List of the shop's sales. */
@@ -15003,6 +14810,11 @@ export type QueryAddressValidationRulesArgs = {
   countryArea?: Maybe<Scalars['String']>;
   city?: Maybe<Scalars['String']>;
   cityArea?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryApiCallArgs = {
+  id?: Maybe<Scalars['ID']>;
 };
 
 
@@ -15129,6 +14941,11 @@ export type QueryCheckoutLinesArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryCheckoutRecalculationArgs = {
+  token?: Maybe<Scalars['UUID']>;
 };
 
 
@@ -15288,6 +15105,7 @@ export type QueryEmailTemplateArgs = {
 
 export type QueryEmailTemplatesArgs = {
   sortBy?: Maybe<EmailTemplateOrder>;
+  filter?: Maybe<EmailTemplateFilterInput>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -15362,11 +15180,6 @@ export type QueryGenericFormsArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-};
-
-
-export type QueryGetOtpArgs = {
-  phone?: Maybe<Scalars['String']>;
 };
 
 
@@ -15712,7 +15525,8 @@ export type QueryProductReviewArgs = {
 
 
 export type QueryProductReviewsArgs = {
-  product: Scalars['ID'];
+  product?: Maybe<Scalars['ID']>;
+  productSlug?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['ID']>;
   user?: Maybe<Scalars['String']>;
   isPublished?: Maybe<Scalars['Boolean']>;
@@ -15785,6 +15599,15 @@ export type QueryProductsArgs = {
 
 export type QueryReportProductSalesArgs = {
   period: ReportingPeriod;
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryReviewByUserArgs = {
+  user?: Maybe<Scalars['String']>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -17764,11 +17587,6 @@ export type SiteDomainInput = {
   name?: Maybe<Scalars['String']>;
 };
 
-export type SkipOtpType = {
-  /** otp */
-  otp: Maybe<Scalars['String']>;
-};
-
 export type SocialMedia =
   | 'FACEBOOK'
   | 'GOOGLE'
@@ -17804,6 +17622,8 @@ export type StaffCreateInput = {
   lastName?: Maybe<Scalars['String']>;
   /** The unique email address of the user. */
   email?: Maybe<Scalars['String']>;
+  /** The unique phone number of the user. */
+  phone?: Maybe<Scalars['String']>;
   /** User account is active. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** A note about the user. */
@@ -17916,6 +17736,8 @@ export type StaffUpdateInput = {
   lastName?: Maybe<Scalars['String']>;
   /** The unique email address of the user. */
   email?: Maybe<Scalars['String']>;
+  /** The unique phone number of the user. */
+  phone?: Maybe<Scalars['String']>;
   /** User account is active. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** A note about the user. */
@@ -19175,6 +18997,8 @@ export type UserCreateInput = {
   lastName?: Maybe<Scalars['String']>;
   /** The unique email address of the user. */
   email?: Maybe<Scalars['String']>;
+  /** The unique phone number of the user. */
+  phone?: Maybe<Scalars['String']>;
   /** User account is active. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** A note about the user. */
@@ -19544,6 +19368,7 @@ export type VoucherRuleErrorCodeEnum =
 export type VoucherRuleFilterInput = {
   isDefault?: Maybe<Scalars['Boolean']>;
   isEnabled?: Maybe<Scalars['Boolean']>;
+  created?: Maybe<DateRangeInput>;
   name?: Maybe<Scalars['String']>;
   name_Icontains?: Maybe<Scalars['String']>;
   name_Istartswith?: Maybe<Scalars['String']>;
@@ -20425,6 +20250,10 @@ export type UserFragment = (
 
 export type PriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> };
 
+export type AddressFragment = (
+  Pick<Address, 'id' | 'firstName' | 'lastName' | 'companyName' | 'streetAddress1' | 'streetAddress2' | 'city' | 'postalCode' | 'countryArea' | 'phone' | 'isDefaultBillingAddress' | 'isDefaultShippingAddress'>
+  & { country: Pick<CountryDisplay, 'code' | 'country'> }
+);
 
 export type ProductVariantFragment = (
   Pick<ProductVariant, 'id' | 'name' | 'sku' | 'quantityAvailable'>
@@ -20463,34 +20292,20 @@ export type CheckoutFragment = (
 export type CheckoutErrorFragment = Pick<CheckoutError, 'code' | 'field' | 'message'>;
 
 export type OrderPriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'>, tax: Pick<Money, 'amount' | 'currency'> };
-export type OrderDetailFragment = Pick<
-  Order,
-  | "userEmail"
-  | "paymentStatus"
-  | "paymentStatusDisplay"
-  | "status"
-  | "statusDisplay"
-  | "id"
-  | "token"
-  | "number"
-  | 'payments'
-> & {
-  voucher: Maybe<Pick<Voucher, "code">>;
-  metadata: Array<Maybe<Pick<MetadataItem, "key" | "value">>>;
-  shippingAddress: Maybe<AddressFragment>;
-  lines: Array<
-    Maybe<
-      Pick<OrderLine, "id" | "productName" | "quantity"> & {
-        variant: Maybe<ProductVariantFragment>;
-        unitPrice: Maybe<Pick<TaxedMoney, "currency"> & OrderPriceFragment>;
-        totalPrice: Maybe<Pick<TaxedMoney, "currency"> & OrderPriceFragment>;
-      }
-    >
-  >;
-  subtotal: Maybe<OrderPriceFragment>;
-  total: Maybe<OrderPriceFragment>;
-  shippingPrice: Maybe<OrderPriceFragment>;
-};
+
+export type OrderDetailFragment = (
+  Pick<Order, 'userEmail' | 'paymentStatus' | 'paymentStatusDisplay' | 'status' | 'statusDisplay' | 'id' | 'token' | 'number'>
+  & { payments: Maybe<Array<Maybe<Pick<Payment, 'id' | 'gateway'>>>>, voucher: Maybe<Pick<Voucher, 'code'>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, shippingAddress: Maybe<AddressFragment>, lines: Array<Maybe<(
+    Pick<OrderLine, 'id' | 'productName' | 'quantity'>
+    & { variant: Maybe<ProductVariantFragment>, unitPrice: Maybe<(
+      Pick<TaxedMoney, 'currency'>
+      & OrderPriceFragment
+    )>, totalPrice: Maybe<(
+      Pick<TaxedMoney, 'currency'>
+      & OrderPriceFragment
+    )> }
+  )>>, subtotal: Maybe<OrderPriceFragment>, total: Maybe<OrderPriceFragment>, shippingPrice: Maybe<OrderPriceFragment> }
+);
 
 export type PaymentFragment = (
   Pick<Payment, 'id' | 'gateway' | 'token'>
@@ -20935,6 +20750,16 @@ export type OrdersByUserQuery = { me: Maybe<(
         ) }> }> }
   )> };
 
+export type CheckoutRecalculationQueryVariables = Exact<{
+  token?: Maybe<Scalars['UUID']>;
+}>;
+
+
+export type CheckoutRecalculationQuery = { checkoutRecalculation: Maybe<(
+    { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+    & CheckoutFragment
+  )> };
+
 export const AccountErrorFragmentDoc = gql`
     fragment AccountErrorFragment on AccountError {
   code
@@ -21184,6 +21009,10 @@ export const OrderDetailFragmentDoc = gql`
   userEmail
   paymentStatus
   paymentStatusDisplay
+  payments {
+    id
+    gateway
+  }
   status
   statusDisplay
   id
@@ -23315,3 +23144,47 @@ export function useOrdersByUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type OrdersByUserQueryHookResult = ReturnType<typeof useOrdersByUserQuery>;
 export type OrdersByUserLazyQueryHookResult = ReturnType<typeof useOrdersByUserLazyQuery>;
 export type OrdersByUserQueryResult = Apollo.QueryResult<OrdersByUserQuery, OrdersByUserQueryVariables>;
+export const CheckoutRecalculationDocument = gql`
+    query CheckoutRecalculation($token: UUID) {
+  checkoutRecalculation(token: $token) {
+    ...Checkout
+    paymentMethod {
+      cashbackDiscountAmount
+      couponDiscount
+      prepaidDiscountAmount
+    }
+    cashback {
+      amount
+      willAddOn
+    }
+  }
+}
+    ${CheckoutFragmentDoc}`;
+
+/**
+ * __useCheckoutRecalculationQuery__
+ *
+ * To run a query within a React component, call `useCheckoutRecalculationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckoutRecalculationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckoutRecalculationQuery({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useCheckoutRecalculationQuery(baseOptions?: Apollo.QueryHookOptions<CheckoutRecalculationQuery, CheckoutRecalculationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CheckoutRecalculationQuery, CheckoutRecalculationQueryVariables>(CheckoutRecalculationDocument, options);
+      }
+export function useCheckoutRecalculationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CheckoutRecalculationQuery, CheckoutRecalculationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CheckoutRecalculationQuery, CheckoutRecalculationQueryVariables>(CheckoutRecalculationDocument, options);
+        }
+export type CheckoutRecalculationQueryHookResult = ReturnType<typeof useCheckoutRecalculationQuery>;
+export type CheckoutRecalculationLazyQueryHookResult = ReturnType<typeof useCheckoutRecalculationLazyQuery>;
+export type CheckoutRecalculationQueryResult = Apollo.QueryResult<CheckoutRecalculationQuery, CheckoutRecalculationQueryVariables>;
