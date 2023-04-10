@@ -279,3 +279,21 @@ export const GET_CHECKOUT_TOTALS = gql`
     }
   }
 `;
+
+export const CHECKOUT_RECALCULATION = gql`
+  ${checkoutFragment}
+  query CheckoutRecalculation($token: UUID) {
+    checkoutRecalculation(token: $token) {
+      ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
+    }
+  }
+`;

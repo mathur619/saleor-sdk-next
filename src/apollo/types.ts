@@ -5706,6 +5706,16 @@ export type EmailTemplateError = {
   code: EmailTemplateCode;
 };
 
+export type EmailTemplateFilterInput = {
+  sender?: Maybe<Scalars['String']>;
+  subject?: Maybe<Scalars['String']>;
+  isEnabled?: Maybe<Scalars['Boolean']>;
+  mailType?: Maybe<Scalars['String']>;
+  search?: Maybe<Scalars['String']>;
+  created?: Maybe<DateRangeInput>;
+  updated?: Maybe<DateRangeInput>;
+};
+
 export type EmailTemplateInput = {
   /** HTML template */
   htmlBody: Scalars['String'];
@@ -14854,6 +14864,8 @@ export type Query = {
   /** List of checkout lines. */
   checkoutLines: Maybe<CheckoutLineCountableConnection>;
   checkoutLoading: Scalars['Boolean'];
+  /** Recalculating checkout */
+  checkoutRecalculation: Maybe<Checkout>;
   checkoutTotals: Maybe<CheckoutTotalsType>;
   checkoutUpdated: Scalars['Boolean'];
   /** List of checkouts. */
@@ -15245,6 +15257,11 @@ export type QueryCheckoutLinesArgs = {
 };
 
 
+export type QueryCheckoutRecalculationArgs = {
+  token?: Maybe<Scalars['UUID']>;
+};
+
+
 export type QueryCheckoutTotalsArgs = {
   token?: Maybe<Scalars['UUID']>;
 };
@@ -15401,6 +15418,7 @@ export type QueryEmailTemplateArgs = {
 
 export type QueryEmailTemplatesArgs = {
   sortBy?: Maybe<EmailTemplateOrder>;
+  filter?: Maybe<EmailTemplateFilterInput>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -19662,6 +19680,7 @@ export type VoucherRuleErrorCodeEnum =
 export type VoucherRuleFilterInput = {
   isDefault?: Maybe<Scalars['Boolean']>;
   isEnabled?: Maybe<Scalars['Boolean']>;
+  created?: Maybe<DateRangeInput>;
   name?: Maybe<Scalars['String']>;
   name_Icontains?: Maybe<Scalars['String']>;
   name_Istartswith?: Maybe<Scalars['String']>;
@@ -20543,6 +20562,11 @@ export type UserFragment = (
 
 export type PriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> };
 
+export type AddressFragment = (
+  Pick<Address, 'id' | 'firstName' | 'lastName' | 'companyName' | 'streetAddress1' | 'streetAddress2' | 'city' | 'postalCode' | 'countryArea' | 'phone' | 'isDefaultBillingAddress' | 'isDefaultShippingAddress'>
+  & { country: Pick<CountryDisplay, 'code' | 'country'> }
+);
+
 export type ProductVariantFragment = (
   Pick<ProductVariant, 'id' | 'name' | 'sku' | 'quantityAvailable'>
   & { images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'sortOrder' | 'alt' | 'url'>>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, pricing: Maybe<(
@@ -21255,6 +21279,16 @@ export type CheckoutTotalsQuery = { checkoutTotals: Maybe<{ prepaidCashback: May
       & { net: Pick<Money, 'currency' | 'amount'>, gross: Pick<Money, 'currency' | 'amount'> }
     )> }> };
 
+export type CheckoutRecalculationQueryVariables = Exact<{
+  token?: Maybe<Scalars['UUID']>;
+}>;
+
+
+export type CheckoutRecalculationQuery = { checkoutRecalculation: Maybe<(
+    { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+    & CheckoutFragment
+  )> };
+
 export const AccountErrorFragmentDoc = gql`
     fragment AccountErrorFragment on AccountError {
   code
@@ -21319,6 +21353,26 @@ export const PriceFragmentDoc = gql`
     amount
     currency
   }
+}
+    `;
+export const AddressFragmentDoc = gql`
+    fragment Address on Address {
+  id
+  firstName
+  lastName
+  companyName
+  streetAddress1
+  streetAddress2
+  city
+  postalCode
+  country {
+    code
+    country
+  }
+  countryArea
+  phone
+  isDefaultBillingAddress
+  isDefaultShippingAddress
 }
     `;
 export const ShippingMethodFragmentDoc = gql`
@@ -24064,3 +24118,47 @@ export function useCheckoutTotalsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type CheckoutTotalsQueryHookResult = ReturnType<typeof useCheckoutTotalsQuery>;
 export type CheckoutTotalsLazyQueryHookResult = ReturnType<typeof useCheckoutTotalsLazyQuery>;
 export type CheckoutTotalsQueryResult = Apollo.QueryResult<CheckoutTotalsQuery, CheckoutTotalsQueryVariables>;
+export const CheckoutRecalculationDocument = gql`
+    query CheckoutRecalculation($token: UUID) {
+  checkoutRecalculation(token: $token) {
+    ...Checkout
+    paymentMethod {
+      cashbackDiscountAmount
+      couponDiscount
+      prepaidDiscountAmount
+    }
+    cashback {
+      amount
+      willAddOn
+    }
+  }
+}
+    ${CheckoutFragmentDoc}`;
+
+/**
+ * __useCheckoutRecalculationQuery__
+ *
+ * To run a query within a React component, call `useCheckoutRecalculationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckoutRecalculationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckoutRecalculationQuery({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useCheckoutRecalculationQuery(baseOptions?: Apollo.QueryHookOptions<CheckoutRecalculationQuery, CheckoutRecalculationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CheckoutRecalculationQuery, CheckoutRecalculationQueryVariables>(CheckoutRecalculationDocument, options);
+      }
+export function useCheckoutRecalculationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CheckoutRecalculationQuery, CheckoutRecalculationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CheckoutRecalculationQuery, CheckoutRecalculationQueryVariables>(CheckoutRecalculationDocument, options);
+        }
+export type CheckoutRecalculationQueryHookResult = ReturnType<typeof useCheckoutRecalculationQuery>;
+export type CheckoutRecalculationLazyQueryHookResult = ReturnType<typeof useCheckoutRecalculationLazyQuery>;
+export type CheckoutRecalculationQueryResult = Apollo.QueryResult<CheckoutRecalculationQuery, CheckoutRecalculationQueryVariables>;
