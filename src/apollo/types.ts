@@ -20634,7 +20634,11 @@ export type AddressFragment = (
 
 export type UserFragment = (
   Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'phone' | 'isStaff'>
-  & { orders: Maybe<Pick<OrderCountableConnection, 'totalCount'>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, defaultShippingAddress: Maybe<AddressFragment>, defaultBillingAddress: Maybe<AddressFragment>, addresses: Maybe<Array<Maybe<AddressFragment>>> }
+  & { orders: Maybe<(
+    { __typename: 'OrderCountableConnection' }
+    & Pick<OrderCountableConnection, 'totalCount'>
+    & { edges: Array<{ node: Pick<Order, 'id'> }> }
+  )>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, defaultShippingAddress: Maybe<AddressFragment>, defaultBillingAddress: Maybe<AddressFragment>, addresses: Maybe<Array<Maybe<AddressFragment>>> }
 );
 
 export type PriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> };
@@ -21086,8 +21090,14 @@ export const UserFragmentDoc = gql`
   lastName
   phone
   isStaff
-  orders {
+  orders(first: 2) {
+    edges {
+      node {
+        id
+      }
+    }
     totalCount
+    __typename
   }
   metadata {
     key
@@ -21116,7 +21126,6 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
-
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
