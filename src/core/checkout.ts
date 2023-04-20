@@ -1041,15 +1041,19 @@ export const checkout = ({
         : checkoutString;
 
     if (checkout && checkout.token) {
+
+      const inputVariables:CheckoutRecalculationQueryVariables = refreshCheckout ? {
+        token: checkout?.token,
+        refreshCheckout: refreshCheckout,
+      }: {
+        token: checkout?.token,
+      };
       const checkoutDetailRes = await client.query<
         CheckoutRecalculationQuery,
         CheckoutRecalculationQueryVariables
       >({
         query: CHECKOUT_RECALCULATION,
-        variables: {
-          token: checkout?.token,
-          refreshCheckout: refreshCheckout || false,
-        },
+        variables: inputVariables,
         fetchPolicy: "no-cache",
       });
 
