@@ -6070,12 +6070,20 @@
         "fields": [
           {
             "name": "metadata",
-            "description": null,
+            "description": "List of public metadata items. Can be accessed without permissions.",
             "args": [],
             "type": {
-              "kind": "SCALAR",
-              "name": "JSONString",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "MetadataItem",
+                  "ofType": null
+                }
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -6098,12 +6106,20 @@
           },
           {
             "name": "privateMetadata",
-            "description": null,
+            "description": "List of private metadata items.Requires proper staff permissions to access.",
             "args": [],
             "type": {
-              "kind": "SCALAR",
-              "name": "JSONString",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "MetadataItem",
+                  "ofType": null
+                }
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -6347,6 +6363,46 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "privateMeta",
+            "description": "List of privately stored metadata namespaces.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "MetaStore",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use the `privetaMetadata` field. This field will be removed after 2020-07-31."
+          },
+          {
+            "name": "meta",
+            "description": "List of publicly stored metadata namespaces.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "MetaStore",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use the `metadata` field. This field will be removed after 2020-07-31."
           }
         ],
         "inputFields": null,
@@ -6354,6 +6410,11 @@
           {
             "kind": "INTERFACE",
             "name": "Node",
+            "ofType": null
+          },
+          {
+            "kind": "INTERFACE",
+            "name": "ObjectWithMetadata",
             "ofType": null
           }
         ],
@@ -31061,6 +31122,77 @@
       },
       {
         "kind": "OBJECT",
+        "name": "DraftOrderApplyWallet",
+        "description": "Adds Wallet discount",
+        "fields": [
+          {
+            "name": "errors",
+            "description": "List of errors that occurred executing the mutation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Error",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use typed errors with error codes. This field will be removed after 2020-07-31."
+          },
+          {
+            "name": "order",
+            "description": "An order instance.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Order",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "orderErrors",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "OrderError",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "DraftOrderBulkDelete",
         "description": "Deletes draft orders.",
         "fields": [
@@ -32195,6 +32327,77 @@
       },
       {
         "kind": "OBJECT",
+        "name": "DraftOrderRemoveWallet",
+        "description": "Removes wallet discount.",
+        "fields": [
+          {
+            "name": "errors",
+            "description": "List of errors that occurred executing the mutation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Error",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use typed errors with error codes. This field will be removed after 2020-07-31."
+          },
+          {
+            "name": "order",
+            "description": "An order instance.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Order",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "orderErrors",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "OrderError",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "DraftOrderUpdate",
         "description": "Updates a draft order.",
         "fields": [
@@ -32509,6 +32712,77 @@
         "kind": "OBJECT",
         "name": "EditProductReview",
         "description": "Edit existing product review.",
+        "fields": [
+          {
+            "name": "errors",
+            "description": "List of errors that occurred executing the mutation.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Error",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use typed errors with error codes. This field will be removed after 2020-07-31."
+          },
+          {
+            "name": "productReview",
+            "description": "A product review instance.",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "ProductReviewType",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "productReviewErrors",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "ProductReviewError",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "EditProductReviewHash",
+        "description": "Edit existing product review by providing a hash.",
         "fields": [
           {
             "name": "errors",
@@ -61366,6 +61640,47 @@
             "deprecationReason": null
           },
           {
+            "name": "editProductReviewHash",
+            "description": "Edit existing product review by providing a hash.",
+            "args": [
+              {
+                "name": "id",
+                "description": "Review Id",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "input",
+                "description": "Fields to Edit Review.",
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "ProductReviewInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "EditProductReviewHash",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "createTokenWithoutOtp",
             "description": "Create JWT token without OTP.",
             "args": [
@@ -61459,6 +61774,64 @@
             "type": {
               "kind": "OBJECT",
               "name": "ProductReviewsBulkDelete",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "draftOrderApplyWallet",
+            "description": "Adds Wallet discount",
+            "args": [
+              {
+                "name": "orderId",
+                "description": "id of the draft order",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "DraftOrderApplyWallet",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "draftOrderRemoveWallet",
+            "description": "Removes wallet discount.",
+            "args": [
+              {
+                "name": "orderId",
+                "description": "id of the draft order",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "OBJECT",
+              "name": "DraftOrderRemoveWallet",
               "ofType": null
             },
             "isDeprecated": false,
@@ -62870,6 +63243,11 @@
           {
             "kind": "OBJECT",
             "name": "App",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "ArchiveOrderType",
             "ofType": null
           },
           {
@@ -78083,6 +78461,12 @@
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "HASH_INVALID",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "possibleTypes": null
@@ -78846,6 +79230,18 @@
             "type": {
               "kind": "SCALAR",
               "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "encryptedToken",
+            "description": "helpful reviews",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "defaultValue": null,
@@ -92888,6 +93284,18 @@
                 "type": {
                   "kind": "SCALAR",
                   "name": "UUID",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "refreshCheckout",
+                "description": "Refresh Checkout calculation",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
                   "ofType": null
                 },
                 "defaultValue": null,
@@ -109055,6 +109463,12 @@
           },
           {
             "name": "MEMBERSHIP_ACTIVATE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REVIEW_MAIL",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

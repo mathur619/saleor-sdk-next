@@ -973,11 +973,13 @@ export type ArchiveOrderStatus =
   | 'CANCELED';
 
 /** Represents an archive order in the shop. */
-export type ArchiveOrderType = Node & {
-  metadata: Maybe<Scalars['JSONString']>;
+export type ArchiveOrderType = Node & ObjectWithMetadata & {
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItem>>;
   /** The ID of the object. */
   id: Scalars['ID'];
-  privateMetadata: Maybe<Scalars['JSONString']>;
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItem>>;
   foreignOrderId: Scalars['String'];
   created: Scalars['DateTime'];
   placedOn: Maybe<Scalars['DateTime']>;
@@ -995,6 +997,16 @@ export type ArchiveOrderType = Node & {
   note: Scalars['String'];
   /** List of archive order lines. */
   lines: Array<Maybe<ArchiveOrderLine>>;
+  /**
+   * List of privately stored metadata namespaces.
+   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
+   */
+  privateMeta: Array<Maybe<MetaStore>>;
+  /**
+   * List of publicly stored metadata namespaces.
+   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
+   */
+  meta: Array<Maybe<MetaStore>>;
 };
 
 export type ArchiveOrderTypeConnection = {
@@ -5389,6 +5401,18 @@ export type DraftOrderApplyPrePaid = {
   orderErrors: Array<OrderError>;
 };
 
+/** Adds Wallet discount */
+export type DraftOrderApplyWallet = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance. */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
+};
+
 /** Deletes draft orders. */
 export type DraftOrderBulkDelete = {
   /**
@@ -5574,6 +5598,18 @@ export type DraftOrderRemovePromoCode = {
   orderErrors: Array<OrderError>;
 };
 
+/** Removes wallet discount. */
+export type DraftOrderRemoveWallet = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance. */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
+};
+
 /** Updates a draft order. */
 export type DraftOrderUpdate = {
   /**
@@ -5632,6 +5668,18 @@ export type DtcTrackingType = Node & {
 
 /** Edit existing product review. */
 export type EditProductReview = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A product review instance. */
+  productReview: Maybe<ProductReviewType>;
+  productReviewErrors: Array<ProductReviewError>;
+};
+
+/** Edit existing product review by providing a hash. */
+export type EditProductReviewHash = {
   /**
    * List of errors that occurred executing the mutation.
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
@@ -8589,12 +8637,18 @@ export type Mutation = {
   removeRtoCustomersList: Maybe<RemoveRtoCustomersListCsv>;
   /** Upload list of risk orders. */
   pushRiskOrdersCsv: Maybe<PushRiskOrderCsv>;
+  /** Edit existing product review by providing a hash. */
+  editProductReviewHash: Maybe<EditProductReviewHash>;
   /** Create JWT token without OTP. */
   createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
   /** Creates an order on CCAvenue. */
   createCcAvenueOrder: Maybe<CreateCcAvenueOrder>;
   /** Deletes productReviews. */
   productReviewBulkDelete: Maybe<ProductReviewsBulkDelete>;
+  /** Adds Wallet discount */
+  draftOrderApplyWallet: Maybe<DraftOrderApplyWallet>;
+  /** Removes wallet discount. */
+  draftOrderRemoveWallet: Maybe<DraftOrderRemoveWallet>;
   /** Creates an order on Gokwik. */
   createGokwikOrder: Maybe<CreateGokwikOrder>;
 };
@@ -10988,6 +11042,12 @@ export type MutationPushRiskOrdersCsvArgs = {
 };
 
 
+export type MutationEditProductReviewHashArgs = {
+  id: Scalars['ID'];
+  input?: Maybe<ProductReviewInput>;
+};
+
+
 export type MutationCreateTokenWithoutOtpArgs = {
   checkoutId?: Maybe<Scalars['ID']>;
   waid?: Maybe<Scalars['String']>;
@@ -11001,6 +11061,16 @@ export type MutationCreateCcAvenueOrderArgs = {
 
 export type MutationProductReviewBulkDeleteArgs = {
   ids: Array<Maybe<Scalars['ID']>>;
+};
+
+
+export type MutationDraftOrderApplyWalletArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationDraftOrderRemoveWalletArgs = {
+  orderId: Scalars['ID'];
 };
 
 
@@ -13482,7 +13552,8 @@ export type ProductReviewError = {
 export type ProductReviewErrorCode =
   | 'INVALID'
   | 'NOT_FOUND'
-  | 'REQUIRED';
+  | 'REQUIRED'
+  | 'HASH_INVALID';
 
 export type ProductReviewFilterInput = {
   product?: Maybe<Scalars['String']>;
@@ -13595,6 +13666,8 @@ export type ProductReviewInput = {
   verified?: Maybe<Scalars['Boolean']>;
   /** helpful reviews */
   helpfulRatings?: Maybe<Scalars['Int']>;
+  /** helpful reviews */
+  encryptedToken?: Maybe<Scalars['String']>;
 };
 
 export type ProductReviewOrder = {
@@ -14946,6 +15019,7 @@ export type QueryCheckoutLinesArgs = {
 
 export type QueryCheckoutRecalculationArgs = {
   token?: Maybe<Scalars['UUID']>;
+  refreshCheckout?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -18317,7 +18391,8 @@ export type TemplateMailType =
   | 'NOTIFICATION'
   | 'INVOICE'
   | 'CONTACT_US'
-  | 'MEMBERSHIP_ACTIVATE';
+  | 'MEMBERSHIP_ACTIVATE'
+  | 'REVIEW_MAIL';
 
 /** Requests for Token for registered user. */
 export type TokenCreateWithAdmin = {
@@ -20747,6 +20822,7 @@ export type OrdersByUserQuery = { me: Maybe<(
 
 export type CheckoutRecalculationQueryVariables = Exact<{
   token?: Maybe<Scalars['UUID']>;
+  refreshCheckout?: Maybe<Scalars['Boolean']>;
 }>;
 
 
