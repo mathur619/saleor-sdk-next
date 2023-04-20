@@ -242,8 +242,8 @@ export const USER_ORDER_DETAILS = gql`
 
 export const CHECKOUT_RECALCULATION = gql`
   ${checkoutFragment}
-  query CheckoutRecalculation($token: UUID) {
-    checkoutRecalculation(token: $token) {
+  query CheckoutRecalculation($token: UUID, $refreshCheckout: Boolean) {
+    checkoutRecalculation(token: $token, refreshCheckout: $refreshCheckout) {
       ...Checkout
       paymentMethod {
         cashbackDiscountAmount

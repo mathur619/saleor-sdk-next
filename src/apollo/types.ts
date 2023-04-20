@@ -23216,8 +23216,8 @@ export type OrdersByUserQueryHookResult = ReturnType<typeof useOrdersByUserQuery
 export type OrdersByUserLazyQueryHookResult = ReturnType<typeof useOrdersByUserLazyQuery>;
 export type OrdersByUserQueryResult = Apollo.QueryResult<OrdersByUserQuery, OrdersByUserQueryVariables>;
 export const CheckoutRecalculationDocument = gql`
-    query CheckoutRecalculation($token: UUID) {
-  checkoutRecalculation(token: $token) {
+    query CheckoutRecalculation($token: UUID, $refreshCheckout: Boolean) {
+  checkoutRecalculation(token: $token, refreshCheckout: $refreshCheckout) {
     ...Checkout
     paymentMethod {
       cashbackDiscountAmount
@@ -23245,6 +23245,7 @@ export const CheckoutRecalculationDocument = gql`
  * const { data, loading, error } = useCheckoutRecalculationQuery({
  *   variables: {
  *      token: // value for 'token'
+ *      refreshCheckout: // value for 'refreshCheckout'
  *   },
  * });
  */
