@@ -1,5 +1,5 @@
 overwrite: true
-schema: https://gourmetgardenapi.farziengineer.co/graphql/
+schema: https://gourmetgardenhapi.farziengineer.co/graphql/?source=website
 generates:
   introspection.json:
     plugins:

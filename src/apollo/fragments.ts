@@ -39,6 +39,9 @@ export const userFragment = gql`
     lastName
     phone
     isStaff
+    orders {
+      totalCount
+    }
     metadata {
       key
       value
