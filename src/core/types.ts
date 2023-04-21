@@ -76,6 +76,7 @@ import {
   UpdateUserMetaMutation,
   CreateTokenWithoutOtpMutation,
   CreateGokwikOrderMutation,
+  CreateTokenTrueCallerMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -308,6 +309,12 @@ export type OtpLessLoginResult = Promise<
     Record<string, any>
   >
 >;
+
+export type TrueCallerLoginResult = FetchResult<
+  CreateTokenTrueCallerMutation,
+  Record<string, any>,
+  Record<string, any>
+> | null;
 
 export type RequestOtpResult = Promise<
   FetchResult<OtpRequestMutation, Record<string, any>, Record<string, any>>

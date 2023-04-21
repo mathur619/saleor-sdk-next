@@ -475,6 +475,35 @@ export const CREATE_TOKEN_WITHOUT_OTP = gql`
   }
 `;
 
+export const CREATE_TOKEN_TRUECALLER = gql`
+  ${userFragment}
+  mutation CreateTokenTrueCaller(
+    $accessToken: String
+    $checkoutId: ID
+    $endpoint: String
+    $requestId: String!
+  ) {
+    CreateTokenTrueCaller: createTokenTrueCaller(
+      accessToken: $accessToken
+      checkoutId: $checkoutId
+      endpoint: $endpoint
+      requestId: $requestId
+    ) {
+      token
+      refreshToken
+      csrfToken
+      user {
+        ...UserFragment
+      }
+      otpErrors {
+        code
+        field
+        message
+      }
+    }
+  }
+`;
+
 export const REGISTER_ACCOUNT = gql`
   mutation AccountRegisterV2($input: AccountRegisterInputV2!) {
     accountRegisterV2(input: $input) {

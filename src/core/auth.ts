@@ -65,6 +65,8 @@ import {
   VerifyCheckoutOtpMutationVariables,
   CreateTokenWithoutOtpMutation,
   CreateTokenWithoutOtpMutationVariables,
+  CreateTokenTrueCallerMutation,
+  CreateTokenTrueCallerMutationVariables,
 } from "..";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
@@ -78,6 +80,7 @@ import {
   CHECKOUT_CUSTOMER_ATTACH,
   CHECKOUT_CUSTOMER_ATTACH_NEW,
   CREATE_TOKEN_WITHOUT_OTP,
+  CREATE_TOKEN_TRUECALLER,
 } from "../apollo/mutations";
 import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
 import { storage } from "./storage";
@@ -101,6 +104,7 @@ import {
   SaleorClientMethodsProps,
   SignInMobileResult,
   SignOutResult,
+  TrueCallerLoginResult,
   VerifyCheckoutOTPResult,
   // SetPasswordResult,
   // VerifyExternalTokenResult,
@@ -232,6 +236,13 @@ export interface AuthSDK {
     waid: string,
     updateShippingMethod?: boolean
   ) => OtpLessLoginResult;
+
+  truecallerLogin: (
+    requestId: string,
+    accessToken?: string,
+    endpoint?: string,
+    updateShippingMethod?: boolean
+  ) => TrueCallerLoginResult;
 
   requestOTP: (phone: string) => RequestOtpResult;
 
@@ -397,6 +408,94 @@ export const auth = ({
     }
 
     return res;
+  };
+
+  const truecallerLogin: AuthSDK["truecallerLogin"] = async (
+    requestId: string,
+    accessToken?: string,
+    endpoint?: string,
+    updateShippingMethod = true
+  ) => {
+    if (requestId) {
+      client.writeQuery({
+        query: USER,
+        data: {
+          authenticating: true,
+        },
+      });
+
+      const checkoutString = storage.getCheckout();
+      const checkout =
+        checkoutString && typeof checkoutString === "string"
+          ? JSON.parse(checkoutString)
+          : checkoutString;
+      let CreateTokenWithTruecallerVariables: CreateTokenTrueCallerMutationVariables = {
+        requestId: requestId,
+      };
+
+      if (checkout?.id) {
+        if (accessToken && endpoint) {
+          CreateTokenWithTruecallerVariables = {
+            ...CreateTokenWithTruecallerVariables,
+            accessToken: accessToken,
+            endpoint: endpoint,
+            checkoutId: checkout.id,
+          };
+        } else {
+          CreateTokenWithTruecallerVariables = {
+            ...CreateTokenWithTruecallerVariables,
+            checkoutId: checkout.id,
+          };
+        }
+      } else {
+        if (accessToken && endpoint) {
+          CreateTokenWithTruecallerVariables = {
+            ...CreateTokenWithTruecallerVariables,
+            accessToken: accessToken,
+            endpoint: endpoint,
+          };
+        }
+      }
+
+      const res = await client.mutate<
+        CreateTokenTrueCallerMutation,
+        CreateTokenTrueCallerMutationVariables
+      >({
+        mutation: CREATE_TOKEN_TRUECALLER,
+        variables: CreateTokenWithTruecallerVariables,
+        update: (_, { data }) => {
+          if (data?.CreateTokenTrueCaller?.token) {
+            storage.setTokens({
+              accessToken: data.CreateTokenTrueCaller.token,
+              csrfToken: data.CreateTokenTrueCaller.csrfToken,
+              refreshToken: data.CreateTokenTrueCaller.refreshToken,
+            });
+            getUserCheckout(updateShippingMethod);
+          } else {
+            client.writeQuery({
+              query: USER,
+              data: {
+                authenticating: false,
+              },
+            });
+          }
+        },
+      });
+
+      if (checkout?.id && res.data?.CreateTokenTrueCaller?.user?.id) {
+        client.mutate({
+          mutation: CHECKOUT_CUSTOMER_ATTACH,
+          variables: {
+            checkoutId: checkout.id,
+            customerId: res.data.CreateTokenTrueCaller.user.id,
+          },
+        });
+      }
+
+      return res;
+    }
+
+    return null;
   };
 
   const requestOTP: AuthSDK["requestOTP"] = async (phone: string) => {
@@ -937,5 +1036,6 @@ export const auth = ({
     getUserCheckout,
     verifyCheckoutOTP,
     otpLessLogin,
+    truecallerLogin,
   };
 };

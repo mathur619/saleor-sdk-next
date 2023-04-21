@@ -973,11 +973,13 @@ export type ArchiveOrderStatus =
   | 'CANCELED';
 
 /** Represents an archive order in the shop. */
-export type ArchiveOrderType = Node & {
-  metadata: Maybe<Scalars['JSONString']>;
+export type ArchiveOrderType = Node & ObjectWithMetadata & {
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItem>>;
   /** The ID of the object. */
   id: Scalars['ID'];
-  privateMetadata: Maybe<Scalars['JSONString']>;
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItem>>;
   foreignOrderId: Scalars['String'];
   created: Scalars['DateTime'];
   placedOn: Maybe<Scalars['DateTime']>;
@@ -995,6 +997,16 @@ export type ArchiveOrderType = Node & {
   note: Scalars['String'];
   /** List of archive order lines. */
   lines: Array<Maybe<ArchiveOrderLine>>;
+  /**
+   * List of privately stored metadata namespaces.
+   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
+   */
+  privateMeta: Array<Maybe<MetaStore>>;
+  /**
+   * List of publicly stored metadata namespaces.
+   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
+   */
+  meta: Array<Maybe<MetaStore>>;
 };
 
 export type ArchiveOrderTypeConnection = {
@@ -3646,6 +3658,17 @@ export type CreatePayuOrder = {
   payuOrder: Maybe<PayuOrderType>;
 };
 
+/** Create Pincode. */
+export type CreatePincodeCsv = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+};
+
 /** Create Product. */
 export type CreateProductCsv = {
   /**
@@ -3780,6 +3803,24 @@ export type CreateTokenOAuth = {
 
 /** Create JWT token via OTP. */
 export type CreateTokenOtp = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** JWT token, required to authenticate. */
+  token: Maybe<Scalars['String']>;
+  /** JWT refresh token, required to re-generate access token. */
+  refreshToken: Maybe<Scalars['String']>;
+  /** CSRF token required to re-generate access token. */
+  csrfToken: Maybe<Scalars['String']>;
+  /** A user instance. */
+  user: Maybe<User>;
+  otpErrors: Array<OtpError>;
+};
+
+/** Create JWT token via TrueCaller. */
+export type CreateTokenTrueCaller = {
   /**
    * List of errors that occurred executing the mutation.
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
@@ -5415,6 +5456,18 @@ export type DraftOrderApplyPrePaid = {
   orderErrors: Array<OrderError>;
 };
 
+/** Adds Wallet discount */
+export type DraftOrderApplyWallet = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance. */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
+};
+
 /** Deletes draft orders. */
 export type DraftOrderBulkDelete = {
   /**
@@ -5600,6 +5653,18 @@ export type DraftOrderRemovePromoCode = {
   orderErrors: Array<OrderError>;
 };
 
+/** Removes wallet discount. */
+export type DraftOrderRemoveWallet = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** An order instance. */
+  order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
+};
+
 /** Updates a draft order. */
 export type DraftOrderUpdate = {
   /**
@@ -5658,6 +5723,18 @@ export type DtcTrackingType = Node & {
 
 /** Edit existing product review. */
 export type EditProductReview = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A product review instance. */
+  productReview: Maybe<ProductReviewType>;
+  productReviewErrors: Array<ProductReviewError>;
+};
+
+/** Edit existing product review by providing a hash. */
+export type EditProductReviewHash = {
   /**
    * List of errors that occurred executing the mutation.
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
@@ -8877,14 +8954,24 @@ export type Mutation = {
   removeRtoCustomersList: Maybe<RemoveRtoCustomersListCsv>;
   /** Upload list of risk orders. */
   pushRiskOrdersCsv: Maybe<PushRiskOrderCsv>;
-  /** Creates an order on CCAvenue. */
-  createCcAvenueOrder: Maybe<CreateCcAvenueOrder>;
   /** Deletes productReviews. */
   productReviewBulkDelete: Maybe<ProductReviewsBulkDelete>;
-  /** Creates an order on Gokwik. */
-  createGokwikOrder: Maybe<CreateGokwikOrder>;
+  /** Edit existing product review by providing a hash. */
+  editProductReviewHash: Maybe<EditProductReviewHash>;
   /** Create JWT token without OTP. */
   createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
+  /** Creates an order on CCAvenue. */
+  createCcAvenueOrder: Maybe<CreateCcAvenueOrder>;
+  /** Adds Wallet discount */
+  draftOrderApplyWallet: Maybe<DraftOrderApplyWallet>;
+  /** Removes wallet discount. */
+  draftOrderRemoveWallet: Maybe<DraftOrderRemoveWallet>;
+  /** Creates an order on Gokwik. */
+  createGokwikOrder: Maybe<CreateGokwikOrder>;
+  /** Create Pincode. */
+  createPincodeCsv: Maybe<CreatePincodeCsv>;
+  /** Create JWT token via TrueCaller. */
+  createTokenTrueCaller: Maybe<CreateTokenTrueCaller>;
 };
 
 
@@ -11301,13 +11388,35 @@ export type MutationPushRiskOrdersCsvArgs = {
 };
 
 
+export type MutationProductReviewBulkDeleteArgs = {
+  ids: Array<Maybe<Scalars['ID']>>;
+};
+
+
+export type MutationEditProductReviewHashArgs = {
+  id: Scalars['ID'];
+  input?: Maybe<ProductReviewInput>;
+};
+
+
+export type MutationCreateTokenWithoutOtpArgs = {
+  checkoutId?: Maybe<Scalars['ID']>;
+  waid?: Maybe<Scalars['String']>;
+};
+
+
 export type MutationCreateCcAvenueOrderArgs = {
   input: CcAvenueCreateOrderInput;
 };
 
 
-export type MutationProductReviewBulkDeleteArgs = {
-  ids: Array<Maybe<Scalars['ID']>>;
+export type MutationDraftOrderApplyWalletArgs = {
+  orderId: Scalars['ID'];
+};
+
+
+export type MutationDraftOrderRemoveWalletArgs = {
+  orderId: Scalars['ID'];
 };
 
 
@@ -11316,9 +11425,16 @@ export type MutationCreateGokwikOrderArgs = {
 };
 
 
-export type MutationCreateTokenWithoutOtpArgs = {
+export type MutationCreatePincodeCsvArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
+export type MutationCreateTokenTrueCallerArgs = {
+  accessToken?: Maybe<Scalars['String']>;
   checkoutId?: Maybe<Scalars['ID']>;
-  waid?: Maybe<Scalars['String']>;
+  endpoint?: Maybe<Scalars['String']>;
+  requestId: Scalars['String'];
 };
 
 export type NameTranslationInput = {
@@ -13178,6 +13294,15 @@ export type Pincode = {
   pincode: Maybe<PincodeType>;
 };
 
+/** An enumeration. */
+export type PincodeCityType =
+  /** Tier1 */
+  | 'TIER1'
+  /** Tier2 */
+  | 'TIER2'
+  /** Tier3 */
+  | 'TIER3';
+
 export type PincodeInput = {
   /** Pincode */
   pin: Scalars['String'];
@@ -13194,6 +13319,7 @@ export type PincodeType = Node & {
   city: Scalars['String'];
   state: Scalars['String'];
   serviceable: Scalars['Boolean'];
+  cityType: PincodeCityType;
   created: Scalars['DateTime'];
   updated: Scalars['DateTime'];
   /** The ID of the object. */
@@ -13795,7 +13921,8 @@ export type ProductReviewError = {
 export type ProductReviewErrorCode =
   | 'INVALID'
   | 'NOT_FOUND'
-  | 'REQUIRED';
+  | 'REQUIRED'
+  | 'HASH_INVALID';
 
 export type ProductReviewFilterInput = {
   product?: Maybe<Scalars['String']>;
@@ -13908,6 +14035,8 @@ export type ProductReviewInput = {
   verified?: Maybe<Scalars['Boolean']>;
   /** helpful reviews */
   helpfulRatings?: Maybe<Scalars['Int']>;
+  /** helpful reviews */
+  encryptedToken?: Maybe<Scalars['String']>;
 };
 
 export type ProductReviewOrder = {
@@ -15259,6 +15388,7 @@ export type QueryCheckoutLinesArgs = {
 
 export type QueryCheckoutRecalculationArgs = {
   token?: Maybe<Scalars['UUID']>;
+  refreshCheckout?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -15801,6 +15931,7 @@ export type QueryPincodesArgs = {
   city?: Maybe<Scalars['String']>;
   state?: Maybe<Scalars['String']>;
   serviceable?: Maybe<Scalars['Boolean']>;
+  cityType?: Maybe<Scalars['String']>;
   created?: Maybe<Scalars['DateTime']>;
   updated?: Maybe<Scalars['DateTime']>;
 };
@@ -15838,7 +15969,8 @@ export type QueryProductReviewArgs = {
 
 
 export type QueryProductReviewsArgs = {
-  product: Scalars['ID'];
+  product?: Maybe<Scalars['ID']>;
+  productSlug?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['ID']>;
   user?: Maybe<Scalars['String']>;
   isPublished?: Maybe<Scalars['Boolean']>;
@@ -18629,7 +18761,8 @@ export type TemplateMailType =
   | 'NOTIFICATION'
   | 'INVOICE'
   | 'CONTACT_US'
-  | 'MEMBERSHIP_ACTIVATE';
+  | 'MEMBERSHIP_ACTIVATE'
+  | 'REVIEW_MAIL';
 
 /** Requests for Token for registered user. */
 export type TokenCreateWithAdmin = {
@@ -20724,6 +20857,19 @@ export type CreateTokenWithoutOtpMutation = { CreateTokenWithoutOtp: Maybe<(
     & { user: Maybe<UserFragment>, otpErrors: Array<Pick<OtpError, 'code' | 'field' | 'message'>> }
   )> };
 
+export type CreateTokenTrueCallerMutationVariables = Exact<{
+  accessToken?: Maybe<Scalars['String']>;
+  checkoutId?: Maybe<Scalars['ID']>;
+  endpoint?: Maybe<Scalars['String']>;
+  requestId: Scalars['String'];
+}>;
+
+
+export type CreateTokenTrueCallerMutation = { CreateTokenTrueCaller: Maybe<(
+    Pick<CreateTokenTrueCaller, 'token' | 'refreshToken' | 'csrfToken'>
+    & { user: Maybe<UserFragment>, otpErrors: Array<Pick<OtpError, 'code' | 'field' | 'message'>> }
+  )> };
+
 export type AccountRegisterV2MutationVariables = Exact<{
   input: AccountRegisterInputV2;
 }>;
@@ -20759,6 +20905,12 @@ export type UpdateUserMetaMutation = { updateMetadata: Maybe<(
       & Pick<MetadataError, 'field' | 'message'>
     )>, item: Maybe<(
       { __typename: 'App' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
+      { __typename: 'ArchiveOrderType' }
       & { metadata: Array<Maybe<(
         { __typename: 'MetadataItem' }
         & Pick<MetadataItem, 'key' | 'value'>
@@ -22066,6 +22218,57 @@ export function useCreateTokenWithoutOtpMutation(baseOptions?: Apollo.MutationHo
 export type CreateTokenWithoutOtpMutationHookResult = ReturnType<typeof useCreateTokenWithoutOtpMutation>;
 export type CreateTokenWithoutOtpMutationResult = Apollo.MutationResult<CreateTokenWithoutOtpMutation>;
 export type CreateTokenWithoutOtpMutationOptions = Apollo.BaseMutationOptions<CreateTokenWithoutOtpMutation, CreateTokenWithoutOtpMutationVariables>;
+export const CreateTokenTrueCallerDocument = gql`
+    mutation CreateTokenTrueCaller($accessToken: String, $checkoutId: ID, $endpoint: String, $requestId: String!) {
+  CreateTokenTrueCaller: createTokenTrueCaller(
+    accessToken: $accessToken
+    checkoutId: $checkoutId
+    endpoint: $endpoint
+    requestId: $requestId
+  ) {
+    token
+    refreshToken
+    csrfToken
+    user {
+      ...UserFragment
+    }
+    otpErrors {
+      code
+      field
+      message
+    }
+  }
+}
+    ${UserFragmentDoc}`;
+export type CreateTokenTrueCallerMutationFn = Apollo.MutationFunction<CreateTokenTrueCallerMutation, CreateTokenTrueCallerMutationVariables>;
+
+/**
+ * __useCreateTokenTrueCallerMutation__
+ *
+ * To run a mutation, you first call `useCreateTokenTrueCallerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTokenTrueCallerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTokenTrueCallerMutation, { data, loading, error }] = useCreateTokenTrueCallerMutation({
+ *   variables: {
+ *      accessToken: // value for 'accessToken'
+ *      checkoutId: // value for 'checkoutId'
+ *      endpoint: // value for 'endpoint'
+ *      requestId: // value for 'requestId'
+ *   },
+ * });
+ */
+export function useCreateTokenTrueCallerMutation(baseOptions?: Apollo.MutationHookOptions<CreateTokenTrueCallerMutation, CreateTokenTrueCallerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateTokenTrueCallerMutation, CreateTokenTrueCallerMutationVariables>(CreateTokenTrueCallerDocument, options);
+      }
+export type CreateTokenTrueCallerMutationHookResult = ReturnType<typeof useCreateTokenTrueCallerMutation>;
+export type CreateTokenTrueCallerMutationResult = Apollo.MutationResult<CreateTokenTrueCallerMutation>;
+export type CreateTokenTrueCallerMutationOptions = Apollo.BaseMutationOptions<CreateTokenTrueCallerMutation, CreateTokenTrueCallerMutationVariables>;
 export const AccountRegisterV2Document = gql`
     mutation AccountRegisterV2($input: AccountRegisterInputV2!) {
   accountRegisterV2(input: $input) {
