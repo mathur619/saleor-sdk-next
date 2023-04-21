@@ -310,11 +310,11 @@ export type OtpLessLoginResult = Promise<
   >
 >;
 
-export type TrueCallerLoginResult = FetchResult<
+export type TrueCallerLoginResult = Promise<FetchResult<
   CreateTokenTrueCallerMutation,
   Record<string, any>,
   Record<string, any>
-> | null;
+> | null>;
 
 export type RequestOtpResult = Promise<
   FetchResult<OtpRequestMutation, Record<string, any>, Record<string, any>>
