@@ -39,6 +39,15 @@ export const userFragment = gql`
     lastName
     phone
     isStaff
+    orders (first: 2) {
+      edges {
+        node {
+          id
+        }
+      }
+      totalCount
+      __typename
+    }
     metadata {
       key
       value
