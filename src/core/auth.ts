@@ -487,6 +487,13 @@ export const auth = ({
         });
       }
 
+      client.writeQuery({
+        query: USER,
+        data: {
+          authenticating: false,
+        },
+      });
+
       return res;
     }
 
