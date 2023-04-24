@@ -964,7 +964,6 @@ export const checkout = ({
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
-        checkoutLoading: true,
         useCashback: useCashback,
       },
     });
