@@ -441,11 +441,6 @@ export const auth = ({
             endpoint: endpoint,
             checkoutId: checkout.id,
           };
-        } else {
-          CreateTokenWithTruecallerVariables = {
-            ...CreateTokenWithTruecallerVariables,
-            checkoutId: checkout.id,
-          };
         }
       } else {
         if (accessToken && endpoint) {
