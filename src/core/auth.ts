@@ -452,49 +452,51 @@ export const auth = ({
         }
       }
 
-      const res = await client.mutate<
-        CreateTokenTrueCallerMutation,
-        CreateTokenTrueCallerMutationVariables
-      >({
-        mutation: CREATE_TOKEN_TRUECALLER,
-        variables: CreateTokenWithTruecallerVariables,
-        update: (_, { data }) => {
-          if (data?.CreateTokenTrueCaller?.token) {
-            storage.setTokens({
-              accessToken: data.CreateTokenTrueCaller.token,
-              csrfToken: data.CreateTokenTrueCaller.csrfToken,
-              refreshToken: data.CreateTokenTrueCaller.refreshToken,
-            });
-            getUserCheckout(updateShippingMethod);
-          } else {
-            client.writeQuery({
-              query: USER,
-              data: {
-                authenticating: false,
-              },
-            });
-          }
-        },
-      });
+      try {
+        const res = await client.mutate<
+          CreateTokenTrueCallerMutation,
+          CreateTokenTrueCallerMutationVariables
+        >({
+          mutation: CREATE_TOKEN_TRUECALLER,
+          variables: CreateTokenWithTruecallerVariables,
+          update: (_, { data }) => {
+            if (data?.CreateTokenTrueCaller?.token) {
+              storage.setTokens({
+                accessToken: data.CreateTokenTrueCaller.token,
+                csrfToken: data.CreateTokenTrueCaller.csrfToken,
+                refreshToken: data.CreateTokenTrueCaller.refreshToken,
+              });
+              getUserCheckout(updateShippingMethod);
+            } else {
+              client.writeQuery({
+                query: USER,
+                data: {
+                  authenticating: false,
+                },
+              });
+            }
+          },
+        });
 
-      if (checkout?.id && res.data?.CreateTokenTrueCaller?.user?.id) {
-        client.mutate({
-          mutation: CHECKOUT_CUSTOMER_ATTACH,
-          variables: {
-            checkoutId: checkout.id,
-            customerId: res.data.CreateTokenTrueCaller.user.id,
+        if (checkout?.id && res.data?.CreateTokenTrueCaller?.user?.id) {
+          client.mutate({
+            mutation: CHECKOUT_CUSTOMER_ATTACH,
+            variables: {
+              checkoutId: checkout.id,
+              customerId: res.data.CreateTokenTrueCaller.user.id,
+            },
+          });
+        }
+
+        return res;
+      } catch (error) {
+        client.writeQuery({
+          query: USER,
+          data: {
+            authenticating: false,
           },
         });
       }
-
-      client.writeQuery({
-        query: USER,
-        data: {
-          authenticating: false,
-        },
-      });
-
-      return res;
     }
 
     return null;
