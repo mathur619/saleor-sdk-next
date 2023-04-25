@@ -188,7 +188,7 @@ export interface CheckoutSDK {
   setUseCashback?: (useCashback: boolean) => {};
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
   createCashfreeOrder?: (returnURL?: string) => CreateCashfreeOrderResult;
-  checkoutRecalculation?: () => any;
+  checkoutRecalculation?: (refreshCheckout?: boolean) => any;
 }
 
 export const checkout = ({
@@ -1368,7 +1368,7 @@ export const checkout = ({
     return { data: null };
   };
 
-  const checkoutRecalculation: CheckoutSDK["checkoutRecalculation"] = async () => {
+  const checkoutRecalculation: CheckoutSDK["checkoutRecalculation"] = async (refreshCheckout?: boolean) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -1383,14 +1383,20 @@ export const checkout = ({
         : checkoutString;
 
     if (checkout && checkout.token) {
+
+      const inputVariables:CheckoutRecalculationQueryVariables = refreshCheckout ? {
+        token: checkout?.token,
+        refreshCheckout: refreshCheckout,
+      }: {
+        token: checkout?.token,
+      };
+
       const checkoutDetailRes = await client.query<
         CheckoutRecalculationQuery,
         CheckoutRecalculationQueryVariables
       >({
         query: CHECKOUT_RECALCULATION,
-        variables: {
-          token: checkout?.token,
-        },
+        variables: inputVariables,
         fetchPolicy: "no-cache",
       });
 

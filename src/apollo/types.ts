@@ -21428,6 +21428,7 @@ export type CheckoutTotalsQuery = { checkoutTotals: Maybe<{ prepaidCashback: May
 
 export type CheckoutRecalculationQueryVariables = Exact<{
   token?: Maybe<Scalars['UUID']>;
+  refreshCheckout?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -24297,8 +24298,8 @@ export type CheckoutTotalsQueryHookResult = ReturnType<typeof useCheckoutTotalsQ
 export type CheckoutTotalsLazyQueryHookResult = ReturnType<typeof useCheckoutTotalsLazyQuery>;
 export type CheckoutTotalsQueryResult = Apollo.QueryResult<CheckoutTotalsQuery, CheckoutTotalsQueryVariables>;
 export const CheckoutRecalculationDocument = gql`
-    query CheckoutRecalculation($token: UUID) {
-  checkoutRecalculation(token: $token) {
+    query CheckoutRecalculation($token: UUID, $refreshCheckout: Boolean) {
+  checkoutRecalculation(token: $token, refreshCheckout: $refreshCheckout) {
     ...Checkout
     paymentMethod {
       cashbackDiscountAmount
@@ -24326,6 +24327,7 @@ export const CheckoutRecalculationDocument = gql`
  * const { data, loading, error } = useCheckoutRecalculationQuery({
  *   variables: {
  *      token: // value for 'token'
+ *      refreshCheckout: // value for 'refreshCheckout'
  *   },
  * });
  */
