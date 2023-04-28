@@ -22,7 +22,8 @@ export const setLocalCheckoutInCache = async (
   client: ApolloClient<NormalizedCacheObject>,
   checkout: any,
   fetchDiscount?: boolean,
-  orderPlaced?: CompleteCheckoutMutation | null | undefined
+  orderPlaced?: CompleteCheckoutMutation | null | undefined,
+  isRecalculate = true
 ) => {
   console.log("setLocalCheckoutInCache", checkout);
   client.writeQuery({
@@ -71,6 +72,7 @@ export const setLocalCheckoutInCache = async (
       const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
         checkoutId: checkout?.id,
         shippingMethodId: checkout.availableShippingMethods[0]?.id,
+        isRecalculate,
       };
 
       try {

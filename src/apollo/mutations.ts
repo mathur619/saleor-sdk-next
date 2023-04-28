@@ -584,10 +584,12 @@ export const UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION = gql`
     $checkoutId: ID!
     $shippingAddress: AddressInput!
     $email: String!
+    $isRecalculate: Boolean
   ) {
     checkoutShippingAddressUpdate(
       checkoutId: $checkoutId
       shippingAddress: $shippingAddress
+      isRecalculate: $isRecalculate
     ) {
       errors: checkoutErrors {
         ...CheckoutError
@@ -683,8 +685,8 @@ export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION = gql`
 export const ADD_CHECKOUT_PROMO_CODE = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
-  mutation AddCheckoutPromoCode($checkoutId: ID!, $promoCode: String!) {
-    checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
+  mutation AddCheckoutPromoCode($checkoutId: ID!, $promoCode: String!, $isRecalculate: Boolean) {
+    checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode, isRecalculate: $isRecalculate) {
       checkout {
         ...Checkout
         paymentMethod {
@@ -707,8 +709,8 @@ export const ADD_CHECKOUT_PROMO_CODE = gql`
 export const REMOVE_CHECKOUT_PROMO_CODE = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
-  mutation RemoveCheckoutPromoCode($checkoutId: ID!, $promoCode: String!) {
-    checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
+  mutation RemoveCheckoutPromoCode($checkoutId: ID!, $promoCode: String!, $isRecalculate: Boolean) {
+    checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode, isRecalculate: $isRecalculate) {
       checkout {
         ...Checkout
         paymentMethod {
@@ -784,11 +786,13 @@ export const CHECKOUT_PAYMENT_METHOD_UPDATE = gql`
     $checkoutId: ID!
     $gatewayId: String!
     $useCashback: Boolean!
+    $isRecalculate: Boolean
   ) {
     checkoutPaymentMethodUpdate(
       checkoutId: $checkoutId
       gatewayId: $gatewayId
       useCashback: $useCashback
+      isRecalculate: $isRecalculate
     ) {
       checkout {
         ...Checkout
@@ -956,10 +960,12 @@ export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT = gql`
   mutation UpdateCheckoutShippingMethodNext(
     $checkoutId: ID!
     $shippingMethodId: ID!
+    $isRecalculate: Boolean
   ) {
     checkoutShippingMethodUpdate(
       checkoutId: $checkoutId
       shippingMethodId: $shippingMethodId
+      isRecalculate: $isRecalculate
     ) {
       checkout {
         ...Checkout
