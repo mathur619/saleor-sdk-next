@@ -532,6 +532,30 @@ export const CREATE_CHECKOUT_MUTATION = gql`
   }
 `;
 
+export const CREATE_CHECKOUT_MUTATION_NEXT = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation CreateCheckoutNext($checkoutInput: CheckoutCreateInput!) {
+    checkoutCreate(input: $checkoutInput) {
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+      checkout {
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
+      }
+    }
+  }
+`;
+
 export const ADD_CHECKOUT_LINE_MUTATION = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
@@ -806,6 +830,57 @@ export const GET_WALLET_AMOUNT = gql`
     wallet {
       id
       amount
+    }
+  }
+`;
+
+export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
+    checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
+      checkout {
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation UpdateCheckoutLineNext(
+    $checkoutId: ID!
+    $lines: [CheckoutLineInput]!
+  ) {
+    checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
+      checkout {
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
     }
   }
 `;
