@@ -20705,7 +20705,10 @@ export type RemoveCheckoutLineMutationVariables = Exact<{
 }>;
 
 
-export type RemoveCheckoutLineMutation = { checkoutLineDelete: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
+export type RemoveCheckoutLineMutation = { checkoutLineDelete: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
 
 export type UpdateCheckoutShippingAddressMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
@@ -20826,6 +20829,17 @@ export type UpdateCheckoutLineNextMutationVariables = Exact<{
 
 
 export type UpdateCheckoutLineNextMutation = { checkoutLinesUpdate: Maybe<{ checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )>, errors: Array<CheckoutErrorFragment> }> };
+
+export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+  shippingMethodId: Scalars['ID'];
+}>;
+
+
+export type UpdateCheckoutShippingMethodNextMutation = { checkoutShippingMethodUpdate: Maybe<{ checkout: Maybe<(
       { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
       & CheckoutFragment
     )>, errors: Array<CheckoutErrorFragment> }> };
@@ -21001,6 +21015,7 @@ export const PriceFragmentDoc = gql`
   }
 }
     `;
+
 export const ShippingMethodFragmentDoc = gql`
     fragment ShippingMethod on ShippingMethod {
   id
@@ -21970,6 +21985,15 @@ export const RemoveCheckoutLineDocument = gql`
   checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
     checkout {
       ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
     }
     errors: checkoutErrors {
       ...CheckoutError
@@ -22634,6 +22658,58 @@ export function useUpdateCheckoutLineNextMutation(baseOptions?: Apollo.MutationH
 export type UpdateCheckoutLineNextMutationHookResult = ReturnType<typeof useUpdateCheckoutLineNextMutation>;
 export type UpdateCheckoutLineNextMutationResult = Apollo.MutationResult<UpdateCheckoutLineNextMutation>;
 export type UpdateCheckoutLineNextMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>;
+export const UpdateCheckoutShippingMethodNextDocument = gql`
+    mutation UpdateCheckoutShippingMethodNext($checkoutId: ID!, $shippingMethodId: ID!) {
+  checkoutShippingMethodUpdate(
+    checkoutId: $checkoutId
+    shippingMethodId: $shippingMethodId
+  ) {
+    checkout {
+      ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
+    }
+    errors: checkoutErrors {
+      ...CheckoutError
+    }
+  }
+}
+    ${CheckoutFragmentDoc}
+${CheckoutErrorFragmentDoc}`;
+export type UpdateCheckoutShippingMethodNextMutationFn = Apollo.MutationFunction<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>;
+
+/**
+ * __useUpdateCheckoutShippingMethodNextMutation__
+ *
+ * To run a mutation, you first call `useUpdateCheckoutShippingMethodNextMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCheckoutShippingMethodNextMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCheckoutShippingMethodNextMutation, { data, loading, error }] = useUpdateCheckoutShippingMethodNextMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      shippingMethodId: // value for 'shippingMethodId'
+ *   },
+ * });
+ */
+export function useUpdateCheckoutShippingMethodNextMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>(UpdateCheckoutShippingMethodNextDocument, options);
+      }
+export type UpdateCheckoutShippingMethodNextMutationHookResult = ReturnType<typeof useUpdateCheckoutShippingMethodNextMutation>;
+export type UpdateCheckoutShippingMethodNextMutationResult = Apollo.MutationResult<UpdateCheckoutShippingMethodNextMutation>;
+export type UpdateCheckoutShippingMethodNextMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>;
 export const RefreshCheckoutDocument = gql`
     mutation RefreshCheckout($checkoutId: ID!) {
   checkoutRefresh(checkoutId: $checkoutId) {

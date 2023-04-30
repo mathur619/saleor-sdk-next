@@ -1,13 +1,13 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
-import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION } from ".";
+import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION, UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT } from ".";
 import { storage } from "../core/storage";
 import { CHECKOUT_DETAILS_NEXT, GET_DISCOUNT_CASHBACK_QUERY, GET_LOCAL_CHECKOUT } from "./queries";
 import {
   CheckoutDetailsNextQuery,
   CheckoutDetailsNextQueryVariables,
   CompleteCheckoutMutation,
-  UpdateCheckoutShippingMethodMutation,
-  UpdateCheckoutShippingMethodMutationVariables,
+  UpdateCheckoutShippingMethodNextMutation,
+  UpdateCheckoutShippingMethodNextMutationVariables,
 } from "./types";
 import {
   DiscountsAndCashbackQuery,
@@ -64,53 +64,96 @@ export const setLocalCheckoutInCache = async (
     });
   } else if (fetchDiscount && checkout?.token) {
     if (checkout.availableShippingMethods[0]?.id) {
-      const variables: UpdateCheckoutShippingMethodMutationVariables = {
+      const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
         checkoutId: checkout?.id,
         shippingMethodId: checkout.availableShippingMethods[0]?.id,
       };
 
-      const resShipping = await client.mutate<
-        UpdateCheckoutShippingMethodMutation,
-        UpdateCheckoutShippingMethodMutationVariables
-      >({
-        mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
-        variables,
-      });
+      try {
+        const resShipping = await client.mutate<
+          UpdateCheckoutShippingMethodNextMutation,
+          UpdateCheckoutShippingMethodNextMutationVariables
+        >({
+          mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
+          variables,
+        });
 
-      if (
-        resShipping.data?.checkoutShippingMethodUpdate?.errors &&
-        resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.code ===
-          "NOT_FOUND" &&
-        resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
-          "checkoutId" &&
-        typeof window !== "undefined"
-      ) {
-        window.localStorage?.clear();
-        window.location?.reload();
+        if (
+          resShipping.data?.checkoutShippingMethodUpdate?.errors &&
+          resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.code ===
+            "NOT_FOUND" &&
+          resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
+            "checkoutId" &&
+          typeof window !== "undefined"
+        ) {
+          window.localStorage?.clear();
+          window.location?.reload();
+          return;
+        }
+
+        if (!resShipping.data?.checkoutShippingMethodUpdate?.checkout?.id) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+          return;
+        }
+
+        // const res = await client.query<
+        //   DiscountsAndCashbackQuery,
+        //   DiscountsAndCashbackQueryVariables
+        // >({
+        //   query: GET_DISCOUNT_CASHBACK_QUERY,
+        //   variables: {
+        //     token: checkout?.token,
+        //   },
+        //   fetchPolicy: "network-only",
+        // });
+
+        const res = {
+          data: {
+            checkoutDiscounts: {
+              __typename: "DiscountsType",
+              prepaidDiscount:
+                resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                  ?.paymentMethod?.prepaidDiscountAmount,
+              couponDiscount:
+                resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                  ?.paymentMethod?.couponDiscount,
+              cashbackDiscount:
+                resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                  ?.paymentMethod?.cashbackDiscountAmount,
+            },
+            cashback:
+              resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                ?.cashback,
+          },
+        };
+
+        storage.setCheckout(
+          resShipping.data?.checkoutShippingMethodUpdate?.checkout
+        );
+        storage.setDiscounts(res.data);
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout:
+              resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+            localCheckoutDiscounts: res.data.checkoutDiscounts,
+            localCashback: res.data.cashback,
+          },
+        });
+      } catch {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
         return;
       }
-
-      const res = await client.query<
-        DiscountsAndCashbackQuery,
-        DiscountsAndCashbackQueryVariables
-      >({
-        query: GET_DISCOUNT_CASHBACK_QUERY,
-        variables: {
-          token: checkout?.token,
-        },
-        fetchPolicy: "network-only",
-      });
-
-      storage.setDiscounts(res.data);
-      client.writeQuery({
-        query: GET_LOCAL_CHECKOUT,
-        data: {
-          localCheckout:
-            resShipping.data?.checkoutShippingMethodUpdate?.checkout,
-          localCheckoutDiscounts: res.data.checkoutDiscounts,
-          localCashback: res.data.cashback,
-        },
-      });
     } else {
       const res = await client.query<
         DiscountsAndCashbackQuery,
@@ -133,6 +176,27 @@ export const setLocalCheckoutInCache = async (
         },
       });
     }
+  } else if (checkout?.token && checkout?.paymentMethod && checkout?.cashback) {
+    const resDiscount = {
+      data: {
+        __typename: "DiscountsType",
+        checkoutDiscounts: {
+          prepaidDiscount: checkout?.paymentMethod?.prepaidDiscountAmount,
+          couponDiscount: checkout?.paymentMethod?.couponDiscount,
+          cashbackDiscount: checkout?.paymentMethod?.cashbackDiscountAmount,
+        },
+        cashback: checkout?.cashback,
+      },
+    };
+    storage.setDiscounts(resDiscount.data);
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        localCheckout: checkout,
+        localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+        localCashback: resDiscount.data.cashback,
+      },
+    });
   }
 
   client.writeQuery({

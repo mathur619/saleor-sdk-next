@@ -68,7 +68,7 @@ export interface CartSDK {
   cashbackRecieve?: any;
 
   addItem: (variantId: string, quantity: number) => AddItemResult;
-  removeItem: (variantId: string) => RemoveItemResult;
+  removeItem: (variantId: string, updateShippingMethod?: boolean) => RemoveItemResult;
   subtractItem?: (variantId: string, quantity: number) => {};
   addToCartNext: (
     variantId: string,
@@ -261,7 +261,7 @@ export const cart = ({
     }
   };
 
-  const removeItem: CartSDK["removeItem"] = async (variantId: string) => {
+  const removeItem: CartSDK["removeItem"] = async (variantId: string, updateShippingMethod = true) => {
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null =
       checkoutString && typeof checkoutString === "string"
@@ -281,16 +281,6 @@ export const cart = ({
           checkoutId: checkout?.id,
           lineId: lineToRemoveId,
         },
-        update: async (_, { data }) => {
-          if (data?.checkoutLineDelete?.checkout?.id) {
-            storage.setCheckout(data?.checkoutLineDelete?.checkout);
-          }
-          await setLocalCheckoutInCache(
-            client,
-            data?.checkoutLineDelete?.checkout,
-            true
-          );
-        },
       });
 
       if (
@@ -308,7 +298,8 @@ export const cart = ({
           "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
-        await clearCart();
+        window.localStorage?.clear();
+        window.location?.reload();
       }
       if (
         res.data?.checkoutLineDelete?.errors &&
@@ -316,7 +307,8 @@ export const cart = ({
           "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
-        await clearCart();
+        window.localStorage?.clear();
+        window.location?.reload();
       }
       if (
         res.data?.checkoutLineDelete?.errors &&
@@ -328,10 +320,56 @@ export const cart = ({
         window.location?.reload();
       }
 
-      return {
-        data: res.data?.checkoutLineDelete?.checkout,
-        errors: res.data?.checkoutLineDelete?.errors,
-      };
+      if (res?.data?.checkoutLineDelete?.checkout?.id) {
+        storage.setCheckout(res?.data?.checkoutLineDelete?.checkout);
+        const resDiscount = {
+          data: {
+            __typename: "DiscountsType",
+            checkoutDiscounts: {
+              prepaidDiscount:
+                res?.data?.checkoutLineDelete?.checkout?.paymentMethod
+                  ?.prepaidDiscountAmount,
+              couponDiscount:
+                res?.data?.checkoutLineDelete?.checkout?.paymentMethod
+                  ?.couponDiscount,
+              cashbackDiscount:
+                res?.data?.checkoutLineDelete?.checkout?.paymentMethod
+                  ?.cashbackDiscountAmount,
+            },
+            cashback: res?.data?.checkoutLineDelete?.checkout?.cashback,
+          },
+        };
+
+        storage.setDiscounts(resDiscount.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: res?.data?.checkoutLineDelete?.checkout,
+            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+            localCashback: resDiscount.data.cashback,
+          },
+        });
+        if (updateShippingMethod) {
+          await setLocalCheckoutInCache(
+            client,
+            res.data?.checkoutLineDelete?.checkout,
+            true
+          );
+        }
+
+        return {
+          data: res.data?.checkoutLineDelete?.checkout,
+          errors: res.data?.checkoutLineDelete?.errors,
+        };
+      }
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
     }
     return null;
   };
