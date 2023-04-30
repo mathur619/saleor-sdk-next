@@ -696,6 +696,15 @@ export const ADD_CHECKOUT_PROMO_CODE = gql`
     checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
@@ -711,6 +720,15 @@ export const REMOVE_CHECKOUT_PROMO_CODE = gql`
     checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
