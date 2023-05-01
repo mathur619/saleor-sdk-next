@@ -9851,6 +9851,7 @@ export type MutationCheckoutCustomerDetachArgs = {
 export type MutationCheckoutEmailUpdateArgs = {
   checkoutId?: Maybe<Scalars['ID']>;
   email: Scalars['String'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -21957,7 +21958,11 @@ export const UpdateCheckoutShippingAddressDocument = gql`
       }
     }
   }
-  checkoutEmailUpdate(checkoutId: $checkoutId, email: $email) {
+  checkoutEmailUpdate(
+    checkoutId: $checkoutId
+    email: $email
+    isRecalculate: $isRecalculate
+  ) {
     checkout {
       ...Checkout
     }

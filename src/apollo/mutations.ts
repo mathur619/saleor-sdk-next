@@ -607,7 +607,7 @@ export const UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION = gql`
         }
       }
     }
-    checkoutEmailUpdate(checkoutId: $checkoutId, email: $email) {
+    checkoutEmailUpdate(checkoutId: $checkoutId, email: $email, isRecalculate: $isRecalculate) {
       checkout {
         ...Checkout
       }
