@@ -612,6 +612,15 @@ export const UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION = gql`
       }
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
     }
     checkoutEmailUpdate(checkoutId: $checkoutId, email: $email) {

@@ -231,7 +231,7 @@ export interface AuthSDK {
 
   setToken: (authToken: string, csrfToken: string) => GetUserCheckoutResult;
 
-  getUserCheckout: () => GetUserCheckoutResult;
+  getUserCheckout: (updateShippingMethod?: boolean) => GetUserCheckoutResult;
 }
 
 export const auth = ({
@@ -415,20 +415,24 @@ export const auth = ({
     return res;
   };
 
-  const getUserCheckout: AuthSDK["getUserCheckout"] = async () => {
+  const getUserCheckout: AuthSDK["getUserCheckout"] = async (
+    updateShippingMethod = true
+  ) => {
     const res = await client.mutate<
       UserCheckoutDetailsQuery,
       UserCheckoutDetailsQueryVariables
     >({
       mutation: USER_CHECKOUT_DETAILS,
-
-      update: (_, { data }) => {
-        setLocalCheckoutInCache(client, data?.me?.checkout, true);
-        if (data?.me?.checkout?.id) {
-          storage.setCheckout(data?.me?.checkout);
-        }
-      },
     });
+
+    if (res?.data?.me?.checkout?.id) {
+      setLocalCheckoutInCache(
+        client,
+        res?.data?.me?.checkout,
+        updateShippingMethod
+      );
+      storage.setCheckout(res?.data?.me?.checkout);
+    }
 
     return res;
   };
@@ -501,7 +505,7 @@ export const auth = ({
         update: (_, { data }) => {
           if (data?.tokenRefresh?.token) {
             storage.setAccessToken(data.tokenRefresh.token);
-            getUserCheckout();
+            getUserCheckout(false);
           } else {
             signOut();
           }
@@ -518,7 +522,7 @@ export const auth = ({
       update: (_, { data }) => {
         if (data?.tokenRefresh?.token) {
           storage.setAccessToken(data.tokenRefresh.token);
-          getUserCheckout();
+          getUserCheckout(false);
         } else {
           signOut();
         }

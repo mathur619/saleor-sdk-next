@@ -116,7 +116,8 @@ export interface CheckoutSDK {
   createCheckout?: () => CreateCheckoutResult;
   setShippingAddress?: (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod?: boolean
   ) => SetShippingAddressResult;
   setShippingAndBillingAddress?: (
     shippingAddress: IAddress,
@@ -125,8 +126,8 @@ export interface CheckoutSDK {
 
   setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
-  addPromoCode?: (promoCode: string) => AddPromoCodeResult;
-  removePromoCode?: (promoCode: string) => RemovePromoCodeResult;
+  addPromoCode?: (promoCode: string, updateShippingMethod?: boolean) => AddPromoCodeResult;
+  removePromoCode?: (promoCode: string, updateShippingMethod?: boolean) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
     input: PaymentMethodUpdateInput
   ) => CheckoutPaymentMethodUpdateResult;
@@ -200,7 +201,8 @@ export const checkout = ({
 
   const setShippingAddress: CheckoutSDK["setShippingAddress"] = async (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod = false
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -238,16 +240,16 @@ export const checkout = ({
       >({
         mutation: UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
         variables,
-        update: (_, { data }) => {
-          setLocalCheckoutInCache(
-            client,
-            data?.checkoutShippingAddressUpdate?.checkout
-          );
-          if (data?.checkoutShippingAddressUpdate?.checkout?.id) {
-            storage.setCheckout(data?.checkoutShippingAddressUpdate?.checkout);
-          }
-        },
       });
+
+      if (res?.data?.checkoutShippingAddressUpdate?.checkout?.id) {
+        setLocalCheckoutInCache(
+          client,
+          res?.data?.checkoutShippingAddressUpdate?.checkout,
+          updateShippingMethod
+        );
+        storage.setCheckout(res?.data?.checkoutShippingAddressUpdate?.checkout);
+      }
 
       return res;
     }
@@ -406,7 +408,8 @@ export const checkout = ({
   };
 
   const addPromoCode: CheckoutSDK["addPromoCode"] = async (
-    promoCode: string
+    promoCode: string,
+    updateShippingMethod = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -466,6 +469,14 @@ export const checkout = ({
         });
       }
 
+      if (updateShippingMethod) {
+        await setLocalCheckoutInCache(
+          client,
+          res.data?.checkoutAddPromoCode?.checkout,
+          true
+        );
+      }
+
       client.writeQuery({
         query: GET_LOCAL_CHECKOUT,
         data: {
@@ -480,7 +491,8 @@ export const checkout = ({
   };
 
   const removePromoCode: CheckoutSDK["removePromoCode"] = async (
-    promoCode: string
+    promoCode: string,
+    updateShippingMethod = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -539,6 +551,14 @@ export const checkout = ({
             localCashback: resDiscount.data.cashback,
           },
         });
+
+        if (updateShippingMethod) {
+          await setLocalCheckoutInCache(
+            client,
+            res.data?.checkoutRemovePromoCode?.checkout,
+            true
+          );
+        }
       }
 
       client.writeQuery({
