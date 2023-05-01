@@ -221,7 +221,8 @@ export interface AuthSDK {
     otp: string,
     phone?: string,
     email?: string,
-    updateShippingMethod?: boolean
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
   ) => SignInMobileResult;
 
   requestOTP: (phone: string) => RequestOtpResult;
@@ -234,7 +235,7 @@ export interface AuthSDK {
     sendWigzoInHeader?: boolean
   ) => RegisterAccountV2Result;
 
-  confirmAccountV2: (otp: string, phone: string, updateShippingMethod?:boolean) => ConfirmAccountV2Result;
+  confirmAccountV2: (otp: string, phone: string, updateShippingMethod?:boolean, isRecalculate?:boolean) => ConfirmAccountV2Result;
 
   checkoutCustomerAttach: (
     token: string,
@@ -247,7 +248,7 @@ export interface AuthSDK {
 
   setToken: (authToken: string, csrfToken: string) => GetUserCheckoutResult;
 
-  getUserCheckout: (updateShippingMethod?: boolean) => GetUserCheckoutResult;
+  getUserCheckout: (updateShippingMethod?: boolean, isRecalculate?:boolean) => GetUserCheckoutResult;
 }
 
 export const auth = ({
@@ -259,7 +260,8 @@ export const auth = ({
     otp: string,
     phone?: string,
     email?: string,
-    updateShippingMethod:boolean = true
+    updateShippingMethod:boolean = true,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: USER,
@@ -299,7 +301,7 @@ export const auth = ({
             csrfToken: data.CreateTokenOTP.csrfToken,
             refreshToken: data.CreateTokenOTP.refreshToken,
           });
-          getUserCheckout(updateShippingMethod);
+          getUserCheckout(updateShippingMethod, isRecalculate);
         } else {
           client.writeQuery({
             query: USER,
@@ -540,7 +542,8 @@ export const auth = ({
   };
 
   const getUserCheckout: AuthSDK["getUserCheckout"] = async (
-    updateShippingMethod: boolean = true
+    updateShippingMethod: boolean = true,
+    isRecalculate = true
   ) => {
     const res = await client.mutate<
       UserCheckoutDetailsQuery,
@@ -553,7 +556,9 @@ export const auth = ({
       setLocalCheckoutInCache(
         client,
         res?.data?.me?.checkout,
-        updateShippingMethod
+        updateShippingMethod,
+        null,
+        isRecalculate
       );
       storage.setCheckout(res?.data?.me?.checkout);
     }
