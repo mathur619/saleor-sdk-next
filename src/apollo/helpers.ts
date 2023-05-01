@@ -1,5 +1,5 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
-import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION, UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT } from ".";
+import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT } from ".";
 import { storage } from "../core/storage";
 import { CHECKOUT_DETAILS_NEXT, GET_DISCOUNT_CASHBACK_QUERY, GET_LOCAL_CHECKOUT } from "./queries";
 import {
