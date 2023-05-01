@@ -249,7 +249,7 @@ export interface AuthSDK {
 
   setToken: (authToken: string, csrfToken: string) => GetUserCheckoutResult;
 
-  getUserCheckout: (updateShippingMethod?: boolean, isRecalculate?:boolean) => GetUserCheckoutResult;
+  getUserCheckout: (updateShippingMethod?: boolean, isRecalculate?:boolean, recalculationQuery?:boolean) => GetUserCheckoutResult;
 }
 
 export const auth = ({
