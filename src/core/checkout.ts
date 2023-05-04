@@ -143,30 +143,35 @@ export interface CheckoutSDK {
   setShippingAddress?: (
     shippingAddress: IAddress,
     email: string,
-    updateShippingMethod?: boolean
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
   ) => SetShippingAddressResult;
   setShippingAndBillingAddress?: (
     shippingAddress: IAddress,
     email: string,
-    updateShippingMethod?: boolean
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
   ) => SetShippingAndBillingAddressResult;
 
   setBillingAddress?: (
     billingAddress: IAddress,
     updateShippingMethod?: boolean
   ) => SetBillingAddressResult;
-  setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
+  setShippingMethod?: (shippingMethodId: string, isRecalculate?: boolean) => SetShippingMethodResult;
   addPromoCode?: (
     promoCode: string,
-    updateShippingMethod?: boolean
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
   ) => AddPromoCodeResult;
   removePromoCode?: (
     promoCode: string,
-    updateShippingMethod?: boolean
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
   ) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
     input: PaymentMethodUpdateInput,
-    updateShippingMethod?: boolean
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
   ) => CheckoutPaymentMethodUpdateResult;
   createPayment?: (input: CreatePaymentInput) => CreatePaymentResult;
   completeCheckout?: (input?: CompleteCheckoutInput) => CompleteCheckoutResult;
@@ -270,7 +275,8 @@ export const checkout = ({
   const setShippingAddress: CheckoutSDK["setShippingAddress"] = async (
     shippingAddress: IAddress,
     email: string,
-    updateShippingMethod = false
+    updateShippingMethod = false,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -287,6 +293,7 @@ export const checkout = ({
     if (checkout && checkout?.id) {
       const variables = {
         checkoutId: checkout?.id,
+        isRecalculate,
         email,
         shippingAddress: {
           city: shippingAddress.city,
@@ -382,7 +389,8 @@ export const checkout = ({
   const setShippingAndBillingAddress: CheckoutSDK["setShippingAndBillingAddress"] = async (
     shippingAddress: IAddress,
     email: string,
-    updateShippingMethod = false
+    updateShippingMethod = false,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -391,7 +399,7 @@ export const checkout = ({
       },
     });
 
-    const resShipping = await setShippingAddress(shippingAddress, email);
+    const resShipping = await setShippingAddress(shippingAddress, email, updateShippingMethod, isRecalculate);
     const resBilling = await setBillingAddress(
       shippingAddress,
       updateShippingMethod
@@ -446,7 +454,8 @@ export const checkout = ({
   };
 
   const setShippingMethod: CheckoutSDK["setShippingMethod"] = async (
-    shippingMethodId: string
+    shippingMethodId: string,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -464,6 +473,7 @@ export const checkout = ({
     if (checkout && checkout?.id) {
       const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
         checkoutId: checkout?.id,
+        isRecalculate,
         shippingMethodId,
       };
 
@@ -506,7 +516,8 @@ export const checkout = ({
 
   const addPromoCode: CheckoutSDK["addPromoCode"] = async (
     promoCode: string,
-    updateShippingMethod = true
+    updateShippingMethod = true,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -523,6 +534,7 @@ export const checkout = ({
     if (checkout && checkout?.id) {
       const variables: AddCheckoutPromoCodeMutationVariables = {
         checkoutId: checkout?.id,
+        isRecalculate,
         promoCode,
       };
 
@@ -589,7 +601,8 @@ export const checkout = ({
 
   const removePromoCode: CheckoutSDK["removePromoCode"] = async (
     promoCode: string,
-    updateShippingMethod = true
+    updateShippingMethod = true,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -607,6 +620,7 @@ export const checkout = ({
     if (checkout && checkout?.id) {
       const variables: RemoveCheckoutPromoCodeMutationVariables = {
         checkoutId: checkout?.id,
+        isRecalculate,
         promoCode,
       };
 
@@ -673,7 +687,8 @@ export const checkout = ({
 
   const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] = async (
     input: PaymentMethodUpdateInput,
-    updateShippingMethod = true
+    updateShippingMethod = true,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -696,6 +711,7 @@ export const checkout = ({
         checkoutId: checkout?.id,
         gatewayId: input.gateway,
         useCashback: input.useCashback,
+        isRecalculate,
       };
 
       const res = await client.mutate<

@@ -2342,6 +2342,7 @@ export type CheckoutErrorCode =
   | 'UNIQUE'
   | 'VOUCHER_NOT_APPLICABLE'
   | 'ZERO_QUANTITY'
+  | 'CHECKOUTS_TOTAL_UNMATCHED'
   | 'RTO_CUSTOMER_FOUND'
   | 'COD_NOT_APPLICABLE_FOR_PRODUCT_IN_CART';
 
@@ -5787,10 +5788,10 @@ export type EmailTemplateFilterInput = {
   sender?: Maybe<Scalars['String']>;
   subject?: Maybe<Scalars['String']>;
   isEnabled?: Maybe<Scalars['Boolean']>;
-  mailType?: Maybe<Scalars['String']>;
   search?: Maybe<Scalars['String']>;
   created?: Maybe<DateRangeInput>;
   updated?: Maybe<DateRangeInput>;
+  mailType?: Maybe<Array<Maybe<TemplateMailTypeFilter>>>;
 };
 
 export type EmailTemplateInput = {
@@ -6480,6 +6481,11 @@ export type GetUserHash = {
   errors: Array<Error>;
   /** Shopify User Id */
   userHash: Maybe<Scalars['String']>;
+};
+
+export type GetVariantSkuType = {
+  /** New generated SKU with city prefix */
+  skuId: Maybe<Scalars['String']>;
 };
 
 /** A gift card is a prepaid electronic payment card accepted in stores. They can be used during checkout by providing a valid gift card codes. */
@@ -10115,6 +10121,7 @@ export type MutationExportProductsArgs = {
 
 export type MutationCheckoutAddPromoCodeArgs = {
   checkoutId: Scalars['ID'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
   promoCode: Scalars['String'];
 };
 
@@ -10152,6 +10159,7 @@ export type MutationCheckoutCustomerDetachArgs = {
 export type MutationCheckoutEmailUpdateArgs = {
   checkoutId?: Maybe<Scalars['ID']>;
   email: Scalars['String'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -10175,6 +10183,7 @@ export type MutationCheckoutLinesUpdateArgs = {
 
 export type MutationCheckoutRemovePromoCodeArgs = {
   checkoutId: Scalars['ID'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
   promoCode: Scalars['String'];
 };
 
@@ -10187,12 +10196,14 @@ export type MutationCheckoutPaymentCreateArgs = {
 
 export type MutationCheckoutShippingAddressUpdateArgs = {
   checkoutId: Scalars['ID'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
   shippingAddress: AddressInput;
 };
 
 
 export type MutationCheckoutShippingMethodUpdateArgs = {
   checkoutId?: Maybe<Scalars['ID']>;
+  isRecalculate?: Maybe<Scalars['Boolean']>;
   shippingMethodId: Scalars['ID'];
 };
 
@@ -10783,6 +10794,7 @@ export type MutationVoucherRuleLinkUpdateArgs = {
 export type MutationCheckoutPaymentMethodUpdateArgs = {
   checkoutId: Scalars['ID'];
   gatewayId: Scalars['String'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
   useCashback: Scalars['Boolean'];
 };
 
@@ -12009,6 +12021,7 @@ export type OrderLine = Node & {
   quantity: Scalars['Int'];
   quantityFulfilled: Scalars['Int'];
   taxRate: Scalars['Float'];
+  lineDiscountAmount: Scalars['Float'];
   digitalContentUrl: Maybe<DigitalContentUrl>;
   /** The main thumbnail for the ordered product. */
   thumbnail: Maybe<Image>;
@@ -15041,6 +15054,8 @@ export type Query = {
   freeCheckoutLines: Maybe<Array<Maybe<CheckoutLine>>>;
   genericFormName: Maybe<Array<Maybe<FormNameType>>>;
   genericForms: Maybe<GenericFormTypeConnection>;
+  /** Look up a product review by ID. */
+  getVariantSku: Maybe<GetVariantSkuType>;
   /** Look up a gift card by ID. */
   giftCard: Maybe<GiftCard>;
   /** List of gift cards. */
@@ -15286,7 +15301,8 @@ export type QueryAppsArgs = {
 
 
 export type QueryArchiveOrderArgs = {
-  id: Scalars['ID'];
+  id?: Maybe<Scalars['ID']>;
+  foreignId?: Maybe<Scalars['ID']>;
 };
 
 
@@ -15623,6 +15639,11 @@ export type QueryGenericFormsArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryGetVariantSkuArgs = {
+  skuPrefix?: Maybe<Scalars['ID']>;
 };
 
 
@@ -18764,6 +18785,21 @@ export type TemplateMailType =
   | 'MEMBERSHIP_ACTIVATE'
   | 'REVIEW_MAIL';
 
+export type TemplateMailTypeFilter =
+  | 'ORDER_CONFIRM'
+  | 'ORDER_CANCEL'
+  | 'ORDER_DISPATCHED'
+  | 'ORDER_DELIVERED'
+  | 'ABANDONED_CART'
+  | 'CASHBACK'
+  | 'CASHBACK_SIGNUP'
+  | 'CASHBACK_USED'
+  | 'WALLET'
+  | 'NOTIFICATION'
+  | 'INVOICE'
+  | 'CONTACT_US'
+  | 'MEMBERSHIP_ACTIVATE';
+
 /** Requests for Token for registered user. */
 export type TokenCreateWithAdmin = {
   /**
@@ -19846,6 +19882,7 @@ export type VoucherRuleInput = {
   isDefault?: Maybe<Scalars['Boolean']>;
   startDate?: Maybe<Scalars['DateTime']>;
   endDate?: Maybe<Scalars['DateTime']>;
+  voucherruleType?: Maybe<Scalars['String']>;
 };
 
 export type VoucherRuleLinkInput = {
@@ -19913,6 +19950,7 @@ export type VoucherRuleType = Node & {
   updated: Scalars['DateTime'];
   startDate: Scalars['DateTime'];
   endDate: Maybe<Scalars['DateTime']>;
+  voucherruleType: Scalars['String'];
   links: VoucherRuleLinkTypeConnection;
   logs: CouponDiscountTypeConnection;
 };
@@ -21093,6 +21131,7 @@ export type UpdateCheckoutShippingAddressMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   shippingAddress: AddressInput;
   email: Scalars['String'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -21131,6 +21170,7 @@ export type UpdateCheckoutShippingMethodMutation = { checkoutShippingMethodUpdat
 export type AddCheckoutPromoCodeMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   promoCode: Scalars['String'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -21142,6 +21182,7 @@ export type AddCheckoutPromoCodeMutation = { checkoutAddPromoCode: Maybe<{ check
 export type RemoveCheckoutPromoCodeMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   promoCode: Scalars['String'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -21175,6 +21216,7 @@ export type CheckoutPaymentMethodUpdateMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   gatewayId: Scalars['String'];
   useCashback: Scalars['Boolean'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -21296,6 +21338,7 @@ export type CreateCheckoutNextMutation = { checkoutCreate: Maybe<{ errors: Array
 export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   shippingMethodId: Scalars['ID'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -22618,10 +22661,11 @@ export type RemoveCheckoutLineMutationHookResult = ReturnType<typeof useRemoveCh
 export type RemoveCheckoutLineMutationResult = Apollo.MutationResult<RemoveCheckoutLineMutation>;
 export type RemoveCheckoutLineMutationOptions = Apollo.BaseMutationOptions<RemoveCheckoutLineMutation, RemoveCheckoutLineMutationVariables>;
 export const UpdateCheckoutShippingAddressDocument = gql`
-    mutation UpdateCheckoutShippingAddress($checkoutId: ID!, $shippingAddress: AddressInput!, $email: String!) {
+    mutation UpdateCheckoutShippingAddress($checkoutId: ID!, $shippingAddress: AddressInput!, $email: String!, $isRecalculate: Boolean) {
   checkoutShippingAddressUpdate(
     checkoutId: $checkoutId
     shippingAddress: $shippingAddress
+    isRecalculate: $isRecalculate
   ) {
     errors: checkoutErrors {
       ...CheckoutError
@@ -22639,7 +22683,11 @@ export const UpdateCheckoutShippingAddressDocument = gql`
       }
     }
   }
-  checkoutEmailUpdate(checkoutId: $checkoutId, email: $email) {
+  checkoutEmailUpdate(
+    checkoutId: $checkoutId
+    email: $email
+    isRecalculate: $isRecalculate
+  ) {
     checkout {
       ...Checkout
     }
@@ -22668,6 +22716,7 @@ export type UpdateCheckoutShippingAddressMutationFn = Apollo.MutationFunction<Up
  *      checkoutId: // value for 'checkoutId'
  *      shippingAddress: // value for 'shippingAddress'
  *      email: // value for 'email'
+ *      isRecalculate: // value for 'isRecalculate'
  *   },
  * });
  */
@@ -22813,8 +22862,12 @@ export type UpdateCheckoutShippingMethodMutationHookResult = ReturnType<typeof u
 export type UpdateCheckoutShippingMethodMutationResult = Apollo.MutationResult<UpdateCheckoutShippingMethodMutation>;
 export type UpdateCheckoutShippingMethodMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutShippingMethodMutation, UpdateCheckoutShippingMethodMutationVariables>;
 export const AddCheckoutPromoCodeDocument = gql`
-    mutation AddCheckoutPromoCode($checkoutId: ID!, $promoCode: String!) {
-  checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
+    mutation AddCheckoutPromoCode($checkoutId: ID!, $promoCode: String!, $isRecalculate: Boolean) {
+  checkoutAddPromoCode(
+    checkoutId: $checkoutId
+    promoCode: $promoCode
+    isRecalculate: $isRecalculate
+  ) {
     checkout {
       ...Checkout
       paymentMethod {
@@ -22851,6 +22904,7 @@ export type AddCheckoutPromoCodeMutationFn = Apollo.MutationFunction<AddCheckout
  *   variables: {
  *      checkoutId: // value for 'checkoutId'
  *      promoCode: // value for 'promoCode'
+ *      isRecalculate: // value for 'isRecalculate'
  *   },
  * });
  */
@@ -22862,8 +22916,12 @@ export type AddCheckoutPromoCodeMutationHookResult = ReturnType<typeof useAddChe
 export type AddCheckoutPromoCodeMutationResult = Apollo.MutationResult<AddCheckoutPromoCodeMutation>;
 export type AddCheckoutPromoCodeMutationOptions = Apollo.BaseMutationOptions<AddCheckoutPromoCodeMutation, AddCheckoutPromoCodeMutationVariables>;
 export const RemoveCheckoutPromoCodeDocument = gql`
-    mutation RemoveCheckoutPromoCode($checkoutId: ID!, $promoCode: String!) {
-  checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
+    mutation RemoveCheckoutPromoCode($checkoutId: ID!, $promoCode: String!, $isRecalculate: Boolean) {
+  checkoutRemovePromoCode(
+    checkoutId: $checkoutId
+    promoCode: $promoCode
+    isRecalculate: $isRecalculate
+  ) {
     checkout {
       ...Checkout
       paymentMethod {
@@ -22900,6 +22958,7 @@ export type RemoveCheckoutPromoCodeMutationFn = Apollo.MutationFunction<RemoveCh
  *   variables: {
  *      checkoutId: // value for 'checkoutId'
  *      promoCode: // value for 'promoCode'
+ *      isRecalculate: // value for 'isRecalculate'
  *   },
  * });
  */
@@ -23004,11 +23063,12 @@ export type CompleteCheckoutMutationHookResult = ReturnType<typeof useCompleteCh
 export type CompleteCheckoutMutationResult = Apollo.MutationResult<CompleteCheckoutMutation>;
 export type CompleteCheckoutMutationOptions = Apollo.BaseMutationOptions<CompleteCheckoutMutation, CompleteCheckoutMutationVariables>;
 export const CheckoutPaymentMethodUpdateDocument = gql`
-    mutation checkoutPaymentMethodUpdate($checkoutId: ID!, $gatewayId: String!, $useCashback: Boolean!) {
+    mutation checkoutPaymentMethodUpdate($checkoutId: ID!, $gatewayId: String!, $useCashback: Boolean!, $isRecalculate: Boolean) {
   checkoutPaymentMethodUpdate(
     checkoutId: $checkoutId
     gatewayId: $gatewayId
     useCashback: $useCashback
+    isRecalculate: $isRecalculate
   ) {
     checkout {
       ...Checkout
@@ -23048,6 +23108,7 @@ export type CheckoutPaymentMethodUpdateMutationFn = Apollo.MutationFunction<Chec
  *      checkoutId: // value for 'checkoutId'
  *      gatewayId: // value for 'gatewayId'
  *      useCashback: // value for 'useCashback'
+ *      isRecalculate: // value for 'isRecalculate'
  *   },
  * });
  */
@@ -23663,10 +23724,11 @@ export type CreateCheckoutNextMutationHookResult = ReturnType<typeof useCreateCh
 export type CreateCheckoutNextMutationResult = Apollo.MutationResult<CreateCheckoutNextMutation>;
 export type CreateCheckoutNextMutationOptions = Apollo.BaseMutationOptions<CreateCheckoutNextMutation, CreateCheckoutNextMutationVariables>;
 export const UpdateCheckoutShippingMethodNextDocument = gql`
-    mutation UpdateCheckoutShippingMethodNext($checkoutId: ID!, $shippingMethodId: ID!) {
+    mutation UpdateCheckoutShippingMethodNext($checkoutId: ID!, $shippingMethodId: ID!, $isRecalculate: Boolean) {
   checkoutShippingMethodUpdate(
     checkoutId: $checkoutId
     shippingMethodId: $shippingMethodId
+    isRecalculate: $isRecalculate
   ) {
     checkout {
       ...Checkout
@@ -23704,6 +23766,7 @@ export type UpdateCheckoutShippingMethodNextMutationFn = Apollo.MutationFunction
  *   variables: {
  *      checkoutId: // value for 'checkoutId'
  *      shippingMethodId: // value for 'shippingMethodId'
+ *      isRecalculate: // value for 'isRecalculate'
  *   },
  * });
  */

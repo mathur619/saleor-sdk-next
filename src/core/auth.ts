@@ -68,7 +68,7 @@ import {
   CreateTokenTrueCallerMutation,
   CreateTokenTrueCallerMutationVariables,
 } from "..";
-import { setLocalCheckoutInCache } from "../apollo/helpers";
+import { checkoutRecalculationUtil, setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   CONFIRM_ACCOUNT,
   CREATE_OTP_TOKEN_MUTATION,
@@ -229,7 +229,9 @@ export interface AuthSDK {
     otp: string,
     phone?: string,
     email?: string,
-    updateShippingMethod?: boolean
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean,
+    recalculationQuery?: boolean
   ) => SignInMobileResult;
 
   otpLessLogin: (
@@ -254,11 +256,7 @@ export interface AuthSDK {
     sendWigzoInHeader?: boolean
   ) => RegisterAccountV2Result;
 
-  confirmAccountV2: (
-    otp: string,
-    phone: string,
-    updateShippingMethod?: boolean
-  ) => ConfirmAccountV2Result;
+  confirmAccountV2: (otp: string, phone: string, updateShippingMethod?:boolean, isRecalculate?:boolean, recalculationQuery?: boolean) => ConfirmAccountV2Result;
 
   checkoutCustomerAttach: (
     token: string,
@@ -271,7 +269,7 @@ export interface AuthSDK {
 
   setToken: (authToken: string, csrfToken: string) => GetUserCheckoutResult;
 
-  getUserCheckout: (updateShippingMethod?: boolean) => GetUserCheckoutResult;
+  getUserCheckout: (updateShippingMethod?: boolean, isRecalculate?:boolean, recalculationQuery?:boolean) => GetUserCheckoutResult;
 }
 
 export const auth = ({
@@ -283,7 +281,9 @@ export const auth = ({
     otp: string,
     phone?: string,
     email?: string,
-    updateShippingMethod = true
+    updateShippingMethod:boolean = true,
+    isRecalculate = true,
+    recalculationQuery = false
   ) => {
     client.writeQuery({
       query: USER,
@@ -323,7 +323,7 @@ export const auth = ({
             csrfToken: data.CreateTokenOTP.csrfToken,
             refreshToken: data.CreateTokenOTP.refreshToken,
           });
-          getUserCheckout(updateShippingMethod);
+          getUserCheckout(updateShippingMethod, isRecalculate, recalculationQuery);
         } else {
           client.writeQuery({
             query: USER,
@@ -590,7 +590,9 @@ export const auth = ({
   const confirmAccountV2: AuthSDK["confirmAccountV2"] = async (
     otp: string,
     phone: string,
-    updateShippingMethod = true
+    updateShippingMethod = true,
+    isRecalculate = true,
+    recalculationQuery = false
   ) => {
     client.writeQuery({
       query: USER,
@@ -622,7 +624,7 @@ export const auth = ({
             csrfToken: data.confirmAccountV2.csrfToken,
             refreshToken: data.confirmAccountV2.refreshToken,
           });
-          getUserCheckout(updateShippingMethod);
+          getUserCheckout(updateShippingMethod, isRecalculate, recalculationQuery);
         } else {
           client.writeQuery({
             query: USER,
@@ -718,7 +720,9 @@ export const auth = ({
   };
 
   const getUserCheckout: AuthSDK["getUserCheckout"] = async (
-    updateShippingMethod = true
+    updateShippingMethod: boolean = true,
+    isRecalculate = true,
+    recalculationQuery = false
   ) => {
     const res = await client.mutate<
       UserCheckoutDetailsQuery,
@@ -728,12 +732,17 @@ export const auth = ({
     });
 
     if (res?.data?.me?.checkout?.id) {
-      setLocalCheckoutInCache(
+      storage.setCheckout(res?.data?.me?.checkout);
+      await setLocalCheckoutInCache(
         client,
         res?.data?.me?.checkout,
-        updateShippingMethod
+        updateShippingMethod,
+        null,
+        isRecalculate
       );
-      storage.setCheckout(res?.data?.me?.checkout);
+      if (recalculationQuery) {
+        await checkoutRecalculationUtil(client, true);
+      }
     }
 
     return res;
