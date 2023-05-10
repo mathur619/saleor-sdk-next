@@ -53648,6 +53648,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "isRecalculate",
+                "description": "Recalculate checkout",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
               }
             ],
             "type": {
@@ -53720,6 +53732,18 @@
                 "deprecationReason": null
               },
               {
+                "name": "isRecalculate",
+                "description": "Recalculate checkout",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
                 "name": "lines",
                 "description": "A list of checkout lines, each containing information about an item in the checkout.",
                 "type": {
@@ -53763,6 +53787,18 @@
                     "name": "ID",
                     "ofType": null
                   }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "isRecalculate",
+                "description": "Recalculate checkout",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
                 },
                 "defaultValue": null,
                 "isDeprecated": false,
@@ -85615,13 +85651,21 @@
                 "name": "id",
                 "description": "Archive Order ID",
                 "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "ID",
-                    "ofType": null
-                  }
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "foreignId",
+                "description": "Foreign ID of the Archive Order",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
                 },
                 "defaultValue": null,
                 "isDeprecated": false,

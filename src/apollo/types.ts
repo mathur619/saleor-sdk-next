@@ -9863,12 +9863,14 @@ export type MutationCheckoutLineDeleteArgs = {
 
 export type MutationCheckoutLinesAddArgs = {
   checkoutId: Scalars['ID'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
   lines: Array<Maybe<CheckoutLineInput>>;
 };
 
 
 export type MutationCheckoutLinesUpdateArgs = {
   checkoutId: Scalars['ID'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
   lines: Array<Maybe<CheckoutLineInput>>;
 };
 
@@ -14960,7 +14962,8 @@ export type QueryAppsArgs = {
 
 
 export type QueryArchiveOrderArgs = {
-  id: Scalars['ID'];
+  id?: Maybe<Scalars['ID']>;
+  foreignId?: Maybe<Scalars['ID']>;
 };
 
 
@@ -20753,6 +20756,7 @@ export type CheckoutCustomerAttachNewMutation = { checkoutCustomerAttach: Maybe<
 export type AddCheckoutLineNextMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -20786,6 +20790,7 @@ export type UpdateCheckoutShippingMethodNextMutation = { checkoutShippingMethodU
 export type UpdateCheckoutLineNextMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -22638,8 +22643,12 @@ export type CheckoutCustomerAttachNewMutationHookResult = ReturnType<typeof useC
 export type CheckoutCustomerAttachNewMutationResult = Apollo.MutationResult<CheckoutCustomerAttachNewMutation>;
 export type CheckoutCustomerAttachNewMutationOptions = Apollo.BaseMutationOptions<CheckoutCustomerAttachNewMutation, CheckoutCustomerAttachNewMutationVariables>;
 export const AddCheckoutLineNextDocument = gql`
-    mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
-  checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
+    mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean) {
+  checkoutLinesAdd(
+    checkoutId: $checkoutId
+    lines: $lines
+    isRecalculate: $isRecalculate
+  ) {
     checkout {
       ...Checkout
       paymentMethod {
@@ -22676,6 +22685,7 @@ export type AddCheckoutLineNextMutationFn = Apollo.MutationFunction<AddCheckoutL
  *   variables: {
  *      checkoutId: // value for 'checkoutId'
  *      lines: // value for 'lines'
+ *      isRecalculate: // value for 'isRecalculate'
  *   },
  * });
  */
@@ -22789,8 +22799,12 @@ export type UpdateCheckoutShippingMethodNextMutationHookResult = ReturnType<type
 export type UpdateCheckoutShippingMethodNextMutationResult = Apollo.MutationResult<UpdateCheckoutShippingMethodNextMutation>;
 export type UpdateCheckoutShippingMethodNextMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>;
 export const UpdateCheckoutLineNextDocument = gql`
-    mutation UpdateCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
-  checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
+    mutation UpdateCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean) {
+  checkoutLinesUpdate(
+    checkoutId: $checkoutId
+    lines: $lines
+    isRecalculate: $isRecalculate
+  ) {
     checkout {
       ...Checkout
       paymentMethod {
@@ -22827,6 +22841,7 @@ export type UpdateCheckoutLineNextMutationFn = Apollo.MutationFunction<UpdateChe
  *   variables: {
  *      checkoutId: // value for 'checkoutId'
  *      lines: // value for 'lines'
+ *      isRecalculate: // value for 'isRecalculate'
  *   },
  * });
  */

@@ -909,8 +909,8 @@ export const CHECKOUT_CUSTOMER_ATTACH_NEW = gql`
 export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
-  mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
-    checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
+  mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean) {
+    checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines, isRecalculate: $isRecalculate) {
       checkout {
         ...Checkout
         paymentMethod {
@@ -992,8 +992,9 @@ export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
   mutation UpdateCheckoutLineNext(
     $checkoutId: ID!
     $lines: [CheckoutLineInput]!
+    $isRecalculate: Boolean
   ) {
-    checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
+    checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines, isRecalculate: $isRecalculate) {
       checkout {
         ...Checkout
         paymentMethod {

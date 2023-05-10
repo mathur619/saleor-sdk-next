@@ -84,18 +84,21 @@ export interface CartSDK {
     quantity: number,
     tags?: string[],
     line_item?: any,
-    useDummyAddress?: boolean
+    useDummyAddress?: boolean,
+    isRecalculate?: boolean
   ) => AddItemResult;
   updateItemNext: (
     variantId: string,
     quantity: number,
     prevQuantity: number,
-    updateShippingMethod?: boolean
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
   ) => UpdateItemResult;
   updateItemWithLines: (
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     updateShippingMethod?: boolean,
-    useCheckoutLoading?: boolean
+    useCheckoutLoading?: boolean,
+    isRecalculate?: boolean
   ) => UpdateItemResult;
   clearCart?: () => UpdateItemResult;
 }
@@ -424,7 +427,8 @@ export const cart = ({
     quantity: number,
     tags?: string[],
     line_item?: any,
-    useDummyAddress: boolean=true
+    useDummyAddress: boolean=true,
+    isRecalculate = true
   ) => {
     const checkoutString = storage.getCheckout();
     const checkout =
@@ -486,6 +490,7 @@ export const cart = ({
           variables: {
             checkoutId: checkout?.id,
             lines: [{ quantity: quantity, variantId: variantId }],
+            isRecalculate,
           },
         });
 
@@ -755,11 +760,12 @@ export const cart = ({
     variantId: string,
     quantity: number,
     prevQuantity: number,
-    updateShippingMethod: boolean = true
+    updateShippingMethod: boolean = true,
+    isRecalculate = true
   ) => {
     const differenceQuantity = quantity - prevQuantity;
     if (differenceQuantity > 0) {
-      const res = await addToCartNext(variantId, differenceQuantity, undefined, undefined, updateShippingMethod);
+      const res = await addToCartNext(variantId, differenceQuantity, undefined, undefined, updateShippingMethod, isRecalculate);
       return res;
     } else {
       const checkoutString = storage.getCheckout();
@@ -788,6 +794,7 @@ export const cart = ({
           variables: {
             checkoutId: checkout?.id,
             lines: alteredLines,
+            isRecalculate,
           },
         });
 
@@ -867,7 +874,8 @@ export const cart = ({
   const updateItemWithLines: CartSDK["updateItemWithLines"] = async (
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     updateShippingMethod = true,
-    useCheckoutLoading = true
+    useCheckoutLoading = true,
+    isRecalculate = true
   ) => {
     if (useCheckoutLoading) {
       client.writeQuery({
@@ -893,6 +901,7 @@ export const cart = ({
         variables: {
           checkoutId: checkout?.id,
           lines: updatedLines,
+          isRecalculate,
         },
       });
       if (!res?.data?.checkoutLinesUpdate?.checkout?.id) {
