@@ -428,7 +428,7 @@ export const cart = ({
     tags?: string[],
     line_item?: any,
     useDummyAddress: boolean=true,
-    isRecalculate = true
+    isRecalculate = false
   ) => {
     const checkoutString = storage.getCheckout();
     const checkout =
@@ -761,7 +761,7 @@ export const cart = ({
     quantity: number,
     prevQuantity: number,
     updateShippingMethod: boolean = true,
-    isRecalculate = true
+    isRecalculate = false
   ) => {
     const differenceQuantity = quantity - prevQuantity;
     if (differenceQuantity > 0) {
@@ -875,7 +875,7 @@ export const cart = ({
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     updateShippingMethod = true,
     useCheckoutLoading = true,
-    isRecalculate = true
+    isRecalculate = false
   ) => {
     if (useCheckoutLoading) {
       client.writeQuery({
