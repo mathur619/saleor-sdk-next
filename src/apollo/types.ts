@@ -3547,6 +3547,27 @@ export type CreateCashfreeOrderSdk = {
   cashfreeOrder: Maybe<CashfreeOrderType>;
 };
 
+/** Create feed specified in input. */
+export type CreateFeed = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A feed instance. */
+  feed: Maybe<FeedType>;
+  feedErrors: Array<FeedError>;
+};
+
+export type CreateFeedInput = {
+  /** feed name */
+  name: Scalars['String'];
+  /** feed active status */
+  status?: Maybe<Scalars['Boolean']>;
+  /** Fields required to update the object's metadata. */
+  additionalField: Array<MetadataInputV2>;
+};
+
 /** Creates an order on Gokwik. */
 export type CreateGokwikOrder = {
   /**
@@ -5081,6 +5102,18 @@ export type DeleteBulkVoucherRule = {
   voucherErrors: Array<VoucherError>;
 };
 
+/** Create feed specified in input. */
+export type DeleteFeed = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A blog instance. */
+  message: Maybe<Scalars['String']>;
+  feedErrors: Array<FeedError>;
+};
+
 /** Delete a file that is hosted. */
 export type DeleteHostingFile = {
   /**
@@ -6226,6 +6259,71 @@ export type FarziWalletInputEmail = {
   type: Scalars['String'];
   /** Secret for updation */
   secret: Scalars['String'];
+};
+
+/** An enumeration. */
+export type FeedCodes =
+  | 'INVALID'
+  | 'NOT_FOUND';
+
+export type FeedError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: FeedCodes;
+};
+
+export type FeedInput = {
+  /** feed name */
+  name?: Maybe<Scalars['String']>;
+  /** feed active status */
+  status?: Maybe<Scalars['Boolean']>;
+  /** Fields required to update the object's metadata. */
+  additionalField: Array<MetadataInputV2>;
+};
+
+export type FeedType = Node & ObjectWithMetadata & {
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  createdAt: Maybe<Scalars['DateTime']>;
+  updatedAt: Scalars['DateTime'];
+  status: Scalars['Boolean'];
+  name: Scalars['String'];
+  /** The URL of field to download. */
+  url: Maybe<Scalars['String']>;
+  user: Maybe<User>;
+  additionalField: Scalars['JSONString'];
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItem>>;
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItem>>;
+  /**
+   * List of privately stored metadata namespaces.
+   * @deprecated Use the `privetaMetadata` field. This field will be removed after 2020-07-31.
+   */
+  privateMeta: Array<Maybe<MetaStore>>;
+  /**
+   * List of publicly stored metadata namespaces.
+   * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
+   */
+  meta: Array<Maybe<MetaStore>>;
+};
+
+export type FeedTypeCountableConnection = {
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  edges: Array<FeedTypeCountableEdge>;
+  /** A total count of items in the collection. */
+  totalCount: Maybe<Scalars['Int']>;
+};
+
+export type FeedTypeCountableEdge = {
+  /** The item at the end of the edge. */
+  node: FeedType;
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String'];
 };
 
 /** An enumeration. */
@@ -8968,6 +9066,12 @@ export type Mutation = {
   createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
   /** Creates an order on CCAvenue. */
   createCcAvenueOrder: Maybe<CreateCcAvenueOrder>;
+  /** Create feed specified in input. */
+  createFeed: Maybe<CreateFeed>;
+  /** Update feed data. */
+  updateFeed: Maybe<UpdateFeed>;
+  /** Create feed specified in input. */
+  deleteFeed: Maybe<DeleteFeed>;
   /** Adds Wallet discount */
   draftOrderApplyWallet: Maybe<DraftOrderApplyWallet>;
   /** Removes wallet discount. */
@@ -10171,12 +10275,14 @@ export type MutationCheckoutLineDeleteArgs = {
 
 export type MutationCheckoutLinesAddArgs = {
   checkoutId: Scalars['ID'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
   lines: Array<Maybe<CheckoutLineInput>>;
 };
 
 
 export type MutationCheckoutLinesUpdateArgs = {
   checkoutId: Scalars['ID'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
   lines: Array<Maybe<CheckoutLineInput>>;
 };
 
@@ -11419,6 +11525,22 @@ export type MutationCreateTokenWithoutOtpArgs = {
 
 export type MutationCreateCcAvenueOrderArgs = {
   input: CcAvenueCreateOrderInput;
+};
+
+
+export type MutationCreateFeedArgs = {
+  input: CreateFeedInput;
+};
+
+
+export type MutationUpdateFeedArgs = {
+  id: Scalars['ID'];
+  input: FeedInput;
+};
+
+
+export type MutationDeleteFeedArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -15050,6 +15172,8 @@ export type Query = {
   exportOrders: Maybe<OrderCountableConnection>;
   /** List of Failed Orders. */
   failedOrders: Maybe<FailedOrderConnection>;
+  feed: Maybe<FeedType>;
+  feeds: Maybe<FeedTypeCountableConnection>;
   filterCheckouts: Maybe<CheckoutTypeCountableConnection>;
   freeCheckoutLines: Maybe<Array<Maybe<CheckoutLine>>>;
   genericFormName: Maybe<Array<Maybe<FormNameType>>>;
@@ -15599,6 +15723,19 @@ export type QueryExportOrdersArgs = {
 
 
 export type QueryFailedOrdersArgs = {
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryFeedArgs = {
+  id?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryFeedsArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -19036,6 +19173,18 @@ export type UpdateCustomerNoAuth = {
   accountErrors: Array<AccountError>;
 };
 
+/** Update feed data. */
+export type UpdateFeed = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A feed instance. */
+  feed: Maybe<FeedType>;
+  feedErrors: Array<FeedError>;
+};
+
 /** Update an Influencer. */
 export type UpdateInfluencer = {
   /**
@@ -20996,6 +21145,12 @@ export type UpdateUserMetaMutation = { updateMetadata: Maybe<(
         & Pick<MetadataItem, 'key' | 'value'>
       )>> }
     ) | (
+      { __typename: 'FeedType' }
+      & { metadata: Array<Maybe<(
+        { __typename: 'MetadataItem' }
+        & Pick<MetadataItem, 'key' | 'value'>
+      )>> }
+    ) | (
       { __typename: 'Fulfillment' }
       & { metadata: Array<Maybe<(
         { __typename: 'MetadataItem' }
@@ -21317,6 +21472,7 @@ export type CheckoutCustomerAttachNewMutation = { checkoutCustomerAttach: Maybe<
 export type AddCheckoutLineNextMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -21350,6 +21506,7 @@ export type UpdateCheckoutShippingMethodNextMutation = { checkoutShippingMethodU
 export type UpdateCheckoutLineNextMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
+  isRecalculate?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -23627,8 +23784,12 @@ export type CheckoutCustomerAttachNewMutationHookResult = ReturnType<typeof useC
 export type CheckoutCustomerAttachNewMutationResult = Apollo.MutationResult<CheckoutCustomerAttachNewMutation>;
 export type CheckoutCustomerAttachNewMutationOptions = Apollo.BaseMutationOptions<CheckoutCustomerAttachNewMutation, CheckoutCustomerAttachNewMutationVariables>;
 export const AddCheckoutLineNextDocument = gql`
-    mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
-  checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
+    mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean) {
+  checkoutLinesAdd(
+    checkoutId: $checkoutId
+    lines: $lines
+    isRecalculate: $isRecalculate
+  ) {
     checkout {
       ...Checkout
       paymentMethod {
@@ -23665,6 +23826,7 @@ export type AddCheckoutLineNextMutationFn = Apollo.MutationFunction<AddCheckoutL
  *   variables: {
  *      checkoutId: // value for 'checkoutId'
  *      lines: // value for 'lines'
+ *      isRecalculate: // value for 'isRecalculate'
  *   },
  * });
  */
@@ -23778,8 +23940,12 @@ export type UpdateCheckoutShippingMethodNextMutationHookResult = ReturnType<type
 export type UpdateCheckoutShippingMethodNextMutationResult = Apollo.MutationResult<UpdateCheckoutShippingMethodNextMutation>;
 export type UpdateCheckoutShippingMethodNextMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutShippingMethodNextMutation, UpdateCheckoutShippingMethodNextMutationVariables>;
 export const UpdateCheckoutLineNextDocument = gql`
-    mutation UpdateCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
-  checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
+    mutation UpdateCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean) {
+  checkoutLinesUpdate(
+    checkoutId: $checkoutId
+    lines: $lines
+    isRecalculate: $isRecalculate
+  ) {
     checkout {
       ...Checkout
       paymentMethod {
@@ -23816,6 +23982,7 @@ export type UpdateCheckoutLineNextMutationFn = Apollo.MutationFunction<UpdateChe
  *   variables: {
  *      checkoutId: // value for 'checkoutId'
  *      lines: // value for 'lines'
+ *      isRecalculate: // value for 'isRecalculate'
  *   },
  * });
  */
