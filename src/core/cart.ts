@@ -94,7 +94,8 @@ export interface CartSDK {
   ) => UpdateItemResult;
   updateItemWithLines: (
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
-    updateShippingMethod?: boolean
+    updateShippingMethod?: boolean,
+    useCheckoutLoading?: boolean
   ) => UpdateItemResult;
   clearCart?: () => UpdateItemResult;
 }
@@ -865,14 +866,17 @@ export const cart = ({
 
   const updateItemWithLines: CartSDK["updateItemWithLines"] = async (
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
-    updateShippingMethod = true
+    updateShippingMethod = true,
+    useCheckoutLoading = true
   ) => {
-    client.writeQuery({
-      query: GET_LOCAL_CHECKOUT,
-      data: {
-        checkoutLoading: true,
-      },
-    });
+    if (useCheckoutLoading) {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: true,
+        },
+      });
+    }
     const checkoutString = storage.getCheckout();
 
     const checkout =
@@ -893,12 +897,14 @@ export const cart = ({
       });
       if (!res?.data?.checkoutLinesUpdate?.checkout?.id) {
         await getLatestCheckout(client, checkout);
-        client.writeQuery({
-          query: GET_LOCAL_CHECKOUT,
-          data: {
-            checkoutLoading: false,
-          },
-        });
+        if (useCheckoutLoading) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+        }
         return {
           data: null,
           errors: res?.data?.checkoutLinesUpdate?.errors,
@@ -982,12 +988,14 @@ export const cart = ({
 
       if (!res?.data?.checkoutCreate?.checkout?.id) {
         await getLatestCheckout(client, checkout);
-        client.writeQuery({
-          query: GET_LOCAL_CHECKOUT,
-          data: {
-            checkoutLoading: false,
-          },
-        });
+        if (useCheckoutLoading) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+        }
         return {
           data: null,
           errors: res?.data?.checkoutCreate?.errors,
