@@ -188,7 +188,7 @@ export interface CheckoutSDK {
   juspayVpaVerify?: (vpa: string) => VerifyJuspayVpaResult;
   createPaytmOrder?: () => CreatePaytmOrderResult;
   getWalletAmount?: () => GetWalletAmountResult;
-  getCheckoutTotals?: () => CheckoutTotalsResult;
+  getCheckoutTotals?: (useCheckoutLoading?: boolean) => CheckoutTotalsResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
@@ -1260,13 +1260,15 @@ export const checkout = ({
     return res;
   };
 
-  const getCheckoutTotals: CheckoutSDK["getCheckoutTotals"] = async () => {
-    client.writeQuery({
-      query: GET_LOCAL_CHECKOUT,
-      data: {
-        checkoutLoading: true,
-      },
-    });
+  const getCheckoutTotals: CheckoutSDK["getCheckoutTotals"] = async (useCheckoutLoading = true) => {
+    if (useCheckoutLoading) {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: true,
+        },
+      });
+    }
 
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null | undefined =
@@ -1286,22 +1288,26 @@ export const checkout = ({
         fetchPolicy: "no-cache",
       });
 
+      if (useCheckoutLoading) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
+
+      return res;
+    }
+
+    if (useCheckoutLoading) {
       client.writeQuery({
         query: GET_LOCAL_CHECKOUT,
         data: {
           checkoutLoading: false,
         },
       });
-
-      return res;
     }
-
-    client.writeQuery({
-      query: GET_LOCAL_CHECKOUT,
-      data: {
-        checkoutLoading: false,
-      },
-    });
 
     return null;
   };
