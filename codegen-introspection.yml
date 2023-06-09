@@ -1,5 +1,5 @@
 overwrite: true
-schema: https://farzistoreapi.farziengineer.co/graphql/?source=website
+schema: https://plixlifefcstagehapi.farziengineer.co/graphql/?source=website
 generates:
   introspection.json:
     plugins:
