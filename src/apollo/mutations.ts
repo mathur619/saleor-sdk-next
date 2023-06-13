@@ -880,6 +880,7 @@ export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
 `;
 
 export const CREATE_CHECKOUT_MUTATION_NEXT = gql`
+  ${checkoutFragment}
   ${checkoutErrorFragment}
   mutation CreateCheckoutNext($checkoutInput: CheckoutCreateInput!) {
     checkoutCreate(input: $checkoutInput) {
@@ -887,10 +888,15 @@ export const CREATE_CHECKOUT_MUTATION_NEXT = gql`
         ...CheckoutError
       }
       checkout {
-        id
-        token
-        availableShippingMethods {
-          id
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
         }
       }
     }

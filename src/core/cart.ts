@@ -94,6 +94,8 @@ export interface CartSDK {
   addToCartRest: (
     variantId: string,
     quantity: number,
+    tags?: string[],
+    useDummyAddress?: boolean,
     isRecalculate?: boolean
   ) => Promise<any>;
   updateItemNext: (
@@ -713,6 +715,8 @@ export const cart = ({
   const addToCartRest: CartSDK["addToCartRest"] = async (
     variantId: string,
     quantity: number,
+    tags?: string[],
+    useDummyAddress = true,
     isRecalculate = false
   ) => {
     client.writeQuery({
@@ -728,60 +732,198 @@ export const cart = ({
         : checkoutString;
 
     try {
-      const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
-      const currentQuantity = checkout?.lines?.find(
-        line => line?.variant.id === variantId
-      )?.quantity;
+      if (checkout && checkout?.token) {
+        const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
+        const currentQuantity = checkout?.lines?.find(
+          line => line?.variant.id === variantId
+        )?.quantity;
 
-      const updatedQuantity =
-        currentQuantity && quantity ? currentQuantity + quantity : quantity;
+        const updatedQuantity =
+          currentQuantity && quantity ? currentQuantity + quantity : quantity;
 
-      if (dbVariantId && updatedQuantity) {
-        const input = {
-          checkoutId: checkout?.token,
-          lines: [
-            {
-              quantity: updatedQuantity,
-              variantId: String(dbVariantId),
+        if (dbVariantId && updatedQuantity) {
+          const input = {
+            checkoutId: checkout?.token,
+            lines: [
+              {
+                quantity: updatedQuantity,
+                variantId: String(dbVariantId),
+              },
+            ],
+            isRecalculate,
+          };
+          const res = await axiosRequest(
+            REST_API_ENDPOINTS.ADD_TO_CART,
+            REST_API_METHODS_TYPES.GET,
+            input
+          );
+
+          if (res?.data?.token) {
+            storage.setCheckout(res?.data);
+            const result = {
+              data: {
+                checkoutDiscounts: {
+                  __typename: "DiscountsType",
+                  prepaidDiscount:
+                    res?.data?.paymentMethod?.prepaidDiscountAmount,
+                  couponDiscount: res?.data?.paymentMethod?.couponDiscount,
+                  cashbackDiscount:
+                    res?.data?.paymentMethod?.cashbackDiscountAmount,
+                },
+                cashback: res?.data?.cashback,
+              },
+            };
+
+            storage.setDiscounts(res.data);
+
+            client.writeQuery({
+              query: GET_LOCAL_CHECKOUT,
+              data: {
+                localCheckout: res?.data,
+                localCheckoutDiscounts: result.data.checkoutDiscounts,
+                localCashback: result.data.cashback,
+                checkoutLoading: false,
+              },
+            });
+
+            return res.data;
+          }
+        }
+      } else {
+        let checkoutInputVariables: CheckoutCreateInput;
+        if (tags && useDummyAddress) {
+          checkoutInputVariables = {
+            lines: [{ quantity: quantity, variantId: variantId }],
+            email: "dummy@dummy.com",
+            tags,
+            shippingAddress: {
+              city: "delhi",
+              companyName: "dummy",
+              country: "IN",
+              countryArea: "Delhi",
+              firstName: "dummy",
+              lastName: "dummy",
+              phone: "7894561230",
+              postalCode: "110006",
+              streetAddress1: "dummy",
+              streetAddress2: "dummy",
             },
-          ],
-          isRecalculate,
-        };
-        const res = await axiosRequest(
-          REST_API_ENDPOINTS.ADD_TO_CART,
-          REST_API_METHODS_TYPES.GET,
-          input
-        );
+          };
+        } else if (useDummyAddress) {
+          checkoutInputVariables = {
+            lines: [{ quantity: quantity, variantId: variantId }],
+            email: "dummy@dummy.com",
+            shippingAddress: {
+              city: "delhi",
+              companyName: "dummy",
+              country: "IN",
+              countryArea: "Delhi",
+              firstName: "dummy",
+              lastName: "dummy",
+              phone: "7894561230",
+              postalCode: "110006",
+              streetAddress1: "dummy",
+              streetAddress2: "dummy",
+            },
+          };
+        } else {
+          checkoutInputVariables = {
+            lines: [{ quantity: quantity, variantId: variantId }],
+            email: "dummy@dummy.com",
+          };
+        }
 
-        if (res?.data?.token) {
-          storage.setCheckout(res?.data);
-          const result = {
+        try {
+          const res = await client.mutate<
+            CreateCheckoutNextMutation,
+            CreateCheckoutNextMutationVariables
+          >({
+            mutation: CREATE_CHECKOUT_MUTATION_NEXT,
+            variables: {
+              checkoutInput: checkoutInputVariables,
+            },
+          });
+          const checkout = res?.data?.checkoutCreate?.checkout;
+          if (!checkout?.id) {
+            client.writeQuery({
+              query: GET_LOCAL_CHECKOUT,
+              data: {
+                checkoutLoading: false,
+              },
+            });
+            return {
+              data: undefined,
+              errors: res?.data?.checkoutCreate?.errors,
+            };
+          }
+
+          storage.setCheckout(res.data?.checkoutCreate?.checkout);
+
+          const resDiscount = {
             data: {
               checkoutDiscounts: {
                 __typename: "DiscountsType",
                 prepaidDiscount:
-                  res?.data?.paymentMethod?.prepaidDiscountAmount,
-                couponDiscount: res?.data?.paymentMethod?.couponDiscount,
+                  res.data?.checkoutCreate?.checkout?.paymentMethod
+                    ?.prepaidDiscountAmount,
+                couponDiscount:
+                  res.data?.checkoutCreate?.checkout?.paymentMethod
+                    ?.couponDiscount,
                 cashbackDiscount:
-                  res?.data?.paymentMethod?.cashbackDiscountAmount,
+                  res.data?.checkoutCreate?.checkout?.paymentMethod
+                    ?.cashbackDiscountAmount,
               },
-              cashback: res?.data?.cashback,
+              cashback: res.data?.checkoutCreate?.checkout?.cashback,
             },
           };
 
-          storage.setDiscounts(res.data);
+          storage.setDiscounts(resDiscount.data);
 
           client.writeQuery({
             query: GET_LOCAL_CHECKOUT,
             data: {
-              localCheckout: res?.data,
-              localCheckoutDiscounts: result.data.checkoutDiscounts,
-              localCashback: result.data.cashback,
-              checkoutLoading: false,
+              localCheckout: res.data?.checkoutCreate?.checkout,
+              localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+              localCashback: resDiscount.data.cashback,
             },
           });
 
-          return res.data;
+          if (useDummyAddress) {
+            await setLocalCheckoutInCache(
+              client,
+              res.data?.checkoutCreate?.checkout,
+              true
+            );
+            return {
+              data: res.data?.checkoutCreate?.checkout,
+              errors: res?.data?.checkoutCreate?.errors,
+            };
+          }
+
+          const returnObject = {
+            data: res.data?.checkoutCreate?.checkout,
+            errors: res?.data?.checkoutCreate?.errors,
+          };
+
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+          return returnObject;
+        } catch {
+          await getLatestCheckout(client, checkout);
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+          return {
+            data: null,
+            errors: undefined,
+          };
         }
       }
     } catch (error) {

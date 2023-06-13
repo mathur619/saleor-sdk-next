@@ -467,7 +467,7 @@ export async function axiosRequest(
   subUrlPath: string,
   method: string | undefined = REST_API_METHODS_TYPES.GET,
   data: {} | undefined = {},
-  options: AxiosRequestConfig<any> = {}
+  options: any = {}
 ) {
   const url = subUrlPath
     ? `${REST_API_BASE_URL}${subUrlPath}`
