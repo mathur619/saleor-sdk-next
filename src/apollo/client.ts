@@ -22,6 +22,9 @@ import {
 } from "./types";
 // import { UpdateCheckoutLine_checkoutLinesUpdate_checkout_lines } from "./cartTypes";
 import { setContext } from "@apollo/client/link/context";
+import axios, { AxiosRequestConfig } from "axios";
+import { REST_API_METHODS_TYPES } from "../constants";
+import { REST_API_BASE_URL } from "../config";
 
 let client: ApolloClient<NormalizedCacheObject>;
 let authClient: AuthSDK;
@@ -48,7 +51,7 @@ export type FetchConfig = Partial<{
   refreshOnUnauthorized: boolean;
 }>;
 
-let renewTimeQueue:any=[];
+let renewTimeQueue: any = [];
 
 export const createFetch = ({
   autoTokenRefresh = true,
@@ -58,10 +61,9 @@ export const createFetch = ({
   input: RequestInfo,
   init: RequestInit = {}
 ): Promise<Response> => {
-
-  function shouldThrottleRenew(renewTimeQueue:any) {
+  function shouldThrottleRenew(renewTimeQueue: any) {
     let shoudlThrottleRenew = false;
-    renewTimeQueue.push(Date.now()); 
+    renewTimeQueue.push(Date.now());
     if (renewTimeQueue?.length == 5) {
       // get and remove first item from queue
       const firstTime = renewTimeQueue[0];
@@ -72,14 +74,14 @@ export const createFetch = ({
       const firstTime = renewTimeQueue[0];
       const lastTime = renewTimeQueue[renewTimeQueue.length - 1];
       if (lastTime - firstTime > 20 * 1000) {
-        renewTimeQueue.splice(0,renewTimeQueue.length);
-        shoudlThrottleRenew=false;
-      }else{
-        shoudlThrottleRenew=true;
-      } 
+        renewTimeQueue.splice(0, renewTimeQueue.length);
+        shoudlThrottleRenew = false;
+      } else {
+        shoudlThrottleRenew = true;
+      }
     }
     return shoudlThrottleRenew;
-  };
+  }
 
   if (!client) {
     throw new Error(
@@ -115,7 +117,9 @@ export const createFetch = ({
         if (shouldThrottleRenew(renewTimeQueue)) {
           if (renewTimeQueue?.length == 5) {
             //THROW ERROR
-            alert("Incorrect system time detected. Please update your time settings.");
+            alert(
+              "Incorrect system time detected. Please update your time settings."
+            );
           }
         } else {
           refreshPromise = authClient.refreshToken();
@@ -406,13 +410,13 @@ export const createApolloClient = (
   const authLink = setContext(async (_, { headers }) => {
     let ip, fbp, fbc;
     if (typeof window !== "undefined") {
-      function getCookie(name:any) {
+      function getCookie(name: any) {
         // Split cookie string and get all individual name=value pairs in an array
         var cookieArr = document.cookie.split(";");
 
         // Loop through the array elements
         for (var i = 0; i < cookieArr.length; i++) {
-          var cookiePair:any = cookieArr[i].split("=");
+          var cookiePair: any = cookieArr[i].split("=");
 
           /* Removing whitespace at the beginning of the cookie name
           and compare it with the given string */
@@ -429,7 +433,7 @@ export const createApolloClient = (
       fbp = getCookie("_fbp");
       fbc = getCookie("_fbc");
     }
-  
+
     return {
       headers: {
         ...headers,
@@ -458,3 +462,72 @@ export const createApolloClient = (
 
   return client;
 };
+
+export async function axiosRequest(
+  subUrlPath: string,
+  method: string | undefined = REST_API_METHODS_TYPES.GET,
+  data: {} | undefined = {},
+  options: AxiosRequestConfig<any> = {}
+) {
+  const url = subUrlPath
+    ? `${REST_API_BASE_URL}${subUrlPath}`
+    : REST_API_BASE_URL;
+
+  //Custom additional headers
+  let ip, fbp, fbc;
+  if (typeof window !== "undefined") {
+    function getCookie(name: any) {
+      // Split cookie string and get all individual name=value pairs in an array
+      var cookieArr = document.cookie.split(";");
+
+      // Loop through the array elements
+      for (var i = 0; i < cookieArr.length; i++) {
+        var cookiePair: any = cookieArr[i].split("=");
+
+        /* Removing whitespace at the beginning of the cookie name
+        and compare it with the given string */
+        if (name == cookiePair[0].trim()) {
+          // Decode the cookie value and return
+          return decodeURIComponent(cookiePair[1]);
+        }
+      }
+
+      // Return null if not found
+      return null;
+    }
+    ip = sessionStorage.getItem("ip");
+    fbp = getCookie("_fbp");
+    fbc = getCookie("_fbc");
+  }
+
+  let customRequestHeaders = {
+    event_source_url: typeof window !== "undefined" ? window.location.href : "",
+    "x-client-ip-address": ip || "",
+    "x-client-user-agent":
+      typeof window !== "undefined" ? window.navigator.userAgent : "",
+    "x-fbp": fbp || "",
+    "x-fbc": fbc || "",
+  };
+
+  if (options?.headers) {
+    customRequestHeaders = { ...customRequestHeaders, ...options.headers };
+  }
+
+  if (url && method) {
+    try {
+      const response = await axios({
+        url,
+        method,
+        data,
+        headers: customRequestHeaders,
+        ...options,
+      });
+
+      return response;
+    } catch (error) {
+      console.log("Error occurred in axiosRequest", error);
+      return;
+    }
+  }
+  return null;
+}

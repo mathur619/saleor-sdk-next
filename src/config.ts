@@ -1,4 +1,6 @@
 export const API_URI = process.env.API_URI || "http://localhost:8000/graphql/";
+export const REST_API_BASE_URL =
+  process.env.REST_API_URL || "http://localhost:8000/rest/";
 export const TEST_AUTH_EMAIL = process.env.TEST_AUTH_EMAIL || "";
 export const TEST_AUTH_PASSWORD = process.env.TEST_AUTH_PASSWORD || "";
 export const TEST_AUTH_SECOND_EMAIL = "second+testers+dashboard@saleor.io";
