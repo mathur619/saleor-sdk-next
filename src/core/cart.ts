@@ -44,7 +44,6 @@ import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
 import { SALEOR_CHECKOUT, SALEOR_CHECKOUT_DISCOUNTS } from "./constants";
 import { getDBIdFromGraphqlId } from "../react/utils/utils";
 import { REST_API_ENDPOINTS, REST_API_METHODS_TYPES } from "../constants";
-import { AxiosResponse } from "axios";
 
 export interface CartSDK {
   loaded?: boolean;

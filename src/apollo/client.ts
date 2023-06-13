@@ -22,7 +22,7 @@ import {
 } from "./types";
 // import { UpdateCheckoutLine_checkoutLinesUpdate_checkout_lines } from "./cartTypes";
 import { setContext } from "@apollo/client/link/context";
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 import { REST_API_METHODS_TYPES } from "../constants";
 import { REST_API_BASE_URL } from "../config";
 
