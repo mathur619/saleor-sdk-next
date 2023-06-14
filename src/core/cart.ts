@@ -762,7 +762,7 @@ export const cart = ({
           );
 
           if (res?.data?.token && line_item?.variant?.product) {
-            const updatedLines = res?.data?.lines.map(line => {
+            const updatedLines = res?.data?.lines.map(line:any => {
               if (line?.variant?.id === line_item?.variant?.id) {
                 const lineWithProduct = {
                   ...line,
