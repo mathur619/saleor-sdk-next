@@ -464,15 +464,11 @@ export const createApolloClient = (
 };
 
 export async function axiosRequest(
-  subUrlPath: string,
+  url: string,
   method: string | undefined = REST_API_METHODS_TYPES.GET,
   data: {} | undefined = {},
   options: any = {}
 ) {
-  const url = subUrlPath
-    ? `${REST_API_BASE_URL}${subUrlPath}`
-    : REST_API_BASE_URL;
-
   //Custom additional headers
   let ip, fbp, fbc;
   if (typeof window !== "undefined") {
