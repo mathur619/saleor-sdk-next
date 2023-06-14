@@ -736,19 +736,12 @@ export const cart = ({
     try {
       if (checkout && checkout?.token) {
         const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
-        const currentQuantity = checkout?.lines?.find(
-          line => line?.variant.id === variantId
-        )?.quantity;
-
-        const updatedQuantity =
-          currentQuantity && quantity ? currentQuantity + quantity : quantity;
-
-        if (dbVariantId && updatedQuantity) {
+        if (dbVariantId && quantity) {
           const input = {
             checkoutId: checkout?.token,
             lines: [
               {
-                quantity: updatedQuantity,
+                quantity: quantity,
                 variantId: String(dbVariantId),
               },
             ],
