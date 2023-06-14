@@ -774,8 +774,12 @@ export const cart = ({
                   },
                 };
                 return lineWithProduct;
+              } else {
+                return checkout?.lines?.find(
+                  oldCheckoutLine =>
+                    oldCheckoutLine?.variant.id === line?.variant?.id
+                );
               }
-              return line;
             });
             const updatedCheckout = { ...res.data, lines: updatedLines };
             storage.setCheckout(updatedCheckout);
