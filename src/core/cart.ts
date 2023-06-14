@@ -755,7 +755,7 @@ export const cart = ({
           const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.ADD_TO_CART}`
           const res = await axiosRequest(
             fullUrl,
-            REST_API_METHODS_TYPES.GET,
+            REST_API_METHODS_TYPES.POST,
             input
           );
 
