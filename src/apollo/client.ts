@@ -24,7 +24,6 @@ import {
 import { setContext } from "@apollo/client/link/context";
 import axios from "axios";
 import { REST_API_METHODS_TYPES } from "../constants";
-import { REST_API_BASE_URL } from "../config";
 
 let client: ApolloClient<NormalizedCacheObject>;
 let authClient: AuthSDK;
