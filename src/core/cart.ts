@@ -110,6 +110,7 @@ export interface CartSDK {
 
 export const cart = ({
   apolloClient: client,
+  restApiUrl,
 }: SaleorClientMethodsProps): CartSDK => {
   const items = cartItemsVar();
 
@@ -751,8 +752,9 @@ export const cart = ({
             ],
             isRecalculate,
           };
+          const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.ADD_TO_CART}`
           const res = await axiosRequest(
-            REST_API_ENDPOINTS.ADD_TO_CART,
+            fullUrl,
             REST_API_METHODS_TYPES.GET,
             input
           );
