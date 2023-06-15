@@ -560,6 +560,15 @@ export const REMOVE_CHECKOUT_LINE_MUTATION = gql`
     checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
