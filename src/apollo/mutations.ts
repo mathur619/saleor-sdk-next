@@ -961,6 +961,7 @@ export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT = gql`
 `;
 
 export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutFragment}
   ${checkoutErrorFragment}
   mutation UpdateCheckoutLineNext(
     $checkoutId: ID!
