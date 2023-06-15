@@ -6,7 +6,11 @@ import {
 } from ".";
 
 import { axiosRequest, cartItemsVar } from "../apollo/client";
-import { getLatestCheckout, setLocalCheckoutInCache } from "../apollo/helpers";
+import {
+  getCheckoutPayments,
+  getLatestCheckout,
+  setLocalCheckoutInCache,
+} from "../apollo/helpers";
 import {
   ADD_CHECKOUT_LINE_MUTATION,
   ADD_CHECKOUT_LINE_MUTATION_NEXT,
@@ -761,7 +765,7 @@ export const cart = ({
                   ...line,
                   variant: {
                     ...line.variant,
-                    product: line_item.variant.product,
+                    product: line?.product || line_item?.variant?.product,
                     quantityAvailable:
                       line_item?.variant?.quantityAvailable || 5,
                   },
@@ -774,7 +778,11 @@ export const cart = ({
                 );
               }
             });
-            const updatedCheckout = { ...res.data, lines: updatedLines };
+            const updatedCheckout = {
+              ...checkout,
+              ...res.data,
+              lines: updatedLines,
+            };
             storage.setCheckout(updatedCheckout);
             const result = {
               data: {
@@ -802,6 +810,8 @@ export const cart = ({
                 checkoutLoading: false,
               },
             });
+
+            getCheckoutPayments(client, updatedCheckout);
 
             return updatedCheckout;
           }

@@ -18587,6 +18587,35 @@ export type CheckoutDetailsNextQuery = Pick<Query, "checkoutUpdated"> & {
   >;
 };
 
+export type CheckoutPaymentsNextQueryVariables = Exact<{
+  token?: Maybe<Scalars["UUID"]>;
+}>;
+
+export type CheckoutPaymentsNextQuery = {
+  checkout: Maybe<
+    Pick<Checkout, "id" | "token" | "voucherCode"> & {
+      totalPrice: Maybe<
+        Pick<TaxedMoney, "currency"> & {
+          gross: Pick<Money, "currency" | "amount">;
+        }
+      >;
+      cashback: Maybe<Pick<CashbackType, "amount" | "willAddOn">>;
+      discount: Maybe<Pick<Money, "amount" | "currency">>;
+      paymentMethod: Maybe<
+        Pick<
+          PaymentMethodType,
+          "cashbackDiscountAmount" | "couponDiscount" | "prepaidDiscountAmount"
+        >
+      >;
+      subtotalPrice: Maybe<
+        Pick<TaxedMoney, "currency"> & {
+          gross: Pick<Money, "currency" | "amount">;
+        }
+      >;
+    }
+  >;
+};
+
 export type GetCartItemsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetCartItemsQuery = { cartItems: Maybe<CheckoutLineFragment> };
@@ -21467,6 +21496,93 @@ export type CheckoutDetailsNextLazyQueryHookResult = ReturnType<
 export type CheckoutDetailsNextQueryResult = Apollo.QueryResult<
   CheckoutDetailsNextQuery,
   CheckoutDetailsNextQueryVariables
+>;
+export const CheckoutPaymentsNextDocument = gql`
+  query CheckoutPaymentsNext($token: UUID) {
+    checkout(token: $token) {
+      id
+      token
+      totalPrice {
+        currency
+        gross {
+          currency
+          amount
+        }
+      }
+      cashback {
+        amount
+        willAddOn
+      }
+      voucherCode
+      discount {
+        amount
+        currency
+      }
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      subtotalPrice {
+        currency
+        gross {
+          currency
+          amount
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useCheckoutPaymentsNextQuery__
+ *
+ * To run a query within a React component, call `useCheckoutPaymentsNextQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckoutPaymentsNextQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckoutPaymentsNextQuery({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useCheckoutPaymentsNextQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    CheckoutPaymentsNextQuery,
+    CheckoutPaymentsNextQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    CheckoutPaymentsNextQuery,
+    CheckoutPaymentsNextQueryVariables
+  >(CheckoutPaymentsNextDocument, options);
+}
+export function useCheckoutPaymentsNextLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CheckoutPaymentsNextQuery,
+    CheckoutPaymentsNextQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    CheckoutPaymentsNextQuery,
+    CheckoutPaymentsNextQueryVariables
+  >(CheckoutPaymentsNextDocument, options);
+}
+export type CheckoutPaymentsNextQueryHookResult = ReturnType<
+  typeof useCheckoutPaymentsNextQuery
+>;
+export type CheckoutPaymentsNextLazyQueryHookResult = ReturnType<
+  typeof useCheckoutPaymentsNextLazyQuery
+>;
+export type CheckoutPaymentsNextQueryResult = Apollo.QueryResult<
+  CheckoutPaymentsNextQuery,
+  CheckoutPaymentsNextQueryVariables
 >;
 export const GetCartItemsDocument = gql`
   query GetCartItems {

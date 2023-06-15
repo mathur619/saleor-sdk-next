@@ -46,6 +46,43 @@ export const CHECKOUT_DETAILS_NEXT = gql`
   }
 `;
 
+export const CHECKOUT_PAYMENTS_NEXT = gql`
+  query CheckoutPaymentsNext($token: UUID) {
+    checkout(token: $token) {
+      id
+      token
+      totalPrice {
+        currency
+        gross {
+          currency
+          amount
+        }
+      }
+      cashback {
+        amount
+        willAddOn
+      }
+      voucherCode
+      discount {
+        amount
+        currency
+      }
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      subtotalPrice {
+        currency
+        gross {
+          currency
+          amount
+        }
+      }
+    }
+  }
+`;
+
 export const GET_CART_ITEMS = gql`
   ${checkoutLineFragment}
   query GetCartItems {
