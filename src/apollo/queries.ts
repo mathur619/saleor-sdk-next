@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   checkoutFragment,
   checkoutLineFragment,
+  checkoutPriceFragment,
   orderDetailFragment,
   userFragment,
 } from "./fragments";
@@ -47,16 +48,13 @@ export const CHECKOUT_DETAILS_NEXT = gql`
 `;
 
 export const CHECKOUT_PAYMENTS_NEXT = gql`
+  ${checkoutPriceFragment}
   query CheckoutPaymentsNext($token: UUID) {
     checkout(token: $token) {
       id
       token
       totalPrice {
-        currency
-        gross {
-          currency
-          amount
-        }
+        ...Price
       }
       cashback {
         amount
@@ -73,11 +71,7 @@ export const CHECKOUT_PAYMENTS_NEXT = gql`
         prepaidDiscountAmount
       }
       subtotalPrice {
-        currency
-        gross {
-          currency
-          amount
-        }
+        ...Price
       }
     }
   }
