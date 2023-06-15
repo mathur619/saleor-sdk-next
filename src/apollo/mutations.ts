@@ -594,6 +594,15 @@ export const UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION = gql`
       }
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
     }
     checkoutEmailUpdate(checkoutId: $checkoutId, email: $email) {
@@ -765,6 +774,15 @@ export const CHECKOUT_PAYMENT_METHOD_UPDATE = gql`
     ) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       checkoutErrors {
         field
@@ -950,7 +968,16 @@ export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
   ) {
     checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
       checkout {
-        id
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError

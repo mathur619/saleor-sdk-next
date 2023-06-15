@@ -18270,7 +18270,19 @@ export type UpdateCheckoutShippingAddressMutationVariables = Exact<{
 export type UpdateCheckoutShippingAddressMutation = {
   checkoutShippingAddressUpdate: Maybe<{
     errors: Array<CheckoutErrorFragment>;
-    checkout: Maybe<CheckoutFragment>;
+    checkout: Maybe<
+      {
+        paymentMethod: Maybe<
+          Pick<
+            PaymentMethodType,
+            | "cashbackDiscountAmount"
+            | "couponDiscount"
+            | "prepaidDiscountAmount"
+          >
+        >;
+        cashback: Maybe<Pick<CashbackType, "amount" | "willAddOn">>;
+      } & CheckoutFragment
+    >;
   }>;
   checkoutEmailUpdate: Maybe<{
     checkout: Maybe<CheckoutFragment>;
@@ -18389,7 +18401,19 @@ export type CheckoutPaymentMethodUpdateMutationVariables = Exact<{
 
 export type CheckoutPaymentMethodUpdateMutation = {
   checkoutPaymentMethodUpdate: Maybe<{
-    checkout: Maybe<CheckoutFragment>;
+    checkout: Maybe<
+      {
+        paymentMethod: Maybe<
+          Pick<
+            PaymentMethodType,
+            | "cashbackDiscountAmount"
+            | "couponDiscount"
+            | "prepaidDiscountAmount"
+          >
+        >;
+        cashback: Maybe<Pick<CashbackType, "amount" | "willAddOn">>;
+      } & CheckoutFragment
+    >;
     checkoutErrors: Array<Pick<CheckoutError, "field" | "message" | "code">>;
   }>;
 };
@@ -18531,8 +18555,8 @@ export type CreateCheckoutNextMutation = {
 };
 
 export type UpdateCheckoutShippingMethodNextMutationVariables = Exact<{
-  checkoutId: Scalars["ID"];
-  shippingMethodId: Scalars["ID"];
+  checkoutId?: Scalars["ID"];
+  shippingMethodId?: Scalars["ID"];
 }>;
 
 export type UpdateCheckoutShippingMethodNextMutation = {
@@ -18561,7 +18585,19 @@ export type UpdateCheckoutLineNextMutationVariables = Exact<{
 
 export type UpdateCheckoutLineNextMutation = {
   checkoutLinesUpdate: Maybe<{
-    checkout: Maybe<Pick<Checkout, "id">>;
+    checkout: Maybe<
+      {
+        paymentMethod: Maybe<
+          Pick<
+            PaymentMethodType,
+            | "cashbackDiscountAmount"
+            | "couponDiscount"
+            | "prepaidDiscountAmount"
+          >
+        >;
+        cashback: Maybe<Pick<CashbackType, "amount" | "willAddOn">>;
+      } & CheckoutFragment
+    >;
     errors: Array<CheckoutErrorFragment>;
   }>;
 };
@@ -20121,6 +20157,15 @@ export const UpdateCheckoutShippingAddressDocument = gql`
       }
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
     }
     checkoutEmailUpdate(checkoutId: $checkoutId, email: $email) {
@@ -20647,6 +20692,15 @@ export const CheckoutPaymentMethodUpdateDocument = gql`
     ) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       checkoutErrors {
         field
@@ -21269,13 +21323,23 @@ export const UpdateCheckoutLineNextDocument = gql`
   ) {
     checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
       checkout {
-        id
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
       }
     }
   }
+  ${CheckoutFragmentDoc}
   ${CheckoutErrorFragmentDoc}
 `;
 export type UpdateCheckoutLineNextMutationFn = Apollo.MutationFunction<
