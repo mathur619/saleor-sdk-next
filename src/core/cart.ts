@@ -1020,65 +1020,71 @@ export const cart = ({
           checkoutId: checkout?.id,
           shippingMethodId: checkout.availableShippingMethods[0]?.id,
         };
+        var returnObject = {
+          data: res?.data?.checkoutLinesUpdate?.checkout,
+          errors: res?.data?.checkoutLinesUpdate?.errors,
+        };
 
-        try {
-          if (!res?.data?.checkoutLinesUpdate?.checkout?.id) {
-            throw new Error("UpdateCheckoutLineNext failed");
-          }
-          const resShipping = await client.mutate<
-            UpdateCheckoutShippingMethodNextMutation,
-            UpdateCheckoutShippingMethodNextMutationVariables
-          >({
-            mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
-            variables,
-          });
-
-          if (resShipping.data?.checkoutShippingMethodUpdate?.checkout?.id) {
-            storage.setCheckout(
-              resShipping.data?.checkoutShippingMethodUpdate?.checkout
-            );
-            const res = {
-              data: {
-                __typename: "DiscountsType",
-                checkoutDiscounts: {
-                  prepaidDiscount:
-                    resShipping.data?.checkoutShippingMethodUpdate?.checkout
-                      ?.paymentMethod?.prepaidDiscountAmount,
-                  couponDiscount:
-                    resShipping.data?.checkoutShippingMethodUpdate?.checkout
-                      ?.paymentMethod?.couponDiscount,
-                  cashbackDiscount:
-                    resShipping.data?.checkoutShippingMethodUpdate?.checkout
-                      ?.paymentMethod?.cashbackDiscountAmount,
-                },
-                cashback:
-                  resShipping.data?.checkoutShippingMethodUpdate?.checkout
-                    ?.cashback,
-              },
-            };
-
-            storage.setDiscounts(res.data);
-
-            client.writeQuery({
-              query: GET_LOCAL_CHECKOUT,
-              data: {
-                localCheckout:
-                  resShipping.data?.checkoutShippingMethodUpdate?.checkout,
-                localCheckoutDiscounts: res.data.checkoutDiscounts,
-                localCashback: res.data.cashback,
-              },
+        if (checkout.availableShippingMethods[0]?.id) {
+          try {
+            if (!res?.data?.checkoutLinesUpdate?.checkout?.id) {
+              throw new Error("UpdateCheckoutLineNext failed");
+            }
+            const resShipping = await client.mutate<
+              UpdateCheckoutShippingMethodNextMutation,
+              UpdateCheckoutShippingMethodNextMutationVariables
+            >({
+              mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
+              variables,
             });
-          } else {
-            throw new Error("UpdateCheckoutShippingMethodNext failed");
+
+            if (resShipping.data?.checkoutShippingMethodUpdate?.checkout?.id) {
+              storage.setCheckout(
+                resShipping.data?.checkoutShippingMethodUpdate?.checkout
+              );
+              const res = {
+                data: {
+                  __typename: "DiscountsType",
+                  checkoutDiscounts: {
+                    prepaidDiscount:
+                      resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                        ?.paymentMethod?.prepaidDiscountAmount,
+                    couponDiscount:
+                      resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                        ?.paymentMethod?.couponDiscount,
+                    cashbackDiscount:
+                      resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                        ?.paymentMethod?.cashbackDiscountAmount,
+                  },
+                  cashback:
+                    resShipping.data?.checkoutShippingMethodUpdate?.checkout
+                      ?.cashback,
+                },
+              };
+
+              storage.setDiscounts(res.data);
+
+              client.writeQuery({
+                query: GET_LOCAL_CHECKOUT,
+                data: {
+                  localCheckout:
+                    resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+                  localCheckoutDiscounts: res.data.checkoutDiscounts,
+                  localCashback: res.data.cashback,
+                },
+              });
+            } else {
+              throw new Error("UpdateCheckoutShippingMethodNext failed");
+            }
+            returnObject = {
+              data: resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+              errors: resShipping?.data?.checkoutShippingMethodUpdate?.errors,
+            };
+          } catch {
+            //fallback if the mutation fails
+            // @ts-ignore
+            var returnObject = await getLatestCheckout(client, checkout);
           }
-          var returnObject = {
-            data: resShipping.data?.checkoutShippingMethodUpdate?.checkout,
-            errors: resShipping?.data?.checkoutShippingMethodUpdate?.errors,
-          };
-        } catch {
-          //fallback if the mutation fails
-          // @ts-ignore
-          var returnObject = await getLatestCheckout(client, checkout);
         }
 
         client.writeQuery({
