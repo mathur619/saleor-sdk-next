@@ -760,9 +760,12 @@ export const cart = ({
 
           if (res?.data?.token) {
             const updatedLines = res?.data?.lines.map((line: any) => {
-              if (line?.variant?.id === variantId && line?.product?.id) {
+              if (
+                line?.variant?.id === variantId &&
+                line?.variant?.product?.id
+              ) {
                 const productData = {
-                  ...line?.product,
+                  ...line.variant.product,
                   metadata: line_item?.variant?.product?.metadata || [],
                 };
                 const lineWithProduct = {
