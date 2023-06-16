@@ -776,15 +776,10 @@ export const cart = ({
                 };
                 return lineWithProduct;
               } else {
-                const oldCheckoutLine = checkout?.lines?.find(
+                return checkout?.lines?.find(
                   oldCheckoutLine =>
                     oldCheckoutLine?.variant.id === line?.variant?.id
                 );
-                const updatedCheckoutLine = {
-                  ...oldCheckoutLine,
-                  quantity: line?.quantity,
-                };
-                return updatedCheckoutLine;
               }
             });
             const updatedCheckout = {
