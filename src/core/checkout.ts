@@ -157,7 +157,10 @@ export interface CheckoutSDK {
     billingAddress: IAddress,
     updateShippingMethod?: boolean
   ) => SetBillingAddressResult;
-  setShippingMethod?: (shippingMethodId: string, isRecalculate?: boolean) => SetShippingMethodResult;
+  setShippingMethod?: (
+    shippingMethodId: string,
+    isRecalculate?: boolean
+  ) => SetShippingMethodResult;
   addPromoCode?: (
     promoCode: string,
     updateShippingMethod?: boolean,
@@ -179,7 +182,8 @@ export interface CheckoutSDK {
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
   createGokwikOrder?: () => CreateGokwikOrderResult;
   juspayOrderAndCustomerCreate?: (
-    createNew?: boolean
+    createNew?: boolean,
+    email?: string
   ) => JuspayOrderAndCustomerCreateResult;
   juspayPaymentCreate?: (
     input: JuspayPaymentInput
@@ -399,7 +403,12 @@ export const checkout = ({
       },
     });
 
-    const resShipping = await setShippingAddress(shippingAddress, email, updateShippingMethod, isRecalculate);
+    const resShipping = await setShippingAddress(
+      shippingAddress,
+      email,
+      updateShippingMethod,
+      isRecalculate
+    );
     const resBilling = await setBillingAddress(
       shippingAddress,
       updateShippingMethod
@@ -947,7 +956,8 @@ export const checkout = ({
   };
 
   const juspayOrderAndCustomerCreate: CheckoutSDK["juspayOrderAndCustomerCreate"] = async (
-    createNew?: boolean
+    createNew?: boolean,
+    email?: string
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -961,11 +971,11 @@ export const checkout = ({
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
         : checkoutString;
-
+    const validEmail = email || checkout?.email;
     if (
       checkout &&
       checkout?.id &&
-      checkout?.email &&
+      validEmail &&
       checkout?.shippingAddress?.phone &&
       checkout?.shippingAddress?.firstName &&
       checkout?.shippingAddress?.lastName
@@ -973,7 +983,7 @@ export const checkout = ({
       const variables: CreateJuspayOrderAndCustomerMutationVariables = {
         input: {
           checkoutId: checkout?.id,
-          emailAddress: checkout?.email,
+          emailAddress: validEmail,
           mobileNumber: checkout?.shippingAddress?.phone,
           mobileCountryCode: "91",
           firstName: checkout?.shippingAddress?.firstName,
@@ -1260,7 +1270,9 @@ export const checkout = ({
     return res;
   };
 
-  const getCheckoutTotals: CheckoutSDK["getCheckoutTotals"] = async (useCheckoutLoading = true) => {
+  const getCheckoutTotals: CheckoutSDK["getCheckoutTotals"] = async (
+    useCheckoutLoading = true
+  ) => {
     if (useCheckoutLoading) {
       client.writeQuery({
         query: GET_LOCAL_CHECKOUT,
@@ -1390,7 +1402,9 @@ export const checkout = ({
     return { data: null };
   };
 
-  const checkoutRecalculation: CheckoutSDK["checkoutRecalculation"] = async (refreshCheckout?: boolean) => {
+  const checkoutRecalculation: CheckoutSDK["checkoutRecalculation"] = async (
+    refreshCheckout?: boolean
+  ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -1405,13 +1419,14 @@ export const checkout = ({
         : checkoutString;
 
     if (checkout && checkout.token) {
-
-      const inputVariables:CheckoutRecalculationQueryVariables = refreshCheckout ? {
-        token: checkout?.token,
-        refreshCheckout: refreshCheckout,
-      }: {
-        token: checkout?.token,
-      };
+      const inputVariables: CheckoutRecalculationQueryVariables = refreshCheckout
+        ? {
+            token: checkout?.token,
+            refreshCheckout: refreshCheckout,
+          }
+        : {
+            token: checkout?.token,
+          };
 
       const checkoutDetailRes = await client.query<
         CheckoutRecalculationQuery,
