@@ -766,7 +766,7 @@ export const cart = ({
               ) {
                 const productData = {
                   ...line.variant.product,
-                  metadata: line_item?.variant?.product?.metadata || [],
+                  metadata: line?.variant?.product?.metadata || [],
                   tags: line?.variant?.product?.tags?.map(
                     (tagname: string) => ({
                       name: tagname,
