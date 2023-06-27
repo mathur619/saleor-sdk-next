@@ -10,4 +10,5 @@ export enum REST_API_METHODS_TYPES {
 export const REST_API_ENDPOINTS = {
   ADD_TO_CART: "add_to_cart/",
   UPDATE_CART: "update_cart/",
+  CREATE_CHECKOUT: "create_checkout/",
 };
