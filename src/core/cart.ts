@@ -1033,22 +1033,22 @@ export const cart = ({
           }
         }
       } else {
-        const createCheckoutInput = tags
-          ? {
-              checkoutInput: {
-                lines: [{ quantity: quantity, variantId: variantId }],
-                email: "dummy@dummy.com",
-                tags,
-              },
-            }
-          : {
-              checkoutInput: {
-                lines: [{ quantity: quantity, variantId: variantId }],
-                email: "dummy@dummy.com",
-              },
-            };
-
         try {
+          const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
+          const createCheckoutInput = tags
+            ? {
+                checkoutInput: {
+                  lines: [{ quantity: quantity, variantId: dbVariantId }],
+                  email: "dummy@dummy.com",
+                  tags,
+                },
+              }
+            : {
+                checkoutInput: {
+                  lines: [{ quantity: quantity, variantId: dbVariantId }],
+                  email: "dummy@dummy.com",
+                },
+              };
           const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
           const res = await axiosRequest(
             fullUrl,
