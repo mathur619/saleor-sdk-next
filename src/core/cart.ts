@@ -1033,12 +1033,20 @@ export const cart = ({
           }
         }
       } else {
-        const createCheckoutInput = {
-          checkoutInput: {
-            lines: [{ quantity: quantity, variantId: variantId }],
-            email: "dummy@dummy.com",
-          },
-        };
+        const createCheckoutInput = tags
+          ? {
+              checkoutInput: {
+                lines: [{ quantity: quantity, variantId: variantId }],
+                email: "dummy@dummy.com",
+                tags,
+              },
+            }
+          : {
+              checkoutInput: {
+                lines: [{ quantity: quantity, variantId: variantId }],
+                email: "dummy@dummy.com",
+              },
+            };
 
         try {
           const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
