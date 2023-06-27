@@ -1108,9 +1108,9 @@ export const cart = ({
             ],
             billingAddress: null,
             cashback: {
-              currency: "INR",
-              amount: 0,
-              __typename: "Money",
+              amount: "0.00",
+              willAddOn: null,
+              __typename: "CashbackType",
             },
             discount: {
               currency: "INR",
