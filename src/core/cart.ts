@@ -1068,7 +1068,34 @@ export const cart = ({
               errors: res?.data?.errors,
             };
           }
+          const updatedLines = res?.data?.lines.map((line: any) => {
+            const productData = {
+              ...line.variant.product,
+              metadata: line?.variant?.product?.metadata || [],
+              tags: line?.variant?.product?.tags?.map((tagname: string) => ({
+                name: tagname,
+                __typename: "TagType",
+              })),
+            };
+            const quantityAvailableValue =
+              line?.variant?.id === variantId
+                ? line_item?.variant?.quantityAvailable
+                : line.variant.quantityAvailable || 5;
+            const lineWithProduct = {
+              ...line,
+              variant: {
+                ...line.variant,
+                product: productData,
+                quantityAvailable: quantityAvailableValue,
+              },
+            };
+            return lineWithProduct;
+          });
 
+          const createCheckoutResUpdated = {
+            ...createCheckoutRes,
+            lines: updatedLines,
+          };
           const updatedCheckout = {
             availablePaymentGateways: [
               {
@@ -1076,6 +1103,7 @@ export const cart = ({
                 id: "mirumee.payments.razorpay",
                 name: "Razorpay",
                 __typename: "PaymentGateway",
+                config: [],
               },
             ],
             billingAddress: null,
@@ -1139,7 +1167,7 @@ export const cart = ({
             },
             translatedDiscountName: null,
             voucherCode: null,
-            ...createCheckoutRes,
+            ...createCheckoutResUpdated,
           };
 
           storage.setCheckout(updatedCheckout);
