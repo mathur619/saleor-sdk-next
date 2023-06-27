@@ -2,10 +2,15 @@ import { getLatestCheckout, setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   ADD_CHECKOUT_PROMO_CODE,
   CHECKOUT_PAYMENT_METHOD_UPDATE,
+  CHECK_JUSPAY_ORDER_STATUS,
+  CHECK_VPA_ADDRESS,
   COMPLETE_CHECKOUT,
   CREATE_CASHFREE_ORDER,
   CREATE_CHECKOUT_MUTATION,
   CREATE_CHECKOUT_PAYMENT,
+  CREATE_GOKWIK_ORDER,
+  CREATE_JUSPAY_CUSTOMER_AND_ORDER,
+  CREATE_JUSPAY_PAYMENT,
   CREATE_RAZORPAY_ORDER,
   GET_WALLET_AMOUNT,
   PAYTM_TXN_CREATE,
@@ -16,6 +21,8 @@ import {
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
 } from "../apollo/mutations";
 import {
+  CHECKOUT_RECALCULATION,
+  GET_CHECKOUT_TOTALS,
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
 } from "../apollo/queries";
@@ -56,7 +63,22 @@ import {
   CreateCashfreeOrderMutationVariables,
   UpdateCheckoutShippingMethodNextMutationVariables,
   UpdateCheckoutShippingMethodNextMutation,
-  CheckoutCreateInput
+  CheckoutCreateInput,
+  CreateJuspayOrderAndCustomerMutation,
+  CreateJuspayOrderAndCustomerMutationVariables,
+  CheckJuspayOrderStatusMutationVariables,
+  CheckJuspayOrderStatusMutation,
+  VerifyJuspayVpaMutationVariables,
+  VerifyJuspayVpaMutation,
+  CheckoutTotalsQuery,
+  CheckoutTotalsQueryVariables,
+  CreateJuspayPaymentMutationVariables,
+  CreateJuspayPaymentMutation,
+  JuspayPaymentInput,
+  CreateGokwikOrderMutationVariables,
+  CreateGokwikOrderMutation,
+  CheckoutRecalculationQuery,
+  CheckoutRecalculationQueryVariables,
 } from "../apollo/types";
 
 import {
@@ -69,16 +91,21 @@ import { SALEOR_CHECKOUT, SALEOR_CHECKOUT_DISCOUNTS } from "./constants";
 import { storage } from "./storage";
 import {
   AddPromoCodeResult,
+  CheckJuspayOrderStatusResult,
   CheckoutPaymentMethodUpdateResult,
+  CheckoutTotalsResult,
   CompleteCheckoutResult,
   CreateCashfreeOrderResult,
   CreateCheckoutResult,
+  CreateGokwikOrderResult,
   CreatePaymentResult,
   CreatePaytmOrderResult,
   CreateRazorpayOrderResult,
   GetCityStateFromPincodeResult,
   GetUserOrdersResult,
   GetWalletAmountResult,
+  JuspayOrderAndCustomerCreateResult,
+  JuspayPaymentCreateResult,
   RemovePromoCodeResult,
   SaleorClientMethodsProps,
   SetAddressTypeResult,
@@ -86,6 +113,7 @@ import {
   SetShippingAddressResult,
   SetShippingAndBillingAddressResult,
   SetShippingMethodResult,
+  VerifyJuspayVpaResult,
 } from "./types";
 
 export interface CheckoutSDK {
@@ -114,36 +142,70 @@ export interface CheckoutSDK {
   createCheckout?: (tags?: string[]) => CreateCheckoutResult;
   setShippingAddress?: (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
   ) => SetShippingAddressResult;
   setShippingAndBillingAddress?: (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
   ) => SetShippingAndBillingAddressResult;
 
-  setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
-  setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
-  addPromoCode?: (promoCode: string) => AddPromoCodeResult;
-  removePromoCode?: (promoCode: string) => RemovePromoCodeResult;
+  setBillingAddress?: (
+    billingAddress: IAddress,
+    updateShippingMethod?: boolean
+  ) => SetBillingAddressResult;
+  setShippingMethod?: (
+    shippingMethodId: string,
+    isRecalculate?: boolean
+  ) => SetShippingMethodResult;
+  addPromoCode?: (
+    promoCode: string,
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
+  ) => AddPromoCodeResult;
+  removePromoCode?: (
+    promoCode: string,
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
+  ) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
-    input: PaymentMethodUpdateInput
+    input: PaymentMethodUpdateInput,
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
   ) => CheckoutPaymentMethodUpdateResult;
   createPayment?: (input: CreatePaymentInput) => CreatePaymentResult;
   completeCheckout?: (input?: CompleteCheckoutInput) => CompleteCheckoutResult;
   getCityStateFromPincode?: (pincode: string) => GetCityStateFromPincodeResult;
   createRazorpayOrder?: () => CreateRazorpayOrderResult;
+  createGokwikOrder?: () => CreateGokwikOrderResult;
+  juspayOrderAndCustomerCreate?: (
+    createNew?: boolean,
+    email?: string
+  ) => JuspayOrderAndCustomerCreateResult;
+  juspayPaymentCreate?: (
+    input: JuspayPaymentInput
+  ) => JuspayPaymentCreateResult;
+  checkJuspayOrderStatus?: () => CheckJuspayOrderStatusResult;
+  juspayVpaVerify?: (vpa: string) => VerifyJuspayVpaResult;
   createPaytmOrder?: () => CreatePaytmOrderResult;
   getWalletAmount?: () => GetWalletAmountResult;
+  getCheckoutTotals?: (useCheckoutLoading?: boolean) => CheckoutTotalsResult;
   getUserOrders?: (opts: OrdersByUserQueryVariables) => GetUserOrdersResult;
   setUseCashback?: (useCashback: boolean) => {};
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
   createCashfreeOrder?: (returnURL?: string) => CreateCashfreeOrderResult;
+  checkoutRecalculation?: (refreshCheckout?: boolean) => any;
 }
 
 export const checkout = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CheckoutSDK => {
-  const createCheckout: CheckoutSDK["createCheckout"] = async (tags?: string[]) => {
+  const createCheckout: CheckoutSDK["createCheckout"] = async (
+    tags?: string[]
+  ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -157,8 +219,7 @@ export const checkout = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     if (!(checkout && checkout?.id)) {
-
-      let checkoutInputVariables:CheckoutCreateInput;
+      let checkoutInputVariables: CheckoutCreateInput;
       if (tags) {
         checkoutInputVariables = {
           lines: [],
@@ -217,7 +278,9 @@ export const checkout = ({
 
   const setShippingAddress: CheckoutSDK["setShippingAddress"] = async (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod = false,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -234,6 +297,7 @@ export const checkout = ({
     if (checkout && checkout?.id) {
       const variables = {
         checkoutId: checkout?.id,
+        isRecalculate,
         email,
         shippingAddress: {
           city: shippingAddress.city,
@@ -255,16 +319,16 @@ export const checkout = ({
       >({
         mutation: UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
         variables,
-        update: (_, { data }) => {
-          setLocalCheckoutInCache(
-            client,
-            data?.checkoutShippingAddressUpdate?.checkout
-          );
-          if (data?.checkoutShippingAddressUpdate?.checkout?.id) {
-            storage.setCheckout(data?.checkoutShippingAddressUpdate?.checkout);
-          }
-        },
       });
+
+      if (res?.data?.checkoutShippingAddressUpdate?.checkout?.id) {
+        setLocalCheckoutInCache(
+          client,
+          res?.data?.checkoutShippingAddressUpdate?.checkout,
+          updateShippingMethod
+        );
+        storage.setCheckout(res?.data?.checkoutShippingAddressUpdate?.checkout);
+      }
 
       return res;
     }
@@ -273,7 +337,8 @@ export const checkout = ({
   };
 
   const setBillingAddress: CheckoutSDK["setBillingAddress"] = async (
-    billingAddress: IAddress
+    billingAddress: IAddress,
+    updateShippingMethod = false
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -312,7 +377,8 @@ export const checkout = ({
         update: (_, { data }) => {
           setLocalCheckoutInCache(
             client,
-            data?.checkoutBillingAddressUpdate?.checkout
+            data?.checkoutBillingAddressUpdate?.checkout,
+            updateShippingMethod
           );
           if (data?.checkoutBillingAddressUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutBillingAddressUpdate?.checkout);
@@ -326,7 +392,9 @@ export const checkout = ({
 
   const setShippingAndBillingAddress: CheckoutSDK["setShippingAndBillingAddress"] = async (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod = false,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -335,8 +403,16 @@ export const checkout = ({
       },
     });
 
-    const resShipping = await setShippingAddress(shippingAddress, email);
-    const resBilling = await setBillingAddress(shippingAddress);
+    const resShipping = await setShippingAddress(
+      shippingAddress,
+      email,
+      updateShippingMethod,
+      isRecalculate
+    );
+    const resBilling = await setBillingAddress(
+      shippingAddress,
+      updateShippingMethod
+    );
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -387,7 +463,8 @@ export const checkout = ({
   };
 
   const setShippingMethod: CheckoutSDK["setShippingMethod"] = async (
-    shippingMethodId: string
+    shippingMethodId: string,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -405,6 +482,7 @@ export const checkout = ({
     if (checkout && checkout?.id) {
       const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
         checkoutId: checkout?.id,
+        isRecalculate,
         shippingMethodId,
       };
 
@@ -430,12 +508,12 @@ export const checkout = ({
         res.data?.checkoutShippingMethodUpdate?.errors &&
         res.data?.checkoutShippingMethodUpdate?.errors[0]?.code ===
           "NOT_FOUND" &&
-          res.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
+        res.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
           "checkoutId" &&
         typeof window !== "undefined"
       ) {
-        localStorage.removeItem(SALEOR_CHECKOUT)
-        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS)
+        localStorage.removeItem(SALEOR_CHECKOUT);
+        localStorage.removeItem(SALEOR_CHECKOUT_DISCOUNTS);
         window.location.reload();
       }
 
@@ -446,7 +524,9 @@ export const checkout = ({
   };
 
   const addPromoCode: CheckoutSDK["addPromoCode"] = async (
-    promoCode: string
+    promoCode: string,
+    updateShippingMethod = true,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -463,6 +543,7 @@ export const checkout = ({
     if (checkout && checkout?.id) {
       const variables: AddCheckoutPromoCodeMutationVariables = {
         checkoutId: checkout?.id,
+        isRecalculate,
         promoCode,
       };
 
@@ -472,15 +553,52 @@ export const checkout = ({
       >({
         mutation: ADD_CHECKOUT_PROMO_CODE,
         variables,
-        update: (_, { data }) => {
-          if (data?.checkoutAddPromoCode?.checkout?.id) {
-            storage.setCheckout(data?.checkoutAddPromoCode?.checkout);
-          }
-          setLocalCheckoutInCache(
+      });
+
+      if (res?.data?.checkoutAddPromoCode?.checkout?.id) {
+        storage.setCheckout(res?.data?.checkoutAddPromoCode?.checkout);
+        const resDiscount = {
+          data: {
+            __typename: "DiscountsType",
+            checkoutDiscounts: {
+              prepaidDiscount:
+                res?.data?.checkoutAddPromoCode?.checkout?.paymentMethod
+                  ?.prepaidDiscountAmount,
+              couponDiscount:
+                res?.data?.checkoutAddPromoCode?.checkout?.paymentMethod
+                  ?.couponDiscount,
+              cashbackDiscount:
+                res?.data?.checkoutAddPromoCode?.checkout?.paymentMethod
+                  ?.cashbackDiscountAmount,
+            },
+            cashback: res?.data?.checkoutAddPromoCode?.checkout?.cashback,
+          },
+        };
+
+        storage.setDiscounts(resDiscount.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: res?.data?.checkoutAddPromoCode?.checkout,
+            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+            localCashback: resDiscount.data.cashback,
+          },
+        });
+
+        if (updateShippingMethod) {
+          await setLocalCheckoutInCache(
             client,
-            data?.checkoutAddPromoCode?.checkout,
+            res.data?.checkoutAddPromoCode?.checkout,
             true
           );
+        }
+      }
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
         },
       });
 
@@ -491,7 +609,9 @@ export const checkout = ({
   };
 
   const removePromoCode: CheckoutSDK["removePromoCode"] = async (
-    promoCode: string
+    promoCode: string,
+    updateShippingMethod = true,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -509,6 +629,7 @@ export const checkout = ({
     if (checkout && checkout?.id) {
       const variables: RemoveCheckoutPromoCodeMutationVariables = {
         checkoutId: checkout?.id,
+        isRecalculate,
         promoCode,
       };
 
@@ -518,15 +639,52 @@ export const checkout = ({
       >({
         mutation: REMOVE_CHECKOUT_PROMO_CODE,
         variables,
-        update: (_, { data }) => {
-          if (data?.checkoutRemovePromoCode?.checkout?.id) {
-            storage.setCheckout(data?.checkoutRemovePromoCode?.checkout);
-          }
-          setLocalCheckoutInCache(
+      });
+
+      if (res?.data?.checkoutRemovePromoCode?.checkout?.id) {
+        storage.setCheckout(res?.data?.checkoutRemovePromoCode?.checkout);
+        const resDiscount = {
+          data: {
+            __typename: "DiscountsType",
+            checkoutDiscounts: {
+              prepaidDiscount:
+                res?.data?.checkoutRemovePromoCode?.checkout?.paymentMethod
+                  ?.prepaidDiscountAmount,
+              couponDiscount:
+                res?.data?.checkoutRemovePromoCode?.checkout?.paymentMethod
+                  ?.couponDiscount,
+              cashbackDiscount:
+                res?.data?.checkoutRemovePromoCode?.checkout?.paymentMethod
+                  ?.cashbackDiscountAmount,
+            },
+            cashback: res?.data?.checkoutRemovePromoCode?.checkout?.cashback,
+          },
+        };
+
+        storage.setDiscounts(resDiscount.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: res?.data?.checkoutRemovePromoCode?.checkout,
+            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+            localCashback: resDiscount.data.cashback,
+          },
+        });
+
+        if (updateShippingMethod) {
+          await setLocalCheckoutInCache(
             client,
-            data?.checkoutRemovePromoCode?.checkout,
+            res.data?.checkoutRemovePromoCode?.checkout,
             true
           );
+        }
+      }
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
         },
       });
 
@@ -537,7 +695,9 @@ export const checkout = ({
   };
 
   const checkoutPaymentMethodUpdate: CheckoutSDK["checkoutPaymentMethodUpdate"] = async (
-    input: PaymentMethodUpdateInput
+    input: PaymentMethodUpdateInput,
+    updateShippingMethod = true,
+    isRecalculate = true
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -560,6 +720,7 @@ export const checkout = ({
         checkoutId: checkout?.id,
         gatewayId: input.gateway,
         useCashback: input.useCashback,
+        isRecalculate,
       };
 
       const res = await client.mutate<
@@ -572,7 +733,7 @@ export const checkout = ({
           setLocalCheckoutInCache(
             client,
             data?.checkoutPaymentMethodUpdate?.checkout,
-            true
+            updateShippingMethod
           );
           if (data?.checkoutPaymentMethodUpdate?.checkout?.id) {
             storage.setCheckout(data?.checkoutPaymentMethodUpdate?.checkout);
@@ -722,7 +883,6 @@ export const checkout = ({
           },
         });
       }
-      
     }
 
     return null;
@@ -778,12 +938,265 @@ export const checkout = ({
       });
 
       if (
-        (res?.errors &&
-          res?.errors[0]?.message) ||
-        (res?.data?.razorpayOrderCreate
-          ?.razorpayErrors &&
-          res?.data?.razorpayOrderCreate
-            ?.razorpayErrors[0]?.message)
+        (res?.errors && res?.errors[0]?.message) ||
+        (res?.data?.razorpayOrderCreate?.razorpayErrors &&
+          res?.data?.razorpayOrderCreate?.razorpayErrors[0]?.message)
+      ) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
+      return res;
+    }
+
+    return { data: null };
+  };
+
+  const juspayOrderAndCustomerCreate: CheckoutSDK["juspayOrderAndCustomerCreate"] = async (
+    createNew?: boolean,
+    email?: string
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    const validEmail = email || checkout?.email;
+    if (
+      checkout &&
+      checkout?.id &&
+      validEmail &&
+      checkout?.shippingAddress?.phone &&
+      checkout?.shippingAddress?.firstName &&
+      checkout?.shippingAddress?.lastName
+    ) {
+      const variables: CreateJuspayOrderAndCustomerMutationVariables = {
+        input: {
+          checkoutId: checkout?.id,
+          emailAddress: validEmail,
+          mobileNumber: checkout?.shippingAddress?.phone,
+          mobileCountryCode: "91",
+          firstName: checkout?.shippingAddress?.firstName,
+          lastName: checkout?.shippingAddress?.lastName,
+          createNew: createNew,
+        },
+      };
+      const res = await client.mutate<
+        CreateJuspayOrderAndCustomerMutation,
+        CreateJuspayOrderAndCustomerMutationVariables
+      >({
+        mutation: CREATE_JUSPAY_CUSTOMER_AND_ORDER,
+        variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+        },
+      });
+
+      if (
+        (res?.errors && res?.errors[0]?.message) ||
+        (res?.data?.juspayOrderAndCustomerCreate?.errors &&
+          res?.data?.juspayOrderAndCustomerCreate?.errors[0]?.message) ||
+        (res?.data?.juspayOrderAndCustomerCreate?.juspayErrors &&
+          res?.data?.juspayOrderAndCustomerCreate?.juspayErrors[0]?.message)
+      ) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
+      return res;
+    }
+
+    return { data: null };
+  };
+
+  const checkJuspayOrderStatus: CheckoutSDK["checkJuspayOrderStatus"] = async () => {
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: CheckJuspayOrderStatusMutationVariables = {
+        input: {
+          checkoutId: checkout?.id,
+        },
+      };
+      const res = await client.mutate<
+        CheckJuspayOrderStatusMutation,
+        CheckJuspayOrderStatusMutationVariables
+      >({
+        mutation: CHECK_JUSPAY_ORDER_STATUS,
+        variables,
+      });
+      return res;
+    }
+
+    return { data: null };
+  };
+
+  const juspayVpaVerify: CheckoutSDK["juspayVpaVerify"] = async (
+    vpa: string
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    const variables: VerifyJuspayVpaMutationVariables = {
+      input: {
+        vpa: vpa,
+      },
+    };
+    const res = await client.mutate<
+      VerifyJuspayVpaMutation,
+      VerifyJuspayVpaMutationVariables
+    >({
+      mutation: CHECK_VPA_ADDRESS,
+      variables,
+      update: async () => {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      },
+    });
+
+    if (
+      (res?.errors && res?.errors[0]?.message) ||
+      (res?.data?.juspayVerifyVpa?.juspayErrors &&
+        res?.data?.juspayVerifyVpa?.juspayErrors[0]?.message)
+    ) {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
+    }
+    return res;
+  };
+
+  const juspayPaymentCreate: CheckoutSDK["juspayPaymentCreate"] = async (
+    input: JuspayPaymentInput
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: CreateJuspayPaymentMutationVariables = {
+        input: {
+          ...input,
+          checkoutId: checkout?.id,
+        },
+      };
+      const res = await client.mutate<
+        CreateJuspayPaymentMutation,
+        CreateJuspayPaymentMutationVariables
+      >({
+        mutation: CREATE_JUSPAY_PAYMENT,
+        variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+        },
+      });
+
+      if (
+        (res?.errors && res?.errors[0]?.message) ||
+        (res?.data?.juspayPayment?.errors &&
+          res?.data?.juspayPayment?.errors[0]?.message) ||
+        (res?.data?.juspayPayment?.juspayErrors &&
+          res?.data?.juspayPayment?.juspayErrors[0]?.message)
+      ) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
+      return res;
+    }
+
+    return { data: null };
+  };
+
+  const createGokwikOrder: CheckoutSDK["createGokwikOrder"] = async () => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: CreateGokwikOrderMutationVariables = {
+        input: {
+          checkoutId: checkout?.id,
+        },
+      };
+      const res = await client.mutate<
+        CreateGokwikOrderMutation,
+        CreateGokwikOrderMutationVariables
+      >({
+        mutation: CREATE_GOKWIK_ORDER,
+        variables,
+        update: async () => {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: true,
+            },
+          });
+        },
+      });
+
+      if (
+        (res?.errors && res?.errors[0]?.message) ||
+        (res?.data?.createGokwikOrder?.gokwikErrors &&
+          res?.data?.createGokwikOrder?.gokwikErrors[0]?.message)
       ) {
         client.writeQuery({
           query: GET_LOCAL_CHECKOUT,
@@ -857,6 +1270,60 @@ export const checkout = ({
     return res;
   };
 
+  const getCheckoutTotals: CheckoutSDK["getCheckoutTotals"] = async (
+    useCheckoutLoading = true
+  ) => {
+    if (useCheckoutLoading) {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: true,
+        },
+      });
+    }
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.token) {
+      const res = await client.query<
+        CheckoutTotalsQuery,
+        CheckoutTotalsQueryVariables
+      >({
+        query: GET_CHECKOUT_TOTALS,
+        variables: {
+          token: checkout?.token,
+        },
+        fetchPolicy: "no-cache",
+      });
+
+      if (useCheckoutLoading) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
+      }
+
+      return res;
+    }
+
+    if (useCheckoutLoading) {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
+    }
+
+    return null;
+  };
+
   const getUserOrders: CheckoutSDK["getUserOrders"] = async (
     opts: OrdersByUserQueryVariables
   ) => {
@@ -874,7 +1341,6 @@ export const checkout = ({
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
-        checkoutLoading: true,
         useCashback: useCashback,
       },
     });
@@ -936,6 +1402,85 @@ export const checkout = ({
     return { data: null };
   };
 
+  const checkoutRecalculation: CheckoutSDK["checkoutRecalculation"] = async (
+    refreshCheckout?: boolean
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout.token) {
+      const inputVariables: CheckoutRecalculationQueryVariables = refreshCheckout
+        ? {
+            token: checkout?.token,
+            refreshCheckout: refreshCheckout,
+          }
+        : {
+            token: checkout?.token,
+          };
+
+      const checkoutDetailRes = await client.query<
+        CheckoutRecalculationQuery,
+        CheckoutRecalculationQueryVariables
+      >({
+        query: CHECKOUT_RECALCULATION,
+        variables: inputVariables,
+        fetchPolicy: "no-cache",
+      });
+
+      if (checkoutDetailRes?.data?.checkoutRecalculation?.id) {
+        storage.setCheckout(checkoutDetailRes?.data?.checkoutRecalculation);
+        const res = {
+          data: {
+            checkoutDiscounts: {
+              __typename: "DiscountsType",
+              prepaidDiscount:
+                checkoutDetailRes?.data?.checkoutRecalculation?.paymentMethod
+                  ?.prepaidDiscountAmount,
+              couponDiscount:
+                checkoutDetailRes?.data?.checkoutRecalculation?.paymentMethod
+                  ?.couponDiscount,
+              cashbackDiscount:
+                checkoutDetailRes?.data?.checkoutRecalculation?.paymentMethod
+                  ?.cashbackDiscountAmount,
+            },
+            cashback: checkoutDetailRes?.data?.checkoutRecalculation?.cashback,
+          },
+        };
+
+        storage.setDiscounts(res.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: checkoutDetailRes?.data?.checkoutRecalculation,
+            localCheckoutDiscounts: res.data.checkoutDiscounts,
+            localCashback: res.data.cashback,
+            checkoutLoading: false,
+          },
+        });
+      }
+      // @ts-ignore
+      var returnObject = {
+        data: checkoutDetailRes?.data?.checkoutRecalculation,
+        errors: checkoutDetailRes?.errors,
+      };
+
+      return returnObject;
+    }
+
+    return null;
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -950,11 +1495,18 @@ export const checkout = ({
     completeCheckout,
     getCityStateFromPincode,
     createRazorpayOrder,
+    juspayOrderAndCustomerCreate,
+    checkJuspayOrderStatus,
+    juspayVpaVerify,
     createPaytmOrder,
     getWalletAmount,
     getUserOrders,
     setUseCashback,
     setCheckout,
     createCashfreeOrder,
+    getCheckoutTotals,
+    juspayPaymentCreate,
+    createGokwikOrder,
+    checkoutRecalculation,
   };
 };

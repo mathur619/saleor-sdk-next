@@ -63,8 +63,12 @@ import {
   UserCheckoutDetailsQueryVariables,
   VerifyCheckoutOtpMutation,
   VerifyCheckoutOtpMutationVariables,
+  CreateTokenWithoutOtpMutation,
+  CreateTokenWithoutOtpMutationVariables,
+  CreateTokenTrueCallerMutation,
+  CreateTokenTrueCallerMutationVariables,
 } from "..";
-import { setLocalCheckoutInCache } from "../apollo/helpers";
+import { checkoutRecalculationUtil, setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   CONFIRM_ACCOUNT,
   CREATE_OTP_TOKEN_MUTATION,
@@ -75,6 +79,8 @@ import {
   VERIFY_CHECKOUT_OTP,
   CHECKOUT_CUSTOMER_ATTACH,
   CHECKOUT_CUSTOMER_ATTACH_NEW,
+  CREATE_TOKEN_WITHOUT_OTP,
+  CREATE_TOKEN_TRUECALLER,
 } from "../apollo/mutations";
 import { USER, USER_CHECKOUT_DETAILS } from "../apollo/queries";
 import { storage } from "./storage";
@@ -82,6 +88,7 @@ import {
   CheckoutCustomerAttachResult,
   ConfirmAccountV2Result,
   GetUserCheckoutResult,
+  OtpLessLoginResult,
   // ChangePasswordResult,
   // LogoutOpts,
   // GetExternalAccessTokenResult,
@@ -97,6 +104,7 @@ import {
   SaleorClientMethodsProps,
   SignInMobileResult,
   SignOutResult,
+  TrueCallerLoginResult,
   VerifyCheckoutOTPResult,
   // SetPasswordResult,
   // VerifyExternalTokenResult,
@@ -220,8 +228,23 @@ export interface AuthSDK {
   signInMobile: (
     otp: string,
     phone?: string,
-    email?: string
+    email?: string,
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean,
+    recalculationQuery?: boolean
   ) => SignInMobileResult;
+
+  otpLessLogin: (
+    waid: string,
+    updateShippingMethod?: boolean
+  ) => OtpLessLoginResult;
+
+  truecallerLogin: (
+    requestId: string,
+    accessToken?: string,
+    endpoint?: string,
+    updateShippingMethod?: boolean
+  ) => TrueCallerLoginResult;
 
   requestOTP: (phone: string) => RequestOtpResult;
 
@@ -233,7 +256,7 @@ export interface AuthSDK {
     sendWigzoInHeader?: boolean
   ) => RegisterAccountV2Result;
 
-  confirmAccountV2: (otp: string, phone: string) => ConfirmAccountV2Result;
+  confirmAccountV2: (otp: string, phone: string, updateShippingMethod?:boolean, isRecalculate?:boolean, recalculationQuery?: boolean) => ConfirmAccountV2Result;
 
   checkoutCustomerAttach: (
     token: string,
@@ -246,7 +269,7 @@ export interface AuthSDK {
 
   setToken: (authToken: string, csrfToken: string) => GetUserCheckoutResult;
 
-  getUserCheckout: () => GetUserCheckoutResult;
+  getUserCheckout: (updateShippingMethod?: boolean, isRecalculate?:boolean, recalculationQuery?:boolean) => GetUserCheckoutResult;
 }
 
 export const auth = ({
@@ -257,7 +280,10 @@ export const auth = ({
   const signInMobile: AuthSDK["signInMobile"] = async (
     otp: string,
     phone?: string,
-    email?: string
+    email?: string,
+    updateShippingMethod:boolean = true,
+    isRecalculate = true,
+    recalculationQuery = false
   ) => {
     client.writeQuery({
       query: USER,
@@ -297,7 +323,7 @@ export const auth = ({
             csrfToken: data.CreateTokenOTP.csrfToken,
             refreshToken: data.CreateTokenOTP.refreshToken,
           });
-          getUserCheckout();
+          getUserCheckout(updateShippingMethod, isRecalculate, recalculationQuery);
         } else {
           client.writeQuery({
             query: USER,
@@ -320,6 +346,160 @@ export const auth = ({
     }
 
     return res;
+  };
+
+  const otpLessLogin: AuthSDK["otpLessLogin"] = async (
+    waid: string,
+    updateShippingMethod = true
+  ) => {
+    client.writeQuery({
+      query: USER,
+      data: {
+        authenticating: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    const CreateTokenWithoutOtpVariables = checkout?.id
+      ? {
+          checkoutId: checkout?.id,
+          waid: waid,
+        }
+      : {
+          waid: waid,
+        };
+    const res = await client.mutate<
+      CreateTokenWithoutOtpMutation,
+      CreateTokenWithoutOtpMutationVariables
+    >({
+      mutation: CREATE_TOKEN_WITHOUT_OTP,
+      variables: CreateTokenWithoutOtpVariables,
+      update: (_, { data }) => {
+        if (data?.CreateTokenWithoutOtp?.token) {
+          storage.setTokens({
+            accessToken: data.CreateTokenWithoutOtp.token,
+            csrfToken: data.CreateTokenWithoutOtp.csrfToken,
+            refreshToken: data.CreateTokenWithoutOtp.refreshToken,
+          });
+          getUserCheckout(updateShippingMethod);
+        } else {
+          client.writeQuery({
+            query: USER,
+            data: {
+              authenticating: false,
+            },
+          });
+        }
+      },
+    });
+
+    if (checkout?.id && res.data?.CreateTokenWithoutOtp?.user?.id) {
+      client.mutate({
+        mutation: CHECKOUT_CUSTOMER_ATTACH,
+        variables: {
+          checkoutId: checkout.id,
+          customerId: res.data.CreateTokenWithoutOtp.user.id,
+        },
+      });
+    }
+
+    return res;
+  };
+
+  const truecallerLogin: AuthSDK["truecallerLogin"] = async (
+    requestId: string,
+    accessToken?: string,
+    endpoint?: string,
+    updateShippingMethod = true
+  ) => {
+    if (requestId) {
+      client.writeQuery({
+        query: USER,
+        data: {
+          authenticating: true,
+        },
+      });
+
+      const checkoutString = storage.getCheckout();
+      const checkout =
+        checkoutString && typeof checkoutString === "string"
+          ? JSON.parse(checkoutString)
+          : checkoutString;
+      let CreateTokenWithTruecallerVariables: CreateTokenTrueCallerMutationVariables = {
+        requestId: requestId,
+      };
+
+      if (checkout?.id) {
+        if (accessToken && endpoint) {
+          CreateTokenWithTruecallerVariables = {
+            ...CreateTokenWithTruecallerVariables,
+            accessToken: accessToken,
+            endpoint: endpoint,
+            checkoutId: checkout.id,
+          };
+        }
+      } else {
+        if (accessToken && endpoint) {
+          CreateTokenWithTruecallerVariables = {
+            ...CreateTokenWithTruecallerVariables,
+            accessToken: accessToken,
+            endpoint: endpoint,
+          };
+        }
+      }
+
+      try {
+        const res = await client.mutate<
+          CreateTokenTrueCallerMutation,
+          CreateTokenTrueCallerMutationVariables
+        >({
+          mutation: CREATE_TOKEN_TRUECALLER,
+          variables: CreateTokenWithTruecallerVariables,
+          update: (_, { data }) => {
+            if (data?.CreateTokenTrueCaller?.token) {
+              storage.setTokens({
+                accessToken: data.CreateTokenTrueCaller.token,
+                csrfToken: data.CreateTokenTrueCaller.csrfToken,
+                refreshToken: data.CreateTokenTrueCaller.refreshToken,
+              });
+              getUserCheckout(updateShippingMethod);
+            } else {
+              client.writeQuery({
+                query: USER,
+                data: {
+                  authenticating: false,
+                },
+              });
+            }
+          },
+        });
+
+        if (checkout?.id && res.data?.CreateTokenTrueCaller?.user?.id) {
+          client.mutate({
+            mutation: CHECKOUT_CUSTOMER_ATTACH,
+            variables: {
+              checkoutId: checkout.id,
+              customerId: res.data.CreateTokenTrueCaller.user.id,
+            },
+          });
+        }
+
+        return res;
+      } catch (error) {
+        client.writeQuery({
+          query: USER,
+          data: {
+            authenticating: false,
+          },
+        });
+      }
+    }
+
+    return null;
   };
 
   const requestOTP: AuthSDK["requestOTP"] = async (phone: string) => {
@@ -409,7 +589,10 @@ export const auth = ({
 
   const confirmAccountV2: AuthSDK["confirmAccountV2"] = async (
     otp: string,
-    phone: string
+    phone: string,
+    updateShippingMethod = true,
+    isRecalculate = true,
+    recalculationQuery = false
   ) => {
     client.writeQuery({
       query: USER,
@@ -441,7 +624,7 @@ export const auth = ({
             csrfToken: data.confirmAccountV2.csrfToken,
             refreshToken: data.confirmAccountV2.refreshToken,
           });
-          getUserCheckout();
+          getUserCheckout(updateShippingMethod, isRecalculate, recalculationQuery);
         } else {
           client.writeQuery({
             query: USER,
@@ -536,20 +719,31 @@ export const auth = ({
     return res;
   };
 
-  const getUserCheckout: AuthSDK["getUserCheckout"] = async () => {
+  const getUserCheckout: AuthSDK["getUserCheckout"] = async (
+    updateShippingMethod: boolean = true,
+    isRecalculate = true,
+    recalculationQuery = false
+  ) => {
     const res = await client.mutate<
       UserCheckoutDetailsQuery,
       UserCheckoutDetailsQueryVariables
     >({
       mutation: USER_CHECKOUT_DETAILS,
-
-      update: (_, { data }) => {
-        setLocalCheckoutInCache(client, data?.me?.checkout, true);
-        if (data?.me?.checkout?.id) {
-          storage.setCheckout(data?.me?.checkout);
-        }
-      },
     });
+
+    if (res?.data?.me?.checkout?.id) {
+      storage.setCheckout(res?.data?.me?.checkout);
+      await setLocalCheckoutInCache(
+        client,
+        res?.data?.me?.checkout,
+        updateShippingMethod,
+        null,
+        isRecalculate
+      );
+      if (recalculationQuery) {
+        await checkoutRecalculationUtil(client, true);
+      }
+    }
 
     return res;
   };
@@ -622,7 +816,7 @@ export const auth = ({
         update: (_, { data }) => {
           if (data?.tokenRefresh?.token) {
             storage.setAccessToken(data.tokenRefresh.token);
-            getUserCheckout();
+            getUserCheckout(false);
           } else {
             signOut();
           }
@@ -639,7 +833,7 @@ export const auth = ({
       update: (_, { data }) => {
         if (data?.tokenRefresh?.token) {
           storage.setAccessToken(data.tokenRefresh.token);
-          getUserCheckout();
+          getUserCheckout(false);
         } else {
           signOut();
         }
@@ -854,5 +1048,7 @@ export const auth = ({
     setToken,
     getUserCheckout,
     verifyCheckoutOTP,
+    otpLessLogin,
+    truecallerLogin,
   };
 };

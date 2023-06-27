@@ -40,10 +40,13 @@ import {
   CreateAccountAddressMutationVariables,
   DeleteAccountAddressMutation,
   DeleteAccountAddressMutationVariables,
+  MetadataItem,
   SetAccountDefaultAddressMutation,
   SetAccountDefaultAddressMutationVariables,
   UpdateAccountAddressMutation,
   UpdateAccountAddressMutationVariables,
+  UpdateUserMetaMutation,
+  UpdateUserMetaMutationVariables,
 } from "..";
 import {
   CREATE_ACCOUNT_ADDRESS,
@@ -51,6 +54,7 @@ import {
   SET_ACCOUNT_DEFAULT_ADDRESS,
   UPDATE_ACCOUNT,
   UPDATE_ACCOUNT_ADDRESS,
+  UPDATE_USER_META,
 } from "../apollo/mutations";
 import {
   CreateAccountAddressOpts,
@@ -71,6 +75,7 @@ import {
   UpdateAccountAddressResult,
   UpdateAccountOpts,
   UpdateAccountResult,
+  UpdateUserMetaDataMutationResult,
   // SetAccountDefaultAddressResult,
   // UpdateAccountAddressResult,
   // UpdateAccountResult,
@@ -167,6 +172,10 @@ export interface UserSDK {
    * @returns Confirmed user account.
    */
   // confirmAccount: (opts: ConfirmAccountOpts) => Promise<ConfirmAccountResult>;
+  updateUserMeta: (
+    userId: string,
+    input: MetadataItem
+  ) => Promise<UpdateUserMetaDataMutationResult>;
 }
 
 export const user = ({
@@ -274,6 +283,21 @@ export const user = ({
     return result;
   };
 
+  const updateUserMeta: UserSDK["updateUserMeta"] = async (
+    userId: string,
+    input: MetadataItem
+  ) => {
+    const result = await client.mutate<
+      UpdateUserMetaMutation,
+      UpdateUserMetaMutationVariables
+    >({
+      mutation: UPDATE_USER_META,
+      variables: { id: userId, input: input },
+    });
+
+    return result;
+  };
+
   const updateAccountAddress: UserSDK["updateAccountAddress"] = async opts => {
     const result = await client.mutate<
       UpdateAccountAddressMutation,
@@ -304,5 +328,6 @@ export const user = ({
     deleteAccountAddress,
     createAccountAddress,
     updateAccountAddress,
+    updateUserMeta,
   };
 };

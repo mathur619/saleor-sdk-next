@@ -453,6 +453,57 @@ export const CREATE_OTP_TOKEN_MUTATION = gql`
   }
 `;
 
+export const CREATE_TOKEN_WITHOUT_OTP = gql`
+  ${userFragment}
+  mutation CreateTokenWithoutOtp($waid: String, $checkoutId: ID) {
+    CreateTokenWithoutOtp: createTokenWithoutOtp(
+      waid: $waid
+      checkoutId: $checkoutId
+    ) {
+      token
+      refreshToken
+      csrfToken
+      user {
+        ...UserFragment
+      }
+      otpErrors {
+        code
+        field
+        message
+      }
+    }
+  }
+`;
+
+export const CREATE_TOKEN_TRUECALLER = gql`
+  ${userFragment}
+  mutation CreateTokenTrueCaller(
+    $accessToken: String
+    $checkoutId: ID
+    $endpoint: String
+    $requestId: String!
+  ) {
+    CreateTokenTrueCaller: createTokenTrueCaller(
+      accessToken: $accessToken
+      checkoutId: $checkoutId
+      endpoint: $endpoint
+      requestId: $requestId
+    ) {
+      token
+      refreshToken
+      csrfToken
+      user {
+        ...UserFragment
+      }
+      otpErrors {
+        code
+        field
+        message
+      }
+    }
+  }
+`;
+
 export const REGISTER_ACCOUNT = gql`
   mutation AccountRegisterV2($input: AccountRegisterInputV2!) {
     accountRegisterV2(input: $input) {
@@ -488,6 +539,27 @@ export const CONFIRM_ACCOUNT = gql`
         field
         message
       }
+    }
+  }
+`;
+
+export const UPDATE_USER_META = gql`
+  mutation UpdateUserMeta($id: ID!, $input: [MetadataInput!]!) {
+    updateMetadata(id: $id, input: $input) {
+      metadataErrors {
+        field
+        message
+        __typename
+      }
+      item {
+        metadata {
+          key
+          value
+          __typename
+        }
+        __typename
+      }
+      __typename
     }
   }
 `;
@@ -560,6 +632,15 @@ export const REMOVE_CHECKOUT_LINE_MUTATION = gql`
     checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
@@ -575,19 +656,30 @@ export const UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION = gql`
     $checkoutId: ID!
     $shippingAddress: AddressInput!
     $email: String!
+    $isRecalculate: Boolean
   ) {
     checkoutShippingAddressUpdate(
       checkoutId: $checkoutId
       shippingAddress: $shippingAddress
+      isRecalculate: $isRecalculate
     ) {
       errors: checkoutErrors {
         ...CheckoutError
       }
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
     }
-    checkoutEmailUpdate(checkoutId: $checkoutId, email: $email) {
+    checkoutEmailUpdate(checkoutId: $checkoutId, email: $email, isRecalculate: $isRecalculate) {
       checkout {
         ...Checkout
       }
@@ -665,10 +757,19 @@ export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION = gql`
 export const ADD_CHECKOUT_PROMO_CODE = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
-  mutation AddCheckoutPromoCode($checkoutId: ID!, $promoCode: String!) {
-    checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
+  mutation AddCheckoutPromoCode($checkoutId: ID!, $promoCode: String!, $isRecalculate: Boolean) {
+    checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode, isRecalculate: $isRecalculate) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
@@ -680,10 +781,19 @@ export const ADD_CHECKOUT_PROMO_CODE = gql`
 export const REMOVE_CHECKOUT_PROMO_CODE = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
-  mutation RemoveCheckoutPromoCode($checkoutId: ID!, $promoCode: String!) {
-    checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode) {
+  mutation RemoveCheckoutPromoCode($checkoutId: ID!, $promoCode: String!, $isRecalculate: Boolean) {
+    checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode, isRecalculate: $isRecalculate) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
@@ -748,14 +858,25 @@ export const CHECKOUT_PAYMENT_METHOD_UPDATE = gql`
     $checkoutId: ID!
     $gatewayId: String!
     $useCashback: Boolean!
+    $isRecalculate: Boolean
   ) {
     checkoutPaymentMethodUpdate(
       checkoutId: $checkoutId
       gatewayId: $gatewayId
       useCashback: $useCashback
+      isRecalculate: $isRecalculate
     ) {
       checkout {
         ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       checkoutErrors {
         field
@@ -782,6 +903,147 @@ export const CREATE_RAZORPAY_ORDER = gql`
         field
         code
         message
+      }
+    }
+  }
+`;
+
+export const CREATE_GOKWIK_ORDER = gql`
+  mutation CreateGokwikOrder($input: GokwikCreateOrderInput!) {
+    createGokwikOrder(input: $input) {
+      errors {
+        field
+        message
+      }
+      gokwickOrder {
+        id
+        requestId
+        orderId
+        amount
+        mid
+        orderType
+        status
+      }
+      gokwikErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
+export const CREATE_JUSPAY_CUSTOMER_AND_ORDER = gql`
+  mutation CreateJuspayOrderAndCustomer(
+    $input: JuspayCreateOrderAndCustomerInput!
+  ) {
+    juspayOrderAndCustomerCreate(input: $input) {
+      errors {
+        field
+        message
+      }
+      juspayResponse {
+        id
+        orderId
+        amount
+        status
+        paymentLinks {
+          web
+          iframe
+          mobile
+        }
+        clientJuspay {
+          clientAuthToken
+          clientAuthTokenExpiry
+        }
+        customerId
+      }
+      juspayErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
+export const CREATE_JUSPAY_PAYMENT = gql`
+  mutation CreateJuspayPayment($input: JuspayPaymentInput!) {
+    juspayPayment(input: $input) {
+      errors {
+        field
+        message
+      }
+      juspayResponse {
+        orderId
+        paymentAuthentication {
+          method
+          url
+        }
+        sdkParams {
+          amount
+          customerFirstName
+          customerLastName
+          mcc
+          merchantName
+          merchantVpa
+          tr
+        }
+        paymentParams {
+          key1
+          key2
+          key3
+        }
+        paymentTxnId
+        status
+        paymentTxnUuid
+      }
+      juspayErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
+export const CHECK_JUSPAY_ORDER_STATUS = gql`
+  mutation CheckJuspayOrderStatus($input: JuspayOrderStatusInput!) {
+    juspayOrderStatusCheck(input: $input) {
+      errors {
+        field
+        message
+      }
+      juspayOrder {
+        id
+        orderId
+        amount
+        status
+        paymentStatus
+      }
+      juspayErrors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
+export const CHECK_VPA_ADDRESS = gql`
+  mutation VerifyJuspayVpa($input: JuspayVerifyVpaInput!) {
+    juspayVerifyVpa(input: $input) {
+      juspayErrors {
+        message
+        code
+      }
+      juspayResponse {
+        customerName
+        status
+        vpa
+        mandateDetails {
+          isHandleSupported
+        }
       }
     }
   }
@@ -858,18 +1120,20 @@ export const CHECKOUT_CUSTOMER_ATTACH_NEW = gql`
 `;
 
 export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutFragment}
   ${checkoutErrorFragment}
-  mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!) {
-    checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines) {
+  mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean) {
+    checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines, isRecalculate: $isRecalculate) {
       checkout {
-        id
-        availableShippingMethods {
-          id
-          name
-          price {
-            currency
-            amount
-          }
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
         }
       }
       errors: checkoutErrors {
@@ -880,6 +1144,7 @@ export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
 `;
 
 export const CREATE_CHECKOUT_MUTATION_NEXT = gql`
+  ${checkoutFragment}
   ${checkoutErrorFragment}
   mutation CreateCheckoutNext($checkoutInput: CheckoutCreateInput!) {
     checkoutCreate(input: $checkoutInput) {
@@ -887,10 +1152,15 @@ export const CREATE_CHECKOUT_MUTATION_NEXT = gql`
         ...CheckoutError
       }
       checkout {
-        id
-        token
-        availableShippingMethods {
-          id
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
         }
       }
     }
@@ -903,10 +1173,12 @@ export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT = gql`
   mutation UpdateCheckoutShippingMethodNext(
     $checkoutId: ID!
     $shippingMethodId: ID!
+    $isRecalculate: Boolean
   ) {
     checkoutShippingMethodUpdate(
       checkoutId: $checkoutId
       shippingMethodId: $shippingMethodId
+      isRecalculate: $isRecalculate
     ) {
       checkout {
         ...Checkout
@@ -928,14 +1200,25 @@ export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT = gql`
 `;
 
 export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
+  ${checkoutFragment}
   ${checkoutErrorFragment}
   mutation UpdateCheckoutLineNext(
     $checkoutId: ID!
     $lines: [CheckoutLineInput]!
+    $isRecalculate: Boolean
   ) {
-    checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines) {
+    checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines, isRecalculate: $isRecalculate) {
       checkout {
-        id
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
       }
       errors: checkoutErrors {
         ...CheckoutError
