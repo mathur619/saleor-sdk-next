@@ -1252,36 +1252,29 @@ export const cart = ({
 
             if (res?.data?.token) {
               const updatedLines = res?.data?.lines.map((line: any) => {
-                if (
-                  line?.variant?.id === variantId &&
-                  line?.variant?.product?.id
-                ) {
-                  const productData = {
-                    ...line.variant.product,
-                    metadata: line?.variant?.product?.metadata || [],
-                    tags: line?.variant?.product?.tags?.map(
-                      (tagname: string) => ({
-                        name: tagname,
-                        __typename: "TagType",
-                      })
-                    ),
-                  };
-                  const lineWithProduct = {
-                    ...line,
-                    variant: {
-                      ...line.variant,
-                      product: productData,
-                      quantityAvailable:
-                        line_item?.variant?.quantityAvailable || 5,
-                    },
-                  };
-                  return lineWithProduct;
-                } else {
-                  return checkout?.lines?.find(
-                    oldCheckoutLine =>
-                      oldCheckoutLine?.variant.id === line?.variant?.id
-                  );
-                }
+                const productData = {
+                  ...line.variant.product,
+                  metadata: line?.variant?.product?.metadata || [],
+                  tags: line?.variant?.product?.tags?.map(
+                    (tagname: string) => ({
+                      name: tagname,
+                      __typename: "TagType",
+                    })
+                  ),
+                };
+                const quantityAvailableValue =
+                  line?.variant?.id === variantId
+                    ? line_item?.variant?.quantityAvailable
+                    : line.variant.quantityAvailable || 5;
+                const lineWithProduct = {
+                  ...line,
+                  variant: {
+                    ...line.variant,
+                    product: productData,
+                    quantityAvailable: quantityAvailableValue,
+                  },
+                };
+                return lineWithProduct;
               });
               const updatedCheckout = {
                 ...checkout,
