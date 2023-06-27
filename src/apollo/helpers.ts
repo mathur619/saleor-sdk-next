@@ -4,14 +4,18 @@ import { storage } from "../core/storage";
 import {
   CHECKOUT_DETAILS_NEXT,
   CHECKOUT_PAYMENTS_NEXT,
+  CHECKOUT_RECALCULATION,
   GET_DISCOUNT_CASHBACK_QUERY,
   GET_LOCAL_CHECKOUT,
 } from "./queries";
 import {
+  Checkout,
   CheckoutDetailsNextQuery,
   CheckoutDetailsNextQueryVariables,
   CheckoutPaymentsNextQuery,
   CheckoutPaymentsNextQueryVariables,
+  CheckoutRecalculationQuery,
+  CheckoutRecalculationQueryVariables,
   CompleteCheckoutMutation,
   UpdateCheckoutShippingMethodNextMutation,
   UpdateCheckoutShippingMethodNextMutationVariables,
@@ -25,7 +29,8 @@ export const setLocalCheckoutInCache = async (
   client: ApolloClient<NormalizedCacheObject>,
   checkout: any,
   fetchDiscount?: boolean,
-  orderPlaced?: CompleteCheckoutMutation | null | undefined
+  orderPlaced?: CompleteCheckoutMutation | null | undefined,
+  isRecalculate = true
 ) => {
   console.log("setLocalCheckoutInCache", checkout);
   client.writeQuery({
@@ -74,6 +79,7 @@ export const setLocalCheckoutInCache = async (
       const variables: UpdateCheckoutShippingMethodNextMutationVariables = {
         checkoutId: checkout?.id,
         shippingMethodId: checkout.availableShippingMethods[0]?.id,
+        isRecalculate,
       };
 
       try {
@@ -183,6 +189,27 @@ export const setLocalCheckoutInCache = async (
         },
       });
     }
+  } else if (checkout?.token && checkout?.paymentMethod && checkout?.cashback) {
+    const resDiscount = {
+      data: {
+        __typename: "DiscountsType",
+        checkoutDiscounts: {
+          prepaidDiscount: checkout?.paymentMethod?.prepaidDiscountAmount,
+          couponDiscount: checkout?.paymentMethod?.couponDiscount,
+          cashbackDiscount: checkout?.paymentMethod?.cashbackDiscountAmount,
+        },
+        cashback: checkout?.cashback,
+      },
+    };
+    storage.setDiscounts(resDiscount.data);
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        localCheckout: checkout,
+        localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+        localCashback: resDiscount.data.cashback,
+      },
+    });
   }
 
   client.writeQuery({
@@ -302,4 +329,78 @@ export const getCheckoutPayments = async (
     data: checkoutPaymentDetailsNext?.data,
     errors: checkoutPaymentDetailsNext?.errors,
   };
+};
+export const checkoutRecalculationUtil = async (client: ApolloClient<NormalizedCacheObject>,refreshCheckout?: boolean) => {
+  client.writeQuery({
+    query: GET_LOCAL_CHECKOUT,
+    data: {
+      checkoutLoading: true,
+    },
+  });
+
+  const checkoutString = storage.getCheckout();
+  const checkout: Checkout | null | undefined =
+    checkoutString && typeof checkoutString === "string"
+      ? JSON.parse(checkoutString)
+      : checkoutString;
+
+  if (checkout && checkout.token) {
+
+    const inputVariables:CheckoutRecalculationQueryVariables = refreshCheckout ? {
+      token: checkout?.token,
+      refreshCheckout: refreshCheckout,
+    }: {
+      token: checkout?.token,
+    };
+    const checkoutDetailRes = await client.query<
+      CheckoutRecalculationQuery,
+      CheckoutRecalculationQueryVariables
+    >({
+      query: CHECKOUT_RECALCULATION,
+      variables: inputVariables,
+      fetchPolicy: "no-cache",
+    });
+
+    if (checkoutDetailRes?.data?.checkoutRecalculation?.id) {
+      storage.setCheckout(checkoutDetailRes?.data?.checkoutRecalculation);
+      const res = {
+        data: {
+          checkoutDiscounts: {
+            __typename: "DiscountsType",
+            prepaidDiscount:
+              checkoutDetailRes?.data?.checkoutRecalculation?.paymentMethod
+                ?.prepaidDiscountAmount,
+            couponDiscount:
+              checkoutDetailRes?.data?.checkoutRecalculation?.paymentMethod
+                ?.couponDiscount,
+            cashbackDiscount:
+              checkoutDetailRes?.data?.checkoutRecalculation?.paymentMethod
+                ?.cashbackDiscountAmount,
+          },
+          cashback: checkoutDetailRes?.data?.checkoutRecalculation?.cashback,
+        },
+      };
+
+      storage.setDiscounts(res.data);
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          localCheckout: checkoutDetailRes?.data?.checkoutRecalculation,
+          localCheckoutDiscounts: res.data.checkoutDiscounts,
+          localCashback: res.data.cashback,
+          checkoutLoading: false,
+        },
+      });
+    }
+    // @ts-ignore
+    var returnObject = {
+      data: checkoutDetailRes?.data?.checkoutRecalculation,
+      errors: checkoutDetailRes?.errors,
+    };
+
+    return returnObject;
+  }
+
+  return null;
 };

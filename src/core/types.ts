@@ -67,7 +67,16 @@ import {
   VerifyCheckoutOtpMutation,
   PaytmTxnCreateMutation,
   CreateCashfreeOrderMutation,
+  CreateJuspayOrderAndCustomerMutation,
+  CheckJuspayOrderStatusMutation,
+  VerifyJuspayVpaMutation,
   CheckoutCustomerAttachNewMutation,
+  CheckoutTotalsQuery,
+  CreateJuspayPaymentMutation,
+  UpdateUserMetaMutation,
+  CreateTokenWithoutOtpMutation,
+  CreateGokwikOrderMutation,
+  CreateTokenTrueCallerMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -178,6 +187,10 @@ export type UpdateAccountAddressResult = FetchResult<
   UpdateAccountAddressMutation
 >;
 
+export type UpdateUserMetaDataMutationResult = FetchResult<
+  UpdateUserMetaMutation
+>;
+
 // export type ConfirmAccountOpts = AccountConfirmMutationVariables;
 
 // Meethods results
@@ -228,6 +241,25 @@ export type GetCityStateFromPincodeResult = Promise<FetchResult<
 export type CreateRazorpayOrderResult = Promise<FetchResult<
   CreateRazorpayOrderMutation
 > | null>;
+export type CreateGokwikOrderResult = Promise<FetchResult<
+  CreateGokwikOrderMutation
+> | null>;
+
+export type JuspayOrderAndCustomerCreateResult = Promise<FetchResult<
+  CreateJuspayOrderAndCustomerMutation
+> | null>;
+
+export type JuspayPaymentCreateResult = Promise<FetchResult<
+  CreateJuspayPaymentMutation
+> | null>;
+
+export type CheckJuspayOrderStatusResult = Promise<FetchResult<
+  CheckJuspayOrderStatusMutation
+> | null>;
+
+export type VerifyJuspayVpaResult = Promise<
+  FetchResult<VerifyJuspayVpaMutation>
+>;
 
 export type CreateCashfreeOrderResult = Promise<FetchResult<
   CreateCashfreeOrderMutation
@@ -244,6 +276,10 @@ export type GetUserOrdersResult = Promise<
     Exact<{ perPage: number; after?: Maybe<string> | undefined }>
   >
 >;
+
+export type CheckoutTotalsResult = Promise<FetchResult<
+  CheckoutTotalsQuery
+> | null>;
 
 // Cart
 
@@ -267,6 +303,20 @@ export type SignInMobileResult = Promise<
     Record<string, any>
   >
 >;
+
+export type OtpLessLoginResult = Promise<
+  FetchResult<
+    CreateTokenWithoutOtpMutation,
+    Record<string, any>,
+    Record<string, any>
+  >
+>;
+
+export type TrueCallerLoginResult = Promise<FetchResult<
+  CreateTokenTrueCallerMutation,
+  Record<string, any>,
+  Record<string, any>
+> | null>;
 
 export type RequestOtpResult = Promise<
   FetchResult<OtpRequestMutation, Record<string, any>, Record<string, any>>
