@@ -1707,6 +1707,7 @@ export const cart = ({
     items,
     addItem,
     removeItem,
+    removeItemRest,
     updateItem,
     addToCartNext,
     addToCartRest,
