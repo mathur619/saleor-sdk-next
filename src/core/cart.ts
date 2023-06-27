@@ -981,7 +981,8 @@ export const cart = ({
                 })),
               };
               const quantityAvailableValue =
-                line?.variant?.id === variantId
+                line?.variant?.id === variantId &&
+                line_item?.variant?.quantityAvailable
                   ? line_item?.variant?.quantityAvailable
                   : line.variant.quantityAvailable || 5;
               const lineWithProduct = {
