@@ -21671,11 +21671,6 @@ export type UserFragment = (
 
 export type PriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> };
 
-export type AddressFragment = (
-  Pick<Address, 'id' | 'firstName' | 'lastName' | 'companyName' | 'streetAddress1' | 'streetAddress2' | 'city' | 'postalCode' | 'countryArea' | 'phone' | 'isDefaultBillingAddress' | 'isDefaultShippingAddress'>
-  & { country: Pick<CountryDisplay, 'code' | 'country'> }
-);
-
 export type ProductVariantFragment = (
   Pick<ProductVariant, 'id' | 'name' | 'sku' | 'quantityAvailable'>
   & { images: Maybe<Array<Maybe<Pick<ProductImage, 'id' | 'sortOrder' | 'alt' | 'url'>>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, pricing: Maybe<(
@@ -22511,26 +22506,6 @@ export const PriceFragmentDoc = gql`
     amount
     currency
   }
-}
-    `;
-export const AddressFragmentDoc = gql`
-    fragment Address on Address {
-  id
-  firstName
-  lastName
-  companyName
-  streetAddress1
-  streetAddress2
-  city
-  postalCode
-  country {
-    code
-    country
-  }
-  countryArea
-  phone
-  isDefaultBillingAddress
-  isDefaultShippingAddress
 }
     `;
 export const ShippingMethodFragmentDoc = gql`
