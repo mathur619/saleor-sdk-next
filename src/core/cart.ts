@@ -526,7 +526,10 @@ export const cart = ({
               );
             }
 
-            return updatedCheckout;
+            return {
+              data: updatedCheckout,
+              errors: res?.data?.errors || [],
+            };
           }
         }
       } catch (error) {
@@ -1040,7 +1043,10 @@ export const cart = ({
 
             getCheckoutPayments(client, updatedCheckout);
 
-            return updatedCheckout;
+            return {
+              data: updatedCheckout,
+              errors: res?.data?.errors || [],
+            };
           }
         }
       } else {
@@ -1323,7 +1329,10 @@ export const cart = ({
                 await setLocalCheckoutInCache(client, updatedCheckout, true);
               }
 
-              return updatedCheckout;
+              return {
+                data: updatedCheckout,
+                errors: res?.data?.errors || [],
+              };
             }
           }
         } catch (error) {
