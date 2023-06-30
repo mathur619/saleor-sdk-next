@@ -72,7 +72,10 @@ export interface CartSDK {
     quantity: number,
     tags?: string[]
   ) => AddItemResult;
-  removeItem: (variantId: string, updateShippingMethod?: boolean) => RemoveItemResult;
+  removeItem: (
+    variantId: string,
+    updateShippingMethod?: boolean
+  ) => RemoveItemResult;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem: (
     variantId: string,
@@ -427,7 +430,7 @@ export const cart = ({
     quantity: number,
     tags?: string[],
     line_item?: any,
-    useDummyAddress: boolean=true,
+    useDummyAddress: boolean = true,
     isRecalculate = false
   ) => {
     const checkoutString = storage.getCheckout();
@@ -437,6 +440,7 @@ export const cart = ({
         : checkoutString;
 
     if (line_item && checkout?.id) {
+      console.log("line_item in sdk", line_item);
       const res = client.readQuery({
         query: GET_LOCAL_CHECKOUT,
       });
@@ -462,7 +466,9 @@ export const cart = ({
       } else {
         existingLines = [...checkout.lines, line_item];
       }
+      console.log("existingLines in sdk", existingLines);
       const updatedCheckout = { ...checkout, lines: existingLines };
+      console.log("updatedCheckout in sdk", updatedCheckout);
 
       client.writeQuery({
         query: GET_LOCAL_CHECKOUT,
@@ -637,7 +643,7 @@ export const cart = ({
             streetAddress2: "dummy",
           },
         };
-      } else if(useDummyAddress) {
+      } else if (useDummyAddress) {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
           email: "dummy@dummy.com",
@@ -654,7 +660,7 @@ export const cart = ({
             streetAddress2: "dummy",
           },
         };
-      }else {
+      } else {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
           email: "dummy@dummy.com",
@@ -765,7 +771,14 @@ export const cart = ({
   ) => {
     const differenceQuantity = quantity - prevQuantity;
     if (differenceQuantity > 0) {
-      const res = await addToCartNext(variantId, differenceQuantity, undefined, undefined, updateShippingMethod, isRecalculate);
+      const res = await addToCartNext(
+        variantId,
+        differenceQuantity,
+        undefined,
+        undefined,
+        updateShippingMethod,
+        isRecalculate
+      );
       return res;
     } else {
       const checkoutString = storage.getCheckout();
