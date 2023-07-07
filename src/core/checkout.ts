@@ -113,7 +113,7 @@ export interface CheckoutSDK {
     addressId: string,
     type: AddressTypes
   ) => SetAddressTypeResult;
-  createCheckout?: () => CreateCheckoutResult;
+  createCheckout?: (tags: any) => CreateCheckoutResult;
   setShippingAddress?: (
     shippingAddress: IAddress,
     email: string
@@ -150,7 +150,9 @@ export interface CheckoutSDK {
 export const checkout = ({
   apolloClient: client,
 }: SaleorClientMethodsProps): CheckoutSDK => {
-  const createCheckout: CheckoutSDK["createCheckout"] = async () => {
+  const createCheckout: CheckoutSDK["createCheckout"] = async (
+    tags: []
+  ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -185,6 +187,7 @@ export const checkout = ({
               streetAddress1: "dummy",
               streetAddress2: "dummy",
             },
+            tags: tags
           },
         },
         update: (_, { data }) => {
