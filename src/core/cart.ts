@@ -391,7 +391,7 @@ export const cart = ({
         variables: {
           checkoutId: checkout?.id,
           lines: updatedLines,
-          tags: tags || ''
+          tags: tags || [""]
         },
         update: async (_, { data }) => {
           if (data?.checkoutLinesUpdate?.checkout?.id) {
