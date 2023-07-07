@@ -66,7 +66,8 @@ export interface CartSDK {
   ) => UpdateItemResult;
 
   updateItemWithLines: (
-    updatedLines: Array<Maybe<CheckoutLineInput>>
+    updatedLines: Array<Maybe<CheckoutLineInput>>,
+    tags: any
   ) => UpdateItemResult;
 
   clearCart?: () => UpdateItemResult;
@@ -371,7 +372,8 @@ export const cart = ({
   };
 
   const updateItemWithLines: CartSDK["updateItemWithLines"] = async (
-    updatedLines: Array<Maybe<CheckoutLineInput>>
+    updatedLines: Array<Maybe<CheckoutLineInput>>,
+    tags: any
   ) => {
     const checkoutString = storage.getCheckout();
 
@@ -389,6 +391,7 @@ export const cart = ({
         variables: {
           checkoutId: checkout?.id,
           lines: updatedLines,
+          tags: tags || ''
         },
         update: async (_, { data }) => {
           if (data?.checkoutLinesUpdate?.checkout?.id) {
@@ -427,6 +430,7 @@ export const cart = ({
               streetAddress1: "dummy",
               streetAddress2: "dummy",
             },
+            tags: tags || [""]
           },
         },
         update: (_, { data }) => {

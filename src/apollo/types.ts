@@ -20830,6 +20830,7 @@ export type VerifyCheckoutOtpMutation = { verifyCheckoutOtp: Maybe<(
 export type UpdateCheckoutLineMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
+  tags?: Maybe<Array<Maybe<Scalars['String']>>>;
 }>;
 
 
