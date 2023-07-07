@@ -218,6 +218,9 @@ export const checkoutFragment = gql`
   fragment Checkout on Checkout {
     token
     id
+    tags {
+      name
+    }
     metadata {
       key
       value
