@@ -3895,18 +3895,6 @@ export type CreateJusPayOrderAndCustomer = {
   juspayErrors: Array<JuspayError>;
 };
 
-/** Create a new member */
-export type CreateMembership = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** Customer email address */
-  email: Maybe<Scalars['String']>;
-  membershipErrors: Array<MembershipCreateError>;
-};
-
 /** Create a menu item image. This mutation must be sent as a `multipart` request. More detailed specs of the upload format can be found here: https://github.com/jaydenseric/graphql-multipart-request-spec */
 export type CreateMenuItemsImages = {
   /**
@@ -5286,8 +5274,7 @@ export type CustomerEventsEnum =
   | 'CUSTOMER_DELETED'
   | 'NAME_ASSIGNED'
   | 'EMAIL_ASSIGNED'
-  | 'NOTE_ADDED'
-  | 'MEMBERSHIP_CREATED';
+  | 'NOTE_ADDED';
 
 export type CustomerExportFilterInput = {
   dateJoined?: Maybe<DateRangeInput>;
@@ -6138,11 +6125,6 @@ export type EmailTemplateError = {
   code: EmailTemplateCode;
 };
 
-export type EmailTemplateEventType = {
-  /** Mail template type data */
-  mailTypeList: Maybe<Array<Maybe<MailType>>>;
-};
-
 export type EmailTemplateFilterInput = {
   sender?: Maybe<Scalars['String']>;
   subject?: Maybe<Scalars['String']>;
@@ -6202,8 +6184,6 @@ export type EmailTemplateType = Node & ObjectWithMetadataV2 & {
   updatedAt: Scalars['DateTime'];
   previousTemplate: Maybe<Scalars['String']>;
   updatedBy: Maybe<User>;
-  /** Mail type enum list */
-  mailTypeList: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 export type EmailTemplateTypeCountableConnection = {
@@ -7899,17 +7879,6 @@ export type LineRefundInput = {
   amount: Scalars['PositiveDecimal'];
 };
 
-export type MailType = {
-  mailType: Maybe<Scalars['String']>;
-  /** email template */
-  emailTemplates: Maybe<Array<Maybe<EmailTemplateType>>>;
-};
-
-export type MailTypeList = {
-  /** email type list */
-  mailType: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
 /** The manifest definition. */
 export type Manifest = {
   identifier: Scalars['String'];
@@ -7941,20 +7910,6 @@ export type MarkAsPaidEditedOrder = {
   /** Order marked as paid. */
   order: Maybe<Order>;
   orderErrors: Array<OrderError>;
-};
-
-/** An enumeration. */
-export type MembershipCreateCode =
-  | 'INVALID'
-  | 'INVALID_EMAIL';
-
-export type MembershipCreateError = {
-  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
-  field: Maybe<Scalars['String']>;
-  /** The error message. */
-  message: Maybe<Scalars['String']>;
-  /** The error code. */
-  code: MembershipCreateCode;
 };
 
 /** Represents a single menu - an object that is used to help navigate through the store. */
@@ -9527,8 +9482,6 @@ export type Mutation = {
   emailTemplateUpdate: Maybe<EmailTemplateUpdate>;
   /** Delete a template instance */
   emailTemplateDelete: Maybe<EmailTemplateDelete>;
-  /** Create a new member */
-  createMembership: Maybe<CreateMembership>;
   /** Upload list of RTO customers. */
   uploadRtoCustomersList: Maybe<UploadRtoCustomersListCsv>;
   /** Remove list of RTO customers. */
@@ -9545,16 +9498,16 @@ export type Mutation = {
   blogBulkDelete: Maybe<BlogBulkDelete>;
   /** Creates an order on CCAvenue. */
   createCcAvenueOrder: Maybe<CreateCcAvenueOrder>;
+  /** Deletes productReviews. */
+  productReviewBulkDelete: Maybe<ProductReviewsBulkDelete>;
+  /** Edit existing product review by providing a hash. */
+  editProductReviewHash: Maybe<EditProductReviewHash>;
   /** Create JWT token without OTP. */
   createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
   /** Completes creating an order. */
   finalizeEditedOrder: Maybe<FinalizeEditedOrder>;
   /** Creates an order on Gokwik. */
   createGokwikOrder: Maybe<CreateGokwikOrder>;
-  /** Deletes productReviews. */
-  productReviewBulkDelete: Maybe<ProductReviewsBulkDelete>;
-  /** Edit existing product review by providing a hash. */
-  editProductReviewHash: Maybe<EditProductReviewHash>;
   /** Create JWT token via TrueCaller. */
   createTokenTrueCaller: Maybe<CreateTokenTrueCaller>;
   /** Create feed specified in input. */
@@ -12009,11 +11962,6 @@ export type MutationEmailTemplateDeleteArgs = {
 };
 
 
-export type MutationCreateMembershipArgs = {
-  email: Scalars['String'];
-};
-
-
 export type MutationUploadRtoCustomersListArgs = {
   csvFile: Scalars['Upload'];
 };
@@ -12055,6 +12003,17 @@ export type MutationCreateCcAvenueOrderArgs = {
 };
 
 
+export type MutationProductReviewBulkDeleteArgs = {
+  ids: Array<Maybe<Scalars['ID']>>;
+};
+
+
+export type MutationEditProductReviewHashArgs = {
+  id: Scalars['ID'];
+  input?: Maybe<ProductReviewInput>;
+};
+
+
 export type MutationCreateTokenWithoutOtpArgs = {
   checkoutId?: Maybe<Scalars['ID']>;
   waid?: Maybe<Scalars['String']>;
@@ -12069,17 +12028,6 @@ export type MutationFinalizeEditedOrderArgs = {
 
 export type MutationCreateGokwikOrderArgs = {
   input: GokwikCreateOrderInput;
-};
-
-
-export type MutationProductReviewBulkDeleteArgs = {
-  ids: Array<Maybe<Scalars['ID']>>;
-};
-
-
-export type MutationEditProductReviewHashArgs = {
-  id: Scalars['ID'];
-  input?: Maybe<ProductReviewInput>;
 };
 
 
@@ -15522,6 +15470,7 @@ export type ProductVariantCreateInput = {
 };
 
 export type ProductVariantCustom = {
+  id: Maybe<Scalars['ID']>;
   listPrice: Maybe<Scalars['Float']>;
   /** Base price of a product variant. This field is restricted for admins. Use the pricing field to get the public price for customers. */
   price: Maybe<Money>;
@@ -15529,6 +15478,7 @@ export type ProductVariantCustom = {
   images: Maybe<ProductImage>;
   /** List of attributes assigned to this variant. */
   attributes: Array<SelectedAttribute>;
+  quantityAvailable: Maybe<Scalars['Int']>;
 };
 
 /** Deletes a product variant. */
@@ -15697,6 +15647,8 @@ export type ProductsCustom = {
   isAvailable: Maybe<Scalars['Boolean']>;
   /** The main thumbnail for a product. */
   thumbnail: Maybe<Image>;
+  productDetails: Maybe<Scalars['String']>;
+  productCardAttributes: Maybe<Scalars['String']>;
 };
 
 
@@ -15829,7 +15781,6 @@ export type Query = {
   /** Look up a Email Template by ID. */
   emailTemplate: Maybe<EmailTemplateType>;
   emailTemplates: Maybe<EmailTemplateTypeCountableConnection>;
-  emailTemplatesEventsList: Maybe<EmailTemplateEventType>;
   /** Look up a export file by ID. */
   exportFile: Maybe<ExportFile>;
   /** List of export files. */
@@ -15862,7 +15813,6 @@ export type Query = {
   localCashback: Maybe<CashbackType>;
   localCheckout: Maybe<Checkout>;
   localCheckoutDiscounts: Maybe<DiscountsType>;
-  mailTypes: Maybe<MailTypeList>;
   /** Return the currently authenticated user. */
   me: Maybe<User>;
   /** Look up a navigation menu by ID or name. */
@@ -16399,11 +16349,6 @@ export type QueryEmailTemplatesArgs = {
 };
 
 
-export type QueryEmailTemplatesEventsListArgs = {
-  mailType?: Maybe<Scalars['String']>;
-};
-
-
 export type QueryExportFileArgs = {
   id: Scalars['ID'];
 };
@@ -16460,6 +16405,7 @@ export type QueryFilterCheckoutsArgs = {
   quantityGte?: Maybe<Scalars['Int']>;
   emailNe?: Maybe<Scalars['String']>;
   paymentsToken?: Maybe<Scalars['String']>;
+  city?: Maybe<Scalars['String']>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -16561,11 +16507,6 @@ export type QueryInfluencerArgs = {
   name?: Maybe<Scalars['String']>;
   phone?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryMailTypesArgs = {
-  first?: Maybe<Scalars['ID']>;
 };
 
 
@@ -16837,6 +16778,7 @@ export type QueryPluginsArgs = {
 export type QueryProductArgs = {
   id?: Maybe<Scalars['ID']>;
   slug?: Maybe<Scalars['String']>;
+  metaFields?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 
@@ -19675,8 +19617,6 @@ export type TemplateMailType =
   | 'MEMBERSHIP_ACTIVATE_ELITE'
   | 'MEMBERSHIP_ACTIVATE_ULTIMATE'
   | 'REVIEW_MAIL'
-  | 'REVIEW_ADMIN_REPLY'
-  | 'ORDER_REFUNDED'
   | 'ORDER_EDITED';
 
 export type TemplateMailTypeFilter =
