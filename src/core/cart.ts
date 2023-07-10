@@ -93,6 +93,7 @@ export interface CartSDK {
     variantId: string,
     quantity: number,
     tags?: string[],
+    line_item?: any,
     useDummyAddress?: boolean,
     isRecalculate?: boolean
   ) => Promise<any>;
@@ -114,6 +115,7 @@ export interface CartSDK {
 
 export const cart = ({
   apolloClient: client,
+  restApiUrl,
 }: SaleorClientMethodsProps): CartSDK => {
   const items = cartItemsVar();
 
@@ -769,6 +771,7 @@ export const cart = ({
     variantId: string,
     quantity: number,
     tags?: string[],
+    line_item?: any,
     useDummyAddress = true,
     isRecalculate = false
   ) => {
@@ -787,59 +790,74 @@ export const cart = ({
     try {
       if (checkout && checkout?.token) {
         const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
-        const currentQuantity = checkout?.lines?.find(
-          line => line?.variant.id === variantId
-        )?.quantity;
-
-        const updatedQuantity =
-          currentQuantity && quantity ? currentQuantity + quantity : quantity;
-
-        if (dbVariantId && updatedQuantity) {
+        if (dbVariantId && quantity) {
           const input = {
             checkoutId: checkout?.token,
             lines: [
               {
-                quantity: updatedQuantity,
+                quantity: quantity,
                 variantId: String(dbVariantId),
               },
             ],
             isRecalculate,
           };
+          const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.ADD_TO_CART}`;
           const res = await axiosRequest(
-            REST_API_ENDPOINTS.ADD_TO_CART,
-            REST_API_METHODS_TYPES.GET,
+            fullUrl,
+            REST_API_METHODS_TYPES.POST,
             input
           );
 
-          if (res?.data?.token) {
-            storage.setCheckout(res?.data);
+          if (res?.data?.token && line_item?.variant?.product) {
+            const updatedLines = res?.data?.lines.map((line: any) => {
+              if (line?.variant?.id === line_item?.variant?.id) {
+                const lineWithProduct = {
+                  ...line,
+                  variant: {
+                    ...line.variant,
+                    product: line_item.variant.product,
+                    quantityAvailable:
+                      line_item?.variant?.quantityAvailable || 5,
+                  },
+                };
+                return lineWithProduct;
+              } else {
+                return checkout?.lines?.find(
+                  oldCheckoutLine =>
+                    oldCheckoutLine?.variant.id === line?.variant?.id
+                );
+              }
+            });
+            const updatedCheckout = { ...res.data, lines: updatedLines };
+            storage.setCheckout(updatedCheckout);
             const result = {
               data: {
                 checkoutDiscounts: {
                   __typename: "DiscountsType",
                   prepaidDiscount:
-                    res?.data?.paymentMethod?.prepaidDiscountAmount,
-                  couponDiscount: res?.data?.paymentMethod?.couponDiscount,
+                    updatedCheckout?.paymentMethod?.prepaidDiscountAmount,
+                  couponDiscount:
+                    updatedCheckout?.paymentMethod?.couponDiscount,
                   cashbackDiscount:
-                    res?.data?.paymentMethod?.cashbackDiscountAmount,
+                    updatedCheckout?.paymentMethod?.cashbackDiscountAmount,
                 },
                 cashback: res?.data?.cashback,
               },
             };
 
-            storage.setDiscounts(res.data);
+            storage.setDiscounts(result.data);
 
             client.writeQuery({
               query: GET_LOCAL_CHECKOUT,
               data: {
-                localCheckout: res?.data,
+                localCheckout: updatedCheckout,
                 localCheckoutDiscounts: result.data.checkoutDiscounts,
                 localCashback: result.data.cashback,
                 checkoutLoading: false,
               },
             });
 
-            return res.data;
+            return updatedCheckout;
           }
         }
       } else {

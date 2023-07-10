@@ -24,7 +24,6 @@ import {
 import { setContext } from "@apollo/client/link/context";
 import axios from "axios";
 import { REST_API_METHODS_TYPES } from "../constants";
-import { REST_API_BASE_URL } from "../config";
 
 let client: ApolloClient<NormalizedCacheObject>;
 let authClient: AuthSDK;
@@ -464,15 +463,11 @@ export const createApolloClient = (
 };
 
 export async function axiosRequest(
-  subUrlPath: string,
+  url: string,
   method: string | undefined = REST_API_METHODS_TYPES.GET,
   data: {} | undefined = {},
   options: any = {}
 ) {
-  const url = subUrlPath
-    ? `${REST_API_BASE_URL}${subUrlPath}`
-    : REST_API_BASE_URL;
-
   //Custom additional headers
   let ip, fbp, fbc;
   if (typeof window !== "undefined") {
