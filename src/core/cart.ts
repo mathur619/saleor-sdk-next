@@ -5,7 +5,7 @@ import {
   UpdateItemResult,
 } from ".";
 
-import { cartItemsVar } from "../apollo/client";
+import { axiosRequest, cartItemsVar } from "../apollo/client";
 import { getLatestCheckout, setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   ADD_CHECKOUT_LINE_MUTATION,
@@ -39,6 +39,8 @@ import {
 } from "../apollo/types";
 import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
 import { SALEOR_CHECKOUT, SALEOR_CHECKOUT_DISCOUNTS } from "./constants";
+import { getDBIdFromGraphqlId } from "../react/utils/utils";
+import { REST_API_ENDPOINTS, REST_API_METHODS_TYPES } from "../constants";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -87,6 +89,13 @@ export interface CartSDK {
     useDummyAddress?: boolean,
     isRecalculate?: boolean
   ) => AddItemResult;
+  addToCartRest: (
+    variantId: string,
+    quantity: number,
+    tags?: string[],
+    useDummyAddress?: boolean,
+    isRecalculate?: boolean
+  ) => Promise<any>;
   updateItemNext: (
     variantId: string,
     quantity: number,
@@ -756,6 +765,232 @@ export const cart = ({
     }
   };
 
+  const addToCartRest: CartSDK["addToCartRest"] = async (
+    variantId: string,
+    quantity: number,
+    tags?: string[],
+    useDummyAddress = true,
+    isRecalculate = false
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    try {
+      if (checkout && checkout?.token) {
+        const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
+        const currentQuantity = checkout?.lines?.find(
+          line => line?.variant.id === variantId
+        )?.quantity;
+
+        const updatedQuantity =
+          currentQuantity && quantity ? currentQuantity + quantity : quantity;
+
+        if (dbVariantId && updatedQuantity) {
+          const input = {
+            checkoutId: checkout?.token,
+            lines: [
+              {
+                quantity: updatedQuantity,
+                variantId: String(dbVariantId),
+              },
+            ],
+            isRecalculate,
+          };
+          const res = await axiosRequest(
+            REST_API_ENDPOINTS.ADD_TO_CART,
+            REST_API_METHODS_TYPES.GET,
+            input
+          );
+
+          if (res?.data?.token) {
+            storage.setCheckout(res?.data);
+            const result = {
+              data: {
+                checkoutDiscounts: {
+                  __typename: "DiscountsType",
+                  prepaidDiscount:
+                    res?.data?.paymentMethod?.prepaidDiscountAmount,
+                  couponDiscount: res?.data?.paymentMethod?.couponDiscount,
+                  cashbackDiscount:
+                    res?.data?.paymentMethod?.cashbackDiscountAmount,
+                },
+                cashback: res?.data?.cashback,
+              },
+            };
+
+            storage.setDiscounts(res.data);
+
+            client.writeQuery({
+              query: GET_LOCAL_CHECKOUT,
+              data: {
+                localCheckout: res?.data,
+                localCheckoutDiscounts: result.data.checkoutDiscounts,
+                localCashback: result.data.cashback,
+                checkoutLoading: false,
+              },
+            });
+
+            return res.data;
+          }
+        }
+      } else {
+        let checkoutInputVariables: CheckoutCreateInput;
+        if (tags && useDummyAddress) {
+          checkoutInputVariables = {
+            lines: [{ quantity: quantity, variantId: variantId }],
+            email: "dummy@dummy.com",
+            tags,
+            shippingAddress: {
+              city: "delhi",
+              companyName: "dummy",
+              country: "IN",
+              countryArea: "Delhi",
+              firstName: "dummy",
+              lastName: "dummy",
+              phone: "7894561230",
+              postalCode: "110006",
+              streetAddress1: "dummy",
+              streetAddress2: "dummy",
+            },
+          };
+        } else if (useDummyAddress) {
+          checkoutInputVariables = {
+            lines: [{ quantity: quantity, variantId: variantId }],
+            email: "dummy@dummy.com",
+            shippingAddress: {
+              city: "delhi",
+              companyName: "dummy",
+              country: "IN",
+              countryArea: "Delhi",
+              firstName: "dummy",
+              lastName: "dummy",
+              phone: "7894561230",
+              postalCode: "110006",
+              streetAddress1: "dummy",
+              streetAddress2: "dummy",
+            },
+          };
+        } else {
+          checkoutInputVariables = {
+            lines: [{ quantity: quantity, variantId: variantId }],
+            email: "dummy@dummy.com",
+          };
+        }
+
+        try {
+          const res = await client.mutate<
+            CreateCheckoutNextMutation,
+            CreateCheckoutNextMutationVariables
+          >({
+            mutation: CREATE_CHECKOUT_MUTATION_NEXT,
+            variables: {
+              checkoutInput: checkoutInputVariables,
+            },
+          });
+          const checkout = res?.data?.checkoutCreate?.checkout;
+          if (!checkout?.id) {
+            client.writeQuery({
+              query: GET_LOCAL_CHECKOUT,
+              data: {
+                checkoutLoading: false,
+              },
+            });
+            return {
+              data: undefined,
+              errors: res?.data?.checkoutCreate?.errors,
+            };
+          }
+
+          storage.setCheckout(res.data?.checkoutCreate?.checkout);
+
+          const resDiscount = {
+            data: {
+              checkoutDiscounts: {
+                __typename: "DiscountsType",
+                prepaidDiscount:
+                  res.data?.checkoutCreate?.checkout?.paymentMethod
+                    ?.prepaidDiscountAmount,
+                couponDiscount:
+                  res.data?.checkoutCreate?.checkout?.paymentMethod
+                    ?.couponDiscount,
+                cashbackDiscount:
+                  res.data?.checkoutCreate?.checkout?.paymentMethod
+                    ?.cashbackDiscountAmount,
+              },
+              cashback: res.data?.checkoutCreate?.checkout?.cashback,
+            },
+          };
+
+          storage.setDiscounts(resDiscount.data);
+
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              localCheckout: res.data?.checkoutCreate?.checkout,
+              localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+              localCashback: resDiscount.data.cashback,
+            },
+          });
+
+          if (useDummyAddress) {
+            await setLocalCheckoutInCache(
+              client,
+              res.data?.checkoutCreate?.checkout,
+              true
+            );
+            return {
+              data: res.data?.checkoutCreate?.checkout,
+              errors: res?.data?.checkoutCreate?.errors,
+            };
+          }
+
+          const returnObject = {
+            data: res.data?.checkoutCreate?.checkout,
+            errors: res?.data?.checkoutCreate?.errors,
+          };
+
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+          return returnObject;
+        } catch {
+          await getLatestCheckout(client, checkout);
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+          return {
+            data: null,
+            errors: undefined,
+          };
+        }
+      }
+    } catch (error) {
+      console.log("Failed to add product in cart, error in atc rest.", error);
+    }
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: false,
+      },
+    });
+    return null;
+  };
+
   const updateItemNext: CartSDK["updateItemNext"] = async (
     variantId: string,
     quantity: number,
@@ -1109,6 +1344,7 @@ export const cart = ({
     removeItem,
     updateItem,
     addToCartNext,
+    addToCartRest,
     updateItemNext,
     clearCart,
     updateItemWithLines,

@@ -45,3 +45,20 @@ function isValidJSONString(str: string) {
   }
   return true;
 }
+
+export const getDBIdFromGraphqlId = (
+  graphqlId: string,
+  schema?: string
+): number | void => {
+  // This is temporary solution, we will use slugs in the future
+  if (typeof window !== "undefined") {
+    const rawId = atob(graphqlId);
+    const regexp = /(\w+):(\d+)/;
+    const arr = regexp.exec(rawId);
+
+    if (schema && schema !== arr![1]) {
+      throw new Error("Schema is not correct");
+    }
+    return parseInt(arr![2], 10);
+  }
+};
