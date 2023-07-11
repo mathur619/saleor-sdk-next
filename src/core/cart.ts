@@ -981,7 +981,8 @@ export const cart = ({
                 })),
               };
               const quantityAvailableValue =
-                line?.variant?.id === variantId
+                line?.variant?.id === variantId &&
+                line_item?.variant?.quantityAvailable
                   ? line_item?.variant?.quantityAvailable
                   : line.variant.quantityAvailable || 5;
               const lineWithProduct = {
@@ -1033,61 +1034,30 @@ export const cart = ({
           }
         }
       } else {
-        let checkoutInputVariables: CheckoutCreateInput;
-        if (tags && useDummyAddress) {
-          checkoutInputVariables = {
-            lines: [{ quantity: quantity, variantId: variantId }],
-            email: "dummy@dummy.com",
-            tags,
-            shippingAddress: {
-              city: "delhi",
-              companyName: "dummy",
-              country: "IN",
-              countryArea: "Delhi",
-              firstName: "dummy",
-              lastName: "dummy",
-              phone: "7894561230",
-              postalCode: "110006",
-              streetAddress1: "dummy",
-              streetAddress2: "dummy",
-            },
-          };
-        } else if (useDummyAddress) {
-          checkoutInputVariables = {
-            lines: [{ quantity: quantity, variantId: variantId }],
-            email: "dummy@dummy.com",
-            shippingAddress: {
-              city: "delhi",
-              companyName: "dummy",
-              country: "IN",
-              countryArea: "Delhi",
-              firstName: "dummy",
-              lastName: "dummy",
-              phone: "7894561230",
-              postalCode: "110006",
-              streetAddress1: "dummy",
-              streetAddress2: "dummy",
-            },
-          };
-        } else {
-          checkoutInputVariables = {
-            lines: [{ quantity: quantity, variantId: variantId }],
-            email: "dummy@dummy.com",
-          };
-        }
-
         try {
-          const res = await client.mutate<
-            CreateCheckoutNextMutation,
-            CreateCheckoutNextMutationVariables
-          >({
-            mutation: CREATE_CHECKOUT_MUTATION_NEXT,
-            variables: {
-              checkoutInput: checkoutInputVariables,
-            },
-          });
-          const checkout = res?.data?.checkoutCreate?.checkout;
-          if (!checkout?.id) {
+          const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
+          const createCheckoutInput = tags
+            ? {
+                checkoutInput: {
+                  lines: [{ quantity: quantity, variantId: dbVariantId }],
+                  email: "dummy@dummy.com",
+                  tags,
+                },
+              }
+            : {
+                checkoutInput: {
+                  lines: [{ quantity: quantity, variantId: dbVariantId }],
+                  email: "dummy@dummy.com",
+                },
+              };
+          const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
+          const res = await axiosRequest(
+            fullUrl,
+            REST_API_METHODS_TYPES.POST,
+            createCheckoutInput
+          );
+          const createCheckoutRes = res?.data;
+          if (!res?.data?.token) {
             client.writeQuery({
               query: GET_LOCAL_CHECKOUT,
               data: {
@@ -1095,28 +1065,125 @@ export const cart = ({
               },
             });
             return {
-              data: undefined,
-              errors: res?.data?.checkoutCreate?.errors,
+              data: res?.data || undefined,
+              errors: res?.data?.errors,
             };
           }
+          const updatedLines = res?.data?.lines.map((line: any) => {
+            const productData = {
+              ...line.variant.product,
+              metadata: line?.variant?.product?.metadata || [],
+              tags: line?.variant?.product?.tags?.map((tagname: string) => ({
+                name: tagname,
+                __typename: "TagType",
+              })),
+            };
+            const quantityAvailableValue =
+              line?.variant?.id === variantId
+                ? line_item?.variant?.quantityAvailable
+                : line.variant.quantityAvailable || 5;
+            const lineWithProduct = {
+              ...line,
+              variant: {
+                ...line.variant,
+                product: productData,
+                quantityAvailable: quantityAvailableValue,
+              },
+            };
+            return lineWithProduct;
+          });
 
-          storage.setCheckout(res.data?.checkoutCreate?.checkout);
+          const createCheckoutResUpdated = {
+            ...createCheckoutRes,
+            lines: updatedLines,
+          };
+          const updatedCheckout = {
+            availablePaymentGateways: [
+              {
+                currencies: ["INR"],
+                id: "mirumee.payments.razorpay",
+                name: "Razorpay",
+                __typename: "PaymentGateway",
+                config: [],
+              },
+            ],
+            billingAddress: null,
+            cashback: {
+              amount: "0.00",
+              willAddOn: null,
+              __typename: "CashbackType",
+            },
+            discount: {
+              currency: "INR",
+              amount: 0,
+              __typename: "Money",
+            },
+            email: "dummy@dummy.com",
+            paymentMethod: {
+              cashbackDiscountAmount: 0,
+              couponDiscount: "0",
+              prepaidDiscountAmount: 0,
+              __typename: "PaymentMethodType",
+            },
+            shippingAddress: null,
+            shippingMethod: null,
+            shippingPrice: {
+              gross: {
+                amount: 0,
+                currency: "INR",
+                __typename: "Money",
+              },
+              net: {
+                amount: 0,
+                currency: "INR",
+                __typename: "Money",
+              },
+              __typename: "TaxedMoney",
+            },
+            subtotalPrice: {
+              gross: {
+                amount: 0,
+                currency: "INR",
+                __typename: "Money",
+              },
+              net: {
+                amount: 0,
+                currency: "INR",
+                __typename: "Money",
+              },
+              __typename: "TaxedMoney",
+            },
+            totalPrice: {
+              gross: {
+                amount: 0,
+                currency: "INR",
+                __typename: "Money",
+              },
+              net: {
+                amount: 0,
+                currency: "INR",
+                __typename: "Money",
+              },
+              __typename: "TaxedMoney",
+            },
+            translatedDiscountName: null,
+            voucherCode: null,
+            ...createCheckoutResUpdated,
+          };
+
+          storage.setCheckout(updatedCheckout);
 
           const resDiscount = {
             data: {
               checkoutDiscounts: {
                 __typename: "DiscountsType",
                 prepaidDiscount:
-                  res.data?.checkoutCreate?.checkout?.paymentMethod
-                    ?.prepaidDiscountAmount,
-                couponDiscount:
-                  res.data?.checkoutCreate?.checkout?.paymentMethod
-                    ?.couponDiscount,
+                  updatedCheckout?.paymentMethod?.prepaidDiscountAmount,
+                couponDiscount: updatedCheckout?.paymentMethod?.couponDiscount,
                 cashbackDiscount:
-                  res.data?.checkoutCreate?.checkout?.paymentMethod
-                    ?.cashbackDiscountAmount,
+                  updatedCheckout?.paymentMethod?.cashbackDiscountAmount,
               },
-              cashback: res.data?.checkoutCreate?.checkout?.cashback,
+              cashback: updatedCheckout?.cashback,
             },
           };
 
@@ -1125,27 +1192,25 @@ export const cart = ({
           client.writeQuery({
             query: GET_LOCAL_CHECKOUT,
             data: {
-              localCheckout: res.data?.checkoutCreate?.checkout,
+              localCheckout: updatedCheckout,
               localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
               localCashback: resDiscount.data.cashback,
             },
           });
 
+          getCheckoutPayments(client, updatedCheckout);
+
           if (useDummyAddress) {
-            await setLocalCheckoutInCache(
-              client,
-              res.data?.checkoutCreate?.checkout,
-              true
-            );
+            await setLocalCheckoutInCache(client, updatedCheckout, true);
             return {
-              data: res.data?.checkoutCreate?.checkout,
-              errors: res?.data?.checkoutCreate?.errors,
+              data: updatedCheckout,
+              errors: res?.data?.errors,
             };
           }
 
           const returnObject = {
-            data: res.data?.checkoutCreate?.checkout,
-            errors: res?.data?.checkoutCreate?.errors,
+            data: res.data,
+            errors: res?.data?.errors,
           };
 
           client.writeQuery({
@@ -1236,7 +1301,7 @@ export const cart = ({
               input
             );
 
-            if (!res?.data?.checkoutLinesUpdate?.checkout?.token) {
+            if (!res?.data?.token) {
               await getLatestCheckout(client, checkout);
               client.writeQuery({
                 query: GET_LOCAL_CHECKOUT,
