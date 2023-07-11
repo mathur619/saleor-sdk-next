@@ -78,7 +78,10 @@ export interface CartSDK {
     quantity: number,
     tags?: string[]
   ) => AddItemResult;
-  removeItem: (variantId: string, updateShippingMethod?: boolean) => RemoveItemResult;
+  removeItem: (
+    variantId: string,
+    updateShippingMethod?: boolean
+  ) => RemoveItemResult;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem: (
     variantId: string,
@@ -442,7 +445,7 @@ export const cart = ({
     quantity: number,
     tags?: string[],
     line_item?: any,
-    useDummyAddress: boolean=true,
+    useDummyAddress: boolean = true,
     isRecalculate = false
   ) => {
     const checkoutString = storage.getCheckout();
@@ -652,7 +655,7 @@ export const cart = ({
             streetAddress2: "dummy",
           },
         };
-      } else if(useDummyAddress) {
+      } else if (useDummyAddress) {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
           email: "dummy@dummy.com",
@@ -669,7 +672,7 @@ export const cart = ({
             streetAddress2: "dummy",
           },
         };
-      }else {
+      } else {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
           email: "dummy@dummy.com",
@@ -812,14 +815,27 @@ export const cart = ({
             input
           );
 
-          if (res?.data?.token && line_item?.variant?.product) {
+          if (res?.data?.token) {
             const updatedLines = res?.data?.lines.map((line: any) => {
-              if (line?.variant?.id === line_item?.variant?.id) {
+              if (
+                line?.variant?.id === variantId &&
+                line?.variant?.product?.id
+              ) {
+                const productData = {
+                  ...line.variant.product,
+                  metadata: line?.variant?.product?.metadata || [],
+                  tags: line?.variant?.product?.tags?.map(
+                    (tagname: string) => ({
+                      name: tagname,
+                      __typename: "TagType",
+                    })
+                  ),
+                };
                 const lineWithProduct = {
                   ...line,
                   variant: {
                     ...line.variant,
-                    product: line?.product || line_item?.variant?.product,
+                    product: productData,
                     quantityAvailable:
                       line_item?.variant?.quantityAvailable || 5,
                   },
@@ -1028,7 +1044,14 @@ export const cart = ({
   ) => {
     const differenceQuantity = quantity - prevQuantity;
     if (differenceQuantity > 0) {
-      const res = await addToCartNext(variantId, differenceQuantity, undefined, undefined, updateShippingMethod, isRecalculate);
+      const res = await addToCartNext(
+        variantId,
+        differenceQuantity,
+        undefined,
+        undefined,
+        updateShippingMethod,
+        isRecalculate
+      );
       return res;
     } else {
       const checkoutString = storage.getCheckout();

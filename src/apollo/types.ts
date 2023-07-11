@@ -21869,13 +21869,7 @@ export type CheckoutPaymentsNextQueryVariables = Exact<{
 
 export type CheckoutPaymentsNextQuery = { checkout: Maybe<(
     Pick<Checkout, 'id' | 'token' | 'voucherCode'>
-    & { totalPrice: Maybe<(
-      Pick<TaxedMoney, 'currency'>
-      & { gross: Pick<Money, 'currency' | 'amount'> }
-    )>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>>, discount: Maybe<Pick<Money, 'amount' | 'currency'>>, paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, subtotalPrice: Maybe<(
-      Pick<TaxedMoney, 'currency'>
-      & { gross: Pick<Money, 'currency' | 'amount'> }
-    )> }
+    & { totalPrice: Maybe<PriceFragment>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>>, discount: Maybe<Pick<Money, 'amount' | 'currency'>>, paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, subtotalPrice: Maybe<PriceFragment> }
   )> };
 
 export type GetCartItemsQueryVariables = Exact<{ [key: string]: never; }>;
@@ -24448,11 +24442,7 @@ export const CheckoutPaymentsNextDocument = gql`
     id
     token
     totalPrice {
-      currency
-      gross {
-        currency
-        amount
-      }
+      ...Price
     }
     cashback {
       amount
@@ -24469,15 +24459,11 @@ export const CheckoutPaymentsNextDocument = gql`
       prepaidDiscountAmount
     }
     subtotalPrice {
-      currency
-      gross {
-        currency
-        amount
-      }
+      ...Price
     }
   }
 }
-    `;
+    ${PriceFragmentDoc}`;
 
 /**
  * __useCheckoutPaymentsNextQuery__
