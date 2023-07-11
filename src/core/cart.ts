@@ -473,10 +473,23 @@ export const cart = ({
                   __typename: "TagType",
                 })),
               };
+
+              const updatedLineVariantAttributes = line?.variant?.attributes?.map(
+                (item: any) => {
+                  return {
+                    ...item,
+                    values: item.values?.map((valueItem: any) => ({
+                      ...valueItem,
+                      value: valueItem.value || valueItem.name,
+                    })),
+                  };
+                }
+              );
               const lineWithProduct = {
                 ...line,
                 variant: {
                   ...line.variant,
+                  attributes: updatedLineVariantAttributes,
                   product: productData,
                   quantityAvailable:
                     line_item?.variant?.quantityAvailable || 50,
@@ -1307,10 +1320,24 @@ export const cart = ({
                   line_item?.variant?.quantityAvailable
                     ? line_item?.variant?.quantityAvailable
                     : line.variant.quantityAvailable || 50;
+
+                const updatedLineVariantAttributes = line?.variant?.attributes?.map(
+                  (item: any) => {
+                    return {
+                      ...item,
+                      values: item.values?.map((valueItem: any) => ({
+                        ...valueItem,
+                        value: valueItem.value || valueItem.name,
+                      })),
+                    };
+                  }
+                );
+
                 const lineWithProduct = {
                   ...line,
                   variant: {
                     ...line.variant,
+                    attributes: updatedLineVariantAttributes,
                     product: productData,
                     quantityAvailable: quantityAvailableValue,
                   },
@@ -1565,10 +1592,24 @@ export const cart = ({
             })),
           };
           const quantityAvailableValue = line.variant.quantityAvailable || 50;
+
+          const updatedLineVariantAttributes = line?.variant?.attributes?.map(
+            (item: any) => {
+              return {
+                ...item,
+                values: item.values?.map((valueItem: any) => ({
+                  ...valueItem,
+                  value: valueItem.value || valueItem.name,
+                })),
+              };
+            }
+          );
+
           const lineWithProduct = {
             ...line,
             variant: {
               ...line.variant,
+              attributes: updatedLineVariantAttributes,
               product: productData,
               quantityAvailable: quantityAvailableValue,
             },
@@ -1657,10 +1698,22 @@ export const cart = ({
             })),
           };
           const quantityAvailableValue = line.variant.quantityAvailable || 50;
+          const updatedLineVariantAttributes = line?.variant?.attributes?.map(
+            (item: any) => {
+              return {
+                ...item,
+                values: item.values?.map((valueItem: any) => ({
+                  ...valueItem,
+                  value: valueItem.value || valueItem.name,
+                })),
+              };
+            }
+          );
           const lineWithProduct = {
             ...line,
             variant: {
               ...line.variant,
+              attributes: updatedLineVariantAttributes,
               product: productData,
               quantityAvailable: quantityAvailableValue,
             },
