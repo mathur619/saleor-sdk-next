@@ -495,6 +495,15 @@ export async function axiosRequest(
     fbc = getCookie("_fbc");
   }
 
+  let userSpecificHeaders = {};
+  const token = storage.getAccessToken();
+  if (token) {
+    userSpecificHeaders = {
+      ...userSpecificHeaders,
+      Authorization: `JWT ${token}`,
+    };
+  }
+
   let customRequestHeaders = {
     event_source_url: typeof window !== "undefined" ? window.location.href : "",
     "x-client-ip-address": ip || "",
@@ -505,7 +514,10 @@ export async function axiosRequest(
   };
 
   if (options?.headers) {
-    customRequestHeaders = { ...customRequestHeaders, ...options.headers };
+    customRequestHeaders = {
+      ...customRequestHeaders,
+      ...options.headers,
+    };
   }
 
   if (url && method) {
@@ -514,7 +526,7 @@ export async function axiosRequest(
         url,
         method,
         data,
-        headers: customRequestHeaders,
+        headers: { ...userSpecificHeaders, ...customRequestHeaders },
         ...options,
       });
 
