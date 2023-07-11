@@ -1025,7 +1025,7 @@ export const cart = ({
                   cashbackDiscount:
                     updatedCheckout?.paymentMethod?.cashbackDiscountAmount,
                 },
-                cashback: res?.data?.cashback,
+                cashback: updatedCheckout?.cashback,
               },
             };
 
