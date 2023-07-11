@@ -503,6 +503,8 @@ export async function axiosRequest(
       Authorization: `JWT ${token}`,
     };
   }
+  console.log("token", token, storage, userSpecificHeaders);
+
   let customRequestHeaders = {
     event_source_url: typeof window !== "undefined" ? window.location.href : "",
     "x-client-ip-address": ip || "",
@@ -515,7 +517,6 @@ export async function axiosRequest(
   if (options?.headers) {
     customRequestHeaders = {
       ...customRequestHeaders,
-      ...userSpecificHeaders,
       ...options.headers,
     };
   }
@@ -526,7 +527,7 @@ export async function axiosRequest(
         url,
         method,
         data,
-        headers: customRequestHeaders,
+        headers: { ...userSpecificHeaders, ...customRequestHeaders },
         ...options,
       });
 
