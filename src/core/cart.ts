@@ -44,7 +44,11 @@ import {
 import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
 import { SALEOR_CHECKOUT, SALEOR_CHECKOUT_DISCOUNTS } from "./constants";
 import { getDBIdFromGraphqlId } from "../react/utils/utils";
-import { REST_API_ENDPOINTS, REST_API_METHODS_TYPES } from "../constants";
+import {
+  REST_API_ENDPOINTS,
+  REST_API_METHODS_TYPES,
+  dummyCheckoutFields,
+} from "../constants";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -133,6 +137,12 @@ export interface CartSDK {
     useCheckoutLoading?: boolean,
     isRecalculate?: boolean
   ) => UpdateItemResult;
+  updateItemWithLinesRest: (
+    linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
+    updateShippingMethod?: boolean,
+    useCheckoutLoading?: boolean,
+    isRecalculate?: boolean
+  ) => Promise<any>;
   clearCart?: () => UpdateItemResult;
 }
 
@@ -439,7 +449,7 @@ export const cart = ({
             input
           );
 
-          if (!res?.data?.checkoutLinesUpdate?.checkout?.token) {
+          if (!res?.data?.token) {
             await getLatestCheckout(client, checkout);
             client.writeQuery({
               query: GET_LOCAL_CHECKOUT,
@@ -516,7 +526,10 @@ export const cart = ({
               );
             }
 
-            return updatedCheckout;
+            return {
+              data: updatedCheckout,
+              errors: res?.data?.errors || [],
+            };
           }
         }
       } catch (error) {
@@ -1030,7 +1043,10 @@ export const cart = ({
 
             getCheckoutPayments(client, updatedCheckout);
 
-            return updatedCheckout;
+            return {
+              data: updatedCheckout,
+              errors: res?.data?.errors || [],
+            };
           }
         }
       } else {
@@ -1079,7 +1095,8 @@ export const cart = ({
               })),
             };
             const quantityAvailableValue =
-              line?.variant?.id === variantId
+              line?.variant?.id === variantId &&
+              line_item?.variant?.quantityAvailable
                 ? line_item?.variant?.quantityAvailable
                 : line.variant.quantityAvailable || 5;
             const lineWithProduct = {
@@ -1098,76 +1115,7 @@ export const cart = ({
             lines: updatedLines,
           };
           const updatedCheckout = {
-            availablePaymentGateways: [
-              {
-                currencies: ["INR"],
-                id: "mirumee.payments.razorpay",
-                name: "Razorpay",
-                __typename: "PaymentGateway",
-                config: [],
-              },
-            ],
-            billingAddress: null,
-            cashback: {
-              amount: "0.00",
-              willAddOn: null,
-              __typename: "CashbackType",
-            },
-            discount: {
-              currency: "INR",
-              amount: 0,
-              __typename: "Money",
-            },
-            email: "dummy@dummy.com",
-            paymentMethod: {
-              cashbackDiscountAmount: 0,
-              couponDiscount: "0",
-              prepaidDiscountAmount: 0,
-              __typename: "PaymentMethodType",
-            },
-            shippingAddress: null,
-            shippingMethod: null,
-            shippingPrice: {
-              gross: {
-                amount: 0,
-                currency: "INR",
-                __typename: "Money",
-              },
-              net: {
-                amount: 0,
-                currency: "INR",
-                __typename: "Money",
-              },
-              __typename: "TaxedMoney",
-            },
-            subtotalPrice: {
-              gross: {
-                amount: 0,
-                currency: "INR",
-                __typename: "Money",
-              },
-              net: {
-                amount: 0,
-                currency: "INR",
-                __typename: "Money",
-              },
-              __typename: "TaxedMoney",
-            },
-            totalPrice: {
-              gross: {
-                amount: 0,
-                currency: "INR",
-                __typename: "Money",
-              },
-              net: {
-                amount: 0,
-                currency: "INR",
-                __typename: "Money",
-              },
-              __typename: "TaxedMoney",
-            },
-            translatedDiscountName: null,
-            voucherCode: null,
+            ...dummyCheckoutFields,
             ...createCheckoutResUpdated,
           };
 
@@ -1328,7 +1276,8 @@ export const cart = ({
                   ),
                 };
                 const quantityAvailableValue =
-                  line?.variant?.id === variantId
+                  line?.variant?.id === variantId &&
+                  line_item?.variant?.quantityAvailable
                     ? line_item?.variant?.quantityAvailable
                     : line.variant.quantityAvailable || 5;
                 const lineWithProduct = {
@@ -1377,14 +1326,13 @@ export const cart = ({
               getCheckoutPayments(client, updatedCheckout);
 
               if (updateShippingMethod) {
-                await setLocalCheckoutInCache(
-                  client,
-                  res.data?.checkoutLinesUpdate?.checkout,
-                  true
-                );
+                await setLocalCheckoutInCache(client, updatedCheckout, true);
               }
 
-              return updatedCheckout;
+              return {
+                data: updatedCheckout,
+                errors: res?.data?.errors || [],
+              };
             }
           }
         } catch (error) {
@@ -1527,6 +1475,221 @@ export const cart = ({
       }
     }
     return null;
+  };
+
+  const updateItemWithLinesRest: CartSDK["updateItemWithLinesRest"] = async (
+    linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
+    updateShippingMethod = true,
+    useCheckoutLoading = true,
+    isRecalculate = false
+  ) => {
+    if (useCheckoutLoading) {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: true,
+        },
+      });
+    }
+    const checkoutString = storage.getCheckout();
+
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.token && linesToAdd) {
+      const input = {
+        checkoutId: checkout?.token,
+        lines: linesToAdd,
+        isRecalculate,
+      };
+
+      const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.UPDATE_CART}`;
+      const res = await axiosRequest(
+        fullUrl,
+        REST_API_METHODS_TYPES.POST,
+        input
+      );
+      if (!res?.data?.token) {
+        await getLatestCheckout(client, checkout);
+        if (useCheckoutLoading) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+        }
+        return {
+          data: null,
+          errors: res?.data?.checkoutLinesUpdate?.errors,
+        };
+      }
+
+      if (res?.data?.token) {
+        const updatedLines = res?.data?.lines.map((line: any) => {
+          const productData = {
+            ...line.variant.product,
+            metadata: line?.variant?.product?.metadata || [],
+            tags: line?.variant?.product?.tags?.map((tagname: string) => ({
+              name: tagname,
+              __typename: "TagType",
+            })),
+          };
+          const quantityAvailableValue = line.variant.quantityAvailable || 5;
+          const lineWithProduct = {
+            ...line,
+            variant: {
+              ...line.variant,
+              product: productData,
+              quantityAvailable: quantityAvailableValue,
+            },
+          };
+          return lineWithProduct;
+        });
+        const updatedCheckout = {
+          ...checkout,
+          ...res.data,
+          lines: updatedLines,
+        };
+
+        storage.setCheckout(updatedCheckout);
+
+        const resDiscount = {
+          data: {
+            __typename: "DiscountsType",
+            checkoutDiscounts: {
+              prepaidDiscount:
+                updatedCheckout?.paymentMethod?.prepaidDiscountAmount,
+              couponDiscount: updatedCheckout?.paymentMethod?.couponDiscount,
+              cashbackDiscount:
+                updatedCheckout?.paymentMethod?.cashbackDiscountAmount,
+            },
+            cashback: updatedCheckout?.cashback,
+          },
+        };
+
+        storage.setDiscounts(resDiscount.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: updatedCheckout,
+            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+            localCashback: resDiscount.data.cashback,
+          },
+        });
+        getCheckoutPayments(client, updatedCheckout);
+        if (updateShippingMethod) {
+          await setLocalCheckoutInCache(client, updatedCheckout, true);
+        }
+      }
+      return {
+        data: res?.data,
+        errors: res.data?.errors,
+      };
+    } else {
+      const createCheckoutInput = {
+        checkoutInput: {
+          lines: linesToAdd,
+          email: "dummy@dummy.com",
+        },
+      };
+      const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
+      const res = await axiosRequest(
+        fullUrl,
+        REST_API_METHODS_TYPES.POST,
+        createCheckoutInput
+      );
+
+      if (!res?.data?.token) {
+        await getLatestCheckout(client, checkout);
+        if (useCheckoutLoading) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+        }
+        return {
+          data: null,
+          errors: res?.data?.checkoutCreate?.errors,
+        };
+      }
+
+      if (res?.data?.token) {
+        const updatedLines = res?.data?.lines.map((line: any) => {
+          const productData = {
+            ...line.variant.product,
+            metadata: line?.variant?.product?.metadata || [],
+            tags: line?.variant?.product?.tags?.map((tagname: string) => ({
+              name: tagname,
+              __typename: "TagType",
+            })),
+          };
+          const quantityAvailableValue = line.variant.quantityAvailable || 5;
+          const lineWithProduct = {
+            ...line,
+            variant: {
+              ...line.variant,
+              product: productData,
+              quantityAvailable: quantityAvailableValue,
+            },
+          };
+          return lineWithProduct;
+        });
+
+        const createCheckoutResUpdated = {
+          ...res?.data,
+          lines: updatedLines,
+        };
+
+        const updatedCheckout = {
+          ...dummyCheckoutFields,
+          ...createCheckoutResUpdated,
+        };
+
+        storage.setCheckout(updatedCheckout);
+
+        const resDiscount = {
+          data: {
+            __typename: "DiscountsType",
+            checkoutDiscounts: {
+              prepaidDiscount:
+                updatedCheckout?.paymentMethod?.prepaidDiscountAmount,
+              couponDiscount: updatedCheckout?.paymentMethod?.couponDiscount,
+              cashbackDiscount:
+                updatedCheckout?.paymentMethod?.cashbackDiscountAmount,
+            },
+            cashback: updatedCheckout?.cashback,
+          },
+        };
+
+        storage.setDiscounts(resDiscount.data);
+
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            localCheckout: updatedCheckout,
+            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+            localCashback: resDiscount.data.cashback,
+          },
+        });
+
+        getCheckoutPayments(client, updatedCheckout);
+
+        if (updateShippingMethod) {
+          await setLocalCheckoutInCache(client, updatedCheckout, true);
+        }
+      }
+      const returnObject = {
+        data: res?.data,
+        errors: res?.data?.errors,
+      };
+      return returnObject;
+    }
   };
 
   const updateItemWithLines: CartSDK["updateItemWithLines"] = async (
@@ -1773,5 +1936,6 @@ export const cart = ({
     updateItemNext,
     clearCart,
     updateItemWithLines,
+    updateItemWithLinesRest,
   };
 };
