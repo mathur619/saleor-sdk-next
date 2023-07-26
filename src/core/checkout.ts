@@ -17,6 +17,7 @@ import {
   REMOVE_CHECKOUT_PROMO_CODE,
   UPDATE_CHECKOUT_ADDRESS_TYPE,
   UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION,
+  UPDATE_CHECKOUT_METADATA,
   UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
 } from "../apollo/mutations";
@@ -79,6 +80,9 @@ import {
   CreateGokwikOrderMutation,
   CheckoutRecalculationQuery,
   CheckoutRecalculationQueryVariables,
+  UpdateCheckoutMetaMutation,
+  UpdateCheckoutMetaMutationVariables,
+  MetadataInput,
 } from "../apollo/types";
 
 import {
@@ -113,6 +117,7 @@ import {
   SetShippingAddressResult,
   SetShippingAndBillingAddressResult,
   SetShippingMethodResult,
+  UpdateCheckoutMetaResult,
   VerifyJuspayVpaResult,
 } from "./types";
 
@@ -198,6 +203,9 @@ export interface CheckoutSDK {
   setCheckout?: (checkout: any, fetchDiscount?: boolean) => {};
   createCashfreeOrder?: (returnURL?: string) => CreateCashfreeOrderResult;
   checkoutRecalculation?: (refreshCheckout?: boolean) => any;
+  updateCheckoutMeta?: (
+    input: Array<MetadataInput> | MetadataInput
+  ) => UpdateCheckoutMetaResult;
 }
 
 export const checkout = ({
@@ -1481,6 +1489,46 @@ export const checkout = ({
     return null;
   };
 
+  const updateCheckoutMeta: CheckoutSDK["updateCheckoutMeta"] = async (
+    input: Array<MetadataInput> | MetadataInput
+  ) => {
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout?.id && input) {
+      const variables = {
+        checkoutId: checkout?.id,
+        input: input,
+      };
+      const res = await client.mutate<
+        UpdateCheckoutMetaMutation,
+        UpdateCheckoutMetaMutationVariables
+      >({
+        mutation: UPDATE_CHECKOUT_METADATA,
+        variables,
+        update: async (_, { data }) => {
+          const latestCheckoutMetadata = data?.updateMetadata?.item?.metadata;
+          const updatedCheckout = {
+            ...checkout,
+            metadata: latestCheckoutMetadata,
+          };
+          storage.setCheckout(updatedCheckout);
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              localCheckout: updatedCheckout,
+            },
+          });
+        },
+      });
+      return res;
+    }
+    return null;
+  };
+
   return {
     createCheckout,
     setShippingAddress,
@@ -1508,5 +1556,6 @@ export const checkout = ({
     juspayPaymentCreate,
     createGokwikOrder,
     checkoutRecalculation,
+    updateCheckoutMeta,
   };
 };

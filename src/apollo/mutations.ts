@@ -679,7 +679,11 @@ export const UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION = gql`
         }
       }
     }
-    checkoutEmailUpdate(checkoutId: $checkoutId, email: $email, isRecalculate: $isRecalculate) {
+    checkoutEmailUpdate(
+      checkoutId: $checkoutId
+      email: $email
+      isRecalculate: $isRecalculate
+    ) {
       checkout {
         ...Checkout
       }
@@ -757,8 +761,16 @@ export const UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION = gql`
 export const ADD_CHECKOUT_PROMO_CODE = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
-  mutation AddCheckoutPromoCode($checkoutId: ID!, $promoCode: String!, $isRecalculate: Boolean) {
-    checkoutAddPromoCode(checkoutId: $checkoutId, promoCode: $promoCode, isRecalculate: $isRecalculate) {
+  mutation AddCheckoutPromoCode(
+    $checkoutId: ID!
+    $promoCode: String!
+    $isRecalculate: Boolean
+  ) {
+    checkoutAddPromoCode(
+      checkoutId: $checkoutId
+      promoCode: $promoCode
+      isRecalculate: $isRecalculate
+    ) {
       checkout {
         ...Checkout
         paymentMethod {
@@ -781,8 +793,16 @@ export const ADD_CHECKOUT_PROMO_CODE = gql`
 export const REMOVE_CHECKOUT_PROMO_CODE = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
-  mutation RemoveCheckoutPromoCode($checkoutId: ID!, $promoCode: String!, $isRecalculate: Boolean) {
-    checkoutRemovePromoCode(checkoutId: $checkoutId, promoCode: $promoCode, isRecalculate: $isRecalculate) {
+  mutation RemoveCheckoutPromoCode(
+    $checkoutId: ID!
+    $promoCode: String!
+    $isRecalculate: Boolean
+  ) {
+    checkoutRemovePromoCode(
+      checkoutId: $checkoutId
+      promoCode: $promoCode
+      isRecalculate: $isRecalculate
+    ) {
       checkout {
         ...Checkout
         paymentMethod {
@@ -1122,8 +1142,16 @@ export const CHECKOUT_CUSTOMER_ATTACH_NEW = gql`
 export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
-  mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean) {
-    checkoutLinesAdd(checkoutId: $checkoutId, lines: $lines, isRecalculate: $isRecalculate) {
+  mutation AddCheckoutLineNext(
+    $checkoutId: ID!
+    $lines: [CheckoutLineInput]!
+    $isRecalculate: Boolean
+  ) {
+    checkoutLinesAdd(
+      checkoutId: $checkoutId
+      lines: $lines
+      isRecalculate: $isRecalculate
+    ) {
       checkout {
         ...Checkout
         paymentMethod {
@@ -1207,7 +1235,11 @@ export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
     $lines: [CheckoutLineInput]!
     $isRecalculate: Boolean
   ) {
-    checkoutLinesUpdate(checkoutId: $checkoutId, lines: $lines, isRecalculate: $isRecalculate) {
+    checkoutLinesUpdate(
+      checkoutId: $checkoutId
+      lines: $lines
+      isRecalculate: $isRecalculate
+    ) {
       checkout {
         ...Checkout
         paymentMethod {
@@ -1222,6 +1254,19 @@ export const UPDATE_CHECKOUT_LINE_MUTATION_NEXT = gql`
       }
       errors: checkoutErrors {
         ...CheckoutError
+      }
+    }
+  }
+`;
+
+export const UPDATE_CHECKOUT_METADATA = gql`
+  mutation UpdateCheckoutMeta($checkoutId: ID!, $input: [MetadataInput!]!) {
+    updateMetadata(id: $checkoutId, input: $input) {
+      item {
+        metadata {
+          key
+          value
+        }
       }
     }
   }

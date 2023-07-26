@@ -21831,6 +21831,14 @@ export type UpdateCheckoutLineNextMutation = { checkoutLinesUpdate: Maybe<{ chec
       & CheckoutFragment
     )>, errors: Array<CheckoutErrorFragment> }> };
 
+export type UpdateCheckoutMetaMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+  input: Array<MetadataInput> | MetadataInput;
+}>;
+
+
+export type UpdateCheckoutMetaMutation = { updateMetadata: Maybe<{ item: Maybe<{ metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> } | { metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>> }> }> };
+
 export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -24309,6 +24317,45 @@ export function useUpdateCheckoutLineNextMutation(baseOptions?: Apollo.MutationH
 export type UpdateCheckoutLineNextMutationHookResult = ReturnType<typeof useUpdateCheckoutLineNextMutation>;
 export type UpdateCheckoutLineNextMutationResult = Apollo.MutationResult<UpdateCheckoutLineNextMutation>;
 export type UpdateCheckoutLineNextMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutLineNextMutation, UpdateCheckoutLineNextMutationVariables>;
+export const UpdateCheckoutMetaDocument = gql`
+    mutation UpdateCheckoutMeta($checkoutId: ID!, $input: [MetadataInput!]!) {
+  updateMetadata(id: $checkoutId, input: $input) {
+    item {
+      metadata {
+        key
+        value
+      }
+    }
+  }
+}
+    `;
+export type UpdateCheckoutMetaMutationFn = Apollo.MutationFunction<UpdateCheckoutMetaMutation, UpdateCheckoutMetaMutationVariables>;
+
+/**
+ * __useUpdateCheckoutMetaMutation__
+ *
+ * To run a mutation, you first call `useUpdateCheckoutMetaMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCheckoutMetaMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCheckoutMetaMutation, { data, loading, error }] = useUpdateCheckoutMetaMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateCheckoutMetaMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCheckoutMetaMutation, UpdateCheckoutMetaMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCheckoutMetaMutation, UpdateCheckoutMetaMutationVariables>(UpdateCheckoutMetaDocument, options);
+      }
+export type UpdateCheckoutMetaMutationHookResult = ReturnType<typeof useUpdateCheckoutMetaMutation>;
+export type UpdateCheckoutMetaMutationResult = Apollo.MutationResult<UpdateCheckoutMetaMutation>;
+export type UpdateCheckoutMetaMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutMetaMutation, UpdateCheckoutMetaMutationVariables>;
 export const UserDetailsDocument = gql`
     query UserDetails {
   user: me {
