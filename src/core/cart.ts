@@ -1201,12 +1201,12 @@ export const cart = ({
             errors: res?.data?.errors,
           };
 
-          client.writeQuery({
-            query: GET_LOCAL_CHECKOUT,
-            data: {
-              checkoutLoading: false,
-            },
-          });
+          // client.writeQuery({
+          //   query: GET_LOCAL_CHECKOUT,
+          //   data: {
+          //     checkoutLoading: false,
+          //   },
+          // });
           return returnObject;
         } catch {
           await getLatestCheckout(client, checkout);

@@ -274,7 +274,10 @@ export const getLatestCheckout = async (
   return returnObject;
 };
 
-export const checkoutRecalculationUtil = async (client: ApolloClient<NormalizedCacheObject>,refreshCheckout?: boolean) => {
+export const checkoutRecalculationUtil = async (
+  client: ApolloClient<NormalizedCacheObject>,
+  refreshCheckout?: boolean
+) => {
   client.writeQuery({
     query: GET_LOCAL_CHECKOUT,
     data: {
@@ -289,13 +292,14 @@ export const checkoutRecalculationUtil = async (client: ApolloClient<NormalizedC
       : checkoutString;
 
   if (checkout && checkout.token) {
-
-    const inputVariables:CheckoutRecalculationQueryVariables = refreshCheckout ? {
-      token: checkout?.token,
-      refreshCheckout: refreshCheckout,
-    }: {
-      token: checkout?.token,
-    };
+    const inputVariables: CheckoutRecalculationQueryVariables = refreshCheckout
+      ? {
+          token: checkout?.token,
+          refreshCheckout: refreshCheckout,
+        }
+      : {
+          token: checkout?.token,
+        };
     const checkoutDetailRes = await client.query<
       CheckoutRecalculationQuery,
       CheckoutRecalculationQueryVariables
@@ -347,7 +351,7 @@ export const checkoutRecalculationUtil = async (client: ApolloClient<NormalizedC
   }
 
   return null;
-}
+};
 export const getCheckoutPayments = async (
   client: ApolloClient<NormalizedCacheObject>,
   checkout: any
@@ -361,6 +365,13 @@ export const getCheckoutPayments = async (
       token: checkout?.token,
     },
     fetchPolicy: "no-cache",
+  });
+
+  client.writeQuery({
+    query: GET_LOCAL_CHECKOUT,
+    data: {
+      checkoutLoading: false,
+    },
   });
 
   if (checkoutPaymentDetailsNext.data.checkout?.token && checkout?.token) {
