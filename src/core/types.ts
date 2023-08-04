@@ -77,6 +77,7 @@ import {
   CreateTokenWithoutOtpMutation,
   CreateGokwikOrderMutation,
   CreateTokenTrueCallerMutation,
+  UpdateCheckoutMetaMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -357,3 +358,9 @@ export type GetUserCheckoutResult = Promise<
     Record<string, any>
   >
 >;
+
+export type UpdateCheckoutMetaResult = Promise<FetchResult<
+  UpdateCheckoutMetaMutation,
+  Record<string, any>,
+  Record<string, any>
+> | null>;
