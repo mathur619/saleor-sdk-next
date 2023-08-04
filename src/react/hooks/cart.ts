@@ -54,8 +54,8 @@ export const useCartState = () => {
           total += parseFloat(listPrice) * curr.quantity;
         } else {
           total +=
-            (curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
-              curr?.variant.pricing?.price?.gross.amount ||
+            (curr?.variant.pricing?.priceUndiscounted?.gross?.amount ||
+              curr?.variant.pricing?.price?.gross?.amount ||
               0) * curr.quantity;
         }
       } else {
@@ -69,8 +69,8 @@ export const useCartState = () => {
     data?.localCheckout?.lines?.reduce((total, curr) => {
       if (curr?.quantity) {
         const netPriceAmount =
-          (curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
-            curr?.variant.pricing?.price?.gross.amount ||
+          (curr?.variant.pricing?.priceUndiscounted?.gross?.amount ||
+            curr?.variant.pricing?.price?.gross?.amount ||
             0) * curr.quantity;
         total += netPriceAmount;
       } else {
