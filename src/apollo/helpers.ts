@@ -4,6 +4,7 @@ import { storage } from "../core/storage";
 import {
   CHECKOUT_DETAILS_NEXT,
   CHECKOUT_RECALCULATION,
+  CHECKOUT_PAYMENTS_NEXT,
   GET_DISCOUNT_CASHBACK_QUERY,
   GET_LOCAL_CHECKOUT,
 } from "./queries";
@@ -13,6 +14,8 @@ import {
   CheckoutDetailsNextQueryVariables,
   CheckoutRecalculationQuery,
   CheckoutRecalculationQueryVariables,
+  CheckoutPaymentsNextQuery,
+  CheckoutPaymentsNextQueryVariables,
   CompleteCheckoutMutation,
   UpdateCheckoutShippingMethodNextMutation,
   UpdateCheckoutShippingMethodNextMutationVariables,
@@ -274,7 +277,10 @@ export const getLatestCheckout = async (
   return null;
 };
 
-export const checkoutRecalculationUtil = async (client: ApolloClient<NormalizedCacheObject>,refreshCheckout?: boolean) => {
+export const checkoutRecalculationUtil = async (
+  client: ApolloClient<NormalizedCacheObject>,
+  refreshCheckout?: boolean
+) => {
   client.writeQuery({
     query: GET_LOCAL_CHECKOUT,
     data: {
@@ -289,13 +295,14 @@ export const checkoutRecalculationUtil = async (client: ApolloClient<NormalizedC
       : checkoutString;
 
   if (checkout && checkout.token) {
-
-    const inputVariables:CheckoutRecalculationQueryVariables = refreshCheckout ? {
-      token: checkout?.token,
-      refreshCheckout: refreshCheckout,
-    }: {
-      token: checkout?.token,
-    };
+    const inputVariables: CheckoutRecalculationQueryVariables = refreshCheckout
+      ? {
+          token: checkout?.token,
+          refreshCheckout: refreshCheckout,
+        }
+      : {
+          token: checkout?.token,
+        };
     const checkoutDetailRes = await client.query<
       CheckoutRecalculationQuery,
       CheckoutRecalculationQueryVariables
@@ -347,4 +354,67 @@ export const checkoutRecalculationUtil = async (client: ApolloClient<NormalizedC
   }
 
   return null;
+};
+export const getCheckoutPayments = async (
+  client: ApolloClient<NormalizedCacheObject>,
+  checkout: any
+) => {
+  const checkoutPaymentDetailsNext = await client.query<
+    CheckoutPaymentsNextQuery,
+    CheckoutPaymentsNextQueryVariables
+  >({
+    query: CHECKOUT_PAYMENTS_NEXT,
+    variables: {
+      token: checkout?.token,
+    },
+    fetchPolicy: "no-cache",
+  });
+
+  client.writeQuery({
+    query: GET_LOCAL_CHECKOUT,
+    data: {
+      checkoutLoading: false,
+    },
+  });
+
+  if (checkoutPaymentDetailsNext.data.checkout?.token && checkout?.token) {
+    const updatedCheckoutDetails = {
+      ...checkout,
+      ...checkoutPaymentDetailsNext.data.checkout,
+    };
+    storage.setCheckout(updatedCheckoutDetails);
+
+    const res = {
+      data: {
+        checkoutDiscounts: {
+          __typename: "DiscountsType",
+          prepaidDiscount:
+            updatedCheckoutDetails?.paymentMethod?.prepaidDiscountAmount,
+          couponDiscount: updatedCheckoutDetails?.paymentMethod?.couponDiscount,
+          cashbackDiscount:
+            updatedCheckoutDetails?.paymentMethod?.cashbackDiscountAmount,
+        },
+        cashback: updatedCheckoutDetails?.cashback,
+      },
+    };
+    storage.setDiscounts(res.data);
+
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        localCheckout: updatedCheckoutDetails,
+        localCheckoutDiscounts: res.data.checkoutDiscounts,
+        localCashback: res.data.cashback,
+      },
+    });
+    return {
+      data: updatedCheckoutDetails,
+      errors: [],
+    };
+  }
+
+  return {
+    data: checkoutPaymentDetailsNext?.data,
+    errors: checkoutPaymentDetailsNext?.errors,
+  };
 };

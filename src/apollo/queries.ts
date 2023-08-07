@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   checkoutFragment,
   checkoutLineFragment,
+  checkoutPriceFragment,
   orderDetailFragment,
   userFragment,
 } from "./fragments";
@@ -43,6 +44,36 @@ export const CHECKOUT_DETAILS_NEXT = gql`
       }
     }
     checkoutUpdated @client
+  }
+`;
+
+export const CHECKOUT_PAYMENTS_NEXT = gql`
+  ${checkoutPriceFragment}
+  query CheckoutPaymentsNext($token: UUID) {
+    checkout(token: $token) {
+      id
+      token
+      totalPrice {
+        ...Price
+      }
+      cashback {
+        amount
+        willAddOn
+      }
+      voucherCode
+      discount {
+        amount
+        currency
+      }
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      subtotalPrice {
+        ...Price
+      }
+    }
   }
 `;
 

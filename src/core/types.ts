@@ -96,6 +96,7 @@ import { WalletSDK } from "./wallet";
 
 export interface SaleorClientInternals {
   apolloClient: ApolloClient<NormalizedCacheObject>;
+  restApiUrl?: string;
 }
 export interface SaleorClientConfig {
   channel: string;
@@ -125,6 +126,7 @@ export interface SaleorClientOpts {
   apiUrl: string;
   channel: string;
   opts?: SaleorClientFetchOpts;
+  restApiUrl?: string;
 }
 
 export interface ShippingAndBilling {
