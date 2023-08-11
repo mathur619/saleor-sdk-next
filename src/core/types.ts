@@ -132,7 +132,7 @@ export interface SaleorClientOpts {
 
 export interface ShippingAndBilling {
   resShipping: FetchResult<
-    UpdateCheckoutShippingAddressMutation,
+    UpdateCheckoutShippingAddressNewMutation,
     Record<string, any>,
     Record<string, any>
   > | null;

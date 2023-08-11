@@ -481,7 +481,7 @@ export const checkout = ({
       },
     });
 
-    const resShipping = await setShippingAddress(
+    const resShipping = await setShippingAddressAndEmail(
       shippingAddress,
       email,
       updateShippingMethod,
