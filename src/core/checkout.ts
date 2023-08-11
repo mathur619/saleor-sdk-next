@@ -19,6 +19,7 @@ import {
   UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION,
   UPDATE_CHECKOUT_METADATA,
   UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
+  UPDATE_CHECKOUT_SHIPPING_ADDRESS_NEW,
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
 } from "../apollo/mutations";
 import {
@@ -83,6 +84,8 @@ import {
   UpdateCheckoutMetaMutation,
   UpdateCheckoutMetaMutationVariables,
   MetadataInput,
+  UpdateCheckoutShippingAddressNewMutation,
+  UpdateCheckoutShippingAddressNewMutationVariables,
 } from "../apollo/types";
 
 import {
@@ -114,6 +117,7 @@ import {
   SaleorClientMethodsProps,
   SetAddressTypeResult,
   SetBillingAddressResult,
+  SetShippingAddressAndEmailResult,
   SetShippingAddressResult,
   SetShippingAndBillingAddressResult,
   SetShippingMethodResult,
@@ -151,6 +155,12 @@ export interface CheckoutSDK {
     updateShippingMethod?: boolean,
     isRecalculate?: boolean
   ) => SetShippingAddressResult;
+  setShippingAddressAndEmail?: (
+    shippingAddress: IAddress,
+    email: string,
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
+  ) => SetShippingAddressAndEmailResult;
   setShippingAndBillingAddress?: (
     shippingAddress: IAddress,
     email: string,
@@ -326,6 +336,66 @@ export const checkout = ({
         UpdateCheckoutShippingAddressMutationVariables
       >({
         mutation: UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION,
+        variables,
+      });
+
+      if (res?.data?.checkoutShippingAddressUpdate?.checkout?.id) {
+        setLocalCheckoutInCache(
+          client,
+          res?.data?.checkoutShippingAddressUpdate?.checkout,
+          updateShippingMethod
+        );
+        storage.setCheckout(res?.data?.checkoutShippingAddressUpdate?.checkout);
+      }
+
+      return res;
+    }
+
+    return null;
+  };
+
+  const setShippingAddressAndEmail: CheckoutSDK["setShippingAddressAndEmail"] = async (
+    shippingAddress: IAddress,
+    email: string,
+    updateShippingMethod = false,
+    isRecalculate = true
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables = {
+        checkoutId: checkout?.id,
+        isRecalculate,
+        email,
+        shippingAddress: {
+          city: shippingAddress.city,
+          companyName: shippingAddress.companyName,
+          country: shippingAddress?.country?.code as CountryCode,
+          countryArea: shippingAddress.countryArea,
+          firstName: shippingAddress.firstName,
+          lastName: shippingAddress.lastName,
+          phone: shippingAddress.phone,
+          postalCode: shippingAddress.postalCode,
+          streetAddress1: shippingAddress.streetAddress1,
+          streetAddress2: shippingAddress.streetAddress2,
+        },
+      };
+
+      const res = await client.mutate<
+        UpdateCheckoutShippingAddressNewMutation,
+        UpdateCheckoutShippingAddressNewMutationVariables
+      >({
+        mutation: UPDATE_CHECKOUT_SHIPPING_ADDRESS_NEW,
         variables,
       });
 
@@ -1532,6 +1602,7 @@ export const checkout = ({
   return {
     createCheckout,
     setShippingAddress,
+    setShippingAddressAndEmail,
     setBillingAddress,
     setShippingAndBillingAddress,
     setAddressType,

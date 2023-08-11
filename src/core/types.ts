@@ -78,6 +78,7 @@ import {
   CreateGokwikOrderMutation,
   CreateTokenTrueCallerMutation,
   UpdateCheckoutMetaMutation,
+  UpdateCheckoutShippingAddressNewMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -213,6 +214,10 @@ export type CreateCheckoutResult = Promise<FetchResult<
 > | null>;
 export type SetShippingAddressResult = Promise<FetchResult<
   UpdateCheckoutShippingAddressMutation
+> | null>;
+
+export type SetShippingAddressAndEmailResult = Promise<FetchResult<
+  UpdateCheckoutShippingAddressNewMutation
 > | null>;
 export type SetShippingAndBillingAddressResult = Promise<ShippingAndBilling>;
 export type SetBillingAddressResult = Promise<FetchResult<

@@ -694,6 +694,40 @@ export const UPDATE_CHECKOUT_SHIPPING_ADDRESS_MUTATION = gql`
   }
 `;
 
+export const UPDATE_CHECKOUT_SHIPPING_ADDRESS_NEW = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation UpdateCheckoutShippingAddressNew(
+    $checkoutId: ID!
+    $shippingAddress: AddressInput!
+    $email: String!
+    $isRecalculate: Boolean
+  ) {
+    checkoutShippingAddressUpdate(
+      checkoutId: $checkoutId
+      shippingAddress: $shippingAddress
+      email: $email
+      isRecalculate: $isRecalculate
+    ) {
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+      checkout {
+        ...Checkout
+        paymentMethod {
+          cashbackDiscountAmount
+          couponDiscount
+          prepaidDiscountAmount
+        }
+        cashback {
+          amount
+          willAddOn
+        }
+      }
+    }
+  }
+`;
+
 export const UPDATE_CHECKOUT_BILLING_ADDRESS_MUTATION = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
