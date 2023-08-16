@@ -628,8 +628,16 @@ export const ADD_CHECKOUT_LINE_MUTATION = gql`
 export const REMOVE_CHECKOUT_LINE_MUTATION = gql`
   ${checkoutFragment}
   ${checkoutErrorFragment}
-  mutation RemoveCheckoutLine($checkoutId: ID!, $lineId: ID) {
-    checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
+  mutation RemoveCheckoutLine(
+    $checkoutId: ID!
+    $lineId: ID
+    $checkoutMetadataInput: [MetadataInputV2!]
+  ) {
+    checkoutLineDelete(
+      checkoutId: $checkoutId
+      lineId: $lineId
+      checkoutMetadataInput: $checkoutMetadataInput
+    ) {
       checkout {
         ...Checkout
         paymentMethod {
@@ -1146,11 +1154,13 @@ export const ADD_CHECKOUT_LINE_MUTATION_NEXT = gql`
     $checkoutId: ID!
     $lines: [CheckoutLineInput]!
     $isRecalculate: Boolean
+    $checkoutMetadataInput: [MetadataInputV2!]
   ) {
     checkoutLinesAdd(
       checkoutId: $checkoutId
       lines: $lines
       isRecalculate: $isRecalculate
+      checkoutMetadataInput: $checkoutMetadataInput
     ) {
       checkout {
         ...Checkout

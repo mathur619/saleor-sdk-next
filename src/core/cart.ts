@@ -84,7 +84,8 @@ export interface CartSDK {
   ) => AddItemResult;
   removeItem: (
     variantId: string,
-    updateShippingMethod?: boolean
+    updateShippingMethod?: boolean,
+    checkoutMetadataInput?: any
   ) => RemoveItemResult;
 
   removeItemRest: (
@@ -104,6 +105,7 @@ export interface CartSDK {
     quantity: number,
     tags?: string[],
     line_item?: any,
+    checkoutMetadataInput?: any,
     useDummyAddress?: boolean,
     isRecalculate?: boolean
   ) => AddItemResult;
@@ -295,7 +297,8 @@ export const cart = ({
 
   const removeItem: CartSDK["removeItem"] = async (
     variantId: string,
-    updateShippingMethod: boolean = true
+    updateShippingMethod: boolean = true,
+    checkoutMetadataInput?: any
   ) => {
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null =
@@ -315,6 +318,9 @@ export const cart = ({
         variables: {
           checkoutId: checkout?.id,
           lineId: lineToRemoveId,
+          ...(checkoutMetadataInput
+            ? { checkoutMetadataInput: checkoutMetadataInput }
+            : {}),
         },
       });
 
@@ -627,6 +633,7 @@ export const cart = ({
     quantity: number,
     tags?: string[],
     line_item?: any,
+    checkoutMetadataInput?: any,
     useDummyAddress: boolean = true,
     isRecalculate = false
   ) => {
@@ -691,6 +698,9 @@ export const cart = ({
             checkoutId: checkout?.id,
             lines: [{ quantity: quantity, variantId: variantId }],
             isRecalculate,
+            ...(checkoutMetadataInput
+              ? { checkoutMetadataInput: checkoutMetadataInput }
+              : {}),
           },
         });
 
@@ -836,6 +846,9 @@ export const cart = ({
             streetAddress1: "dummy",
             streetAddress2: "dummy",
           },
+          ...(checkoutMetadataInput
+            ? { checkoutMetadataInput: checkoutMetadataInput }
+            : {}),
         };
       } else if (useDummyAddress) {
         checkoutInputVariables = {
@@ -853,11 +866,17 @@ export const cart = ({
             streetAddress1: "dummy",
             streetAddress2: "dummy",
           },
+          ...(checkoutMetadataInput
+            ? { checkoutMetadataInput: checkoutMetadataInput }
+            : {}),
         };
       } else {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
           email: "dummy@dummy.com",
+          ...(checkoutMetadataInput
+            ? { checkoutMetadataInput: checkoutMetadataInput }
+            : {}),
         };
       }
 
