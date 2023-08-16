@@ -105,9 +105,9 @@ export interface CartSDK {
     quantity: number,
     tags?: string[],
     line_item?: any,
-    checkoutMetadataInput?: any,
     useDummyAddress?: boolean,
-    isRecalculate?: boolean
+    isRecalculate?: boolean,
+    checkoutMetadataInput?: any
   ) => AddItemResult;
   addToCartRest: (
     variantId: string,
@@ -633,9 +633,9 @@ export const cart = ({
     quantity: number,
     tags?: string[],
     line_item?: any,
-    checkoutMetadataInput?: any,
     useDummyAddress: boolean = true,
-    isRecalculate = false
+    isRecalculate = false,
+    checkoutMetadataInput?: any,
   ) => {
     const checkoutString = storage.getCheckout();
     const checkout =
