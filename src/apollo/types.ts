@@ -167,7 +167,8 @@ export type AccountErrorCode =
   | 'JWT_INVALID_TOKEN'
   | 'JWT_DECODE_ERROR'
   | 'JWT_MISSING_TOKEN'
-  | 'JWT_INVALID_CSRF_TOKEN';
+  | 'JWT_INVALID_CSRF_TOKEN'
+  | 'REQUIRE_SUPERUSER_PERMISSION';
 
 export type AccountInput = {
   /** Given name. */
@@ -978,10 +979,10 @@ export type ArchiveOrderStatus =
 export type ArchiveOrderType = Node & ObjectWithMetadata & {
   /** List of public metadata items. Can be accessed without permissions. */
   metadata: Array<Maybe<MetadataItem>>;
-  /** The ID of the object. */
-  id: Scalars['ID'];
   /** List of private metadata items.Requires proper staff permissions to access. */
   privateMetadata: Array<Maybe<MetadataItem>>;
+  /** The ID of the object. */
+  id: Scalars['ID'];
   foreignOrderId: Scalars['String'];
   created: Scalars['DateTime'];
   placedOn: Maybe<Scalars['DateTime']>;
@@ -1024,6 +1025,17 @@ export type ArchiveOrderTypeEdge = {
   node: Maybe<ArchiveOrderType>;
   /** A cursor for use in pagination */
   cursor: Scalars['String'];
+};
+
+/** Assigns ContentTags of the object. */
+export type AssignContentTags = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success Message */
+  message: Maybe<Scalars['String']>;
 };
 
 /** Assigns storefront's navigation menus. */
@@ -1604,6 +1616,8 @@ export type BannerInput = {
   relatedId?: Maybe<Scalars['ID']>;
   /** Slug of the related object */
   slug?: Maybe<Scalars['String']>;
+  /** content tag */
+  contentTags?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 /** An enumeration. */
@@ -1629,6 +1643,212 @@ export type BannerTypes =
   | 'COLLECTION'
   | 'SALE'
   | 'PRODUCT';
+
+/** Deletes a blog. */
+export type BlogBulkDelete = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+  blogErrors: Array<BlogError>;
+};
+
+/** Creates a new blog. */
+export type BlogCreate = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A blog instance. */
+  blog: Maybe<BlogType>;
+  blogErrors: Array<BlogError>;
+};
+
+/** Deletes a blog. */
+export type BlogDelete = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success message */
+  message: Maybe<Scalars['String']>;
+  blogErrors: Array<BlogError>;
+};
+
+export type BlogError = {
+  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
+  field: Maybe<Scalars['String']>;
+  /** The error message. */
+  message: Maybe<Scalars['String']>;
+  /** The error code. */
+  code: BlogErrorCode;
+};
+
+/** An enumeration. */
+export type BlogErrorCode =
+  | 'GRAPHQL_ERROR'
+  | 'INVALID'
+  | 'NOT_FOUND'
+  | 'REQUIRED'
+  | 'UNIQUE'
+  | 'DUPLICATED_INPUT_ITEM';
+
+export type BlogFilterInput = {
+  search?: Maybe<Scalars['String']>;
+  publicationDate?: Maybe<DateRangeInput>;
+  isPublished?: Maybe<Scalars['Boolean']>;
+  categories?: Maybe<Array<Maybe<Scalars['ID']>>>;
+  tags?: Maybe<TagsListInput>;
+};
+
+export type BlogInput = {
+  /** Blog internal name. */
+  slug?: Maybe<Scalars['String']>;
+  /** Blog title. */
+  title?: Maybe<Scalars['String']>;
+  /** Blog content. May consist of ordinary text, HTML and images. */
+  content?: Maybe<Scalars['String']>;
+  /** Blog content in JSON format. */
+  contentJson?: Maybe<Scalars['JSONString']>;
+  /** Determines if blog is visible in the storefront. */
+  isPublished?: Maybe<Scalars['Boolean']>;
+  /** Publication date. ISO 8601 standard. */
+  publicationDate?: Maybe<Scalars['Date']>;
+  /** Search engine optimization fields. */
+  seo?: Maybe<SeoInput>;
+  /** ID of the product's category. */
+  category?: Maybe<Scalars['ID']>;
+};
+
+export type BlogSortField =
+  | 'TITLE'
+  | 'SLUG'
+  | 'VISIBILITY'
+  | 'CREATION_DATE'
+  | 'PUBLICATION_DATE';
+
+export type BlogSortingInput = {
+  /** Specifies the direction in which to sort products. */
+  direction: OrderDirection;
+  /** Sort blogs by the selected field. */
+  field: BlogSortField;
+};
+
+export type BlogTranslatableContent = Node & {
+  seoTitle: Maybe<Scalars['String']>;
+  seoDescription: Maybe<Scalars['String']>;
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  title: Scalars['String'];
+  contentJson: Scalars['JSONString'];
+  /**
+   * Content of the page.
+   * @deprecated Use the `contentJson` field instead.
+   */
+  content: Scalars['String'];
+  /** Returns translated page fields for the given language code. */
+  translation: Maybe<BlogTranslation>;
+  /** ('A static page that can be manually added by a shop operator ', 'through the dashboard.') */
+  blog: Maybe<BlogType>;
+};
+
+
+export type BlogTranslatableContentTranslationArgs = {
+  languageCode: LanguageCodeEnum;
+};
+
+export type BlogTranslation = Node & {
+  seoTitle: Maybe<Scalars['String']>;
+  seoDescription: Maybe<Scalars['String']>;
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  title: Scalars['String'];
+  contentJson: Scalars['JSONString'];
+  /** Translation language. */
+  language: LanguageDisplay;
+  /**
+   * Translated description of the page.
+   * @deprecated Use the `contentJson` field instead.
+   */
+  content: Scalars['String'];
+};
+
+export type BlogTranslationCountableConnection = {
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  edges: Array<BlogTranslationCountableEdge>;
+  /** A total count of items in the collection. */
+  totalCount: Maybe<Scalars['Int']>;
+};
+
+export type BlogTranslationCountableEdge = {
+  /** The item at the end of the edge. */
+  node: BlogTranslation;
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String'];
+};
+
+export type BlogType = Node & ObjectWithMetadataV2 & {
+  seoTitle: Maybe<Scalars['String']>;
+  seoDescription: Maybe<Scalars['String']>;
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  title: Scalars['String'];
+  contentJson: Scalars['JSONString'];
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItemV2>>;
+  publicationDate: Maybe<Scalars['Date']>;
+  isPublished: Scalars['Boolean'];
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItemV2>>;
+  slug: Scalars['String'];
+  content: Scalars['String'];
+  /** Tags */
+  tags: Maybe<Array<Maybe<TagType>>>;
+  category: Maybe<Category>;
+  created: Scalars['DateTime'];
+  translations: BlogTranslationCountableConnection;
+};
+
+
+export type BlogTypeTranslationsArgs = {
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+export type BlogTypeCountableConnection = {
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  edges: Array<BlogTypeCountableEdge>;
+  /** A total count of items in the collection. */
+  totalCount: Maybe<Scalars['Int']>;
+};
+
+export type BlogTypeCountableEdge = {
+  /** The item at the end of the edge. */
+  node: BlogType;
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String'];
+};
+
+/** Updates an existing blog. */
+export type BlogUpdate = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** A blog instance. */
+  blog: Maybe<BlogType>;
+  blogErrors: Array<BlogError>;
+};
 
 /** Creates Shipments for Bluedart. */
 export type BluedartShipmentCreate = {
@@ -1777,6 +1997,8 @@ export type CashfreeCreateOrderInput = {
   checkoutId: Scalars['ID'];
   /** Url to redirect to after payment. */
   returnUrl: Scalars['String'];
+  /** source name (App/Web) */
+  source?: Maybe<Scalars['String']>;
 };
 
 export type CashfreeCreateOrderSdkInput = {
@@ -1846,6 +2068,8 @@ export type Category = Node & ObjectWithMetadata & {
   backgroundImage: Maybe<Image>;
   /** Returns translated category fields for the given language code. */
   translation: Maybe<CategoryTranslation>;
+  /** List of selective public metadata items . */
+  customMetaData: Maybe<Array<Maybe<MetadataItem>>>;
 };
 
 
@@ -2272,6 +2496,8 @@ export type CheckoutCreateInput = {
   billingAddress?: Maybe<AddressInput>;
   /** Tags if any, associated with the Checkout */
   tags?: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** Fields required to update the object's metadata. */
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2>>;
 };
 
 /** Sets the customer as the owner of the checkout. */
@@ -2643,6 +2869,8 @@ export type Collection = Node & ObjectWithMetadata & {
   translation: Maybe<CollectionTranslation>;
   /** Whether the collection is published. */
   isPublished: Scalars['Boolean'];
+  /** List of selective public metadata items . */
+  customMetaData: Maybe<Array<Maybe<MetadataItem>>>;
 };
 
 
@@ -2650,6 +2878,7 @@ export type Collection = Node & ObjectWithMetadata & {
 export type CollectionProductsArgs = {
   filter?: Maybe<ProductFilterInput>;
   sortBy?: Maybe<ProductOrder>;
+  metaFields?: Maybe<Array<Maybe<Scalars['String']>>>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -3012,9 +3241,9 @@ export type ComboRemoveProductVariants = {
 
 export type ComboType = Node & {
   publicationDate: Maybe<Scalars['Date']>;
+  isPublished: Scalars['Boolean'];
   /** The ID of the object. */
   id: Scalars['ID'];
-  isPublished: Scalars['Boolean'];
   variant: ProductVariant;
   variants: ProductVariantCountableConnection;
   createdAt: Scalars['DateTime'];
@@ -3223,6 +3452,13 @@ export type ContactUsTypeCountableEdge = {
   node: ContactUsType;
   /** A cursor for use in pagination. */
   cursor: Scalars['String'];
+};
+
+export type ContentTagInput = {
+  /** content_tags */
+  contentTags: Array<Maybe<Scalars['String']>>;
+  /** ID of the object to content_tags. */
+  instanceId: Scalars['ID'];
 };
 
 /** An enumeration. */
@@ -3659,18 +3895,6 @@ export type CreateJusPayOrderAndCustomer = {
   juspayErrors: Array<JuspayError>;
 };
 
-/** Create a new member */
-export type CreateMembership = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** Customer email address */
-  email: Maybe<Scalars['String']>;
-  membershipErrors: Array<MembershipCreateError>;
-};
-
 /** Create a menu item image. This mutation must be sent as a `multipart` request. More detailed specs of the upload format can be found here: https://github.com/jaydenseric/graphql-multipart-request-spec */
 export type CreateMenuItemsImages = {
   /**
@@ -3824,6 +4048,24 @@ export type CreateShopifyUser = {
 
 /** Create JWT token. */
 export type CreateToken = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** JWT token, required to authenticate. */
+  token: Maybe<Scalars['String']>;
+  /** JWT refresh token, required to re-generate access token. */
+  refreshToken: Maybe<Scalars['String']>;
+  /** CSRF token required to re-generate access token. */
+  csrfToken: Maybe<Scalars['String']>;
+  /** A user instance. */
+  user: Maybe<User>;
+  accountErrors: Array<AccountError>;
+};
+
+/** Create JWT token. */
+export type CreateTokenForSuperUser = {
   /**
    * List of errors that occurred executing the mutation.
    * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
@@ -4886,6 +5128,8 @@ export type CustomBannerType = Node & {
   image: Maybe<Scalars['String']>;
   imageMobile: Maybe<Scalars['String']>;
   name: Scalars['String'];
+  /** tags associated with the banner */
+  contentTags: Maybe<Array<Maybe<Scalars['String']>>>;
   created: Scalars['DateTime'];
   updated: Scalars['DateTime'];
   /** The URL of the image. */
@@ -4911,6 +5155,28 @@ export type CustomBannerTypeEdge = {
 
 export type CustomOrderStatus = {
   status: Maybe<Scalars['String']>;
+};
+
+export type CustomTagType = Node & {
+  /** The URL of field to download. */
+  name: Maybe<Scalars['String']>;
+  /** The ID of the object. */
+  id: Scalars['ID'];
+};
+
+export type CustomTagTypeCountableConnection = {
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  edges: Array<CustomTagTypeCountableEdge>;
+  /** A total count of items in the collection. */
+  totalCount: Maybe<Scalars['Int']>;
+};
+
+export type CustomTagTypeCountableEdge = {
+  /** The item at the end of the edge. */
+  node: CustomTagType;
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String'];
 };
 
 export type CustomWalletLogType = Node & {
@@ -5008,8 +5274,7 @@ export type CustomerEventsEnum =
   | 'CUSTOMER_DELETED'
   | 'NAME_ASSIGNED'
   | 'EMAIL_ASSIGNED'
-  | 'NOTE_ADDED'
-  | 'MEMBERSHIP_CREATED';
+  | 'NOTE_ADDED';
 
 export type CustomerExportFilterInput = {
   dateJoined?: Maybe<DateRangeInput>;
@@ -7647,20 +7912,6 @@ export type MarkAsPaidEditedOrder = {
   orderErrors: Array<OrderError>;
 };
 
-/** An enumeration. */
-export type MembershipCreateCode =
-  | 'INVALID'
-  | 'INVALID_EMAIL';
-
-export type MembershipCreateError = {
-  /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
-  field: Maybe<Scalars['String']>;
-  /** The error message. */
-  message: Maybe<Scalars['String']>;
-  /** The error code. */
-  code: MembershipCreateCode;
-};
-
 /** Represents a single menu - an object that is used to help navigate through the store. */
 export type Menu = Node & {
   /** The ID of the object. */
@@ -8913,6 +9164,8 @@ export type Mutation = {
   permissionGroupUpdate: Maybe<PermissionGroupUpdate>;
   /** Delete permission group. */
   permissionGroupDelete: Maybe<PermissionGroupDelete>;
+  /** Create JWT token. */
+  createTokenForSuperUser: Maybe<CreateTokenForSuperUser>;
   /** Export products to csv file. */
   exportProductsV2: Maybe<ExportProductsV2>;
   /** Create a new File that is going to be hosted. */
@@ -9229,28 +9482,32 @@ export type Mutation = {
   emailTemplateUpdate: Maybe<EmailTemplateUpdate>;
   /** Delete a template instance */
   emailTemplateDelete: Maybe<EmailTemplateDelete>;
-  /** Create a new member */
-  createMembership: Maybe<CreateMembership>;
   /** Upload list of RTO customers. */
   uploadRtoCustomersList: Maybe<UploadRtoCustomersListCsv>;
   /** Remove list of RTO customers. */
   removeRtoCustomersList: Maybe<RemoveRtoCustomersListCsv>;
   /** Upload list of risk orders. */
   pushRiskOrdersCsv: Maybe<PushRiskOrderCsv>;
-  /** Create JWT token without OTP. */
-  createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
+  /** Creates a new blog. */
+  blogCreate: Maybe<BlogCreate>;
+  /** Updates an existing blog. */
+  blogUpdate: Maybe<BlogUpdate>;
+  /** Deletes a blog. */
+  blogDelete: Maybe<BlogDelete>;
+  /** Deletes a blog. */
+  blogBulkDelete: Maybe<BlogBulkDelete>;
   /** Creates an order on CCAvenue. */
   createCcAvenueOrder: Maybe<CreateCcAvenueOrder>;
-  /** Completes creating an order. */
-  finalizeEditedOrder: Maybe<FinalizeEditedOrder>;
-  /** Creates an order on Gokwik. */
-  createGokwikOrder: Maybe<CreateGokwikOrder>;
   /** Deletes productReviews. */
   productReviewBulkDelete: Maybe<ProductReviewsBulkDelete>;
   /** Edit existing product review by providing a hash. */
   editProductReviewHash: Maybe<EditProductReviewHash>;
-  /** Create Pincode. */
-  createPincodeCsv: Maybe<CreatePincodeCsv>;
+  /** Create JWT token without OTP. */
+  createTokenWithoutOtp: Maybe<CreateTokenWithoutOtp>;
+  /** Completes creating an order. */
+  finalizeEditedOrder: Maybe<FinalizeEditedOrder>;
+  /** Creates an order on Gokwik. */
+  createGokwikOrder: Maybe<CreateGokwikOrder>;
   /** Create JWT token via TrueCaller. */
   createTokenTrueCaller: Maybe<CreateTokenTrueCaller>;
   /** Create feed specified in input. */
@@ -9263,6 +9520,12 @@ export type Mutation = {
   draftOrderApplyWallet: Maybe<DraftOrderApplyWallet>;
   /** Removes wallet discount. */
   draftOrderRemoveWallet: Maybe<DraftOrderRemoveWallet>;
+  /** Create Pincode. */
+  createPincodeCsv: Maybe<CreatePincodeCsv>;
+  /** Assigns ContentTags of the object. */
+  assignContentTags: Maybe<AssignContentTags>;
+  /** UnAssigns ContentTags of the object. */
+  unassignedContentTags: Maybe<UnAssignContentTags>;
 };
 
 
@@ -10461,12 +10724,14 @@ export type MutationCheckoutEmailUpdateArgs = {
 
 export type MutationCheckoutLineDeleteArgs = {
   checkoutId: Scalars['ID'];
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2>>;
   lineId?: Maybe<Scalars['ID']>;
 };
 
 
 export type MutationCheckoutLinesAddArgs = {
   checkoutId: Scalars['ID'];
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2>>;
   isRecalculate?: Maybe<Scalars['Boolean']>;
   lines: Array<Maybe<CheckoutLineInput>>;
 };
@@ -10474,6 +10739,7 @@ export type MutationCheckoutLinesAddArgs = {
 
 export type MutationCheckoutLinesUpdateArgs = {
   checkoutId: Scalars['ID'];
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2>>;
   isRecalculate?: Maybe<Scalars['Boolean']>;
   lines: Array<Maybe<CheckoutLineInput>>;
 };
@@ -10846,6 +11112,11 @@ export type MutationPermissionGroupUpdateArgs = {
 
 export type MutationPermissionGroupDeleteArgs = {
   id: Scalars['ID'];
+};
+
+
+export type MutationCreateTokenForSuperUserArgs = {
+  userId: Scalars['ID'];
 };
 
 
@@ -11694,11 +11965,6 @@ export type MutationEmailTemplateDeleteArgs = {
 };
 
 
-export type MutationCreateMembershipArgs = {
-  email: Scalars['String'];
-};
-
-
 export type MutationUploadRtoCustomersListArgs = {
   csvFile: Scalars['Upload'];
 };
@@ -11714,25 +11980,29 @@ export type MutationPushRiskOrdersCsvArgs = {
 };
 
 
-export type MutationCreateTokenWithoutOtpArgs = {
-  checkoutId?: Maybe<Scalars['ID']>;
-  waid?: Maybe<Scalars['String']>;
+export type MutationBlogCreateArgs = {
+  input: BlogInput;
+};
+
+
+export type MutationBlogUpdateArgs = {
+  id: Scalars['ID'];
+  input: BlogInput;
+};
+
+
+export type MutationBlogDeleteArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type MutationBlogBulkDeleteArgs = {
+  ids: Array<Maybe<Scalars['ID']>>;
 };
 
 
 export type MutationCreateCcAvenueOrderArgs = {
   input: CcAvenueCreateOrderInput;
-};
-
-
-export type MutationFinalizeEditedOrderArgs = {
-  id: Scalars['ID'];
-  parentOrderId: Scalars['ID'];
-};
-
-
-export type MutationCreateGokwikOrderArgs = {
-  input: GokwikCreateOrderInput;
 };
 
 
@@ -11747,8 +12017,20 @@ export type MutationEditProductReviewHashArgs = {
 };
 
 
-export type MutationCreatePincodeCsvArgs = {
-  csvFile: Scalars['Upload'];
+export type MutationCreateTokenWithoutOtpArgs = {
+  checkoutId?: Maybe<Scalars['ID']>;
+  waid?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationFinalizeEditedOrderArgs = {
+  id: Scalars['ID'];
+  parentOrderId: Scalars['ID'];
+};
+
+
+export type MutationCreateGokwikOrderArgs = {
+  input: GokwikCreateOrderInput;
 };
 
 
@@ -11783,6 +12065,21 @@ export type MutationDraftOrderApplyWalletArgs = {
 
 export type MutationDraftOrderRemoveWalletArgs = {
   orderId: Scalars['ID'];
+};
+
+
+export type MutationCreatePincodeCsvArgs = {
+  csvFile: Scalars['Upload'];
+};
+
+
+export type MutationAssignContentTagsArgs = {
+  input: ContentTagInput;
+};
+
+
+export type MutationUnassignedContentTagsArgs = {
+  input: ContentTagInput;
 };
 
 export type NameTranslationInput = {
@@ -12252,6 +12549,7 @@ export type OrderEventsEnum =
   | 'DRAFT_REMOVED_PRODUCTS'
   | 'PLACED'
   | 'PLACED_FROM_DRAFT'
+  | 'EXTERNAL_ORDER_ERROR'
   | 'OVERSOLD_ITEMS'
   | 'CANCELED'
   | 'ORDER_MARKED_AS_PAID'
@@ -12498,6 +12796,7 @@ export type OrderStatusFilter =
   | 'PARTIALLY_FULFILLED'
   | 'FULFILLED'
   | 'CANCELED'
+  | 'EXTERNAL_ORDER_ERROR'
   | 'DISCARDED';
 
 /** An enumeration. */
@@ -12612,6 +12911,8 @@ export type Page = Node & ObjectWithMetadata & {
   translation: Maybe<PageTranslation>;
   /** Whether the page is published. */
   isPublished: Scalars['Boolean'];
+  /** List of selective public metadata items . */
+  customMetaData: Maybe<Array<Maybe<MetadataItem>>>;
 };
 
 
@@ -13558,6 +13859,7 @@ export type PermissionEnum =
   | 'MANAGE_MENUS'
   | 'MANAGE_ORDERS'
   | 'MANAGE_PAGES'
+  | 'MANAGE_BLOGS'
   | 'MANAGE_PRODUCTS'
   | 'MANAGE_PRODUCT_TYPES_AND_ATTRIBUTES'
   | 'MANAGE_SHIPPING'
@@ -13909,6 +14211,8 @@ export type Product = Node & ObjectWithMetadata & {
    * @deprecated Use the `descriptionJson` field instead.
    */
   description: Scalars['String'];
+  /** List of selective public metadata items . */
+  customMetaData: Maybe<Array<Maybe<MetadataItem>>>;
 };
 
 
@@ -15018,6 +15322,8 @@ export type ProductVariant = Node & ObjectWithMetadata & {
   stocks: Maybe<Array<Maybe<Stock>>>;
   /** Quantity of a product available for sale in one checkout. */
   quantityAvailable: Scalars['Int'];
+  /** List of selective public metadata items . */
+  customMetaData: Maybe<Array<Maybe<MetadataItem>>>;
 };
 
 
@@ -15390,6 +15696,10 @@ export type Query = {
   authenticated: Scalars['Boolean'];
   authenticating: Scalars['Boolean'];
   banners: Maybe<CustomBannerTypeConnection>;
+  /** Look up a blog by ID or slug. */
+  blog: Maybe<BlogType>;
+  /** List of the shop's blogs. */
+  blogs: Maybe<BlogTypeCountableConnection>;
   bulkAction: Maybe<BulkActionCsvLogsTypeCountableConnection>;
   cartItems: Maybe<CheckoutLine>;
   cashback: Maybe<CashbackType>;
@@ -15418,6 +15728,7 @@ export type Query = {
   combos: Maybe<ComboTypeConnection>;
   contactUs: Maybe<ContactUsTypeCountableConnection>;
   couponDiscount: Maybe<CouponDiscountType>;
+  customerTags: Maybe<CustomTagTypeCountableConnection>;
   /** List of the shop's customers. */
   customers: Maybe<UserCountableConnection>;
   deliveryDate: Maybe<Scalars['JSONString']>;
@@ -15463,6 +15774,8 @@ export type Query = {
   giftCards: Maybe<GiftCardCountableConnection>;
   /** Search Value for global search. */
   globalSearch: Maybe<GlobalSearchType>;
+  /** Search Value for global search. */
+  globalSearchStorefront: Maybe<GlobalSearchStorefrontType>;
   gokwikRtoPredict: Maybe<GokwikType>;
   headers: Maybe<HeaderTypeConnection>;
   /** List of activity events to display on homepage (at the moment it only contains order-events). */
@@ -15605,6 +15918,8 @@ export type Query = {
   /** Look up a Survey by ID. */
   surveyFill: Maybe<SurveyFillType>;
   surveys: Maybe<SurveyTypeConnection>;
+  /** Look up a Tag by ID. */
+  tag: Maybe<CustomTagType>;
   /** List of all tax rates available from tax gateway. */
   taxTypes: Maybe<Array<Maybe<TaxType>>>;
   translation: Maybe<TranslatableItem>;
@@ -15747,6 +16062,23 @@ export type QueryBannersArgs = {
   link?: Maybe<Scalars['String']>;
   position?: Maybe<Scalars['Int']>;
   slug?: Maybe<Scalars['String']>;
+  contentTags?: Maybe<Array<Maybe<Scalars['ID']>>>;
+};
+
+
+export type QueryBlogArgs = {
+  id?: Maybe<Scalars['ID']>;
+  slug?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryBlogsArgs = {
+  sortBy?: Maybe<BlogSortingInput>;
+  filter?: Maybe<BlogFilterInput>;
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
 };
 
 
@@ -15770,6 +16102,7 @@ export type QueryCategoriesArgs = {
   filter?: Maybe<CategoryFilterInput>;
   sortBy?: Maybe<CategorySortingInput>;
   level?: Maybe<Scalars['Int']>;
+  metaFields?: Maybe<Array<Maybe<Scalars['String']>>>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -15834,6 +16167,7 @@ export type QueryCollectionArgs = {
 export type QueryCollectionsArgs = {
   filter?: Maybe<CollectionFilterInput>;
   sortBy?: Maybe<CollectionSortingInput>;
+  metaFields?: Maybe<Array<Maybe<Scalars['String']>>>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -15874,6 +16208,15 @@ export type QueryContactUsArgs = {
 
 export type QueryCouponDiscountArgs = {
   token?: Maybe<Scalars['UUID']>;
+};
+
+
+export type QueryCustomerTagsArgs = {
+  filter?: Maybe<TagFilterInput>;
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
 };
 
 
@@ -16032,6 +16375,7 @@ export type QueryFilterCheckoutsArgs = {
   quantityGte?: Maybe<Scalars['Int']>;
   emailNe?: Maybe<Scalars['String']>;
   paymentsToken?: Maybe<Scalars['String']>;
+  city?: Maybe<Scalars['String']>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -16083,6 +16427,11 @@ export type QueryGlobalSearchArgs = {
 };
 
 
+export type QueryGlobalSearchStorefrontArgs = {
+  search?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryGokwikRtoPredictArgs = {
   checkoutId?: Maybe<Scalars['String']>;
 };
@@ -16128,6 +16477,11 @@ export type QueryInfluencerArgs = {
   name?: Maybe<Scalars['String']>;
   phone?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryMeArgs = {
+  source?: Maybe<Scalars['String']>;
 };
 
 
@@ -16270,6 +16624,7 @@ export type QueryPageSlugsArgs = {
 export type QueryPagesArgs = {
   sortBy?: Maybe<PageSortingInput>;
   filter?: Maybe<PageFilterInput>;
+  metaFields?: Maybe<Array<Maybe<Scalars['String']>>>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -16398,6 +16753,7 @@ export type QueryPluginsArgs = {
 export type QueryProductArgs = {
   id?: Maybe<Scalars['ID']>;
   slug?: Maybe<Scalars['String']>;
+  metaFields?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 
@@ -16466,6 +16822,7 @@ export type QueryProductVariantArgs = {
 export type QueryProductVariantsArgs = {
   ids?: Maybe<Array<Maybe<Scalars['ID']>>>;
   filter?: Maybe<ProductVariantFilterInput>;
+  metaFields?: Maybe<Array<Maybe<Scalars['String']>>>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -16477,6 +16834,7 @@ export type QueryProductsArgs = {
   filter?: Maybe<ProductFilterInput>;
   sortBy?: Maybe<ProductOrder>;
   stockAvailability?: Maybe<StockAvailability>;
+  metaFields?: Maybe<Array<Maybe<Scalars['String']>>>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -16619,6 +16977,7 @@ export type QueryShopifyUserOrdersArgs = {
 
 
 export type QueryShopmetaArgs = {
+  metaFields?: Maybe<Array<Maybe<Scalars['String']>>>;
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -16683,6 +17042,11 @@ export type QuerySurveysArgs = {
   shown?: Maybe<Scalars['Boolean']>;
   attempted?: Maybe<Scalars['Boolean']>;
   created?: Maybe<Scalars['DateTime']>;
+};
+
+
+export type QueryTagArgs = {
+  id?: Maybe<Scalars['ID']>;
 };
 
 
@@ -17481,9 +17845,9 @@ export type SectionType = Node & ObjectWithMetadataV2 & {
   /** List of public metadata items. Can be accessed without permissions. */
   metadata: Array<Maybe<MetadataItemV2>>;
   publicationDate: Maybe<Scalars['Date']>;
+  isPublished: Scalars['Boolean'];
   /** List of private metadata items.Requires proper staff permissions to access. */
   privateMetadata: Array<Maybe<MetadataItemV2>>;
-  isPublished: Scalars['Boolean'];
   /** The ID of the object. */
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -18337,6 +18701,8 @@ export type ShopMetaType = Node & ObjectWithMetadataV2 & {
   /** The ID of the object. */
   id: Scalars['ID'];
   name: Scalars['String'];
+  /** List of selective public metadata items . */
+  customMetaData: Maybe<Array<Maybe<MetadataItem>>>;
 };
 
 export type ShopMetaTypeConnection = {
@@ -19131,6 +19497,10 @@ export type TagFilter =
   | 'AND'
   | 'OR';
 
+export type TagFilterInput = {
+  search?: Maybe<Scalars['String']>;
+};
+
 export type TagType = {
   /** The name of the tag */
   name: Scalars['String'];
@@ -19212,13 +19582,7 @@ export type TemplateMailType =
   | 'INVOICE'
   | 'CONTACT_US'
   | 'MEMBERSHIP_ACTIVATE'
-  | 'MEMBERSHIP_ACTIVATE_CLASSIC'
-  | 'MEMBERSHIP_ACTIVATE_FIRST_ORDER'
-  | 'MEMBERSHIP_ACTIVATE_ELITE'
-  | 'MEMBERSHIP_ACTIVATE_ULTIMATE'
   | 'REVIEW_MAIL'
-  | 'REVIEW_ADMIN_REPLY'
-  | 'ORDER_REFUNDED'
   | 'ORDER_EDITED';
 
 export type TemplateMailTypeFilter =
@@ -19235,10 +19599,6 @@ export type TemplateMailTypeFilter =
   | 'INVOICE'
   | 'CONTACT_US'
   | 'MEMBERSHIP_ACTIVATE'
-  | 'MEMBERSHIP_ACTIVATE_CLASSIC'
-  | 'MEMBERSHIP_ACTIVATE_FIRST_ORDER'
-  | 'MEMBERSHIP_ACTIVATE_ELITE'
-  | 'MEMBERSHIP_ACTIVATE_ULTIMATE'
   | 'ORDER_EDITED';
 
 /** Requests for Token for registered user. */
@@ -19314,7 +19674,7 @@ export type TransactionKind =
   /** Manual Capture */
   | 'MANUAL_CAPTURE';
 
-export type TranslatableItem = ProductTranslatableContent | CollectionTranslatableContent | CategoryTranslatableContent | AttributeTranslatableContent | AttributeValueTranslatableContent | ProductVariantTranslatableContent | PageTranslatableContent | ShippingMethodTranslatableContent | SaleTranslatableContent | VoucherTranslatableContent | MenuItemTranslatableContent;
+export type TranslatableItem = ProductTranslatableContent | CollectionTranslatableContent | CategoryTranslatableContent | AttributeTranslatableContent | AttributeValueTranslatableContent | ProductVariantTranslatableContent | PageTranslatableContent | BlogTranslatableContent | ShippingMethodTranslatableContent | SaleTranslatableContent | VoucherTranslatableContent | MenuItemTranslatableContent;
 
 export type TranslatableItemConnection = {
   /** Pagination data for this connection. */
@@ -19338,6 +19698,7 @@ export type TranslatableKinds =
   | 'COLLECTION'
   | 'MENU_ITEM'
   | 'PAGE'
+  | 'BLOG'
   | 'PRODUCT'
   | 'SALE'
   | 'SHIPPING_METHOD'
@@ -19393,6 +19754,17 @@ export type TriggerCronError = {
   code: TriggerCronCodes;
 };
 
+
+/** UnAssigns ContentTags of the object. */
+export type UnAssignContentTags = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success Message */
+  message: Maybe<Scalars['String']>;
+};
 
 /** Update an address type */
 export type UpdateAddressType = {
@@ -21165,6 +21537,13 @@ export type CheckoutRemovePromoCodeShopify = {
   checkout: Maybe<Checkout>;
 };
 
+export type GlobalSearchStorefrontType = {
+  /** Blog data */
+  blogs: Maybe<Array<Maybe<BlogType>>>;
+  /** Search Products */
+  products: Maybe<Array<Maybe<Product>>>;
+};
+
 export type GlobalSearchType = {
   /** Search Order */
   orders: Maybe<Array<Maybe<Order>>>;
@@ -21176,6 +21555,8 @@ export type GlobalSearchType = {
   vouchers: Maybe<Array<Maybe<VoucherRuleLinkType>>>;
   /** Shopmeta data */
   shopmeta: Maybe<Array<Maybe<GlobalSearchShopMetaType>>>;
+  /** Blog data */
+  blogs: Maybe<Array<Maybe<BlogType>>>;
 };
 
 export type AccountErrorFragment = Pick<AccountError, 'code' | 'field' | 'message'>;
@@ -21590,6 +21971,7 @@ export type AddCheckoutLineMutation = { checkoutLinesAdd: Maybe<{ checkout: Mayb
 export type RemoveCheckoutLineMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lineId?: Maybe<Scalars['ID']>;
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2> | MetadataInputV2>;
 }>;
 
 
@@ -21789,6 +22171,7 @@ export type AddCheckoutLineNextMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
   isRecalculate?: Maybe<Scalars['Boolean']>;
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2> | MetadataInputV2>;
 }>;
 
 
@@ -23103,8 +23486,12 @@ export type AddCheckoutLineMutationHookResult = ReturnType<typeof useAddCheckout
 export type AddCheckoutLineMutationResult = Apollo.MutationResult<AddCheckoutLineMutation>;
 export type AddCheckoutLineMutationOptions = Apollo.BaseMutationOptions<AddCheckoutLineMutation, AddCheckoutLineMutationVariables>;
 export const RemoveCheckoutLineDocument = gql`
-    mutation RemoveCheckoutLine($checkoutId: ID!, $lineId: ID) {
-  checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
+    mutation RemoveCheckoutLine($checkoutId: ID!, $lineId: ID, $checkoutMetadataInput: [MetadataInputV2!]) {
+  checkoutLineDelete(
+    checkoutId: $checkoutId
+    lineId: $lineId
+    checkoutMetadataInput: $checkoutMetadataInput
+  ) {
     checkout {
       ...Checkout
       paymentMethod {
@@ -23141,6 +23528,7 @@ export type RemoveCheckoutLineMutationFn = Apollo.MutationFunction<RemoveCheckou
  *   variables: {
  *      checkoutId: // value for 'checkoutId'
  *      lineId: // value for 'lineId'
+ *      checkoutMetadataInput: // value for 'checkoutMetadataInput'
  *   },
  * });
  */
@@ -24118,11 +24506,12 @@ export type CheckoutCustomerAttachNewMutationHookResult = ReturnType<typeof useC
 export type CheckoutCustomerAttachNewMutationResult = Apollo.MutationResult<CheckoutCustomerAttachNewMutation>;
 export type CheckoutCustomerAttachNewMutationOptions = Apollo.BaseMutationOptions<CheckoutCustomerAttachNewMutation, CheckoutCustomerAttachNewMutationVariables>;
 export const AddCheckoutLineNextDocument = gql`
-    mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean) {
+    mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean, $checkoutMetadataInput: [MetadataInputV2!]) {
   checkoutLinesAdd(
     checkoutId: $checkoutId
     lines: $lines
     isRecalculate: $isRecalculate
+    checkoutMetadataInput: $checkoutMetadataInput
   ) {
     checkout {
       ...Checkout
@@ -24161,6 +24550,7 @@ export type AddCheckoutLineNextMutationFn = Apollo.MutationFunction<AddCheckoutL
  *      checkoutId: // value for 'checkoutId'
  *      lines: // value for 'lines'
  *      isRecalculate: // value for 'isRecalculate'
+ *      checkoutMetadataInput: // value for 'checkoutMetadataInput'
  *   },
  * });
  */
