@@ -1070,6 +1070,7 @@ export type Attribute = Node & ObjectWithMetadata & {
    * @deprecated Use the `metadata` field. This field will be removed after 2020-07-31.
    */
   meta: Array<Maybe<MetaStore>>;
+  pk: Maybe<Scalars['ID']>;
   /** The input type to use for entering attribute values in the dashboard. */
   inputType: Maybe<AttributeInputTypeEnum>;
   /** Name of an attribute displayed in the interface. */
@@ -1411,6 +1412,7 @@ export type AttributeUpdatePrivateMeta = {
 export type AttributeValue = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
+  pk: Maybe<Scalars['ID']>;
   /** Name of a value displayed in the interface. */
   name: Maybe<Scalars['String']>;
   /** Internal representation of a value (unique per attribute). */
@@ -4191,6 +4193,15 @@ export type CreditCard = {
   expYear: Maybe<Scalars['Int']>;
 };
 
+export type CronArgumentType = {
+  name: Maybe<Scalars['String']>;
+  required: Maybe<Scalars['Boolean']>;
+  dataType: Maybe<Scalars['String']>;
+  position: Maybe<Scalars['Int']>;
+  sampleValue: Maybe<Scalars['String']>;
+  startwithdash: Maybe<Scalars['Boolean']>;
+};
+
 export type CronInput = {
   /** minute when cron should run */
   minute?: Maybe<Scalars['String']>;
@@ -6125,6 +6136,11 @@ export type EmailTemplateError = {
   code: EmailTemplateCode;
 };
 
+export type EmailTemplateEventType = {
+  /** Mail template type data */
+  mailTypeList: Maybe<Array<Maybe<MailType>>>;
+};
+
 export type EmailTemplateFilterInput = {
   sender?: Maybe<Scalars['String']>;
   subject?: Maybe<Scalars['String']>;
@@ -6184,6 +6200,8 @@ export type EmailTemplateType = Node & ObjectWithMetadataV2 & {
   updatedAt: Scalars['DateTime'];
   previousTemplate: Maybe<Scalars['String']>;
   updatedBy: Maybe<User>;
+  /** Mail type enum list */
+  mailTypeList: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 export type EmailTemplateTypeCountableConnection = {
@@ -7879,6 +7897,17 @@ export type LineRefundInput = {
   amount: Scalars['PositiveDecimal'];
 };
 
+export type MailType = {
+  mailType: Maybe<Scalars['String']>;
+  /** email template */
+  emailTemplates: Maybe<Array<Maybe<EmailTemplateType>>>;
+};
+
+export type MailTypeList = {
+  /** email type list */
+  mailType: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
 /** The manifest definition. */
 export type Manifest = {
   identifier: Scalars['String'];
@@ -8878,6 +8907,8 @@ export type Mutation = {
   orderLineRefund: Maybe<OrderLineRefund>;
   /** Mark order as manually paid. */
   markAsPaidEditedOrder: Maybe<MarkAsPaidEditedOrder>;
+  /** Cancel an order. */
+  orderCancelByCustomer: Maybe<OrderCancelByCustomer>;
   /** Delete metadata of an object. */
   deleteMetadata: Maybe<DeleteMetadata>;
   /** Delete object's private metadata. */
@@ -10448,6 +10479,12 @@ export type MutationMarkAsPaidEditedOrderArgs = {
 };
 
 
+export type MutationOrderCancelByCustomerArgs = {
+  id: Scalars['ID'];
+  reason: Scalars['String'];
+};
+
+
 export type MutationDeleteMetadataArgs = {
   id: Scalars['ID'];
   keys: Array<Scalars['String']>;
@@ -10760,6 +10797,7 @@ export type MutationCheckoutPaymentCreateArgs = {
 
 export type MutationCheckoutShippingAddressUpdateArgs = {
   checkoutId: Scalars['ID'];
+  email?: Maybe<Scalars['String']>;
   isRecalculate?: Maybe<Scalars['Boolean']>;
   shippingAddress: AddressInput;
 };
@@ -12220,6 +12258,7 @@ export type Order = Node & ObjectWithMetadata & {
   /** Total price of shipping. */
   shippingPrice: Maybe<TaxedMoney>;
   token: Scalars['String'];
+  orderName: Scalars['String'];
   voucher: Maybe<Voucher>;
   /** List of user gift cards. */
   giftCards: Maybe<Array<Maybe<GiftCard>>>;
@@ -12289,6 +12328,8 @@ export type Order = Node & ObjectWithMetadata & {
   childOrder: Maybe<Scalars['ID']>;
   /** Parent Order Id */
   parentOrderId: Maybe<Scalars['ID']>;
+  /** AWB No for order. It is implemented for Uniware only. */
+  awbNo: Maybe<Scalars['String']>;
 };
 
 export type OrderAction =
@@ -12353,6 +12394,20 @@ export type OrderCancel = {
   errors: Array<Error>;
   /** Canceled order. */
   order: Maybe<Order>;
+  orderErrors: Array<OrderError>;
+};
+
+/** Cancel an order. */
+export type OrderCancelByCustomer = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Canceled order. */
+  order: Maybe<Order>;
+  /** message */
+  message: Maybe<Scalars['String']>;
   orderErrors: Array<OrderError>;
 };
 
@@ -14441,6 +14496,7 @@ export type ProductImage = Node & {
   id: Scalars['ID'];
   sortOrder: Maybe<Scalars['Int']>;
   alt: Scalars['String'];
+  pk: Maybe<Scalars['ID']>;
   /** The URL of the image. */
   url: Scalars['String'];
 };
@@ -14647,6 +14703,7 @@ export type ProductReviewFilterInput = {
   created?: Maybe<DateRangeInput>;
   isPublished?: Maybe<Scalars['Boolean']>;
   rating?: Maybe<RatingRangeInput>;
+  source?: Maybe<Scalars['String']>;
   search?: Maybe<Scalars['String']>;
 };
 
@@ -14792,7 +14849,11 @@ export type ProductReviewSortOrders =
   | 'PUBLISHED_DATE_NEWEST'
   | 'PUBLISHED_DATE_OLDEST';
 
-export type ProductReviewType = Node & {
+export type ProductReviewType = Node & ObjectWithMetadataV2 & {
+  /** List of public metadata items. Can be accessed without permissions. */
+  metadata: Array<Maybe<MetadataItemV2>>;
+  /** List of private metadata items.Requires proper staff permissions to access. */
+  privateMetadata: Array<Maybe<MetadataItemV2>>;
   /** The ID of the object. */
   id: Scalars['ID'];
   user: Maybe<User>;
@@ -14813,6 +14874,7 @@ export type ProductReviewType = Node & {
   adminReply: Scalars['String'];
   helpfulRatings: Scalars['Int'];
   unhelpfulRatings: Scalars['Int'];
+  source: Maybe<Scalars['String']>;
   images: ProductReviewImageTypeConnection;
   videos: ProductReviewVideoTypeConnection;
   rated: Maybe<Scalars['String']>;
@@ -15471,6 +15533,18 @@ export type ProductVariantCreateInput = {
   stocks?: Maybe<Array<StockInput>>;
 };
 
+export type ProductVariantCustom = {
+  id: Maybe<Scalars['ID']>;
+  listPrice: Maybe<Scalars['Float']>;
+  /** Base price of a product variant. This field is restricted for admins. Use the pricing field to get the public price for customers. */
+  price: Maybe<Money>;
+  /** List of images for the product variant. */
+  images: Maybe<ProductImage>;
+  /** List of attributes assigned to this variant. */
+  attributes: Array<SelectedAttribute>;
+  quantityAvailable: Maybe<Scalars['Int']>;
+};
+
 /** Deletes a product variant. */
 export type ProductVariantDelete = {
   /**
@@ -15628,6 +15702,25 @@ export type ProductVariantUpdatePrivateMeta = {
   productVariant: Maybe<ProductVariant>;
 };
 
+export type ProductsCustom = {
+  id: Maybe<Scalars['ID']>;
+  name: Maybe<Scalars['String']>;
+  slug: Maybe<Scalars['String']>;
+  avgRating: Maybe<Scalars['String']>;
+  /** List of variants for the product. */
+  defaultVariant: Maybe<ProductVariantCustom>;
+  isAvailable: Maybe<Scalars['Boolean']>;
+  /** The main thumbnail for a product. */
+  thumbnail: Maybe<Image>;
+  productDetails: Maybe<Scalars['String']>;
+  productCardAttributes: Maybe<Scalars['String']>;
+};
+
+
+export type ProductsCustomThumbnailArgs = {
+  size?: Maybe<Scalars['Int']>;
+};
+
 /** Push or sync all unsynced orders to wareiq */
 export type PushAllToWareIq = {
   /**
@@ -15753,6 +15846,7 @@ export type Query = {
   /** Look up a Email Template by ID. */
   emailTemplate: Maybe<EmailTemplateType>;
   emailTemplates: Maybe<EmailTemplateTypeCountableConnection>;
+  emailTemplatesEventsList: Maybe<EmailTemplateEventType>;
   /** Look up a export file by ID. */
   exportFile: Maybe<ExportFile>;
   /** List of export files. */
@@ -15785,6 +15879,7 @@ export type Query = {
   localCashback: Maybe<CashbackType>;
   localCheckout: Maybe<Checkout>;
   localCheckoutDiscounts: Maybe<DiscountsType>;
+  mailTypes: Maybe<MailTypeList>;
   /** Return the currently authenticated user. */
   me: Maybe<User>;
   /** Look up a navigation menu by ID or name. */
@@ -15870,6 +15965,8 @@ export type Query = {
   productVariants: Maybe<ProductVariantCountableConnection>;
   /** List of the shop's products. */
   products: Maybe<ProductCountableConnection>;
+  /** List of the products for given ids */
+  productsCustom: Maybe<Array<Maybe<ProductsCustom>>>;
   recentOrder: Maybe<Order>;
   /** List of top selling products. */
   reportProductSales: Maybe<ProductVariantCountableConnection>;
@@ -15925,6 +16022,8 @@ export type Query = {
   translation: Maybe<TranslatableItem>;
   /** Returns a list of all translatable items of a given kind. */
   translations: Maybe<TranslatableItemConnection>;
+  /** TriggerCron arguments data */
+  triggerCrons: Maybe<Array<Maybe<TriggerCronsType>>>;
   useCashback: Scalars['Boolean'];
   /** Look up a user by ID. */
   user: Maybe<User>;
@@ -16319,6 +16418,11 @@ export type QueryEmailTemplatesArgs = {
 };
 
 
+export type QueryEmailTemplatesEventsListArgs = {
+  mailType?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryExportFileArgs = {
   id: Scalars['ID'];
 };
@@ -16561,6 +16665,7 @@ export type QueryOrderArgs = {
 
 
 export type QueryOrderByTokenArgs = {
+  source?: Maybe<Scalars['String']>;
   token: Scalars['UUID'];
 };
 
@@ -16842,6 +16947,11 @@ export type QueryProductsArgs = {
 };
 
 
+export type QueryProductsCustomArgs = {
+  ids?: Maybe<Array<Maybe<Scalars['ID']>>>;
+};
+
+
 export type QueryReportProductSalesArgs = {
   period: ReportingPeriod;
   before?: Maybe<Scalars['String']>;
@@ -17062,6 +17172,11 @@ export type QueryTranslationsArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryTriggerCronsArgs = {
+  cronName?: Maybe<Scalars['String']>;
 };
 
 
@@ -19743,7 +19858,9 @@ export type TriggerCron = {
 /** An enumeration. */
 export type TriggerCronCodes =
   | 'REQUIRE_SUPERUSER_PERMISSION'
-  | 'INVALID_CRON_NAME';
+  | 'INVALID_CRON_NAME'
+  | 'INVALID_ARGUMENT_VALUE'
+  | 'INVALID';
 
 export type TriggerCronError = {
   /** Name of a field that caused the error. A value of `null` indicates that the error isn't associated with a particular field. */
@@ -19754,6 +19871,24 @@ export type TriggerCronError = {
   code: TriggerCronCodes;
 };
 
+export type TriggerCronsType = {
+  /** Cron name */
+  cronName: Maybe<Scalars['String']>;
+  /** List of cron arguments */
+  arguments: Maybe<Array<Maybe<CronArgumentType>>>;
+};
+
+
+/** UnAssigns ContentTags of the object. */
+export type UnAssignContentTags = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success Message */
+  message: Maybe<Scalars['String']>;
+};
 
 /** UnAssigns ContentTags of the object. */
 export type UnAssignContentTags = {
@@ -20713,6 +20848,7 @@ export type VoucherRuleInput = {
   isDefault?: Maybe<Scalars['Boolean']>;
   startDate?: Maybe<Scalars['DateTime']>;
   endDate?: Maybe<Scalars['DateTime']>;
+  voucherruleType?: Maybe<Scalars['String']>;
 };
 
 export type VoucherRuleLinkInput = {
@@ -20780,6 +20916,7 @@ export type VoucherRuleType = Node & {
   updated: Scalars['DateTime'];
   startDate: Scalars['DateTime'];
   endDate: Maybe<Scalars['DateTime']>;
+  voucherruleType: Maybe<Scalars['String']>;
   links: VoucherRuleLinkTypeConnection;
   logs: CouponDiscountTypeConnection;
 };
@@ -21992,6 +22129,19 @@ export type UpdateCheckoutShippingAddressMutation = { checkoutShippingAddressUpd
       { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
       & CheckoutFragment
     )> }>, checkoutEmailUpdate: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
+
+export type UpdateCheckoutShippingAddressNewMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+  shippingAddress: AddressInput;
+  email: Scalars['String'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
+}>;
+
+
+export type UpdateCheckoutShippingAddressNewMutation = { checkoutShippingAddressUpdate: Maybe<{ errors: Array<CheckoutErrorFragment>, checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )> }> };
 
 export type UpdateCheckoutBillingAddressMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
@@ -23606,6 +23756,62 @@ export function useUpdateCheckoutShippingAddressMutation(baseOptions?: Apollo.Mu
 export type UpdateCheckoutShippingAddressMutationHookResult = ReturnType<typeof useUpdateCheckoutShippingAddressMutation>;
 export type UpdateCheckoutShippingAddressMutationResult = Apollo.MutationResult<UpdateCheckoutShippingAddressMutation>;
 export type UpdateCheckoutShippingAddressMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutShippingAddressMutation, UpdateCheckoutShippingAddressMutationVariables>;
+export const UpdateCheckoutShippingAddressNewDocument = gql`
+    mutation UpdateCheckoutShippingAddressNew($checkoutId: ID!, $shippingAddress: AddressInput!, $email: String!, $isRecalculate: Boolean) {
+  checkoutShippingAddressUpdate(
+    checkoutId: $checkoutId
+    shippingAddress: $shippingAddress
+    email: $email
+    isRecalculate: $isRecalculate
+  ) {
+    errors: checkoutErrors {
+      ...CheckoutError
+    }
+    checkout {
+      ...Checkout
+      paymentMethod {
+        cashbackDiscountAmount
+        couponDiscount
+        prepaidDiscountAmount
+      }
+      cashback {
+        amount
+        willAddOn
+      }
+    }
+  }
+}
+    ${CheckoutErrorFragmentDoc}
+${CheckoutFragmentDoc}`;
+export type UpdateCheckoutShippingAddressNewMutationFn = Apollo.MutationFunction<UpdateCheckoutShippingAddressNewMutation, UpdateCheckoutShippingAddressNewMutationVariables>;
+
+/**
+ * __useUpdateCheckoutShippingAddressNewMutation__
+ *
+ * To run a mutation, you first call `useUpdateCheckoutShippingAddressNewMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCheckoutShippingAddressNewMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCheckoutShippingAddressNewMutation, { data, loading, error }] = useUpdateCheckoutShippingAddressNewMutation({
+ *   variables: {
+ *      checkoutId: // value for 'checkoutId'
+ *      shippingAddress: // value for 'shippingAddress'
+ *      email: // value for 'email'
+ *      isRecalculate: // value for 'isRecalculate'
+ *   },
+ * });
+ */
+export function useUpdateCheckoutShippingAddressNewMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCheckoutShippingAddressNewMutation, UpdateCheckoutShippingAddressNewMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCheckoutShippingAddressNewMutation, UpdateCheckoutShippingAddressNewMutationVariables>(UpdateCheckoutShippingAddressNewDocument, options);
+      }
+export type UpdateCheckoutShippingAddressNewMutationHookResult = ReturnType<typeof useUpdateCheckoutShippingAddressNewMutation>;
+export type UpdateCheckoutShippingAddressNewMutationResult = Apollo.MutationResult<UpdateCheckoutShippingAddressNewMutation>;
+export type UpdateCheckoutShippingAddressNewMutationOptions = Apollo.BaseMutationOptions<UpdateCheckoutShippingAddressNewMutation, UpdateCheckoutShippingAddressNewMutationVariables>;
 export const UpdateCheckoutBillingAddressDocument = gql`
     mutation UpdateCheckoutBillingAddress($checkoutId: ID!, $billingAddress: AddressInput!) {
   checkoutBillingAddressUpdate(
