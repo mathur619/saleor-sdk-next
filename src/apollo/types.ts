@@ -2498,6 +2498,8 @@ export type CheckoutCreateInput = {
   billingAddress?: Maybe<AddressInput>;
   /** Tags if any, associated with the Checkout */
   tags?: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** Fields required to update the object's metadata. */
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2>>;
 };
 
 /** Sets the customer as the owner of the checkout. */
@@ -10759,12 +10761,14 @@ export type MutationCheckoutEmailUpdateArgs = {
 
 export type MutationCheckoutLineDeleteArgs = {
   checkoutId: Scalars['ID'];
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2>>;
   lineId?: Maybe<Scalars['ID']>;
 };
 
 
 export type MutationCheckoutLinesAddArgs = {
   checkoutId: Scalars['ID'];
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2>>;
   isRecalculate?: Maybe<Scalars['Boolean']>;
   lines: Array<Maybe<CheckoutLineInput>>;
 };
@@ -10772,6 +10776,7 @@ export type MutationCheckoutLinesAddArgs = {
 
 export type MutationCheckoutLinesUpdateArgs = {
   checkoutId: Scalars['ID'];
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2>>;
   isRecalculate?: Maybe<Scalars['Boolean']>;
   lines: Array<Maybe<CheckoutLineInput>>;
 };
@@ -16579,11 +16584,6 @@ export type QueryInfluencerArgs = {
 };
 
 
-export type QueryMailTypesArgs = {
-  first?: Maybe<Scalars['ID']>;
-};
-
-
 export type QueryMeArgs = {
   source?: Maybe<Scalars['String']>;
 };
@@ -19697,13 +19697,7 @@ export type TemplateMailType =
   | 'INVOICE'
   | 'CONTACT_US'
   | 'MEMBERSHIP_ACTIVATE'
-  | 'MEMBERSHIP_ACTIVATE_CLASSIC'
-  | 'MEMBERSHIP_ACTIVATE_FIRST_ORDER'
-  | 'MEMBERSHIP_ACTIVATE_ELITE'
-  | 'MEMBERSHIP_ACTIVATE_ULTIMATE'
   | 'REVIEW_MAIL'
-  | 'REVIEW_ADMIN_REPLY'
-  | 'ORDER_REFUNDED'
   | 'ORDER_EDITED';
 
 export type TemplateMailTypeFilter =
@@ -19720,10 +19714,6 @@ export type TemplateMailTypeFilter =
   | 'INVOICE'
   | 'CONTACT_US'
   | 'MEMBERSHIP_ACTIVATE'
-  | 'MEMBERSHIP_ACTIVATE_CLASSIC'
-  | 'MEMBERSHIP_ACTIVATE_FIRST_ORDER'
-  | 'MEMBERSHIP_ACTIVATE_ELITE'
-  | 'MEMBERSHIP_ACTIVATE_ULTIMATE'
   | 'ORDER_EDITED';
 
 /** Requests for Token for registered user. */
@@ -19888,6 +19878,17 @@ export type TriggerCronsType = {
   arguments: Maybe<Array<Maybe<CronArgumentType>>>;
 };
 
+
+/** UnAssigns ContentTags of the object. */
+export type UnAssignContentTags = {
+  /**
+   * List of errors that occurred executing the mutation.
+   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
+   */
+  errors: Array<Error>;
+  /** Success Message */
+  message: Maybe<Scalars['String']>;
+};
 
 /** UnAssigns ContentTags of the object. */
 export type UnAssignContentTags = {
@@ -22107,6 +22108,7 @@ export type AddCheckoutLineMutation = { checkoutLinesAdd: Maybe<{ checkout: Mayb
 export type RemoveCheckoutLineMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lineId?: Maybe<Scalars['ID']>;
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2> | MetadataInputV2>;
 }>;
 
 
@@ -22319,6 +22321,7 @@ export type AddCheckoutLineNextMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   lines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>;
   isRecalculate?: Maybe<Scalars['Boolean']>;
+  checkoutMetadataInput?: Maybe<Array<MetadataInputV2> | MetadataInputV2>;
 }>;
 
 
@@ -23633,8 +23636,12 @@ export type AddCheckoutLineMutationHookResult = ReturnType<typeof useAddCheckout
 export type AddCheckoutLineMutationResult = Apollo.MutationResult<AddCheckoutLineMutation>;
 export type AddCheckoutLineMutationOptions = Apollo.BaseMutationOptions<AddCheckoutLineMutation, AddCheckoutLineMutationVariables>;
 export const RemoveCheckoutLineDocument = gql`
-    mutation RemoveCheckoutLine($checkoutId: ID!, $lineId: ID) {
-  checkoutLineDelete(checkoutId: $checkoutId, lineId: $lineId) {
+    mutation RemoveCheckoutLine($checkoutId: ID!, $lineId: ID, $checkoutMetadataInput: [MetadataInputV2!]) {
+  checkoutLineDelete(
+    checkoutId: $checkoutId
+    lineId: $lineId
+    checkoutMetadataInput: $checkoutMetadataInput
+  ) {
     checkout {
       ...Checkout
       paymentMethod {
@@ -23671,6 +23678,7 @@ export type RemoveCheckoutLineMutationFn = Apollo.MutationFunction<RemoveCheckou
  *   variables: {
  *      checkoutId: // value for 'checkoutId'
  *      lineId: // value for 'lineId'
+ *      checkoutMetadataInput: // value for 'checkoutMetadataInput'
  *   },
  * });
  */
@@ -24704,11 +24712,12 @@ export type CheckoutCustomerAttachNewMutationHookResult = ReturnType<typeof useC
 export type CheckoutCustomerAttachNewMutationResult = Apollo.MutationResult<CheckoutCustomerAttachNewMutation>;
 export type CheckoutCustomerAttachNewMutationOptions = Apollo.BaseMutationOptions<CheckoutCustomerAttachNewMutation, CheckoutCustomerAttachNewMutationVariables>;
 export const AddCheckoutLineNextDocument = gql`
-    mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean) {
+    mutation AddCheckoutLineNext($checkoutId: ID!, $lines: [CheckoutLineInput]!, $isRecalculate: Boolean, $checkoutMetadataInput: [MetadataInputV2!]) {
   checkoutLinesAdd(
     checkoutId: $checkoutId
     lines: $lines
     isRecalculate: $isRecalculate
+    checkoutMetadataInput: $checkoutMetadataInput
   ) {
     checkout {
       ...Checkout
@@ -24747,6 +24756,7 @@ export type AddCheckoutLineNextMutationFn = Apollo.MutationFunction<AddCheckoutL
  *      checkoutId: // value for 'checkoutId'
  *      lines: // value for 'lines'
  *      isRecalculate: // value for 'isRecalculate'
+ *      checkoutMetadataInput: // value for 'checkoutMetadataInput'
  *   },
  * });
  */

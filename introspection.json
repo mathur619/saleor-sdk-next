@@ -15866,6 +15866,26 @@
             "defaultValue": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "checkoutMetadataInput",
+            "description": "Fields required to update the object's metadata.",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "MetadataInputV2",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "interfaces": null,
@@ -59219,6 +59239,26 @@
                 "deprecationReason": null
               },
               {
+                "name": "checkoutMetadataInput",
+                "description": "Fields required to update the object's metadata.",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "MetadataInputV2",
+                      "ofType": null
+                    }
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
                 "name": "lineId",
                 "description": "ID of the checkout line to delete.",
                 "type": {
@@ -59253,6 +59293,26 @@
                     "kind": "SCALAR",
                     "name": "ID",
                     "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "checkoutMetadataInput",
+                "description": "Fields required to update the object's metadata.",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "MetadataInputV2",
+                      "ofType": null
+                    }
                   }
                 },
                 "defaultValue": null,
@@ -59314,6 +59374,26 @@
                     "kind": "SCALAR",
                     "name": "ID",
                     "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "checkoutMetadataInput",
+                "description": "Fields required to update the object's metadata.",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "MetadataInputV2",
+                      "ofType": null
+                    }
                   }
                 },
                 "defaultValue": null,
@@ -117673,43 +117753,7 @@
             "deprecationReason": null
           },
           {
-            "name": "MEMBERSHIP_ACTIVATE_CLASSIC",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MEMBERSHIP_ACTIVATE_FIRST_ORDER",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MEMBERSHIP_ACTIVATE_ELITE",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MEMBERSHIP_ACTIVATE_ULTIMATE",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "REVIEW_MAIL",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "REVIEW_ADMIN_REPLY",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ORDER_REFUNDED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -117805,30 +117849,6 @@
           },
           {
             "name": "MEMBERSHIP_ACTIVATE",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MEMBERSHIP_ACTIVATE_CLASSIC",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MEMBERSHIP_ACTIVATE_FIRST_ORDER",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MEMBERSHIP_ACTIVATE_ELITE",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MEMBERSHIP_ACTIVATE_ULTIMATE",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
