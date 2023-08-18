@@ -85,7 +85,8 @@ export interface CartSDK {
   removeItem: (
     variantId: string,
     updateShippingMethod?: boolean,
-    checkoutMetadataInput?: any
+    checkoutMetadataInput?: any,
+    isRecalculate?: boolean,
   ) => RemoveItemResult;
 
   removeItemRest: (
@@ -298,7 +299,8 @@ export const cart = ({
   const removeItem: CartSDK["removeItem"] = async (
     variantId: string,
     updateShippingMethod: boolean = true,
-    checkoutMetadataInput?: any
+    checkoutMetadataInput?: any,
+    isRecalculate=false
   ) => {
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null =
@@ -321,6 +323,7 @@ export const cart = ({
           ...(checkoutMetadataInput
             ? { checkoutMetadataInput: checkoutMetadataInput }
             : {}),
+          isRecalculate
         },
       });
 
