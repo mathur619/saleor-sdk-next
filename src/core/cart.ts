@@ -891,6 +891,7 @@ export const cart = ({
           mutation: CREATE_CHECKOUT_MUTATION_NEXT,
           variables: {
             checkoutInput: checkoutInputVariables,
+            isRecalculate
           },
         });
         const checkout = res?.data?.checkoutCreate?.checkout;
