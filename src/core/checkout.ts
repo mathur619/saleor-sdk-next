@@ -165,7 +165,8 @@ export interface CheckoutSDK {
     shippingAddress: IAddress,
     email: string,
     updateShippingMethod?: boolean,
-    isRecalculate?: boolean
+    isRecalculate?: boolean,
+    updateEmailWithShippingAddressMutation?: boolean,
   ) => SetShippingAndBillingAddressResult;
 
   setBillingAddress?: (
@@ -472,7 +473,8 @@ export const checkout = ({
     shippingAddress: IAddress,
     email: string,
     updateShippingMethod = false,
-    isRecalculate = true
+    isRecalculate = true,
+    updateEmailWithShippingAddressMutation = false,
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -481,12 +483,24 @@ export const checkout = ({
       },
     });
 
-    const resShipping = await setShippingAddressAndEmail(
-      shippingAddress,
-      email,
-      updateShippingMethod,
-      isRecalculate
-    );
+    let resShipping;
+
+    if (updateEmailWithShippingAddressMutation) {
+      resShipping = await setShippingAddressAndEmail(
+        shippingAddress,
+        email,
+        updateShippingMethod,
+        isRecalculate
+      );
+    } else {
+      resShipping = await setShippingAddress(
+        shippingAddress,
+        email,
+        updateShippingMethod,
+        isRecalculate
+      );
+    }
+
     const resBilling = await setBillingAddress(
       shippingAddress,
       updateShippingMethod
