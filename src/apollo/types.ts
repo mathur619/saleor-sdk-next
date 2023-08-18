@@ -19890,17 +19890,6 @@ export type UnAssignContentTags = {
   message: Maybe<Scalars['String']>;
 };
 
-/** UnAssigns ContentTags of the object. */
-export type UnAssignContentTags = {
-  /**
-   * List of errors that occurred executing the mutation.
-   * @deprecated Use typed errors with error codes. This field will be removed after 2020-07-31.
-   */
-  errors: Array<Error>;
-  /** Success Message */
-  message: Maybe<Scalars['String']>;
-};
-
 /** Update an address type */
 export type UpdateAddressType = {
   /**
