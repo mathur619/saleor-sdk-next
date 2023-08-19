@@ -92,7 +92,8 @@ export interface CartSDK {
     variantId: string,
     updateShippingMethod?: boolean,
     isRecalculate?: boolean,
-    line_item?: any
+    line_item?: any,
+    checkoutMetadataInput?: any,
   ) => Promise<any>;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem: (
@@ -115,7 +116,8 @@ export interface CartSDK {
     tags?: string[],
     line_item?: any,
     useDummyAddress?: boolean,
-    isRecalculate?: boolean
+    isRecalculate?: boolean,
+    checkoutMetadataInput?: any,
   ) => Promise<any>;
   updateItemNext: (
     variantId: string,
@@ -131,7 +133,8 @@ export interface CartSDK {
     prevQuantity: number,
     updateShippingMethod?: boolean,
     isRecalculate?: boolean,
-    line_item?: any
+    line_item?: any,
+    checkoutMetadataInput?: any,
   ) => Promise<any>;
   updateItemWithLines: (
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
@@ -143,7 +146,8 @@ export interface CartSDK {
     linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     updateShippingMethod?: boolean,
     useCheckoutLoading?: boolean,
-    isRecalculate?: boolean
+    isRecalculate?: boolean,
+    checkoutMetadataInput?: any,
   ) => Promise<any>;
   clearCart?: () => UpdateItemResult;
 }
@@ -419,7 +423,8 @@ export const cart = ({
     variantId: string,
     updateShippingMethod = true,
     isRecalculate = false,
-    line_item: any
+    line_item: any,
+    checkoutMetadataInput: any,
   ) => {
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null =
@@ -447,6 +452,9 @@ export const cart = ({
               },
             ],
             isRecalculate,
+            ...(checkoutMetadataInput
+              ? { checkoutMetadataInput: checkoutMetadataInput }
+              : {}),
           };
           const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.UPDATE_CART}`;
           const res = await axiosRequest(
@@ -981,7 +989,8 @@ export const cart = ({
     tags?: string[],
     line_item?: any,
     useDummyAddress = true,
-    isRecalculate = false
+    isRecalculate = false,
+    checkoutMetadataInput?: any,
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -1008,6 +1017,9 @@ export const cart = ({
               },
             ],
             isRecalculate,
+            ...(checkoutMetadataInput
+              ? { checkoutMetadataInput: checkoutMetadataInput }
+              : {}),
           };
           const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.ADD_TO_CART}`;
           const res = await axiosRequest(
@@ -1104,12 +1116,18 @@ export const cart = ({
                   lines: [{ quantity: quantity, variantId: dbVariantId }],
                   email: "dummy@dummy.com",
                   tags,
+                  ...(checkoutMetadataInput
+                    ? { checkoutMetadataInput: checkoutMetadataInput }
+                    : {}),
                 },
               }
             : {
                 checkoutInput: {
                   lines: [{ quantity: quantity, variantId: dbVariantId }],
                   email: "dummy@dummy.com",
+                  ...(checkoutMetadataInput
+                    ? { checkoutMetadataInput: checkoutMetadataInput }
+                    : {}),
                 },
               };
           const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
@@ -1259,7 +1277,8 @@ export const cart = ({
     prevQuantity: number,
     updateShippingMethod: boolean = true,
     isRecalculate = false,
-    line_item?: any
+    line_item?: any,
+    checkoutMetadataInput?: any
   ) => {
     const differenceQuantity = quantity - prevQuantity;
     if (differenceQuantity > 0) {
@@ -1269,7 +1288,8 @@ export const cart = ({
         undefined,
         undefined,
         updateShippingMethod,
-        isRecalculate
+        isRecalculate,
+        checkoutMetadataInput
       );
       return res;
     } else {
@@ -1300,6 +1320,9 @@ export const cart = ({
                 },
               ],
               isRecalculate,
+              ...(checkoutMetadataInput
+                ? { checkoutMetadataInput: checkoutMetadataInput }
+                : {}),
             };
             const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.UPDATE_CART}`;
             const res = await axiosRequest(
@@ -1554,7 +1577,8 @@ export const cart = ({
     linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     updateShippingMethod = true,
     useCheckoutLoading = true,
-    isRecalculate = false
+    isRecalculate = false,
+    checkoutMetadataInput?: any
   ) => {
     if (useCheckoutLoading) {
       client.writeQuery({
@@ -1576,6 +1600,9 @@ export const cart = ({
         checkoutId: checkout?.token,
         lines: linesToAdd,
         isRecalculate,
+        ...(checkoutMetadataInput
+          ? { checkoutMetadataInput: checkoutMetadataInput }
+          : {}),
       };
 
       const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.UPDATE_CART}`;
@@ -1681,6 +1708,9 @@ export const cart = ({
         checkoutInput: {
           lines: linesToAdd,
           email: "dummy@dummy.com",
+          ...(checkoutMetadataInput
+            ? { checkoutMetadataInput: checkoutMetadataInput }
+            : {}),
         },
       };
       const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
