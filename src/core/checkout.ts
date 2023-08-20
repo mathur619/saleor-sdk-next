@@ -1,4 +1,9 @@
-import { getLatestCheckout, setLocalCheckoutInCache } from "../apollo/helpers";
+import { axiosRequest } from "../apollo";
+import {
+  getCheckoutPayments,
+  getLatestCheckout,
+  setLocalCheckoutInCache,
+} from "../apollo/helpers";
 import {
   ADD_CHECKOUT_PROMO_CODE,
   CHECKOUT_PAYMENT_METHOD_UPDATE,
@@ -94,6 +99,11 @@ import {
   IAddress,
   PaymentMethodUpdateInput,
 } from "../apollo/types/checkout";
+import {
+  REST_API_ENDPOINTS,
+  REST_API_METHODS_TYPES,
+  dummyCheckoutFields,
+} from "../constants";
 import { SALEOR_CHECKOUT, SALEOR_CHECKOUT_DISCOUNTS } from "./constants";
 import { storage } from "./storage";
 import {
@@ -166,7 +176,7 @@ export interface CheckoutSDK {
     email: string,
     updateShippingMethod?: boolean,
     isRecalculate?: boolean,
-    updateEmailWithShippingAddressMutation?: boolean,
+    updateEmailWithShippingAddressMutation?: boolean
   ) => SetShippingAndBillingAddressResult;
 
   setBillingAddress?: (
@@ -217,10 +227,15 @@ export interface CheckoutSDK {
   updateCheckoutMeta?: (
     input: Array<MetadataInput> | MetadataInput
   ) => UpdateCheckoutMetaResult;
+  createCheckoutRest?: (
+    tags?: string[],
+    checkoutMetadataInput?: any
+  ) => Promise<any>;
 }
 
 export const checkout = ({
   apolloClient: client,
+  restApiUrl,
 }: SaleorClientMethodsProps): CheckoutSDK => {
   const createCheckout: CheckoutSDK["createCheckout"] = async (
     tags?: string[]
@@ -293,6 +308,88 @@ export const checkout = ({
       });
     }
     return null;
+  };
+
+  const createCheckoutRest: CheckoutSDK["createCheckoutRest"] = async (
+    tags?: string[],
+    checkoutMetadataInput?: any
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    try {
+      if (!(checkout && checkout?.id)) {
+        const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
+        const createCheckoutInput = {
+          checkoutInput: {
+            lines: [],
+            email: "dummy@dummy.com",
+            ...(tags ? { tags: tags } : {}),
+            ...(checkoutMetadataInput
+              ? { checkoutMetadataInput: checkoutMetadataInput }
+              : {}),
+          },
+        };
+        const res = await axiosRequest(
+          fullUrl,
+          REST_API_METHODS_TYPES.POST,
+          createCheckoutInput
+        );
+
+        const createCheckoutRes = res?.data;
+        if (!res?.data?.token) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+          return {
+            data: res?.data || undefined,
+            errors: res?.data?.errors,
+          };
+        }
+
+        const updatedCheckout = {
+          ...dummyCheckoutFields,
+          ...createCheckoutRes,
+        };
+
+        storage.setCheckout(updatedCheckout);
+
+        getCheckoutPayments(client, updatedCheckout);
+
+        const returnObject = {
+          data: res.data,
+          errors: res?.data?.errors,
+        };
+
+        return returnObject;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.log(
+        "Failed to create checkout, error in createCheckoutRest.",
+        error
+      );
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
+      return null;
+    }
   };
 
   const setShippingAddress: CheckoutSDK["setShippingAddress"] = async (
@@ -474,7 +571,7 @@ export const checkout = ({
     email: string,
     updateShippingMethod = false,
     isRecalculate = true,
-    updateEmailWithShippingAddressMutation = false,
+    updateEmailWithShippingAddressMutation = false
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -1642,5 +1739,6 @@ export const checkout = ({
     createGokwikOrder,
     checkoutRecalculation,
     updateCheckoutMeta,
+    createCheckoutRest,
   };
 };
