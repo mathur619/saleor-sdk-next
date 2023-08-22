@@ -1115,6 +1115,7 @@ export const cart = ({
                 checkoutInput: {
                   lines: [{ quantity: quantity, variantId: dbVariantId }],
                   email: "dummy@dummy.com",
+                  isRecalculate: isRecalculate,
                   tags,
                   ...(checkoutMetadataInput
                     ? { checkoutMetadataInput: checkoutMetadataInput }
@@ -1125,6 +1126,7 @@ export const cart = ({
                 checkoutInput: {
                   lines: [{ quantity: quantity, variantId: dbVariantId }],
                   email: "dummy@dummy.com",
+                  isRecalculate: isRecalculate,
                   ...(checkoutMetadataInput
                     ? { checkoutMetadataInput: checkoutMetadataInput }
                     : {}),
