@@ -232,7 +232,7 @@ export interface AuthSDK {
     updateShippingMethod?: boolean,
     isRecalculate?: boolean,
     recalculationQuery?: boolean,
-    signInMobile?:boolean
+    refreshToken?: boolean
   ) => SignInMobileResult;
 
   otpLessLogin: (
