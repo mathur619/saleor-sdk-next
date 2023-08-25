@@ -16584,6 +16584,11 @@ export type QueryInfluencerArgs = {
 };
 
 
+export type QueryMailTypesArgs = {
+  first?: Maybe<Scalars['ID']>;
+};
+
+
 export type QueryMeArgs = {
   source?: Maybe<Scalars['String']>;
 };
@@ -25251,7 +25256,7 @@ export type DiscountsAndCashbackQueryLazyQueryHookResult = ReturnType<typeof use
 export type DiscountsAndCashbackQueryQueryResult = Apollo.QueryResult<DiscountsAndCashbackQuery, DiscountsAndCashbackQueryVariables>;
 export const UserCheckoutDetailsDocument = gql`
     query UserCheckoutDetails {
-  me {
+  me(source: "user_details") {
     id
     checkout {
       ...Checkout
