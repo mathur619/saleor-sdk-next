@@ -231,7 +231,8 @@ export interface AuthSDK {
     email?: string,
     updateShippingMethod?: boolean,
     isRecalculate?: boolean,
-    recalculationQuery?: boolean
+    recalculationQuery?: boolean,
+    refreshToken?: boolean
   ) => SignInMobileResult;
 
   otpLessLogin: (
@@ -256,7 +257,14 @@ export interface AuthSDK {
     sendWigzoInHeader?: boolean
   ) => RegisterAccountV2Result;
 
-  confirmAccountV2: (otp: string, phone: string, updateShippingMethod?:boolean, isRecalculate?:boolean, recalculationQuery?: boolean) => ConfirmAccountV2Result;
+  confirmAccountV2: (
+    otp: string,
+    phone: string,
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean,
+    recalculationQuery?: boolean,
+    refreshToken?: boolean
+  ) => ConfirmAccountV2Result;
 
   checkoutCustomerAttach: (
     token: string,
@@ -269,7 +277,12 @@ export interface AuthSDK {
 
   setToken: (authToken: string, csrfToken: string) => GetUserCheckoutResult;
 
-  getUserCheckout: (updateShippingMethod?: boolean, isRecalculate?:boolean, recalculationQuery?:boolean) => GetUserCheckoutResult;
+  getUserCheckout: (
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean,
+    recalculationQuery?: boolean,
+    refreshToken?: boolean
+  ) => GetUserCheckoutResult;
 }
 
 export const auth = ({
@@ -281,9 +294,10 @@ export const auth = ({
     otp: string,
     phone?: string,
     email?: string,
-    updateShippingMethod:boolean = true,
+    updateShippingMethod: boolean = true,
     isRecalculate = true,
-    recalculationQuery = false
+    recalculationQuery = false,
+    refreshToken = true
   ) => {
     client.writeQuery({
       query: USER,
@@ -323,7 +337,12 @@ export const auth = ({
             csrfToken: data.CreateTokenOTP.csrfToken,
             refreshToken: data.CreateTokenOTP.refreshToken,
           });
-          getUserCheckout(updateShippingMethod, isRecalculate, recalculationQuery);
+          getUserCheckout(
+            updateShippingMethod,
+            isRecalculate,
+            recalculationQuery,
+            refreshToken
+          );
         } else {
           client.writeQuery({
             query: USER,
@@ -592,7 +611,8 @@ export const auth = ({
     phone: string,
     updateShippingMethod = true,
     isRecalculate = true,
-    recalculationQuery = false
+    recalculationQuery = false,
+    refreshToken = true,
   ) => {
     client.writeQuery({
       query: USER,
@@ -624,7 +644,7 @@ export const auth = ({
             csrfToken: data.confirmAccountV2.csrfToken,
             refreshToken: data.confirmAccountV2.refreshToken,
           });
-          getUserCheckout(updateShippingMethod, isRecalculate, recalculationQuery);
+          getUserCheckout(updateShippingMethod, isRecalculate, recalculationQuery, refreshToken);
         } else {
           client.writeQuery({
             query: USER,
@@ -722,7 +742,8 @@ export const auth = ({
   const getUserCheckout: AuthSDK["getUserCheckout"] = async (
     updateShippingMethod: boolean = true,
     isRecalculate = true,
-    recalculationQuery = false
+    recalculationQuery = false,
+    refreshToken= true
   ) => {
     const res = await client.mutate<
       UserCheckoutDetailsQuery,
@@ -741,7 +762,7 @@ export const auth = ({
         isRecalculate
       );
       if (recalculationQuery) {
-        await checkoutRecalculationUtil(client, true);
+        await checkoutRecalculationUtil(client, refreshToken);
       }
     }
 
