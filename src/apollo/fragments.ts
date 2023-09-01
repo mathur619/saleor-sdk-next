@@ -221,6 +221,7 @@ export const checkoutFragment = gql`
     tags {
       name
     }
+    note
     metadata {
       key
       value
