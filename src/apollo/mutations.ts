@@ -742,11 +742,15 @@ export const CHECKOUT_PAYMENT_METHOD_UPDATE = gql`
     $checkoutId: ID!
     $gatewayId: String!
     $useCashback: Boolean!
+    $cashbackType: CashBackMethodType!
+    $isRecalculate: Boolean!
   ) {
     checkoutPaymentMethodUpdate(
       checkoutId: $checkoutId
       gatewayId: $gatewayId
       useCashback: $useCashback
+      cashbackType: $cashbackType
+      isRecalculate: $isRecalculate
     ) {
       checkout {
         ...Checkout

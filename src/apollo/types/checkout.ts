@@ -47,9 +47,19 @@ export type ICreditCard = IPaymentCreditCard;
     returnUrl?: string;
   }
 
+  export type CashBackMethodType =
+  | 'CASHBACK'
+  | 'RECHARGE_WALLET'
+  | 'CASHBACK_AND_RECHARGE_WALLET'
+
+
+
+
   export interface PaymentMethodUpdateInput {
     gateway: string;
     useCashback: boolean;
+    isRecalculate: boolean;
+    cashbackType: CashBackMethodType
   }
   
   export interface CompleteCheckoutInput {

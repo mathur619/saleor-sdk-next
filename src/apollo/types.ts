@@ -20931,10 +20931,17 @@ export type CompleteCheckoutMutation = { checkoutComplete: Maybe<(
     & { errors: Array<CheckoutErrorFragment>, order: Maybe<OrderDetailFragment> }
   )> };
 
+export type CashBackMethodType =
+| 'CASHBACK'
+| 'RECHARGE_WALLET'
+| 'CASHBACK_AND_RECHARGE_WALLET';
+
 export type CheckoutPaymentMethodUpdateMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   gatewayId: Scalars['String'];
   useCashback: Scalars['Boolean'];
+  isRecalculate: boolean;
+  cashbackType: CashBackMethodType;
 }>;
 
 

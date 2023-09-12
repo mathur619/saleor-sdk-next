@@ -520,6 +520,8 @@ export const checkout = ({
         checkoutId: checkout?.id,
         gatewayId: input.gateway,
         useCashback: input.useCashback,
+        isRecalculate: input.isRecalculate,
+        cashbackType: input.cashbackType
       };
 
       const res = await client.mutate<
