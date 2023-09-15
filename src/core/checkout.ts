@@ -172,37 +172,37 @@ export const checkout = ({
       if (tags) {
         checkoutInputVariables = {
           lines: [],
-          email: "dummy@dummy.com",
-          tags,
-          shippingAddress: {
-            city: "delhi",
-            companyName: "dummy",
-            country: "IN",
-            countryArea: "Delhi",
-            firstName: "dummy",
-            lastName: "dummy",
-            phone: "7894561230",
-            postalCode: "110006",
-            streetAddress1: "dummy",
-            streetAddress2: "dummy",
-          },
+          // email: "dummy@dummy.com",
+          tags
+          // shippingAddress: {
+          //   city: "delhi",
+          //   companyName: "dummy",
+          //   country: "IN",
+          //   countryArea: "Delhi",
+          //   firstName: "dummy",
+          //   lastName: "dummy",
+          //   phone: "7894561230",
+          //   postalCode: "110006",
+          //   streetAddress1: "dummy",
+          //   streetAddress2: "dummy",
+          // },
         };
       } else {
         checkoutInputVariables = {
-          lines: [],
-          email: "dummy@dummy.com",
-          shippingAddress: {
-            city: "delhi",
-            companyName: "dummy",
-            country: "IN",
-            countryArea: "Delhi",
-            firstName: "dummy",
-            lastName: "dummy",
-            phone: "7894561230",
-            postalCode: "110006",
-            streetAddress1: "dummy",
-            streetAddress2: "dummy",
-          },
+          lines: []
+          // email: "dummy@dummy.com",
+          // shippingAddress: {
+          //   city: "delhi",
+          //   companyName: "dummy",
+          //   country: "IN",
+          //   countryArea: "Delhi",
+          //   firstName: "dummy",
+          //   lastName: "dummy",
+          //   phone: "7894561230",
+          //   postalCode: "110006",
+          //   streetAddress1: "dummy",
+          //   streetAddress2: "dummy",
+          // },
         };
       }
 
