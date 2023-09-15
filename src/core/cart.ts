@@ -195,37 +195,37 @@ export const cart = ({
       if (tags) {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
-          email: "dummy@dummy.com",
+          // email: "dummy@dummy.com",
           tags,
-          shippingAddress: {
-            city: "delhi",
-            companyName: "dummy",
-            country: "IN",
-            countryArea: "Delhi",
-            firstName: "dummy",
-            lastName: "dummy",
-            phone: "7894561230",
-            postalCode: "110006",
-            streetAddress1: "dummy",
-            streetAddress2: "dummy",
-          },
+          // shippingAddress: {
+          //   city: "delhi",
+          //   companyName: "dummy",
+          //   country: "IN",
+          //   countryArea: "Delhi",
+          //   firstName: "dummy",
+          //   lastName: "dummy",
+          //   phone: "7894561230",
+          //   postalCode: "110006",
+          //   streetAddress1: "dummy",
+          //   streetAddress2: "dummy",
+          // },
         };
       } else {
         checkoutInputVariables = {
           lines: [{ quantity: quantity, variantId: variantId }],
-          email: "dummy@dummy.com",
-          shippingAddress: {
-            city: "delhi",
-            companyName: "dummy",
-            country: "IN",
-            countryArea: "Delhi",
-            firstName: "dummy",
-            lastName: "dummy",
-            phone: "7894561230",
-            postalCode: "110006",
-            streetAddress1: "dummy",
-            streetAddress2: "dummy",
-          },
+          // email: "dummy@dummy.com",
+          // shippingAddress: {
+          //   city: "delhi",
+          //   companyName: "dummy",
+          //   country: "IN",
+          //   countryArea: "Delhi",
+          //   firstName: "dummy",
+          //   lastName: "dummy",
+          //   phone: "7894561230",
+          //   postalCode: "110006",
+          //   streetAddress1: "dummy",
+          //   streetAddress2: "dummy",
+          // },
         };
       }
       const res = await client.mutate<
@@ -340,37 +340,37 @@ export const cart = ({
       if (tags) {
         checkoutInputVariables = {
           lines: lineItems,
-          email: "dummy@dummy.com",
+          // email: "dummy@dummy.com",
           tags,
-          shippingAddress: {
-            city: "delhi",
-            companyName: "dummy",
-            country: "IN",
-            countryArea: "Delhi",
-            firstName: "dummy",
-            lastName: "dummy",
-            phone: "7894561230",
-            postalCode: "110006",
-            streetAddress1: "dummy",
-            streetAddress2: "dummy",
-          },
+          // shippingAddress: {
+          //   city: "delhi",
+          //   companyName: "dummy",
+          //   country: "IN",
+          //   countryArea: "Delhi",
+          //   firstName: "dummy",
+          //   lastName: "dummy",
+          //   phone: "7894561230",
+          //   postalCode: "110006",
+          //   streetAddress1: "dummy",
+          //   streetAddress2: "dummy",
+          // },
         };
       } else {
         checkoutInputVariables = {
           lines: lineItems,
-          email: "dummy@dummy.com",
-          shippingAddress: {
-            city: "delhi",
-            companyName: "dummy",
-            country: "IN",
-            countryArea: "Delhi",
-            firstName: "dummy",
-            lastName: "dummy",
-            phone: "7894561230",
-            postalCode: "110006",
-            streetAddress1: "dummy",
-            streetAddress2: "dummy",
-          },
+          // email: "dummy@dummy.com",
+          // shippingAddress: {
+          //   city: "delhi",
+          //   companyName: "dummy",
+          //   country: "IN",
+          //   countryArea: "Delhi",
+          //   firstName: "dummy",
+          //   lastName: "dummy",
+          //   phone: "7894561230",
+          //   postalCode: "110006",
+          //   streetAddress1: "dummy",
+          //   streetAddress2: "dummy",
+          // },
         };
       }
       const res = await client.mutate<
@@ -1017,19 +1017,19 @@ export const cart = ({
       let checkoutInputVariables: CheckoutCreateInput;
       checkoutInputVariables = {
         lines: lineItemsInFormat,
-        email: "dummy@dummy.com",
-        shippingAddress: {
-          city: "delhi",
-          companyName: "dummy",
-          country: "IN",
-          countryArea: "Delhi",
-          firstName: "dummy",
-          lastName: "dummy",
-          phone: "7894561230",
-          postalCode: "110006",
-          streetAddress1: "dummy",
-          streetAddress2: "dummy",
-        },
+        // email: "dummy@dummy.com",
+        // shippingAddress: {
+        //   city: "delhi",
+        //   companyName: "dummy",
+        //   country: "IN",
+        //   countryArea: "Delhi",
+        //   firstName: "dummy",
+        //   lastName: "dummy",
+        //   phone: "7894561230",
+        //   postalCode: "110006",
+        //   streetAddress1: "dummy",
+        //   streetAddress2: "dummy",
+        // },
       };
       const res = await client.mutate<
         CreateCheckoutMutation,
