@@ -1,16 +1,11 @@
 import axios from "axios";
-import { axiosRequest } from "../apollo";
 import { REST_API_METHODS_TYPES, WIZZY_ENDPOINTS } from "../constants";
 
 export interface UtilityFunctionsSDK {
   searchProducts: (queryOptions: any) => any;
 }
 
-export const utilityFunctions = ({
-  apolloClient: client,
-  restApiUrl,
-  wizzyConfig,
-}: any): UtilityFunctionsSDK => {
+export const utilityFunctions = ({ wizzyConfig }: any): UtilityFunctionsSDK => {
   const searchProducts = async (queryOptions = null) => {
     if (queryOptions && wizzyConfig.headers) {
       try {

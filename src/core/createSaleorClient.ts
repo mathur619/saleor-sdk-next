@@ -37,7 +37,7 @@ export const createSaleorClient = ({
   const userSDK = user(coreInternals);
   const cartSDK = cart(coreInternals);
   const checkoutSDK = checkout(coreInternals);
-  const utilityFunctionsSdk = utilityFunctions(coreInternals);
+  const utilityFunctionsSdk = utilityFunctions({ ...wizzyConfig });
   const wishlistSDK = {};
   const walletSDK = {};
   if (autologin) {

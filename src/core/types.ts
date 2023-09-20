@@ -131,7 +131,7 @@ export interface SaleorClientOpts {
   channel: string;
   opts?: SaleorClientFetchOpts;
   restApiUrl?: string;
-  wizzyConfig?: string;
+  wizzyConfig?: any;
 }
 
 export interface ShippingAndBilling {
