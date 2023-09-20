@@ -1,5 +1,4 @@
 import axios from "axios";
-import { REST_API_METHODS_TYPES, WIZZY_ENDPOINTS } from "../constants";
 
 export interface UtilityFunctionsSDK {
   searchProducts: (queryOptions: {} | undefined) => any;
