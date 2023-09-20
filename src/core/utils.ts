@@ -10,9 +10,11 @@ export const utilityFunctions = ({ wizzyConfig }: any): UtilityFunctionsSDK => {
     if (queryOptions && wizzyConfig.headers) {
       try {
         const wizzyHeaders = wizzyConfig.headers;
+        const url: string = WIZZY_ENDPOINTS.SEARCH;
+        const method: string = REST_API_METHODS_TYPES.POST;
         const response = await axios({
-          url: WIZZY_ENDPOINTS.SEARCH,
-          method: REST_API_METHODS_TYPES.POST,
+          url,
+          method,
           data: queryOptions,
           headers: { ...wizzyHeaders },
         });
