@@ -2,16 +2,16 @@ import axios from "axios";
 import { REST_API_METHODS_TYPES, WIZZY_ENDPOINTS } from "../constants";
 
 export interface UtilityFunctionsSDK {
-  searchProducts: (queryOptions: any) => any;
+  searchProducts: (queryOptions: {} | undefined) => any;
 }
 
 export const utilityFunctions = ({ wizzyConfig }: any): UtilityFunctionsSDK => {
-  const searchProducts = async (queryOptions = null) => {
+  const searchProducts = async (queryOptions: {} | undefined = {}) => {
     if (queryOptions && wizzyConfig.headers) {
       try {
         const wizzyHeaders = wizzyConfig.headers;
-        const url: string = WIZZY_ENDPOINTS.SEARCH;
-        const method: string = REST_API_METHODS_TYPES.POST;
+        const url = "https://api.wizzy.ai/v1/products/search";
+        const method = "POST";
         const response = await axios({
           url,
           method,
