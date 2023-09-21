@@ -1,24 +1,28 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 export interface UtilityFunctionsSDK {
-  searchProducts: (queryOptions: {} | undefined, options: any) => any;
+  searchProducts: (
+    queryOptions: any,
+    options?: any
+  ) => Promise<AxiosResponse<any, any> | null | undefined>;
+  filterProducts: (
+    filters: any,
+    options?: any
+  ) => Promise<AxiosResponse<any, any> | null | undefined>;
 }
 
-export const utilityFunctions = ({ wizzyConfig }: any): UtilityFunctionsSDK => {
-  const searchProducts = async (
-    queryOptions: {} | undefined = {},
-    options: any = {}
-  ) => {
-    if (queryOptions && wizzyConfig.headers) {
+export const utilityFunctions = (wizzyConfig: any): UtilityFunctionsSDK => {
+  const searchProducts = async (queryOptions: any, options: any = {}) => {
+    const { headers, baseUrl } = wizzyConfig;
+    if (queryOptions && headers && baseUrl) {
       try {
-        const wizzyHeaders = wizzyConfig.headers;
-        const url = "https://api.wizzy.ai/v1/products/search";
+        const url = `${baseUrl}/products/search`;
         const method = "POST";
         const response = await axios({
           url,
           method,
           data: queryOptions,
-          headers: { ...wizzyHeaders },
+          headers,
           ...options,
         });
 
@@ -30,7 +34,32 @@ export const utilityFunctions = ({ wizzyConfig }: any): UtilityFunctionsSDK => {
     }
     return null;
   };
+
+  const filterProducts = async (filters: any, options: any = {}) => {
+    const { headers, baseUrl } = wizzyConfig;
+    if (filters && headers && baseUrl) {
+      try {
+        const url = `${baseUrl}/products/filter`;
+        const method = "POST";
+        const response = await axios({
+          url,
+          method,
+          data: filters,
+          headers,
+          ...options,
+        });
+
+        return response;
+      } catch (error) {
+        console.log("Error occurred in axiosRequest", error);
+        return;
+      }
+    }
+    return null;
+  };
+
   return {
     searchProducts,
+    filterProducts,
   };
 };
