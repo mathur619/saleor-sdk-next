@@ -1,11 +1,14 @@
 import axios from "axios";
 
 export interface UtilityFunctionsSDK {
-  searchProducts: (queryOptions: {} | undefined) => any;
+  searchProducts: (queryOptions: {} | undefined, options: any) => any;
 }
 
 export const utilityFunctions = ({ wizzyConfig }: any): UtilityFunctionsSDK => {
-  const searchProducts = async (queryOptions: {} | undefined = {}) => {
+  const searchProducts = async (
+    queryOptions: {} | undefined = {},
+    options: any = {}
+  ) => {
     if (queryOptions && wizzyConfig.headers) {
       try {
         const wizzyHeaders = wizzyConfig.headers;
@@ -16,6 +19,7 @@ export const utilityFunctions = ({ wizzyConfig }: any): UtilityFunctionsSDK => {
           method,
           data: queryOptions,
           headers: { ...wizzyHeaders },
+          ...options,
         });
 
         return response;
