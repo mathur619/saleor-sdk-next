@@ -39,6 +39,9 @@ export const userFragment = gql`
     lastName
     phone
     isStaff
+    tags {
+      name
+    }
     orders (first: 2) {
       edges {
         node {
