@@ -61,10 +61,12 @@ export const setLocalCheckoutInCache = async (
       },
     });
   } else if (fetchDiscount && checkout?.token) {
-    if (checkout.availableShippingMethods[0]?.id) {
+    if (checkout.availableShippingMethods.length > 0) {
+      const availableShipping = checkout?.availableShippingMethods?.slice(-1)
+      
       const variables: UpdateCheckoutShippingMethodMutationVariables = {
         checkoutId: checkout?.id,
-        shippingMethodId: checkout.availableShippingMethods[0]?.id,
+        shippingMethodId: availableShipping[0]?.id,
       };
 
       const resShipping = await client.mutate<
