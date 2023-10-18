@@ -34,5 +34,5 @@ export const useAuthState = (): UserDetailsQuery => {
       }
   }
 
-  return data || { authenticated: false, authenticating: false, user: null };
+  return data || { authenticated: false, authenticating: false, user: null, userCheckoutLoading: false };
 };

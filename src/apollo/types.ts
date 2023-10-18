@@ -16027,6 +16027,7 @@ export type Query = {
   useCashback: Scalars['Boolean'];
   /** Look up a user by ID. */
   user: Maybe<User>;
+  userCheckoutLoading: Scalars['Boolean'];
   userExists: Maybe<UserExistsType>;
   userWalletBalance: Scalars['Float'];
   users: Maybe<User>;
@@ -22370,7 +22371,7 @@ export type UserDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type UserDetailsQuery = (
-  Pick<Query, 'authenticated' | 'authenticating'>
+  Pick<Query, 'authenticated' | 'authenticating' | 'userCheckoutLoading'>
   & { user: Maybe<UserFragment> }
 );
 
@@ -24963,6 +24964,7 @@ export const UserDetailsDocument = gql`
   }
   authenticated @client
   authenticating @client
+  userCheckoutLoading @client
 }
     ${UserFragmentDoc}`;
 

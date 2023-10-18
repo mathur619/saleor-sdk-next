@@ -15,6 +15,7 @@ export const USER = gql`
     }
     authenticated @client
     authenticating @client
+    userCheckoutLoading @client
   }
 `;
 
@@ -128,7 +129,7 @@ export const GET_DISCOUNT_CASHBACK_QUERY = gql`
 export const USER_CHECKOUT_DETAILS = gql`
   ${checkoutFragment}
   query UserCheckoutDetails {
-    me (source: "user_details") {
+    me(source: "user_details") {
       id
       checkout {
         ...Checkout
