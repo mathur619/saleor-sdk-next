@@ -354,6 +354,15 @@ const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
           return existing;
         },
       },
+
+      userCheckoutLoading: {
+        read(existing) {
+          if (existing === undefined || existing === null || !existing) {
+            return false;
+          }
+          return existing;
+        },
+      },
       userWalletBalance: {
         read(existing) {
           if (!existing) {

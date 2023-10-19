@@ -68,7 +68,10 @@ import {
   CreateTokenTrueCallerMutation,
   CreateTokenTrueCallerMutationVariables,
 } from "..";
-import { checkoutRecalculationUtil, setLocalCheckoutInCache } from "../apollo/helpers";
+import {
+  checkoutRecalculationUtil,
+  setLocalCheckoutInCache,
+} from "../apollo/helpers";
 import {
   CONFIRM_ACCOUNT,
   CREATE_OTP_TOKEN_MUTATION,
@@ -332,6 +335,12 @@ export const auth = ({
       variables: CreateTokenOTPVariables,
       update: (_, { data }) => {
         if (data?.CreateTokenOTP?.token) {
+          client.writeQuery({
+            query: USER,
+            data: {
+              userCheckoutLoading: true,
+            },
+          });
           storage.setTokens({
             accessToken: data.CreateTokenOTP.token,
             csrfToken: data.CreateTokenOTP.csrfToken,
@@ -399,6 +408,12 @@ export const auth = ({
       variables: CreateTokenWithoutOtpVariables,
       update: (_, { data }) => {
         if (data?.CreateTokenWithoutOtp?.token) {
+          client.writeQuery({
+            query: USER,
+            data: {
+              userCheckoutLoading: true,
+            },
+          });
           storage.setTokens({
             accessToken: data.CreateTokenWithoutOtp.token,
             csrfToken: data.CreateTokenWithoutOtp.csrfToken,
@@ -480,6 +495,12 @@ export const auth = ({
           variables: CreateTokenWithTruecallerVariables,
           update: (_, { data }) => {
             if (data?.CreateTokenTrueCaller?.token) {
+              client.writeQuery({
+                query: USER,
+                data: {
+                  userCheckoutLoading: true,
+                },
+              });
               storage.setTokens({
                 accessToken: data.CreateTokenTrueCaller.token,
                 csrfToken: data.CreateTokenTrueCaller.csrfToken,
@@ -612,7 +633,7 @@ export const auth = ({
     updateShippingMethod = true,
     isRecalculate = true,
     recalculationQuery = false,
-    refreshToken = true,
+    refreshToken = true
   ) => {
     client.writeQuery({
       query: USER,
@@ -639,12 +660,23 @@ export const auth = ({
       },
       update: (_, { data }) => {
         if (data?.confirmAccountV2?.token) {
+          client.writeQuery({
+            query: USER,
+            data: {
+              userCheckoutLoading: true,
+            },
+          });
           storage.setTokens({
             accessToken: data.confirmAccountV2.token,
             csrfToken: data.confirmAccountV2.csrfToken,
             refreshToken: data.confirmAccountV2.refreshToken,
           });
-          getUserCheckout(updateShippingMethod, isRecalculate, recalculationQuery, refreshToken);
+          getUserCheckout(
+            updateShippingMethod,
+            isRecalculate,
+            recalculationQuery,
+            refreshToken
+          );
         } else {
           client.writeQuery({
             query: USER,
@@ -735,6 +767,12 @@ export const auth = ({
       accessToken: authToken,
       csrfToken: csrfToken,
     });
+    client.writeQuery({
+      query: USER,
+      data: {
+        userCheckoutLoading: true,
+      },
+    });
     const res = await getUserCheckout();
     return res;
   };
@@ -743,7 +781,7 @@ export const auth = ({
     updateShippingMethod: boolean = true,
     isRecalculate = true,
     recalculationQuery = false,
-    refreshToken= true
+    refreshToken = true
   ) => {
     const res = await client.mutate<
       UserCheckoutDetailsQuery,
@@ -765,6 +803,12 @@ export const auth = ({
         await checkoutRecalculationUtil(client, refreshToken);
       }
     }
+    client.writeQuery({
+      query: USER,
+      data: {
+        userCheckoutLoading: false,
+      },
+    });
 
     return res;
   };
@@ -836,6 +880,12 @@ export const auth = ({
         },
         update: (_, { data }) => {
           if (data?.tokenRefresh?.token) {
+            client.writeQuery({
+              query: USER,
+              data: {
+                userCheckoutLoading: true,
+              },
+            });
             storage.setAccessToken(data.tokenRefresh.token);
             getUserCheckout(false);
           } else {
