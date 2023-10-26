@@ -1,16 +1,18 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
-import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION } from ".";
-import { storage } from "../core/storage";
-import { GET_DISCOUNT_CASHBACK_QUERY, GET_LOCAL_CHECKOUT } from "./queries";
+// import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION } from ".";
+// import { storage } from "../core/storage";
+import { 
+  // GET_DISCOUNT_CASHBACK_QUERY,
+   GET_LOCAL_CHECKOUT } from "./queries";
 import {
   CompleteCheckoutMutation,
-  UpdateCheckoutShippingMethodMutation,
-  UpdateCheckoutShippingMethodMutationVariables,
+  // UpdateCheckoutShippingMethodMutation,
+  // UpdateCheckoutShippingMethodMutationVariables,
 } from "./types";
-import {
-  DiscountsAndCashbackQuery,
-  DiscountsAndCashbackQueryVariables,
-} from "./types/DiscountsAndCashbackQuery";
+// import {
+//   DiscountsAndCashbackQuery,
+//   DiscountsAndCashbackQueryVariables,
+// } from "./types/DiscountsAndCashbackQuery";
 
 export const setLocalCheckoutInCache = async (
   client: ApolloClient<NormalizedCacheObject>,
@@ -60,79 +62,81 @@ export const setLocalCheckoutInCache = async (
         },
       },
     });
-  } else if (fetchDiscount && checkout?.token) {
-    if (checkout.availableShippingMethods.length > 0) {
-      const availableShipping = checkout?.availableShippingMethods?.slice(-1)
+  } 
+  else if (fetchDiscount && checkout?.token) {
+    // if (checkout.availableShippingMethods.length > 0) {
+    //   const availableShipping = checkout?.availableShippingMethods?.slice(-1)
       
-      const variables: UpdateCheckoutShippingMethodMutationVariables = {
-        checkoutId: checkout?.id,
-        shippingMethodId: availableShipping[0]?.id,
-      };
+    //   const variables: UpdateCheckoutShippingMethodMutationVariables = {
+    //     checkoutId: checkout?.id,
+    //     shippingMethodId: availableShipping[0]?.id,
+    //   };
 
-      const resShipping = await client.mutate<
-        UpdateCheckoutShippingMethodMutation,
-        UpdateCheckoutShippingMethodMutationVariables
-      >({
-        mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
-        variables,
-      });
+    //   const resShipping = await client.mutate<
+    //     UpdateCheckoutShippingMethodMutation,
+    //     UpdateCheckoutShippingMethodMutationVariables
+    //   >({
+    //     mutation: UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
+    //     variables,
+    //   });
 
-      if (
-        resShipping.data?.checkoutShippingMethodUpdate?.errors &&
-        resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.code ===
-          "NOT_FOUND" &&
-        resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
-          "checkoutId" &&
-        typeof window !== "undefined"
-      ) {
-        window.localStorage?.clear();
-        window.location?.reload();
-        return;
-      }
+    //   if (
+    //     resShipping.data?.checkoutShippingMethodUpdate?.errors &&
+    //     resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.code ===
+    //       "NOT_FOUND" &&
+    //     resShipping.data?.checkoutShippingMethodUpdate?.errors[0]?.field ===
+    //       "checkoutId" &&
+    //     typeof window !== "undefined"
+    //   ) {
+    //     window.localStorage?.clear();
+    //     window.location?.reload();
+    //     return;
+    //   }
 
-      const res = await client.query<
-        DiscountsAndCashbackQuery,
-        DiscountsAndCashbackQueryVariables
-      >({
-        query: GET_DISCOUNT_CASHBACK_QUERY,
-        variables: {
-          token: checkout?.token,
-        },
-        fetchPolicy: "network-only",
-      });
+    //   const res = await client.query<
+    //     DiscountsAndCashbackQuery,
+    //     DiscountsAndCashbackQueryVariables
+    //   >({
+    //     query: GET_DISCOUNT_CASHBACK_QUERY,
+    //     variables: {
+    //       token: checkout?.token,
+    //     },
+    //     fetchPolicy: "network-only",
+    //   });
 
-      storage.setDiscounts(res.data);
-      client.writeQuery({
-        query: GET_LOCAL_CHECKOUT,
-        data: {
-          localCheckout:
-            resShipping.data?.checkoutShippingMethodUpdate?.checkout,
-          localCheckoutDiscounts: res.data.checkoutDiscounts,
-          localCashback: res.data.cashback,
-        },
-      });
-    } else {
-      const res = await client.query<
-        DiscountsAndCashbackQuery,
-        DiscountsAndCashbackQueryVariables
-      >({
-        query: GET_DISCOUNT_CASHBACK_QUERY,
-        variables: {
-          token: checkout?.token,
-        },
-        fetchPolicy: "network-only",
-      });
+    //   storage.setDiscounts(res.data);
+    //   client.writeQuery({
+    //     query: GET_LOCAL_CHECKOUT,
+    //     data: {
+    //       localCheckout:
+    //         resShipping.data?.checkoutShippingMethodUpdate?.checkout,
+    //       localCheckoutDiscounts: res.data.checkoutDiscounts,
+    //       localCashback: res.data.cashback,
+    //     },
+    //   });
+    // } 
+    // else {
+    //   const res = await client.query<
+    //     DiscountsAndCashbackQuery,
+    //     DiscountsAndCashbackQueryVariables
+    //   >({
+    //     query: GET_DISCOUNT_CASHBACK_QUERY,
+    //     variables: {
+    //       token: checkout?.token,
+    //     },
+    //     fetchPolicy: "network-only",
+    //   });
 
-      storage.setDiscounts(res.data);
-      client.writeQuery({
-        query: GET_LOCAL_CHECKOUT,
-        data: {
-          localCheckout: checkout,
-          localCheckoutDiscounts: res.data.checkoutDiscounts,
-          localCashback: res.data.cashback,
-        },
-      });
-    }
+    //   storage.setDiscounts(res.data);
+    //   client.writeQuery({
+    //     query: GET_LOCAL_CHECKOUT,
+    //     data: {
+    //       localCheckout: checkout,
+    //       localCheckoutDiscounts: res.data.checkoutDiscounts,
+    //       localCashback: res.data.cashback,
+    //     },
+    //   });
+    // }
   }
 
   client.writeQuery({
