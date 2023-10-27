@@ -1,18 +1,19 @@
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 // import { UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION } from ".";
-// import { storage } from "../core/storage";
-import { 
-  // GET_DISCOUNT_CASHBACK_QUERY,
-   GET_LOCAL_CHECKOUT } from "./queries";
+import { storage } from "../core/storage";
+import {
+  GET_DISCOUNT_CASHBACK_QUERY,
+  GET_LOCAL_CHECKOUT,
+} from "./queries";
 import {
   CompleteCheckoutMutation,
   // UpdateCheckoutShippingMethodMutation,
   // UpdateCheckoutShippingMethodMutationVariables,
 } from "./types";
-// import {
-//   DiscountsAndCashbackQuery,
-//   DiscountsAndCashbackQueryVariables,
-// } from "./types/DiscountsAndCashbackQuery";
+import {
+  DiscountsAndCashbackQuery,
+  DiscountsAndCashbackQueryVariables,
+} from "./types/DiscountsAndCashbackQuery";
 
 export const setLocalCheckoutInCache = async (
   client: ApolloClient<NormalizedCacheObject>,
@@ -62,11 +63,10 @@ export const setLocalCheckoutInCache = async (
         },
       },
     });
-  } 
-  else if (fetchDiscount && checkout?.token) {
+  } else if (fetchDiscount && checkout?.token) {
     // if (checkout.availableShippingMethods.length > 0) {
     //   const availableShipping = checkout?.availableShippingMethods?.slice(-1)
-      
+
     //   const variables: UpdateCheckoutShippingMethodMutationVariables = {
     //     checkoutId: checkout?.id,
     //     shippingMethodId: availableShipping[0]?.id,
@@ -114,29 +114,27 @@ export const setLocalCheckoutInCache = async (
     //       localCashback: res.data.cashback,
     //     },
     //   });
-    // } 
-    // else {
-    //   const res = await client.query<
-    //     DiscountsAndCashbackQuery,
-    //     DiscountsAndCashbackQueryVariables
-    //   >({
-    //     query: GET_DISCOUNT_CASHBACK_QUERY,
-    //     variables: {
-    //       token: checkout?.token,
-    //     },
-    //     fetchPolicy: "network-only",
-    //   });
-
-    //   storage.setDiscounts(res.data);
-    //   client.writeQuery({
-    //     query: GET_LOCAL_CHECKOUT,
-    //     data: {
-    //       localCheckout: checkout,
-    //       localCheckoutDiscounts: res.data.checkoutDiscounts,
-    //       localCashback: res.data.cashback,
-    //     },
-    //   });
     // }
+    const res = await client.query<
+      DiscountsAndCashbackQuery,
+      DiscountsAndCashbackQueryVariables
+    >({
+      query: GET_DISCOUNT_CASHBACK_QUERY,
+      variables: {
+        token: checkout?.token,
+      },
+      fetchPolicy: "network-only",
+    });
+
+    storage.setDiscounts(res.data);
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        localCheckout: checkout,
+        localCheckoutDiscounts: res.data.checkoutDiscounts,
+        localCashback: res.data.cashback,
+      },
+    });
   }
 
   client.writeQuery({
