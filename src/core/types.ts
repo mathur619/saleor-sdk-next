@@ -70,6 +70,7 @@ import {
   PayuOrderCreateMutation,
   CheckoutCustomerAttachNewMutation,
   CcAvenueOrderCreateMutation,
+  UpdateCheckoutShippingAddressNewMutation,
   // ConfirmEmailChangeMutation,
   // CreateAccountAddressMutation,
   // DeleteAccountAddressMutation,
@@ -121,7 +122,7 @@ export interface SaleorClientOpts {
 
 export interface ShippingAndBilling {
   resShipping: FetchResult<
-    UpdateCheckoutShippingAddressMutation,
+    UpdateCheckoutShippingAddressNewMutation,
     Record<string, any>,
     Record<string, any>
   > | null;
@@ -199,6 +200,10 @@ export type CreateCheckoutResult = Promise<FetchResult<
 > | null>;
 export type SetShippingAddressResult = Promise<FetchResult<
   UpdateCheckoutShippingAddressMutation
+> | null>;
+
+export type SetShippingAddressAndEmailResult = Promise<FetchResult<
+  UpdateCheckoutShippingAddressNewMutation
 > | null>;
 export type SetShippingAndBillingAddressResult = Promise<ShippingAndBilling>;
 export type SetBillingAddressResult = Promise<FetchResult<

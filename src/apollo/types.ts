@@ -20281,6 +20281,19 @@ export type UpdateCheckoutShippingAddressMutationVariables = Exact<{
 
 export type UpdateCheckoutShippingAddressMutation = { checkoutShippingAddressUpdate: Maybe<{ errors: Array<CheckoutErrorFragment>, checkout: Maybe<CheckoutFragment> }>, checkoutEmailUpdate: Maybe<{ checkout: Maybe<CheckoutFragment>, errors: Array<CheckoutErrorFragment> }> };
 
+export type UpdateCheckoutShippingAddressNewMutationVariables = Exact<{
+  checkoutId: Scalars['ID'];
+  shippingAddress: AddressInput;
+  email: Scalars['String'];
+  isRecalculate?: Maybe<Scalars['Boolean']>;
+}>;
+
+
+export type UpdateCheckoutShippingAddressNewMutation = { checkoutShippingAddressUpdate: Maybe<{ errors: Array<CheckoutErrorFragment>, checkout: Maybe<(
+      { paymentMethod: Maybe<Pick<PaymentMethodType, 'cashbackDiscountAmount' | 'couponDiscount' | 'prepaidDiscountAmount'>>, cashback: Maybe<Pick<CashbackType, 'amount' | 'willAddOn'>> }
+      & CheckoutFragment
+    )> }> };
+
 export type UpdateCheckoutBillingAddressMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
   billingAddress: AddressInput;
