@@ -140,7 +140,7 @@ export interface CheckoutSDK {
     updateShippingMethod?: boolean,
     isRecalculate?: boolean,
     updateEmailWithShippingAddressMutation?: boolean
-  ) => SetShippingAndBillingAddressResult;
+  ) => SetShippingAndBillingAddressResult | any;
 
   setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
