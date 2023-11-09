@@ -16,6 +16,7 @@ import {
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION_NEXT,
   CREATE_PAYU_ORDER,
   CREATE_CCAVENUE_ORDER,
+  UPDATE_CHECKOUT_SHIPPING_ADDRESS_NEW,
 } from "../apollo/mutations";
 import {
   GET_CITY_STATE_FROM_PINCODE,
@@ -63,6 +64,8 @@ import {
   PayuOrderCreateMutationVariables,
   CcAvenueOrderCreateMutation,
   CcAvenueOrderCreateMutationVariables,
+  UpdateCheckoutShippingAddressNewMutation,
+  UpdateCheckoutShippingAddressNewMutationVariables,
 } from "../apollo/types";
 
 import {
@@ -94,6 +97,7 @@ import {
   SetShippingMethodResult,
   PayuOrderCreateMutationResult,
   CcAvenueOrderCreateMutationResult,
+  SetShippingAddressAndEmailResult,
 } from "./types";
 
 export interface CheckoutSDK {
@@ -124,10 +128,19 @@ export interface CheckoutSDK {
     shippingAddress: IAddress,
     email: string
   ) => SetShippingAddressResult;
+  setShippingAddressAndEmail?: (
+    shippingAddress: IAddress,
+    email: string,
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean
+  ) => SetShippingAddressAndEmailResult;
   setShippingAndBillingAddress?: (
     shippingAddress: IAddress,
-    email: string
-  ) => SetShippingAndBillingAddressResult;
+    email: string,
+    updateShippingMethod?: boolean,
+    isRecalculate?: boolean,
+    updateEmailWithShippingAddressMutation?: boolean
+  ) => SetShippingAndBillingAddressResult | any;
 
   setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
@@ -282,6 +295,66 @@ export const checkout = ({
     return null;
   };
 
+  const setShippingAddressAndEmail: CheckoutSDK["setShippingAddressAndEmail"] = async (
+    shippingAddress: IAddress,
+    email: string,
+    updateShippingMethod = false,
+    isRecalculate = true
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables = {
+        checkoutId: checkout?.id,
+        isRecalculate,
+        email,
+        shippingAddress: {
+          city: shippingAddress.city,
+          companyName: shippingAddress.companyName,
+          country: shippingAddress?.country?.code as CountryCode,
+          countryArea: shippingAddress.countryArea,
+          firstName: shippingAddress.firstName,
+          lastName: shippingAddress.lastName,
+          phone: shippingAddress.phone,
+          postalCode: shippingAddress.postalCode,
+          streetAddress1: shippingAddress.streetAddress1,
+          streetAddress2: shippingAddress.streetAddress2,
+        },
+      };
+
+      const res = await client.mutate<
+        UpdateCheckoutShippingAddressNewMutation,
+        UpdateCheckoutShippingAddressNewMutationVariables
+      >({
+        mutation: UPDATE_CHECKOUT_SHIPPING_ADDRESS_NEW,
+        variables,
+      });
+
+      if (res?.data?.checkoutShippingAddressUpdate?.checkout?.id) {
+        setLocalCheckoutInCache(
+          client,
+          res?.data?.checkoutShippingAddressUpdate?.checkout,
+          updateShippingMethod
+        );
+        storage.setCheckout(res?.data?.checkoutShippingAddressUpdate?.checkout);
+      }
+
+      return res;
+    }
+
+    return null;
+  };
+
   const setBillingAddress: CheckoutSDK["setBillingAddress"] = async (
     billingAddress: IAddress
   ) => {
@@ -336,7 +409,10 @@ export const checkout = ({
 
   const setShippingAndBillingAddress: CheckoutSDK["setShippingAndBillingAddress"] = async (
     shippingAddress: IAddress,
-    email: string
+    email: string,
+    updateShippingMethod = false,
+    isRecalculate = true,
+    updateEmailWithShippingAddressMutation = false
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -345,7 +421,19 @@ export const checkout = ({
       },
     });
 
-    const resShipping = await setShippingAddress(shippingAddress, email);
+    let resShipping;
+
+    if (updateEmailWithShippingAddressMutation) {
+      resShipping = await setShippingAddressAndEmail(
+        shippingAddress,
+        email,
+        updateShippingMethod,
+        isRecalculate
+      );
+    } else {
+      resShipping = await setShippingAddress(shippingAddress, email);
+    }
+
     const resBilling = await setBillingAddress(shippingAddress);
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -1011,6 +1099,7 @@ export const checkout = ({
   return {
     createCheckout,
     setShippingAddress,
+    setShippingAddressAndEmail,
     setBillingAddress,
     setShippingAndBillingAddress,
     setAddressType,
