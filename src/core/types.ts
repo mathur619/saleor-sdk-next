@@ -94,10 +94,12 @@ import { CartSDK } from "./cart";
 import { CheckoutSDK } from "./checkout";
 import { WishlistSDK } from "./wishlist";
 import { WalletSDK } from "./wallet";
+import { UtilityFunctionsSDK } from "./utils";
 
 export interface SaleorClientInternals {
   apolloClient: ApolloClient<NormalizedCacheObject>;
   restApiUrl?: string;
+  wizzyConfig?: string;
 }
 export interface SaleorClientConfig {
   channel: string;
@@ -113,6 +115,7 @@ export interface SaleorClient {
   getToken(): string | null;
   getCheckout(): CheckoutState;
   cart: CartSDK;
+  utilityFunctions: UtilityFunctionsSDK;
   checkout: CheckoutSDK;
   wishlist: WishlistSDK;
   wallet: WalletSDK;
@@ -128,6 +131,7 @@ export interface SaleorClientOpts {
   channel: string;
   opts?: SaleorClientFetchOpts;
   restApiUrl?: string;
+  wizzyConfig?: any;
 }
 
 export interface ShippingAndBilling {

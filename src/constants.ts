@@ -85,3 +85,8 @@ export const dummyCheckoutFields = {
   translatedDiscountName: null,
   voucherCode: null,
 };
+
+export enum WIZZY_ENDPOINTS {
+  SEARCH = "https://api.wizzy.ai/v1/products/search",
+  FILTER = "https://api.wizzy.ai/v1/products/filter",
+}

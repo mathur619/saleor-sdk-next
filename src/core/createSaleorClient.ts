@@ -8,12 +8,14 @@ import { createStorage, storage } from "./storage";
 import { DEVELOPMENT_MODE, WINDOW_EXISTS } from "../constants";
 import { cart } from "./cart";
 import { checkout } from "./checkout";
+import { utilityFunctions } from "./utils";
 
 export const createSaleorClient = ({
   apiUrl,
   channel,
   opts = {},
   restApiUrl,
+  wizzyConfig,
 }: SaleorClientOpts): SaleorClient => {
   let _channel = channel;
   const { autologin = true, fetchOpts } = opts;
@@ -25,11 +27,17 @@ export const createSaleorClient = ({
 
   createStorage(autologin);
   const apolloClient = createApolloClient(apiUrl, autologin, fetchOpts);
-  const coreInternals = { apolloClient, channel: _channel, restApiUrl };
+  const coreInternals = {
+    apolloClient,
+    channel: _channel,
+    restApiUrl,
+    wizzyConfig,
+  };
   const authSDK = auth(coreInternals);
   const userSDK = user(coreInternals);
   const cartSDK = cart(coreInternals);
   const checkoutSDK = checkout(coreInternals);
+  const utilityFunctionsSdk = utilityFunctions({ ...wizzyConfig });
   const wishlistSDK = {};
   const walletSDK = {};
   if (autologin) {
@@ -48,6 +56,7 @@ export const createSaleorClient = ({
     cart: cartSDK,
     checkout: checkoutSDK,
     wishlist: wishlistSDK,
+    utilityFunctions: utilityFunctionsSdk,
     wallet: walletSDK,
     config: { channel: _channel, setChannel, autologin },
     _internal: { apolloClient },
