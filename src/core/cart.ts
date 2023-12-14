@@ -1442,6 +1442,7 @@ export const cart = ({
             );
 
             if (!res?.data?.token) {
+              console.log("response of error",res)
               if (res?.data?.includes("Checkout ID not found")) {
                 createCheckoutRest(
                   lines,
