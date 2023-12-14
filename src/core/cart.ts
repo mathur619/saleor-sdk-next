@@ -93,7 +93,7 @@ export interface CartSDK {
     updateShippingMethod?: boolean,
     isRecalculate?: boolean,
     line_item?: any,
-    checkoutMetadataInput?: any,
+    checkoutMetadataInput?: any
   ) => Promise<any>;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem: (
@@ -117,7 +117,7 @@ export interface CartSDK {
     line_item?: any,
     useDummyAddress?: boolean,
     isRecalculate?: boolean,
-    checkoutMetadataInput?: any,
+    checkoutMetadataInput?: any
   ) => Promise<any>;
   updateItemNext: (
     variantId: string,
@@ -134,7 +134,7 @@ export interface CartSDK {
     updateShippingMethod?: boolean,
     isRecalculate?: boolean,
     line_item?: any,
-    checkoutMetadataInput?: any,
+    checkoutMetadataInput?: any
   ) => Promise<any>;
   updateItemWithLines: (
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
@@ -147,7 +147,13 @@ export interface CartSDK {
     updateShippingMethod?: boolean,
     useCheckoutLoading?: boolean,
     isRecalculate?: boolean,
-    checkoutMetadataInput?: any,
+    checkoutMetadataInput?: any
+  ) => Promise<any>;
+  createCheckoutRest?: (
+    linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
+    tags?: string[],
+    isRecalculate?: boolean,
+    checkoutMetadataInput?: any
   ) => Promise<any>;
   clearCart?: () => UpdateItemResult;
 }
@@ -157,6 +163,91 @@ export const cart = ({
   restApiUrl,
 }: SaleorClientMethodsProps): CartSDK => {
   const items = cartItemsVar();
+
+  const createCheckoutRest: CartSDK["createCheckoutRest"] = async (
+    linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
+    tags?: string[],
+    isRecalculate = false,
+    checkoutMetadataInput?: any
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    try {
+      if (!(checkout && checkout?.id)) {
+        const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
+        const createCheckoutInput = {
+          checkoutInput: {
+            lines: linesToAdd,
+            email: "dummy@dummy.com",
+            isRecalculate: isRecalculate,
+            ...(tags ? { tags: tags } : {}),
+            ...(checkoutMetadataInput
+              ? { checkoutMetadataInput: checkoutMetadataInput }
+              : {}),
+          },
+        };
+        const res = await axiosRequest(
+          fullUrl,
+          REST_API_METHODS_TYPES.POST,
+          createCheckoutInput
+        );
+
+        const createCheckoutRes = res?.data;
+        if (!res?.data?.token) {
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+          return {
+            data: res?.data || undefined,
+            errors: res?.data?.errors,
+          };
+        }
+
+        const updatedCheckout = {
+          ...dummyCheckoutFields,
+          ...createCheckoutRes,
+        };
+
+        storage.setCheckout(updatedCheckout);
+
+        getCheckoutPayments(client, updatedCheckout);
+
+        const returnObject = {
+          data: res.data,
+          errors: res?.data?.errors,
+        };
+
+        return returnObject;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.log(
+        "Failed to create checkout, error in createCheckoutRest.",
+        error
+      );
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
+      return null;
+    }
+  };
 
   const addItem: CartSDK["addItem"] = async (
     variantId: string,
@@ -310,7 +401,8 @@ export const cart = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     const lineToRemove =
-      checkout && checkout?.lines?.find(line => line?.variant.id === variantId);
+      checkout &&
+      checkout?.lines?.find((line) => line?.variant.id === variantId);
     const lineToRemoveId = lineToRemove?.id;
 
     if (checkout && checkout?.token) {
@@ -424,7 +516,7 @@ export const cart = ({
     updateShippingMethod = true,
     isRecalculate = false,
     line_item: any,
-    checkoutMetadataInput: any,
+    checkoutMetadataInput: any
   ) => {
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null =
@@ -464,17 +556,26 @@ export const cart = ({
           );
 
           if (!res?.data?.token) {
-            await getLatestCheckout(client, checkout);
-            client.writeQuery({
-              query: GET_LOCAL_CHECKOUT,
-              data: {
-                checkoutLoading: false,
-              },
-            });
-            return {
-              data: res?.data,
-              errors: res?.data?.errors,
-            };
+            if (res?.data?.includes("Checkout ID not found")) {
+              createCheckoutRest(
+                [],
+                undefined,
+                checkoutMetadataInput,
+                isRecalculate
+              );
+            } else {
+              await getLatestCheckout(client, checkout);
+              client.writeQuery({
+                query: GET_LOCAL_CHECKOUT,
+                data: {
+                  checkoutLoading: false,
+                },
+              });
+              return {
+                data: res?.data,
+                errors: res?.data?.errors,
+              };
+            }
           }
 
           if (res?.data?.token) {
@@ -488,8 +589,8 @@ export const cart = ({
                 })),
               };
 
-              const updatedLineVariantAttributes = line?.variant?.attributes?.map(
-                (item: any) => {
+              const updatedLineVariantAttributes =
+                line?.variant?.attributes?.map((item: any) => {
                   return {
                     ...item,
                     values: item.values?.map((valueItem: any) => ({
@@ -497,8 +598,7 @@ export const cart = ({
                       value: valueItem.value || valueItem.name,
                     })),
                   };
-                }
-              );
+                });
               const lineWithProduct = {
                 ...line,
                 variant: {
@@ -643,7 +743,7 @@ export const cart = ({
     line_item?: any,
     useDummyAddress: boolean = true,
     isRecalculate = false,
-    checkoutMetadataInput?: any,
+    checkoutMetadataInput?: any
   ) => {
     const checkoutString = storage.getCheckout();
     const checkout =
@@ -990,7 +1090,7 @@ export const cart = ({
     line_item?: any,
     useDummyAddress = true,
     isRecalculate = false,
-    checkoutMetadataInput?: any,
+    checkoutMetadataInput?: any
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -1007,15 +1107,16 @@ export const cart = ({
     try {
       if (checkout && checkout?.token) {
         const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
+        const lines = [
+          {
+            quantity: quantity,
+            variantId: String(dbVariantId),
+          },
+        ];
         if (dbVariantId && quantity) {
           const input = {
             checkoutId: checkout?.token,
-            lines: [
-              {
-                quantity: quantity,
-                variantId: String(dbVariantId),
-              },
-            ],
+            lines,
             isRecalculate,
             ...(checkoutMetadataInput
               ? { checkoutMetadataInput: checkoutMetadataInput }
@@ -1044,8 +1145,8 @@ export const cart = ({
                   ? line_item?.variant?.quantityAvailable
                   : line.variant.quantityAvailable || 50;
 
-              const updatedLineVariantAttributes = line?.variant?.attributes?.map(
-                (item: any) => {
+              const updatedLineVariantAttributes =
+                line?.variant?.attributes?.map((item: any) => {
                   return {
                     ...item,
                     values: item.values?.map((valueItem: any) => ({
@@ -1053,8 +1154,7 @@ export const cart = ({
                       value: valueItem.value || valueItem.name,
                     })),
                   };
-                }
-              );
+                });
               const lineWithProduct = {
                 ...line,
                 variant: {
@@ -1105,6 +1205,13 @@ export const cart = ({
               data: updatedCheckout,
               errors: res?.data?.errors || [],
             };
+          } else if (res?.data?.includes("Checkout ID not found")) {
+            createCheckoutRest(
+              lines,
+              tags,
+              checkoutMetadataInput,
+              isRecalculate
+            );
           }
         }
       } else {
@@ -1313,14 +1420,15 @@ export const cart = ({
         try {
           const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
           if (dbVariantId && quantity) {
+            const lines = [
+              {
+                quantity: quantity,
+                variantId: String(dbVariantId),
+              },
+            ];
             const input = {
               checkoutId: checkout?.token,
-              lines: [
-                {
-                  quantity: quantity,
-                  variantId: String(dbVariantId),
-                },
-              ],
+              lines,
               isRecalculate,
               ...(checkoutMetadataInput
                 ? { checkoutMetadataInput: checkoutMetadataInput }
@@ -1334,17 +1442,26 @@ export const cart = ({
             );
 
             if (!res?.data?.token) {
-              await getLatestCheckout(client, checkout);
-              client.writeQuery({
-                query: GET_LOCAL_CHECKOUT,
-                data: {
-                  checkoutLoading: false,
-                },
-              });
-              return {
-                data: res?.data,
-                errors: res?.data?.errors,
-              };
+              if (res?.data?.includes("Checkout ID not found")) {
+                createCheckoutRest(
+                  lines,
+                  undefined,
+                  checkoutMetadataInput,
+                  isRecalculate
+                );
+              } else {
+                await getLatestCheckout(client, checkout);
+                client.writeQuery({
+                  query: GET_LOCAL_CHECKOUT,
+                  data: {
+                    checkoutLoading: false,
+                  },
+                });
+                return {
+                  data: res?.data,
+                  errors: res?.data?.errors,
+                };
+              }
             }
 
             if (res?.data?.token) {
@@ -1365,8 +1482,8 @@ export const cart = ({
                     ? line_item?.variant?.quantityAvailable
                     : line.variant.quantityAvailable || 50;
 
-                const updatedLineVariantAttributes = line?.variant?.attributes?.map(
-                  (item: any) => {
+                const updatedLineVariantAttributes =
+                  line?.variant?.attributes?.map((item: any) => {
                     return {
                       ...item,
                       values: item.values?.map((valueItem: any) => ({
@@ -1374,8 +1491,7 @@ export const cart = ({
                         value: valueItem.value || valueItem.name,
                       })),
                     };
-                  }
-                );
+                  });
 
                 const lineWithProduct = {
                   ...line,
@@ -1614,19 +1730,23 @@ export const cart = ({
         input
       );
       if (!res?.data?.token) {
-        await getLatestCheckout(client, checkout);
-        if (useCheckoutLoading) {
-          client.writeQuery({
-            query: GET_LOCAL_CHECKOUT,
-            data: {
-              checkoutLoading: false,
-            },
-          });
+        if (res?.data?.includes("Checkout ID not found")) {
+          createCheckoutRest(linesToAdd, undefined, checkoutMetadataInput, isRecalculate);
+        } else {
+          await getLatestCheckout(client, checkout);
+          if (useCheckoutLoading) {
+            client.writeQuery({
+              query: GET_LOCAL_CHECKOUT,
+              data: {
+                checkoutLoading: false,
+              },
+            });
+          }
+          return {
+            data: null,
+            errors: res?.data?.checkoutLinesUpdate?.errors,
+          };
         }
-        return {
-          data: null,
-          errors: res?.data?.checkoutLinesUpdate?.errors,
-        };
       }
 
       if (res?.data?.token) {
