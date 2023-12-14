@@ -992,7 +992,7 @@ export const cart = ({
   };
 
   const createCheckoutRestItems: CartSDK["createCheckoutRestItems"] = async (
-    variantId: string,
+    variantId: string = "",
     quantity: number,
     tags?: string[],
     line_item?: any,
@@ -1008,6 +1008,7 @@ export const cart = ({
       },
     });
     const checkoutString = storage.getCheckout();
+    const linesToAddCheck = Array.isArray(linesToAdd) && linesToAdd?.length;
     const checkout: Checkout | null | undefined =
       checkoutString && typeof checkoutString === "string"
         ? JSON.parse(checkoutString)
@@ -1061,6 +1062,8 @@ export const cart = ({
               };
             }
           })
+        : linesToAddCheck
+        ? []
         : [
             {
               quantity: quantity,
@@ -1068,15 +1071,17 @@ export const cart = ({
             },
           ];
     } else {
-      checkoutLines = [
-        {
-          quantity: quantity,
-          variantId: dbVariantId,
-        },
-      ];
+      checkoutLines = linesToAddCheck
+        ? []
+        : [
+            {
+              quantity: quantity,
+              variantId: dbVariantId,
+            },
+          ];
     }
 
-    if (Array.isArray(linesToAdd) && linesToAdd?.length) {
+    if (linesToAddCheck) {
       linesToAdd?.forEach((line: any) => {
         const selectlineItems = checkoutLines?.find(
           (item: any) => line?.variantId === item?.variantId
@@ -1746,19 +1751,29 @@ export const cart = ({
         input
       );
       if (!res?.data?.token) {
-        await getLatestCheckout(client, checkout);
-        if (useCheckoutLoading) {
-          client.writeQuery({
-            query: GET_LOCAL_CHECKOUT,
-            data: {
-              checkoutLoading: false,
-            },
-          });
-        }
-        return {
-          data: null,
-          errors: res?.data?.checkoutLinesUpdate?.errors,
-        };
+        // await getLatestCheckout(client, checkout);
+        // if (useCheckoutLoading) {
+        //   client.writeQuery({
+        //     query: GET_LOCAL_CHECKOUT,
+        //     data: {
+        //       checkoutLoading: false,
+        //     },
+        //   });
+        // }
+        // return {
+        //   data: null,
+        //   errors: res?.data?.checkoutLinesUpdate?.errors,
+        // };
+        createCheckoutRestItems(
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          isRecalculate,
+          checkoutMetadataInput,
+          linesToAdd
+        );
       }
 
       if (res?.data?.token) {
