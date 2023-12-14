@@ -177,13 +177,7 @@ export const cart = ({
       },
     });
 
-    const checkoutString = storage.getCheckout();
-    const checkout =
-      checkoutString && typeof checkoutString === "string"
-        ? JSON.parse(checkoutString)
-        : checkoutString;
     try {
-      if (!(checkout && checkout?.id)) {
         const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
         const createCheckoutInput = {
           checkoutInput: {
@@ -231,9 +225,6 @@ export const cart = ({
         };
 
         return returnObject;
-      } else {
-        return null;
-      }
     } catch (error) {
       console.log(
         "Failed to create checkout, error in createCheckoutRest.",
