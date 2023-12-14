@@ -163,13 +163,13 @@ export const cart = ({
   restApiUrl,
 }: SaleorClientMethodsProps): CartSDK => {
   const items = cartItemsVar();
-  console.log("create checkout   ");
   const createCheckoutRest: CartSDK["createCheckoutRest"] = async (
     linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     tags?: string[],
     isRecalculate = false,
     checkoutMetadataInput?: any
   ) => {
+    console.log("create checkout");
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -2186,5 +2186,6 @@ export const cart = ({
     clearCart,
     updateItemWithLines,
     updateItemWithLinesRest,
+    createCheckoutRest,
   };
 };
