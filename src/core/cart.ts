@@ -163,7 +163,7 @@ export const cart = ({
   restApiUrl,
 }: SaleorClientMethodsProps): CartSDK => {
   const items = cartItemsVar();
-
+  console.log("create checkout   ");
   const createCheckoutRest: CartSDK["createCheckoutRest"] = async (
     linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     tags?: string[],
@@ -178,53 +178,53 @@ export const cart = ({
     });
 
     try {
-        const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
-        const createCheckoutInput = {
-          checkoutInput: {
-            lines: linesToAdd,
-            email: "dummy@dummy.com",
-            isRecalculate: isRecalculate,
-            ...(tags ? { tags: tags } : {}),
-            ...(checkoutMetadataInput
-              ? { checkoutMetadataInput: checkoutMetadataInput }
-              : {}),
+      const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
+      const createCheckoutInput = {
+        checkoutInput: {
+          lines: linesToAdd,
+          email: "dummy@dummy.com",
+          isRecalculate: isRecalculate,
+          ...(tags ? { tags: tags } : {}),
+          ...(checkoutMetadataInput
+            ? { checkoutMetadataInput: checkoutMetadataInput }
+            : {}),
+        },
+      };
+      const res = await axiosRequest(
+        fullUrl,
+        REST_API_METHODS_TYPES.POST,
+        createCheckoutInput
+      );
+
+      const createCheckoutRes = res?.data;
+      if (!res?.data?.token) {
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
           },
-        };
-        const res = await axiosRequest(
-          fullUrl,
-          REST_API_METHODS_TYPES.POST,
-          createCheckoutInput
-        );
-
-        const createCheckoutRes = res?.data;
-        if (!res?.data?.token) {
-          client.writeQuery({
-            query: GET_LOCAL_CHECKOUT,
-            data: {
-              checkoutLoading: false,
-            },
-          });
-          return {
-            data: res?.data || undefined,
-            errors: res?.data?.errors,
-          };
-        }
-
-        const updatedCheckout = {
-          ...dummyCheckoutFields,
-          ...createCheckoutRes,
-        };
-
-        storage.setCheckout(updatedCheckout);
-
-        getCheckoutPayments(client, updatedCheckout);
-
-        const returnObject = {
-          data: res.data,
+        });
+        return {
+          data: res?.data || undefined,
           errors: res?.data?.errors,
         };
+      }
 
-        return returnObject;
+      const updatedCheckout = {
+        ...dummyCheckoutFields,
+        ...createCheckoutRes,
+      };
+
+      storage.setCheckout(updatedCheckout);
+
+      getCheckoutPayments(client, updatedCheckout);
+
+      const returnObject = {
+        data: res.data,
+        errors: res?.data?.errors,
+      };
+
+      return returnObject;
     } catch (error) {
       console.log(
         "Failed to create checkout, error in createCheckoutRest.",
@@ -1197,7 +1197,7 @@ export const cart = ({
               errors: res?.data?.errors || [],
             };
           } else if (res?.data?.includes("Checkout ID not found")) {
-            console.log("response of error",res)
+            console.log("response of error", res);
             createCheckoutRest(
               lines,
               tags,
@@ -1434,7 +1434,7 @@ export const cart = ({
             );
 
             if (!res?.data?.token) {
-              console.log("response of error",res)
+              console.log("response of error", res);
               if (res?.data?.includes("Checkout ID not found")) {
                 createCheckoutRest(
                   lines,
@@ -1724,7 +1724,12 @@ export const cart = ({
       );
       if (!res?.data?.token) {
         if (res?.data?.includes("Checkout ID not found")) {
-          createCheckoutRest(linesToAdd, undefined, checkoutMetadataInput, isRecalculate);
+          createCheckoutRest(
+            linesToAdd,
+            undefined,
+            checkoutMetadataInput,
+            isRecalculate
+          );
         } else {
           await getLatestCheckout(client, checkout);
           if (useCheckoutLoading) {
