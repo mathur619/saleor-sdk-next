@@ -253,6 +253,8 @@ export const cart = ({
         lines: updatedLines,
       };
 
+      console.log("updatedCheckout",updatedCheckout)
+
       storage.setCheckout(updatedCheckout);
 
       getCheckoutPayments(client, updatedCheckout);
