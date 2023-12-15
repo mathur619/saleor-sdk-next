@@ -377,12 +377,14 @@ export const getCheckoutPayments = async (
     },
   });
 
+  console.log("checkoutPaymentDetailsNext",checkoutPaymentDetailsNext)
   if (checkoutPaymentDetailsNext.data.checkout?.token && checkout?.token) {
     const updatedCheckoutDetails = {
       ...checkout,
       ...checkoutPaymentDetailsNext.data.checkout,
     };
     storage.setCheckout(updatedCheckoutDetails);
+
 
     const res = {
       data: {

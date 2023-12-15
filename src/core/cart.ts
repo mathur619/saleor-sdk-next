@@ -255,6 +255,31 @@ export const cart = ({
 
       console.log("updatedCheckout",updatedCheckout)
 
+      const resDiscount = {
+        data: {
+          checkoutDiscounts: {
+            __typename: "DiscountsType",
+            prepaidDiscount:
+              updatedCheckout?.paymentMethod?.prepaidDiscountAmount,
+            couponDiscount: updatedCheckout?.paymentMethod?.couponDiscount,
+            cashbackDiscount:
+              updatedCheckout?.paymentMethod?.cashbackDiscountAmount,
+          },
+          cashback: updatedCheckout?.cashback,
+        },
+      };
+
+      storage.setDiscounts(resDiscount.data);
+
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          localCheckout: updatedCheckout,
+          localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+          localCashback: resDiscount.data.cashback,
+        },
+      });
+
       storage.setCheckout(updatedCheckout);
 
       getCheckoutPayments(client, updatedCheckout);
