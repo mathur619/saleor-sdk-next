@@ -176,7 +176,7 @@ export const cart = ({
         checkoutLoading: true,
       },
     });
-
+    storage.setCheckout({})
     try {
       const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
       const createCheckoutInput = {
@@ -551,8 +551,8 @@ export const cart = ({
               createCheckoutRest(
                 [],
                 undefined,
-                checkoutMetadataInput,
-                isRecalculate
+                isRecalculate,
+                checkoutMetadataInput
               );
             } else {
               await getLatestCheckout(client, checkout);
@@ -1201,8 +1201,8 @@ export const cart = ({
             createCheckoutRest(
               lines,
               tags,
-              checkoutMetadataInput,
-              isRecalculate
+              isRecalculate,  
+              checkoutMetadataInput
             );
           }
         }
@@ -1439,8 +1439,8 @@ export const cart = ({
                 createCheckoutRest(
                   lines,
                   undefined,
-                  checkoutMetadataInput,
-                  isRecalculate
+                  isRecalculate,
+                  checkoutMetadataInput
                 );
               } else {
                 await getLatestCheckout(client, checkout);
@@ -1727,8 +1727,8 @@ export const cart = ({
           createCheckoutRest(
             linesToAdd,
             undefined,
-            checkoutMetadataInput,
-            isRecalculate
+            isRecalculate,
+            checkoutMetadataInput
           );
         } else {
           await getLatestCheckout(client, checkout);
