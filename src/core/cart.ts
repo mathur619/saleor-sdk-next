@@ -150,7 +150,7 @@ export interface CartSDK {
     checkoutMetadataInput?: any
   ) => Promise<any>;
   createCheckoutRest?: (
-    linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
+    linesToAdd: Array<Maybe<CheckoutLineInput>>,
     tags?: string[],
     isRecalculate?: boolean,
     checkoutMetadataInput?: any
@@ -164,7 +164,7 @@ export const cart = ({
 }: SaleorClientMethodsProps): CartSDK => {
   const items = cartItemsVar();
   const createCheckoutRest: CartSDK["createCheckoutRest"] = async (
-    linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
+    linesToAdd: Array<Maybe<CheckoutLineInput>>,
     tags?: string[],
     isRecalculate = false,
     checkoutMetadataInput?: any
@@ -176,7 +176,7 @@ export const cart = ({
         checkoutLoading: true,
       },
     });
-    storage.setCheckout({})
+    storage.setCheckout({});
     try {
       const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.CREATE_CHECKOUT}`;
       const createCheckoutInput = {
@@ -210,9 +210,45 @@ export const cart = ({
         };
       }
 
+      const updatedLines = res?.data?.lines.map((line: any) => {
+        const productData = {
+          ...line.variant.product,
+          metadata: line?.variant?.product?.metadata || [],
+          tags: line?.variant?.product?.tags?.map((tagname: string) => ({
+            name: tagname,
+            __typename: "TagType",
+          })),
+        };
+
+        const quantityAvailableValue = line.variant.quantityAvailable || 50;
+
+        const updatedLineVariantAttributes = line?.variant?.attributes?.map(
+          (item: any) => {
+            return {
+              ...item,
+              values: item.values?.map((valueItem: any) => ({
+                ...valueItem,
+                value: valueItem.value || valueItem.name,
+              })),
+            };
+          }
+        );
+        const lineWithProduct = {
+          ...line,
+          variant: {
+            ...line.variant,
+            attributes: updatedLineVariantAttributes,
+            product: productData,
+            quantityAvailable: quantityAvailableValue,
+          },
+        };
+        return lineWithProduct;
+      });
+
       const updatedCheckout = {
         ...dummyCheckoutFields,
         ...createCheckoutRes,
+        lines: updatedLines,
       };
 
       storage.setCheckout(updatedCheckout);
@@ -1201,7 +1237,7 @@ export const cart = ({
             createCheckoutRest(
               lines,
               tags,
-              isRecalculate,  
+              isRecalculate,
               checkoutMetadataInput
             );
           }
