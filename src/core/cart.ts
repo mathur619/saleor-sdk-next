@@ -150,7 +150,7 @@ export interface CartSDK {
     checkoutMetadataInput?: any
   ) => Promise<any>;
   createCheckoutRest?: (
-    linesToAdd: Array<Maybe<CheckoutLineInput>>,
+    linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     tags?: string[],
     isRecalculate?: boolean,
     checkoutMetadataInput?: any
@@ -164,7 +164,7 @@ export const cart = ({
 }: SaleorClientMethodsProps): CartSDK => {
   const items = cartItemsVar();
   const createCheckoutRest: CartSDK["createCheckoutRest"] = async (
-    linesToAdd: Array<Maybe<CheckoutLineInput>>,
+    linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     tags?: string[],
     isRecalculate = false,
     checkoutMetadataInput?: any
