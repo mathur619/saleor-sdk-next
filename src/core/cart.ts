@@ -149,7 +149,7 @@ export interface CartSDK {
     isRecalculate?: boolean,
     checkoutMetadataInput?: any
   ) => Promise<any>;
-  createCheckoutRest?: (
+  createCheckoutCartRest?: (
     linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     tags?: string[],
     isRecalculate?: boolean,
@@ -163,13 +163,12 @@ export const cart = ({
   restApiUrl,
 }: SaleorClientMethodsProps): CartSDK => {
   const items = cartItemsVar();
-  const createCheckoutRest: CartSDK["createCheckoutRest"] = async (
+  const createCheckoutCartRest: CartSDK["createCheckoutCartRest"] = async (
     linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     tags?: string[],
     isRecalculate = false,
     checkoutMetadataInput?: any
   ) => {
-    console.log("create checkout");
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
@@ -253,8 +252,6 @@ export const cart = ({
         lines: updatedLines,
       };
 
-      console.log("updatedCheckout",updatedCheckout)
-
       const resDiscount = {
         data: {
           checkoutDiscounts: {
@@ -292,7 +289,7 @@ export const cart = ({
       return returnObject;
     } catch (error) {
       console.log(
-        "Failed to create checkout, error in createCheckoutRest.",
+        "Failed to create checkout, error in createCheckoutCartRest.",
         error
       );
       client.writeQuery({
@@ -613,7 +610,7 @@ export const cart = ({
 
           if (!res?.data?.token) {
             if (res?.data?.includes("Checkout ID not found")) {
-              createCheckoutRest(
+              createCheckoutCartRest(
                 [],
                 undefined,
                 isRecalculate,
@@ -1262,8 +1259,7 @@ export const cart = ({
               errors: res?.data?.errors || [],
             };
           } else if (res?.data?.includes("Checkout ID not found")) {
-            console.log("response of error", res);
-            createCheckoutRest(
+            createCheckoutCartRest(
               lines,
               tags,
               isRecalculate,
@@ -1499,9 +1495,8 @@ export const cart = ({
             );
 
             if (!res?.data?.token) {
-              console.log("response of error", res);
               if (res?.data?.includes("Checkout ID not found")) {
-                createCheckoutRest(
+                createCheckoutCartRest(
                   lines,
                   undefined,
                   isRecalculate,
@@ -1789,7 +1784,7 @@ export const cart = ({
       );
       if (!res?.data?.token) {
         if (res?.data?.includes("Checkout ID not found")) {
-          createCheckoutRest(
+          createCheckoutCartRest(
             linesToAdd,
             undefined,
             isRecalculate,
@@ -2251,6 +2246,6 @@ export const cart = ({
     clearCart,
     updateItemWithLines,
     updateItemWithLinesRest,
-    createCheckoutRest,
+    createCheckoutCartRest,
   };
 };
