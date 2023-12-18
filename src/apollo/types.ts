@@ -17319,7 +17319,8 @@ export type RazorpayError = {
 export type RazorpayErrorCodeEnum =
   | 'INVALID_AMOUNT'
   | 'INVALID_CURRENCY'
-  | 'INVALID';
+  | 'INVALID'
+  |  null;
 
 export type RazorpayOrderType = {
   /** Razorpay Order ID. */
@@ -22195,7 +22196,7 @@ export type CreateCheckoutPaymentMutationVariables = Exact<{
 }>;
 
 
-export type CreateCheckoutPaymentMutation = { checkoutPaymentCreate: Maybe<{ checkout: Maybe<CheckoutFragment>, payment: Maybe<PaymentFragment>, errors: Array<PaymentErrorFragment> }> };
+export type CreateCheckoutPaymentMutation = { checkoutPaymentCreate: Maybe<{ checkout: Maybe<CheckoutFragment>, payment: Maybe<PaymentFragment>, errors: Array<PaymentErrorFragment> } | null> };
 
 export type CompleteCheckoutMutationVariables = Exact<{
   checkoutId: Scalars['ID'];

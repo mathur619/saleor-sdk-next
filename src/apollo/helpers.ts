@@ -384,6 +384,7 @@ export const getCheckoutPayments = async (
     };
     storage.setCheckout(updatedCheckoutDetails);
 
+
     const res = {
       data: {
         checkoutDiscounts: {
