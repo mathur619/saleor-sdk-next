@@ -17319,7 +17319,8 @@ export type RazorpayError = {
 export type RazorpayErrorCodeEnum =
   | 'INVALID_AMOUNT'
   | 'INVALID_CURRENCY'
-  | 'INVALID';
+  | 'INVALID'
+  |  null;
 
 export type RazorpayOrderType = {
   /** Razorpay Order ID. */
