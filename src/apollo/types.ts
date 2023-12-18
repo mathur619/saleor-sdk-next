@@ -22196,7 +22196,7 @@ export type CreateCheckoutPaymentMutationVariables = Exact<{
 }>;
 
 
-export type CreateCheckoutPaymentMutation = { checkoutPaymentCreate: Maybe<{ checkout: Maybe<CheckoutFragment>, payment: Maybe<PaymentFragment>, errors: Array<PaymentErrorFragment> }> };
+export type CreateCheckoutPaymentMutation = { checkoutPaymentCreate: Maybe<{ checkout: Maybe<CheckoutFragment>, payment: Maybe<PaymentFragment>, errors: Array<PaymentErrorFragment> } | null> };
 
 export type CompleteCheckoutMutationVariables = Exact<{
   checkoutId: Scalars['ID'];
