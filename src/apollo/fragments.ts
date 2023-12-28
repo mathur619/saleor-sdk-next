@@ -42,6 +42,12 @@ export const userFragment = gql`
     tags {
       name
     }
+    extraData {
+      id
+      user
+      key
+      value
+    }
     orders (first: 2) {
       edges {
         node {
