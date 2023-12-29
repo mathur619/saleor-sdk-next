@@ -44,7 +44,6 @@ export const userFragment = gql`
     }
     extraData {
       id
-      user
       key
       value
     }
