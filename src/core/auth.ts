@@ -156,7 +156,7 @@ export interface AuthSDK {
    * @param includeUser - Whether to fetch user. Default false.
    * @returns Authorization token.
    */
-  refreshToken: (includeUser?: boolean, crftoken?:string | null, refreshtoken?:string | null) => Promise<RefreshTokenResult>;
+  refreshToken: (includeUser?: boolean, csrftoken?:string | null, refreshtoken?:string | null) => Promise<RefreshTokenResult>;
 
   /**
    * Registers user with email and password.
