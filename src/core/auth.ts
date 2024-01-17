@@ -156,7 +156,7 @@ export interface AuthSDK {
    * @param includeUser - Whether to fetch user. Default false.
    * @returns Authorization token.
    */
-  refreshToken: (includeUser?: boolean) => Promise<RefreshTokenResult>;
+  refreshToken: (includeUser?: boolean, csrftoken?:string | null, refreshtoken?:string | null) => Promise<RefreshTokenResult>;
 
   /**
    * Registers user with email and password.
@@ -860,9 +860,9 @@ export const auth = ({
   //     },
   //   });
 
-  const refreshToken: AuthSDK["refreshToken"] = (includeUser = false) => {
-    const csrfToken = storage.getCSRFToken();
-    const refreshToken = storage.getRefreshToken();
+  const refreshToken: AuthSDK["refreshToken"] = (includeUser = false, csrftoken = null, refreshtoken = null) => {
+    const csrfToken = !!csrftoken ? csrftoken : storage.getCSRFToken();
+    const refreshToken = !!refreshtoken ? refreshtoken : storage.getRefreshToken();
 
     if (!csrfToken) {
       throw Error("csrfToken not present");
