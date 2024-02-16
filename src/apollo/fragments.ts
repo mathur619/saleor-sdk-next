@@ -263,6 +263,15 @@ export const checkoutFragment = gql`
       currency
       amount
     }
+    cashback {
+      amount
+      willAddOn
+    }
+    paymentMethod {
+      cashbackDiscountAmount
+      couponDiscount
+      prepaidDiscountAmount
+    }
     discountName
     translatedDiscountName
     voucherCode
