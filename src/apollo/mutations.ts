@@ -831,8 +831,8 @@ export const REFRESH_CHECKOUT = gql`
 
 export const REORDER = gql`
   ${checkoutFragment}
-  mutation ReOrder($orderId: ID, $pincode: String, $skipLines: Boolean) {
-    reOrder(orderId: $orderId, pincode: $pincode, skipLines: $skipLines) {
+  mutation ReOrder($orderId: ID, $warehouseId: String, $attachUser:Boolean, $skipLines: Boolean) {
+    reOrder(orderId: $orderId, warehouseId: $warehouseId, attachUser: $attachUser, skipLines: $skipLines) {
       reorderErrors {
         field
         message

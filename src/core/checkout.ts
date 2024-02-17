@@ -835,8 +835,9 @@ export const checkout = ({
 
   const reOrder: CheckoutSDK["reOrder"] = async (
     orderId: string,
-    pincode: string,
-    skipLines: boolean
+    warehouseId: string,
+    skipLines: boolean,
+    attachUser: boolean,
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -849,8 +850,9 @@ export const checkout = ({
       mutation: REORDER,
       variables: {
         orderId: orderId,
-        pincode: pincode,
+        warehouseId: warehouseId,
         skipLines: skipLines,
+        attachUser: attachUser,
       },
       update: (_, { data }) => {
         if (data?.reOrder?.checkout?.id) {
