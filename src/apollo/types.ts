@@ -20975,7 +20975,8 @@ export type RefreshCheckoutMutation = { checkoutRefresh: Maybe<{ checkout: Maybe
 
 export type ReOrderMutationVariables = Exact<{
   orderId?: Maybe<Scalars['ID']>;
-  pincode?: Maybe<Scalars['String']>;
+  warehouseId?: Maybe<Scalars['String']>;
+  attachUser?:Maybe<Scalars['Boolean']>;
   skipLines?: Maybe<Scalars['Boolean']>;
 }>;
 

@@ -142,7 +142,8 @@ export interface CheckoutSDK {
   refreshCheckout?: () => RefreshCheckoutResult;
   reOrder?: (
     orderId: string,
-    pincode: string,
+    warehouseId: string,
+    attachUser: boolean,
     skipLines: boolean
   ) => ReOrderResult;
 }
@@ -837,7 +838,7 @@ export const checkout = ({
     orderId: string,
     warehouseId: string,
     skipLines: boolean,
-    attachUser: boolean,
+    attachUser: boolean
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
