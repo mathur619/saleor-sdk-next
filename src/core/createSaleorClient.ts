@@ -8,11 +8,13 @@ import { createStorage, storage } from "./storage";
 import { DEVELOPMENT_MODE, WINDOW_EXISTS } from "../constants";
 import { cart } from "./cart";
 import { checkout } from "./checkout";
+import { restSearchFunctions } from "./utils";
 
 export const createSaleorClient = ({
   apiUrl,
   channel,
   opts = {},
+  wizzyConfig,
 }: SaleorClientOpts): SaleorClient => {
   let _channel = channel;
   const { autologin = true, fetchOpts } = opts;
@@ -29,6 +31,7 @@ export const createSaleorClient = ({
   const userSDK = user(coreInternals);
   const cartSDK = cart(coreInternals);
   const checkoutSDK = checkout(coreInternals);
+  const RestSearchFunctionsSDK = restSearchFunctions({ ...wizzyConfig });
   const wishlistSDK = {};
   const walletSDK = {};
   if (autologin) {
