@@ -14,7 +14,7 @@ export const createSaleorClient = ({
   apiUrl,
   channel,
   opts = {},
-  wizzyConfig,
+  restApiUrl,
 }: SaleorClientOpts): SaleorClient => {
   let _channel = channel;
   const { autologin = true, fetchOpts } = opts;
@@ -31,7 +31,7 @@ export const createSaleorClient = ({
   const userSDK = user(coreInternals);
   const cartSDK = cart(coreInternals);
   const checkoutSDK = checkout(coreInternals);
-  const RestSearchFunctionsSDK = restSearchFunctions({ ...wizzyConfig });
+  const RestSearchFunctionsSDK = restSearchFunctions(coreInternals);
   const wishlistSDK = {};
   const walletSDK = {};
   if (autologin) {
