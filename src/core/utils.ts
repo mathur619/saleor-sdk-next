@@ -1,13 +1,13 @@
 import axios, { AxiosResponse } from "axios";
 
-export interface RestSearchFunctionsSDK {
+export interface RestApiFunctionsSDK {
   restSearchProducts: (
     queryOptions: any,
     options?: any
   ) => Promise<AxiosResponse<any, any> | null | undefined>;
 }
 
-export const restSearchFunctions = (restApiUrl: any): RestSearchFunctionsSDK => {
+export const restSearchFunctions = (restApiUrl: any): RestApiFunctionsSDK => {
   const restSearchProducts = async (queryOptions: any, options: any = {}) => {
     const { headers, baseUrl } = options;
     if (queryOptions && headers && baseUrl) {
