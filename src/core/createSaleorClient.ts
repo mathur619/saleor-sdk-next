@@ -8,7 +8,7 @@ import { createStorage, storage } from "./storage";
 import { DEVELOPMENT_MODE, WINDOW_EXISTS } from "../constants";
 import { cart } from "./cart";
 import { checkout } from "./checkout";
-import { restSearchFunctions } from "./utils";
+import { restApiFunction } from "./utils";
 
 export const createSaleorClient = ({
   apiUrl,
@@ -31,7 +31,7 @@ export const createSaleorClient = ({
   const userSDK = user(coreInternals);
   const cartSDK = cart(coreInternals);
   const checkoutSDK = checkout(coreInternals);
-  const RestSearchFunctionsSDK = restSearchFunctions(coreInternals);
+  const RestApiFunctionsSDK = restApiFunction(coreInternals);
   const wishlistSDK = {};
   const walletSDK = {};
   if (autologin) {

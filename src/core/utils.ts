@@ -1,18 +1,19 @@
 import axios, { AxiosResponse } from "axios";
 
-export interface RestApiFunctionsSDK {
+export interface RestApiFunctionSDK {
   restSearchProducts: (
     queryOptions: any,
     options?: any
   ) => Promise<AxiosResponse<any, any> | null | undefined>;
 }
 
-export const restSearchFunctions = (restApiUrl: any): RestApiFunctionsSDK => {
-  const restSearchProducts = async (queryOptions: any, options: any = {}) => {
-    const { headers, baseUrl } = options;
-    if (queryOptions && headers && baseUrl) {
+export const restApiFunction = (coreInternals: any): RestApiFunctionSDK => {
+  const restSearchProducts = async (queryOptions: any, parameters: any = {}) => {
+    const { headers, options } = parameters;
+    const { restApiUrl } = coreInternals;
+    if (queryOptions && headers && restApiUrl) {
       try {
-        const url = `${baseUrl}/rest/search_products/`;
+        const url = `${restApiUrl}/rest/search_products/`;
         const method = "POST";
         const response = await axios({
           url,

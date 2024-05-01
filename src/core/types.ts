@@ -83,7 +83,7 @@ import { CartSDK } from "./cart";
 import { CheckoutSDK } from "./checkout";
 import { WishlistSDK } from "./wishlist";
 import { WalletSDK } from "./wallet";
-import { RestApiFunctionsSDK } from "./utils";
+import { RestApiFunctionSDK } from "./utils";
 export interface SaleorClientInternals {
   apolloClient: ApolloClient<NormalizedCacheObject>;
 }
@@ -104,7 +104,7 @@ export interface SaleorClient {
   checkout: CheckoutSDK;
   wishlist: WishlistSDK;
   wallet: WalletSDK;
-  restSearchFunctions: RestApiFunctionsSDK;
+  restApiFunction: RestApiFunctionSDK;
 }
 
 interface SaleorClientFetchOpts {
