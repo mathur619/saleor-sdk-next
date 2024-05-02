@@ -50,6 +50,7 @@ export const createSaleorClient = ({
     cart: cartSDK,
     checkout: checkoutSDK,
     wishlist: wishlistSDK,
+    restApiFunctions: RestApiFunctionsSDK,
     wallet: walletSDK,
     config: { channel: _channel, setChannel, autologin },
     _internal: { apolloClient },
