@@ -104,7 +104,7 @@ export interface SaleorClient {
   checkout: CheckoutSDK;
   wishlist: WishlistSDK;
   wallet: WalletSDK;
-  restApiFunction: RestApiFunctionSDK;
+  restApiFunctions: RestApiFunctionSDK;
 }
 
 interface SaleorClientFetchOpts {
