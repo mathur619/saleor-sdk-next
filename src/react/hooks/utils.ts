@@ -1,3 +1,3 @@
 import { hookFactory } from "../helpers/hookFactory";
 
-export const useRestApiFunctions = hookFactory("restApiFunction");
+export const useRestApiFunctions = hookFactory("restApiFunctions");
