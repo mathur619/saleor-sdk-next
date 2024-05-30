@@ -412,7 +412,7 @@ export const UPDATE_ACCOUNT_ADDRESS = gql`
 // `;
 
 export const REQUEST_OTP_MUTATION = gql`
-  mutation OTPRequest($phone: String!, $type: String) {
+  mutation OTPRequestNew($phone: String!, $type: String) {
     RequestOTP: requestOtp(phone: $phone, type: $type) {
       message
       otpErrors {
