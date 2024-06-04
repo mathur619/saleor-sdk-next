@@ -142,6 +142,9 @@ export interface CartSDK {
     useCheckoutLoading?: boolean,
     isRecalculate?: boolean
   ) => UpdateItemResult;
+
+  checkCouponValidation: (couponCodes: Array<string>) => Promise<any>;
+
   updateItemWithLinesRest: (
     linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     updateShippingMethod?: boolean,
@@ -2002,6 +2005,38 @@ export const cart = ({
     }
   };
 
+  const checkCouponValidation: CartSDK["checkCouponValidation"] = async couponCodes => {
+    const checkoutString = storage.getCheckout();
+
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    let result: any = null;
+
+    if (checkout && checkout?.token) {
+      const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.VALIDATE_COUPON}`;
+      const input =
+        Array.isArray(couponCodes) && couponCodes.length ? couponCodes : [];
+      try {
+        const res = await axiosRequest(
+          fullUrl,
+          REST_API_METHODS_TYPES.POST,
+          input
+        );
+
+        if (res?.data) {
+          result = res.data;
+        }
+      } catch (err) {
+        console.log("coupon error:", err);
+      }
+    }
+
+    return result;
+  };
+
   const updateItemWithLines: CartSDK["updateItemWithLines"] = async (
     updatedLines: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     updateShippingMethod = true,
@@ -2248,5 +2283,6 @@ export const cart = ({
     updateItemWithLines,
     updateItemWithLinesRest,
     createCheckoutCartRest,
+    checkCouponValidation,
   };
 };
