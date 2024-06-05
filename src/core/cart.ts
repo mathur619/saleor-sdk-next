@@ -2017,8 +2017,13 @@ export const cart = ({
 
     if (checkout && checkout?.token) {
       const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.VALIDATE_COUPON}`;
-      const input =
+      const coupons =
         Array.isArray(couponCodes) && couponCodes.length ? couponCodes : [];
+      const input = {
+        checkoutId: checkout?.token,
+        codes: coupons,
+      };
+
       try {
         const res = await axiosRequest(
           fullUrl,
