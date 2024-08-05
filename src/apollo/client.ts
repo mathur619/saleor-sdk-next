@@ -20,6 +20,7 @@ import {
   // ExternalRefreshMutation,
   Maybe,
   RefreshTokenMutation,
+  WishlistItem,
 } from "./types";
 // import { UpdateCheckoutLine_checkoutLinesUpdate_checkout_lines } from "./cartTypes";
 
@@ -152,6 +153,7 @@ export const createFetch = ({
 };
 
 export const cartItemsVar = makeVar<Maybe<CheckoutLineFragment>[]>([]);
+export const wishlistItemsVar = makeVar<Maybe<WishlistItem>[]>([]);
 
 const getTypePolicies = (autologin: boolean): TypedTypePolicies => ({
   Query: {

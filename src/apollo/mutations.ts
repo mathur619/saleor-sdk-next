@@ -844,3 +844,424 @@ export const REORDER = gql`
     }
   }
 `;
+
+export const WISHLIST_ADD_PRODUCT = gql`
+  mutation wishlistAddProduct($productId: ID!) {
+    WishlistAddProduct: wishlistAddProduct(productId: $productId) {
+      wishlist {
+        id
+        wishlist {
+          id
+          createdAt
+          items(first: 20) {
+            edges {
+              node {
+                id
+                product {
+                  id
+                  name
+                  isPublished
+                  slug
+                  isAvailableForPurchase
+                  metadata {
+                    key
+                    value
+                  }
+                  thumbnail {
+                    url
+                  }
+                  images {
+                    id
+                    alt
+                    url
+                  }
+                  variants {
+                    id
+                    sku
+                    name
+                    attributes {
+                      attribute {
+                        name
+                      }
+                      values {
+                        name
+                      }
+                    }
+                    quantityAvailable(countryCode: IN)
+                    images {
+                      id
+                      url
+                      alt
+                    }
+                    pricing {
+                      onSale
+                      priceUndiscounted {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                      price {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                  productType{
+                    name
+                  }
+                  pricing {
+                    priceRangeUndiscounted {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                    priceRange {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const WISHLIST_REMOVE_PRODUCT = gql`
+  mutation wishlistRemoveProduct($productId: ID!) {
+    WishlistRemoveProduct: wishlistRemoveProduct(productId: $productId) {
+      wishlist {
+        id
+        wishlist {
+          id
+          createdAt
+          items(first: 20) {
+            edges {
+              node {
+                id
+                product {
+                  id
+                  name
+                  isPublished
+                  slug
+                  isAvailableForPurchase
+                  metadata {
+                    key
+                    value
+                  }
+                  thumbnail {
+                    url
+                  }
+                  images {
+                    id
+                    alt
+                    url
+                  }
+                  variants {
+                    id
+                    sku
+                    name
+                    attributes {
+                      attribute {
+                        name
+                      }
+                      values {
+                        name
+                      }
+                    }
+                    quantityAvailable(countryCode: IN)
+                    images {
+                      id
+                      url
+                      alt
+                    }
+                    pricing {
+                      onSale
+                      priceUndiscounted {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                      price {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                  productType{
+                    name
+                  }
+                  pricing {
+                    priceRangeUndiscounted {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                    priceRange {
+                      start {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                      stop {
+                        net {
+                          amount
+                          currency
+                        }
+                        gross {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const WISHLIST_ADD_VARIANT = gql`
+mutation wishlistAddVariant($variantId: ID!) {
+  WishlistAddVariant: wishlistAddVariant(variantId: $variantId) {
+    wishlist {
+      id
+      wishlist {
+        id
+        createdAt
+        items(first: 20) {
+          edges {
+            node {
+              id
+              product{
+                id
+                name
+                slug
+                isAvailableForPurchase
+              }
+              variants(first:20){
+                edges{
+                  node{
+                    id
+                    name
+                    sku
+                    attributes{
+                      attribute{
+                        name
+                      }
+                      values{
+                        name
+                      }
+                    }
+                    quantityAvailableByWarehouse
+                    quantityAvailable(countryCode:IN)
+                    images{
+                      id
+                      url
+                      alt
+                    }
+                    pricing {
+                    onSale
+                    priceUndiscounted {
+                      gross {
+                        amount
+                        currency
+                      }
+                      net {
+                        amount
+                        currency
+                      }
+                    }
+                    price {
+                      gross {
+                        amount
+                        currency
+                      }
+                      net {
+                        amount
+                        currency
+                      }
+                    }
+                  }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    errors: wishlistErrors {
+      code
+      field
+      message
+    }
+  }
+}
+`;
+
+export const WISHLIST_REMOVE_VARIANT = gql`
+  mutation wishlistRemoveVariant($variantId: ID!) {
+    WishlistRemoveVariant: wishlistRemoveVariant(variantId: $variantId) {
+      wishlist {
+        id
+        wishlist {
+          id
+          createdAt
+          items(first: 20) {
+            edges {
+              node {
+                id
+                product{
+                  id
+                  name
+                  slug
+                  isAvailableForPurchase
+                }
+                variants(first:20){
+                  edges{
+                    node{
+                      id
+                      name
+                      sku
+                      attributes{
+                        attribute{
+                          name
+                        }
+                        values{
+                          name
+                        }
+                      }
+                      quantityAvailableByWarehouse
+                      quantityAvailable(countryCode:IN)
+                      images{
+                        id
+                        url
+                        alt
+                      }
+                      pricing {
+                      onSale
+                      priceUndiscounted {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                      price {
+                        gross {
+                          amount
+                          currency
+                        }
+                        net {
+                          amount
+                          currency
+                        }
+                      }
+                    }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      errors: wishlistErrors {
+        code
+        field
+        message
+      }
+    }
+  }
+`;
+
