@@ -323,6 +323,17 @@ export type Address = Node & {
   isDefaultBillingAddress: Maybe<Scalars['Boolean']>;
 };
 
+export type MembershipEdge = {
+  id: Scalars['ID'],
+  isActive: Scalars['Boolean'],
+  membershipDiscount: Scalars['Int'],
+  membershipExpiry: Scalars['String'],
+  membershipPurchase: Scalars['String'],
+  membershipCashbackAmount: Scalars['Int'],
+  membershipAmount: Scalars['Int'],
+  usedVouchers: Array<Scalars['String']>
+};
+
 export type AddressCountableConnection = {
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
@@ -21691,7 +21702,10 @@ export type GlobalSearchType = {
   blogs: Maybe<Array<Maybe<BlogType>>>;
 };
 
+export type membershipHistory = Pick<MembershipEdge, 'id' | 'isActive' | 'membershipDiscount' | 'membershipExpiry' | 'membershipPurchase' | 'membershipCashbackAmount' | 'membershipAmount' | 'usedVouchers'>
+
 export type AccountErrorFragment = Pick<AccountError, 'code' | 'field' | 'message'>;
+
 
 export type AddressFragment = (
   Pick<Address, 'id' | 'firstName' | 'lastName' | 'companyName' | 'streetAddress1' | 'streetAddress2' | 'city' | 'cityArea' | 'postalCode' | 'countryArea' | 'phone' | 'isDefaultBillingAddress' | 'isDefaultShippingAddress'>
@@ -21700,7 +21714,7 @@ export type AddressFragment = (
 
 export type UserFragment = (
   Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'phone' | 'isStaff'>
-  & { tags: Array<Maybe<Pick<TagType, 'name'>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, defaultShippingAddress: Maybe<AddressFragment>, defaultBillingAddress: Maybe<AddressFragment>, addresses: Maybe<Array<Maybe<AddressFragment>>> }
+  & { tags: Array<Maybe<Pick<TagType, 'name'>>>, metadata: Array<Maybe<Pick<MetadataItem, 'key' | 'value'>>>, defaultShippingAddress: Maybe<AddressFragment>, defaultBillingAddress: Maybe<AddressFragment>, membershipHistory: Array<Maybe<membershipHistory>>, addresses: Maybe<Array<Maybe<AddressFragment>>> }
 );
 
 export type PriceFragment = { gross: Pick<Money, 'amount' | 'currency'>, net: Pick<Money, 'amount' | 'currency'> };
