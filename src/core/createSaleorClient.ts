@@ -9,6 +9,7 @@ import { DEVELOPMENT_MODE, WINDOW_EXISTS } from "../constants";
 import { cart } from "./cart";
 import { checkout } from "./checkout";
 import { restApiFunction } from "./utils";
+import { wishlist } from "./wishlist";
 
 export const createSaleorClient = ({
   apiUrl,
@@ -32,7 +33,7 @@ export const createSaleorClient = ({
   const cartSDK = cart(coreInternals);
   const checkoutSDK = checkout(coreInternals);
   const RestApiFunctionsSDK = restApiFunction(coreInternals);
-  const wishlistSDK = {};
+  const wishlistSDK = wishlist(coreInternals);
   const walletSDK = {};
   if (autologin) {
     const csrfToken = storage.getCSRFToken();
