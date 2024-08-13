@@ -7,11 +7,11 @@ export interface WishlistSDK {
 
   items?: any;
 
-  getWishlistItems?: () => {};
+  getWishlistItems?: (() => {}) | undefined;
   addVariantInWishlist?: (variantId: string) => Promise<{ data: any; wishlistErrors: any; errors: 
-    readonly GraphQLError[] | undefined; }>;
+    readonly GraphQLError[] | undefined; } | undefined>;
   removeVariantFromWishlist?: (variantId: string) => Promise<{ data: any; wishlistErrors: any; errors: 
-    readonly GraphQLError[] | undefined; }>;
+    readonly GraphQLError[] | undefined; } | undefined>;
 }
 
 export const wishlist = ({
