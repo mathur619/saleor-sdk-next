@@ -8,8 +8,7 @@ export interface WishlistSDK {
 
   items?: any;
 
-  getWishlistItems?: (first: number, warehouseId: string) => Promise<{ data: any; error: ApolloError 
-    | undefined; errors: readonly GraphQLError[] | undefined; }>;
+  getWishlistItems?: (first: number, warehouseId: string) => Promise<{ data: any; errors: readonly GraphQLError[] | undefined; }>;
   addVariantInWishlist?: (variantId: string) => Promise<{ data: any; wishlistErrors: any; errors: 
     readonly GraphQLError[] | undefined; } | undefined>;
   removeVariantFromWishlist?: (variantId: string) => Promise<{ data: any; wishlistErrors: any; errors: 
@@ -62,17 +61,16 @@ export const wishlist = ({
   };
 
   const getWishlistItems: WishlistSDK["getWishlistItems"] = async (first:number, warehouseId:string) => {
-    const res = await client.query<any,any>({
-      query: GET_WISHLIST,
+    const res = await client.mutate<any,any>({
+      mutation: GET_WISHLIST,
       variables: {
         first,
         warehouseId,
-      }
+      },
     });
 
     return {
       data: res?.data?.Wishlist?.wishlist,
-      error: res?.error,
       errors: res?.errors
     }
   }
