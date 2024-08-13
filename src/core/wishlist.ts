@@ -1,13 +1,15 @@
 import { GraphQLError } from "graphql";
 import { GET_WISHLIST, WISHLIST_ADD_VARIANT, WISHLIST_REMOVE_VARIANT, wishlistItemsVar } from "../apollo";
 import { SaleorClientMethodsProps } from "./types";
+import { ApolloError } from "@apollo/client";
 
 export interface WishlistSDK {
   loaded?: boolean;
 
   items?: any;
 
-  getWishlistItems?: (() => {}) | undefined;
+  getWishlistItems?: (first: number, warehouseId: string) => Promise<{ data: any; error: ApolloError 
+    | undefined; errors: readonly GraphQLError[] | undefined; }>;
   addVariantInWishlist?: (variantId: string) => Promise<{ data: any; wishlistErrors: any; errors: 
     readonly GraphQLError[] | undefined; } | undefined>;
   removeVariantFromWishlist?: (variantId: string) => Promise<{ data: any; wishlistErrors: any; errors: 
@@ -59,14 +61,17 @@ export const wishlist = ({
     }
   };
 
-  const getWishlistItems: WishlistSDK["getWishlistItems"] = async () => {
+  const getWishlistItems: WishlistSDK["getWishlistItems"] = async (first:number, warehouseId:string) => {
     const res = await client.query<any,any>({
       query: GET_WISHLIST,
+      variables: {
+        first,
+        warehouseId,
+      }
     });
 
     return {
       data: res?.data?.Wishlist?.wishlist,
-      wishlistErrors: res?.data?.Wishlist?.errors,
       error: res?.error,
       errors: res?.errors
     }

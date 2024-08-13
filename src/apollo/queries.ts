@@ -280,10 +280,5 @@ export const GET_WISHLIST = gql`
         }
       }
     }
-    errors: wishlistErrors{
-      code
-      field
-       message 
-    }
   }
 `;
