@@ -1,7 +1,6 @@
 import { GraphQLError } from "graphql";
 import { GET_WISHLIST, WISHLIST_ADD_VARIANT, WISHLIST_REMOVE_VARIANT, wishlistItemsVar } from "../apollo";
 import { SaleorClientMethodsProps } from "./types";
-import { ApolloError } from "@apollo/client";
 
 export interface WishlistSDK {
   loaded?: boolean;
