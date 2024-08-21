@@ -69,7 +69,7 @@ export const wishlist = ({
     });
 
     return {
-      data: res?.data?.Wishlist?.wishlist,
+      data: res?.data?.wishlist,
       errors: res?.errors
     }
   }
