@@ -187,6 +187,18 @@ export const cart = ({
           lines: linesToAdd,
           email: "dummy@dummy.com",
           isRecalculate: isRecalculate,
+          shippingAddress: {
+            city: "delhi",
+            companyName: "dummy",
+            country: "IN",
+            countryArea: "Delhi",
+            firstName: "dummy",
+            lastName: "dummy",
+            phone: "+917894561230",
+            postalCode: "110006",
+            streetAddress1: "dummy",
+            streetAddress2: "dummy",
+          },
           ...(tags ? { tags: tags } : {}),
           ...(checkoutMetadataInput
             ? { checkoutMetadataInput: checkoutMetadataInput }
@@ -1281,6 +1293,18 @@ export const cart = ({
                   email: "dummy@dummy.com",
                   isRecalculate: isRecalculate,
                   tags,
+                  shippingAddress: {
+                    city: "delhi",
+                    companyName: "dummy",
+                    country: "IN",
+                    countryArea: "Delhi",
+                    firstName: "dummy",
+                    lastName: "dummy",
+                    phone: "+917894561230",
+                    postalCode: "110006",
+                    streetAddress1: "dummy",
+                    streetAddress2: "dummy",
+                  },
                   ...(checkoutMetadataInput
                     ? { checkoutMetadataInput: checkoutMetadataInput }
                     : {}),
@@ -1291,6 +1315,18 @@ export const cart = ({
                   lines: [{ quantity: quantity, variantId: dbVariantId }],
                   email: "dummy@dummy.com",
                   isRecalculate: isRecalculate,
+                  shippingAddress: {
+                    city: "delhi",
+                    companyName: "dummy",
+                    country: "IN",
+                    countryArea: "Delhi",
+                    firstName: "dummy",
+                    lastName: "dummy",
+                    phone: "+917894561230",
+                    postalCode: "110006",
+                    streetAddress1: "dummy",
+                    streetAddress2: "dummy",
+                  },
                   ...(checkoutMetadataInput
                     ? { checkoutMetadataInput: checkoutMetadataInput }
                     : {}),
@@ -1892,6 +1928,18 @@ export const cart = ({
         checkoutInput: {
           lines: linesToAdd,
           email: "dummy@dummy.com",
+          shippingAddress: {
+            city: "delhi",
+            companyName: "dummy",
+            country: "IN",
+            countryArea: "Delhi",
+            firstName: "dummy",
+            lastName: "dummy",
+            phone: "+917894561230",
+            postalCode: "110006",
+            streetAddress1: "dummy",
+            streetAddress2: "dummy",
+          },
           ...(checkoutMetadataInput
             ? { checkoutMetadataInput: checkoutMetadataInput }
             : {}),
