@@ -15,7 +15,7 @@ export const useCheckoutState = () => {
   >(GET_LOCAL_CHECKOUT);
 
   const { data } = res;
-
+  console.log("checkout-sdk", data)
 
   if (!data) {
     // throw new Error(
