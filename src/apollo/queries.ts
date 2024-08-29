@@ -3,6 +3,7 @@ import {
   checkoutFragment,
   checkoutLineFragment,
   checkoutPriceFragment,
+  checkoutShippingMethodFragment,
   orderDetailFragment,
   userFragment,
 } from "./fragments";
@@ -50,12 +51,19 @@ export const CHECKOUT_DETAILS_NEXT = gql`
 
 export const CHECKOUT_PAYMENTS_NEXT = gql`
   ${checkoutPriceFragment}
+  ${checkoutShippingMethodFragment}
   query CheckoutPaymentsNext($token: UUID) {
     checkout(token: $token) {
       id
       token
       totalPrice {
         ...Price
+      }
+      availableShippingMethods {
+        ...ShippingMethod
+      }
+      shippingMethod {
+        ...ShippingMethod
       }
       cashback {
         amount
