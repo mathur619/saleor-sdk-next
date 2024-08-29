@@ -398,14 +398,6 @@ export const getCheckoutPayments = async (
       },
     };
     storage.setDiscounts(res.data);
-    console.log(
-      "update-sdk-getcheckoutpayment",
-      updatedCheckoutDetails,
-      "checkout",
-      checkout,
-      "checkoutpaymentdetails",
-      checkoutPaymentDetailsNext.data.checkout
-    );
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
       data: {
