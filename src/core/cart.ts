@@ -1240,6 +1240,14 @@ export const cart = ({
               ...res.data,
               lines: updatedLines,
             };
+            console.log(
+              "sdk-update-checkout",
+              checkout,
+              "res",
+              res,
+              "updatedCheckout",
+              updatedCheckout
+            );
             storage.setCheckout(updatedCheckout);
             const result = {
               data: {
@@ -1397,7 +1405,7 @@ export const cart = ({
             ...dummyCheckoutFields,
             ...createCheckoutResUpdated,
           };
-
+          console.log("sdk-create-checkout", updatedCheckout, createCheckoutCartRest)
           storage.setCheckout(updatedCheckout);
 
           const resDiscount = {
