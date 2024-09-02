@@ -8,7 +8,7 @@ import {
   makeVar,
 } from "@apollo/client";
 import fetch from "cross-fetch";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 import { TypedTypePolicies } from "./apollo-helpers";
 import { JWTToken } from "../core";
@@ -57,7 +57,7 @@ export const createFetch = ({
   tokenRefreshTimeSkew = 120,
   refreshOnUnauthorized = true,
 }: FetchConfig = {}) => async (
-  input: RequestInfo,
+  input: string | Request | URL,
   init: RequestInit = {}
 ): Promise<Response> => {
   function shouldThrottleRenew(renewTimeQueue: any) {

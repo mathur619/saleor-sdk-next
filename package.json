@@ -1,5 +1,5 @@
 {
-  "version": "0.4.1",
+  "version": "0.5.1",
   "license": "MIT",
   "homepage": "https://saleor.io/",
   "repository": {
@@ -25,6 +25,11 @@
   "engines": {
     "node": ">=10"
   },
+  "compilerOptions": {
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  },
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
@@ -38,9 +43,9 @@
     "release": "np"
   },
   "peerDependencies": {
-    "@apollo/client": "^3.3.19",
-    "graphql": "^15.5.0",
-    "react": "^16.8.0 || ^17.0.0"
+    "@apollo/client": "^3.11.5",
+    "graphql": "^16.9.0",
+    "react": "^18"
   },
   "husky": {
     "hooks": {
@@ -75,13 +80,13 @@
     }
   ],
   "devDependencies": {
-    "@apollo/client": "^3.3.19",
-    "@graphql-codegen/cli": "1.21.5",
-    "@graphql-codegen/introspection": "^1.18.2",
-    "@graphql-codegen/typescript": "^1.22.3",
-    "@graphql-codegen/typescript-apollo-client-helpers": "^1.1.9",
-    "@graphql-codegen/typescript-operations": "^1.18.2",
-    "@graphql-codegen/typescript-react-apollo": "^2.2.7",
+    "@apollo/client": "^3.11.5",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/introspection": "^4.0.3",
+    "@graphql-codegen/typescript": "^4.0.9",
+    "@graphql-codegen/typescript-apollo-client-helpers": "^3.0.0",
+    "@graphql-codegen/typescript-operations": "^4.2.3",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.0",
     "@pollyjs/adapter-node-http": "^5.1.1",
     "@pollyjs/core": "^5.1.1",
     "@pollyjs/persister-fs": "^5.1.1",
@@ -93,15 +98,15 @@
     "@types/react": "^17.0.6",
     "@types/setup-polly-jest": "^0.5.1",
     "eslint-plugin-tsdoc": "^0.2.14",
-    "graphql": "^15.5.1",
+    "graphql": "^16.9.0",
     "husky": "^6.0.0",
     "jest": "^27.0.5",
     "jsonwebtoken": "^8.5.1",
     "msw": "^0.35.0",
     "np": "^7.5.0",
     "omit-deep-lodash": "^1.1.5",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18",
+    "react-dom": "^18",
     "setup-polly-jest": "^0.9.1",
     "size-limit": "^4.10.2",
     "ts-jest": "^27.0.3",
@@ -110,8 +115,8 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "axios": "^1.4.0",
-    "cross-fetch": "^3.1.4",
-    "jwt-decode": "^3.1.2"
+    "axios": "^1.7.7",
+    "cross-fetch": "^4.0.0",
+    "jwt-decode": "^4.0.0"
   }
 }
