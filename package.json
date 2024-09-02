@@ -98,7 +98,7 @@
     "@types/react": "^17.0.6",
     "@types/setup-polly-jest": "^0.5.1",
     "eslint-plugin-tsdoc": "^0.2.14",
-    "graphql": "^16.9.0",
+    "graphql": "^15.9.0",
     "husky": "^6.0.0",
     "jest": "^27.0.5",
     "jsonwebtoken": "^8.5.1",
