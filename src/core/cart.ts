@@ -301,7 +301,10 @@ export const cart = ({
           checkoutLoading: false,
         },
       });
-      return null;
+      return {
+        data: null,
+        errors: error,
+      };
     }
   };
 
@@ -1162,116 +1165,131 @@ export const cart = ({
 
     try {
       if (checkout && checkout?.token) {
-        const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
-        const lines = [
-          {
-            quantity: quantity,
-            variantId: String(dbVariantId),
-          },
-        ];
-        if (dbVariantId && quantity) {
-          const input = {
-            checkoutId: checkout?.token,
-            lines,
-            isRecalculate,
-            ...(checkoutMetadataInput
-              ? { checkoutMetadataInput: checkoutMetadataInput }
-              : {}),
-          };
-          const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.ADD_TO_CART}`;
-          const res = await axiosRequest(
-            fullUrl,
-            REST_API_METHODS_TYPES.POST,
-            input
-          );
-
-          if (res?.data?.token) {
-            const updatedLines = res?.data?.lines.map((line: any) => {
-              const productData = {
-                ...line.variant.product,
-                metadata: line?.variant?.product?.metadata || [],
-                tags: line?.variant?.product?.tags?.map((tagname: string) => ({
-                  name: tagname,
-                  __typename: "TagType",
-                })),
-              };
-              const quantityAvailableValue =
-                line?.variant?.id === variantId &&
-                line_item?.variant?.quantityAvailable
-                  ? line_item?.variant?.quantityAvailable
-                  : line.variant.quantityAvailable || 50;
-
-              const updatedLineVariantAttributes = line?.variant?.attributes?.map(
-                (item: any) => {
-                  return {
-                    ...item,
-                    values: item.values?.map((valueItem: any) => ({
-                      ...valueItem,
-                      value: valueItem.value || valueItem.name,
-                    })),
-                  };
-                }
-              );
-              const lineWithProduct = {
-                ...line,
-                variant: {
-                  ...line.variant,
-                  attributes: updatedLineVariantAttributes,
-                  product: productData,
-                  quantityAvailable: quantityAvailableValue,
-                },
-              };
-              return lineWithProduct;
-            });
-            const updatedCheckout = {
-              ...checkout,
-              ...res.data,
-              lines: updatedLines,
-            };
-            storage.setCheckout(updatedCheckout);
-            const result = {
-              data: {
-                checkoutDiscounts: {
-                  __typename: "DiscountsType",
-                  prepaidDiscount:
-                    updatedCheckout?.paymentMethod?.prepaidDiscountAmount,
-                  couponDiscount:
-                    updatedCheckout?.paymentMethod?.couponDiscount,
-                  cashbackDiscount:
-                    updatedCheckout?.paymentMethod?.cashbackDiscountAmount,
-                },
-                cashback: updatedCheckout?.cashback,
-              },
-            };
-
-            storage.setDiscounts(result.data);
-
-            client.writeQuery({
-              query: GET_LOCAL_CHECKOUT,
-              data: {
-                localCheckout: updatedCheckout,
-                localCheckoutDiscounts: result.data.checkoutDiscounts,
-                localCashback: result.data.cashback,
-                checkoutLoading: false,
-              },
-            });
-
-            getCheckoutPayments(client, updatedCheckout);
-
-            return {
-              data: updatedCheckout,
-              errors: res?.data?.errors || [],
-            };
-          } else if (res?.data?.includes("Checkout ID not found")) {
-            createCheckoutCartRest(
+        try {
+          const dbVariantId = getDBIdFromGraphqlId(variantId, "ProductVariant");
+          const lines = [
+            {
+              quantity: quantity,
+              variantId: String(dbVariantId),
+            },
+          ];
+          if (dbVariantId && quantity) {
+            const input = {
+              checkoutId: checkout?.token,
               lines,
-              tags,
               isRecalculate,
-              checkoutMetadataInput
+              ...(checkoutMetadataInput
+                ? { checkoutMetadataInput: checkoutMetadataInput }
+                : {}),
+            };
+            const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.ADD_TO_CART}`;
+            const res = await axiosRequest(
+              fullUrl,
+              REST_API_METHODS_TYPES.POST,
+              input
             );
-          } else {
-            return res;
+
+            if (res?.data?.token) {
+              const updatedLines = res?.data?.lines.map((line: any) => {
+                const productData = {
+                  ...line.variant.product,
+                  metadata: line?.variant?.product?.metadata || [],
+                  tags: line?.variant?.product?.tags?.map((tagname: string) => ({
+                    name: tagname,
+                    __typename: "TagType",
+                  })),
+                };
+                const quantityAvailableValue =
+                  line?.variant?.id === variantId &&
+                  line_item?.variant?.quantityAvailable
+                    ? line_item?.variant?.quantityAvailable
+                    : line.variant.quantityAvailable || 50;
+  
+                const updatedLineVariantAttributes = line?.variant?.attributes?.map(
+                  (item: any) => {
+                    return {
+                      ...item,
+                      values: item.values?.map((valueItem: any) => ({
+                        ...valueItem,
+                        value: valueItem.value || valueItem.name,
+                      })),
+                    };
+                  }
+                );
+                const lineWithProduct = {
+                  ...line,
+                  variant: {
+                    ...line.variant,
+                    attributes: updatedLineVariantAttributes,
+                    product: productData,
+                    quantityAvailable: quantityAvailableValue,
+                  },
+                };
+                return lineWithProduct;
+              });
+              const updatedCheckout = {
+                ...checkout,
+                ...res.data,
+                lines: updatedLines,
+              };
+              storage.setCheckout(updatedCheckout);
+              const result = {
+                data: {
+                  checkoutDiscounts: {
+                    __typename: "DiscountsType",
+                    prepaidDiscount:
+                      updatedCheckout?.paymentMethod?.prepaidDiscountAmount,
+                    couponDiscount:
+                      updatedCheckout?.paymentMethod?.couponDiscount,
+                    cashbackDiscount:
+                      updatedCheckout?.paymentMethod?.cashbackDiscountAmount,
+                  },
+                  cashback: updatedCheckout?.cashback,
+                },
+              };
+  
+              storage.setDiscounts(result.data);
+  
+              client.writeQuery({
+                query: GET_LOCAL_CHECKOUT,
+                data: {
+                  localCheckout: updatedCheckout,
+                  localCheckoutDiscounts: result.data.checkoutDiscounts,
+                  localCashback: result.data.cashback,
+                  checkoutLoading: false,
+                },
+              });
+  
+              getCheckoutPayments(client, updatedCheckout);
+  
+              return {
+                data: updatedCheckout,
+                errors: res?.data?.errors || [],
+              };
+            } else if (res?.data?.includes("Checkout ID not found")) {
+              createCheckoutCartRest(
+                lines,
+                tags,
+                isRecalculate,
+                checkoutMetadataInput
+              );
+            }
           }
+        } catch (error) {
+          console.log(
+            "Failed to add product in cart, error in atc rest.",
+            error
+          );
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+          return {
+            data: null,
+            errors: error,
+          };
         }
       } else {
         try {
@@ -1610,12 +1628,21 @@ export const cart = ({
             }
           }
         } catch (error) {
+          console.log(
+            "Failed to update product in cart, error in udpate rest.",
+            error
+          );
+
           client.writeQuery({
             query: GET_LOCAL_CHECKOUT,
             data: {
               checkoutLoading: false,
             },
           });
+          return {
+            data: null,
+            errors: error,
+          };
         }
 
         client.writeQuery({
@@ -1774,122 +1801,139 @@ export const cart = ({
         : checkoutString;
 
     if (checkout && checkout?.token && linesToAdd) {
-      const input = {
-        checkoutId: checkout?.token,
-        lines: linesToAdd,
-        isRecalculate,
-        ...(checkoutMetadataInput
-          ? { checkoutMetadataInput: checkoutMetadataInput }
-          : {}),
-      };
+      try {
+        const input = {
+          checkoutId: checkout?.token,
+          lines: linesToAdd,
+          isRecalculate,
+          ...(checkoutMetadataInput
+            ? { checkoutMetadataInput: checkoutMetadataInput }
+            : {}),
+        };
 
-      const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.UPDATE_CART}`;
-      const res = await axiosRequest(
-        fullUrl,
-        REST_API_METHODS_TYPES.POST,
-        input
-      );
-      if (!res?.data?.token) {
-        if (res?.data?.includes("Checkout ID not found")) {
-          createCheckoutCartRest(
-            linesToAdd,
-            undefined,
-            isRecalculate,
-            checkoutMetadataInput
-          );
-        } else {
-          await getLatestCheckout(client, checkout);
-          if (useCheckoutLoading) {
-            client.writeQuery({
-              query: GET_LOCAL_CHECKOUT,
-              data: {
-                checkoutLoading: false,
-              },
-            });
-          }
-          return {
-            data: null,
-            errors: res?.data?.checkoutLinesUpdate?.errors,
-          };
-        }
-      }
-
-      if (res?.data?.token) {
-        const updatedLines = res?.data?.lines.map((line: any) => {
-          const productData = {
-            ...line.variant.product,
-            metadata: line?.variant?.product?.metadata || [],
-            tags: line?.variant?.product?.tags?.map((tagname: string) => ({
-              name: tagname,
-              __typename: "TagType",
-            })),
-          };
-          const quantityAvailableValue = line.variant.quantityAvailable || 50;
-
-          const updatedLineVariantAttributes = line?.variant?.attributes?.map(
-            (item: any) => {
-              return {
-                ...item,
-                values: item.values?.map((valueItem: any) => ({
-                  ...valueItem,
-                  value: valueItem.value || valueItem.name,
-                })),
-              };
+        const fullUrl = `${restApiUrl}${REST_API_ENDPOINTS.UPDATE_CART}`;
+        const res = await axiosRequest(
+          fullUrl,
+          REST_API_METHODS_TYPES.POST,
+          input
+        );
+        if (!res?.data?.token) {
+          if (res?.data?.includes("Checkout ID not found")) {
+            createCheckoutCartRest(
+              linesToAdd,
+              undefined,
+              isRecalculate,
+              checkoutMetadataInput
+            );
+          } else {
+            await getLatestCheckout(client, checkout);
+            if (useCheckoutLoading) {
+              client.writeQuery({
+                query: GET_LOCAL_CHECKOUT,
+                data: {
+                  checkoutLoading: false,
+                },
+              });
             }
-          );
+            return {
+              data: null,
+              errors: res?.data?.checkoutLinesUpdate?.errors,
+            };
+          }
+        }
 
-          const lineWithProduct = {
-            ...line,
-            variant: {
-              ...line.variant,
-              attributes: updatedLineVariantAttributes,
-              product: productData,
-              quantityAvailable: quantityAvailableValue,
+        if (res?.data?.token) {
+          const updatedLines = res?.data?.lines.map((line: any) => {
+            const productData = {
+              ...line.variant.product,
+              metadata: line?.variant?.product?.metadata || [],
+              tags: line?.variant?.product?.tags?.map((tagname: string) => ({
+                name: tagname,
+                __typename: "TagType",
+              })),
+            };
+            const quantityAvailableValue = line.variant.quantityAvailable || 50;
+  
+            const updatedLineVariantAttributes = line?.variant?.attributes?.map(
+              (item: any) => {
+                return {
+                  ...item,
+                  values: item.values?.map((valueItem: any) => ({
+                    ...valueItem,
+                    value: valueItem.value || valueItem.name,
+                  })),
+                };
+              }
+            );
+  
+            const lineWithProduct = {
+              ...line,
+              variant: {
+                ...line.variant,
+                attributes: updatedLineVariantAttributes,
+                product: productData,
+                quantityAvailable: quantityAvailableValue,
+              },
+            };
+            return lineWithProduct;
+          });
+          const updatedCheckout = {
+            ...checkout,
+            ...res.data,
+            lines: updatedLines,
+          };
+  
+          storage.setCheckout(updatedCheckout);
+  
+          const resDiscount = {
+            data: {
+              __typename: "DiscountsType",
+              checkoutDiscounts: {
+                prepaidDiscount:
+                  updatedCheckout?.paymentMethod?.prepaidDiscountAmount,
+                couponDiscount: updatedCheckout?.paymentMethod?.couponDiscount,
+                cashbackDiscount:
+                  updatedCheckout?.paymentMethod?.cashbackDiscountAmount,
+              },
+              cashback: updatedCheckout?.cashback,
             },
           };
-          return lineWithProduct;
-        });
-        const updatedCheckout = {
-          ...checkout,
-          ...res.data,
-          lines: updatedLines,
-        };
-
-        storage.setCheckout(updatedCheckout);
-
-        const resDiscount = {
-          data: {
-            __typename: "DiscountsType",
-            checkoutDiscounts: {
-              prepaidDiscount:
-                updatedCheckout?.paymentMethod?.prepaidDiscountAmount,
-              couponDiscount: updatedCheckout?.paymentMethod?.couponDiscount,
-              cashbackDiscount:
-                updatedCheckout?.paymentMethod?.cashbackDiscountAmount,
+  
+          storage.setDiscounts(resDiscount.data);
+  
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              localCheckout: updatedCheckout,
+              localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
+              localCashback: resDiscount.data.cashback,
             },
-            cashback: updatedCheckout?.cashback,
-          },
+          });
+          getCheckoutPayments(client, updatedCheckout);
+          if (updateShippingMethod) {
+            await setLocalCheckoutInCache(client, updatedCheckout, true);
+          }
+        }
+        return {
+          data: res?.data,
+          errors: res.data?.errors,
         };
-
-        storage.setDiscounts(resDiscount.data);
-
+      } catch (error) {
+        console.log(
+          "Failed to update products in cart, error in updateItemWithLinesRest rest.",
+          error
+        );
         client.writeQuery({
           query: GET_LOCAL_CHECKOUT,
           data: {
-            localCheckout: updatedCheckout,
-            localCheckoutDiscounts: resDiscount.data.checkoutDiscounts,
-            localCashback: resDiscount.data.cashback,
+            checkoutLoading: false,
           },
         });
-        getCheckoutPayments(client, updatedCheckout);
-        if (updateShippingMethod) {
-          await setLocalCheckoutInCache(client, updatedCheckout, true);
-        }
+        return {
+          data: null,
+          errors: error,
+        };
       }
-      return {
-        data: res?.data,
-        errors: res.data?.errors,
-      };
     } else {
       const createCheckoutInput = {
         checkoutInput: {
