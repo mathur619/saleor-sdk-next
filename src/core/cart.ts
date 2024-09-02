@@ -166,7 +166,6 @@ export const cart = ({
   restApiUrl,
 }: SaleorClientMethodsProps): CartSDK => {
   const items = cartItemsVar();
-  
   const createCheckoutCartRest: CartSDK["createCheckoutCartRest"] = async (
     linesToAdd: Array<Maybe<CheckoutLineInput>> | Maybe<CheckoutLineInput>,
     tags?: string[],
@@ -458,8 +457,7 @@ export const cart = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
     const lineToRemove =
-      checkout &&
-      checkout?.lines?.find((line) => line?.variant.id === variantId);
+      checkout && checkout?.lines?.find(line => line?.variant.id === variantId);
     const lineToRemoveId = lineToRemove?.id;
 
     if (checkout && checkout?.token) {
@@ -646,8 +644,8 @@ export const cart = ({
                 })),
               };
 
-              const updatedLineVariantAttributes =
-                line?.variant?.attributes?.map((item: any) => {
+              const updatedLineVariantAttributes = line?.variant?.attributes?.map(
+                (item: any) => {
                   return {
                     ...item,
                     values: item.values?.map((valueItem: any) => ({
@@ -655,7 +653,8 @@ export const cart = ({
                       value: valueItem.value || valueItem.name,
                     })),
                   };
-                });
+                }
+              );
               const lineWithProduct = {
                 ...line,
                 variant: {
@@ -1202,8 +1201,8 @@ export const cart = ({
                   ? line_item?.variant?.quantityAvailable
                   : line.variant.quantityAvailable || 50;
 
-              const updatedLineVariantAttributes =
-                line?.variant?.attributes?.map((item: any) => {
+              const updatedLineVariantAttributes = line?.variant?.attributes?.map(
+                (item: any) => {
                   return {
                     ...item,
                     values: item.values?.map((valueItem: any) => ({
@@ -1211,7 +1210,8 @@ export const cart = ({
                       value: valueItem.value || valueItem.name,
                     })),
                   };
-                });
+                }
+              );
               const lineWithProduct = {
                 ...line,
                 variant: {
@@ -1269,6 +1269,8 @@ export const cart = ({
               isRecalculate,
               checkoutMetadataInput
             );
+          } else {
+            return res;
           }
         }
       } else {
@@ -1539,8 +1541,8 @@ export const cart = ({
                     ? line_item?.variant?.quantityAvailable
                     : line.variant.quantityAvailable || 50;
 
-                const updatedLineVariantAttributes =
-                  line?.variant?.attributes?.map((item: any) => {
+                const updatedLineVariantAttributes = line?.variant?.attributes?.map(
+                  (item: any) => {
                     return {
                       ...item,
                       values: item.values?.map((valueItem: any) => ({
@@ -1548,7 +1550,8 @@ export const cart = ({
                         value: valueItem.value || valueItem.name,
                       })),
                     };
-                  });
+                  }
+                );
 
                 const lineWithProduct = {
                   ...line,
