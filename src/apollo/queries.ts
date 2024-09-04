@@ -224,6 +224,10 @@ export const GET_WISHLIST = gql`
               id
               isAvailableForPurchase
               slug
+              metadata {
+                key
+                value
+              }
             }
             variants(first:$first){
               edges{
