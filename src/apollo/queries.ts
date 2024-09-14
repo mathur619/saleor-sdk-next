@@ -286,3 +286,11 @@ export const GET_WISHLIST = gql`
     }
   }
 `;
+
+export const ADD_TAGS = gql`
+  mutation AddTags($id: ID!, $tags: [String!]!) {
+    addTags(id: $id, tags: $tags) {
+      message
+    }
+  }
+`;

@@ -17,6 +17,7 @@ import {
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
 } from "../apollo/mutations";
 import {
+  ADD_TAGS,
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
 } from "../apollo/queries";
@@ -146,6 +147,7 @@ export interface CheckoutSDK {
     attachUser: boolean,
     skipLines: boolean
   ) => ReOrderResult;
+  addTagsInCheckout?: (tag: string) => void;
 }
 
 export const checkout = ({
@@ -875,7 +877,37 @@ export const checkout = ({
     return res;
   };
 
+  const addTagsInCheckout = async (tag: string) => {
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables = {
+        checkoutId: checkout?.id,
+        tags: [tag],
+      };
+      await client.mutate({
+        mutation: ADD_TAGS,
+        variables,
+        update: (_, { data }) => {
+          if (data?.checkoutAddTags?.checkout?.id) {
+            storage.setCheckout(data?.checkoutAddTags?.checkout);
+          }
+          setLocalCheckoutInCache(
+            client,
+            data?.checkoutAddTags?.checkout,
+            true
+          );
+        },
+      });
+    }
+  };
+
   return {
+    addTagsInCheckout,
     createCheckout,
     setShippingAddress,
     setBillingAddress,
