@@ -296,7 +296,7 @@ export const ADD_TAGS = gql`
 `;
 
 export const REMOVE_TAGS = gql`
-  mutation removeTags($id: ID!, $tags: [String!]!) {
+  mutation RemoveTags($id: ID!, $tags: [String!]!) {
     removeTags(id: $id, tags: $tags) {
       message
     }

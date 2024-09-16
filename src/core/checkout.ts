@@ -925,22 +925,26 @@ export const checkout = ({
         id: checkout?.id,
         tags: tags,
       };
-      await client.mutate({
-        mutation: REMOVE_TAGS,
-        variables,
-      });
-      await client.mutate<
-        UserCheckoutDetailsQuery,
-        UserCheckoutDetailsQueryVariables
-      >({
-        mutation: USER_CHECKOUT_DETAILS,
-        update: (_, { data }) => {
-          setLocalCheckoutInCache(client, data?.me?.checkout, true);
-          if (data?.me?.checkout?.id) {
-            storage.setCheckout(data?.me?.checkout);
-          }
-        },
-      });
+      try {
+        await client.mutate({
+          mutation: REMOVE_TAGS,
+          variables,
+        });
+        await client.mutate<
+          UserCheckoutDetailsQuery,
+          UserCheckoutDetailsQueryVariables
+        >({
+          mutation: USER_CHECKOUT_DETAILS,
+          update: (_, { data }) => {
+            setLocalCheckoutInCache(client, data?.me?.checkout, true);
+            if (data?.me?.checkout?.id) {
+              storage.setCheckout(data?.me?.checkout);
+            }
+          },
+        });
+      } catch (error) {
+        console.log("this is sdk ashar", error);
+      }
     }
   };
 
