@@ -18,6 +18,7 @@ import {
 } from "../apollo/mutations";
 import {
   ADD_TAGS,
+  CHECKOUT_DETAILS,
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
 } from "../apollo/queries";
@@ -147,7 +148,7 @@ export interface CheckoutSDK {
     attachUser: boolean,
     skipLines: boolean
   ) => ReOrderResult;
-  addTagsInCheckout?: (tag: string) => void;
+  addTagsInCheckout?: (tag: string[]) => void;
 }
 
 export const checkout = ({
@@ -877,7 +878,7 @@ export const checkout = ({
     return res;
   };
 
-  const addTagsInCheckout = async (tag: string) => {
+  const addTagsInCheckout = async (tags: string[]) => {
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null | undefined =
       checkoutString && typeof checkoutString === "string"
@@ -886,23 +887,20 @@ export const checkout = ({
 
     if (checkout && checkout?.id) {
       const variables = {
-        checkoutId: checkout?.id,
-        tags: [tag],
+        id: checkout?.id,
+        tags: tags,
       };
       await client.mutate({
         mutation: ADD_TAGS,
         variables,
-        update: (_, { data }) => {
-          if (data?.checkoutAddTags?.checkout?.id) {
-            storage.setCheckout(data?.checkoutAddTags?.checkout);
-          }
-          setLocalCheckoutInCache(
-            client,
-            data?.checkoutAddTags?.checkout,
-            true
-          );
-        },
       });
+      const response = await client.query({
+        query: CHECKOUT_DETAILS,
+      });
+      if(response?.data?.checkout){
+        storage.setCheckout(response?.data?.checkout);
+        setLocalCheckoutInCache(client, response?.data?.checkout, true);
+      }
     }
   };
 
