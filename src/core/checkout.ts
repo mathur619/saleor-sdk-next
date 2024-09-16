@@ -898,6 +898,7 @@ export const checkout = ({
         query: CHECKOUT_DETAILS,
       });
       if(response?.data?.checkout){
+        console.log("this is tag response", response);
         storage.setCheckout(response?.data?.checkout);
         setLocalCheckoutInCache(client, response?.data?.checkout, true);
       }
