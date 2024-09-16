@@ -18,9 +18,9 @@ import {
 } from "../apollo/mutations";
 import {
   ADD_TAGS,
+  USER_CHECKOUT_DETAILS,
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
-  USER_CHECKOUT_DETAILS,
 } from "../apollo/queries";
 import {
   AddCheckoutPromoCodeMutation,
@@ -61,6 +61,8 @@ import {
   UpdateCheckoutShippingMethodMutation,
   UpdateCheckoutShippingMethodMutationVariables,
   useOrdersByUserQuery,
+  UserCheckoutDetailsQuery,
+  UserCheckoutDetailsQueryVariables,
 } from "../apollo/types";
 
 import {
@@ -894,14 +896,18 @@ export const checkout = ({
         mutation: ADD_TAGS,
         variables,
       });
-      const response = await client.query({
-        query: USER_CHECKOUT_DETAILS,
+      await client.mutate<
+        UserCheckoutDetailsQuery,
+        UserCheckoutDetailsQueryVariables
+      >({
+        mutation: USER_CHECKOUT_DETAILS,
+        update: (_, { data }) => {
+          setLocalCheckoutInCache(client, data?.me?.checkout, true);
+          if (data?.me?.checkout?.id) {
+            storage.setCheckout(data?.me?.checkout);
+          }
+        },
       });
-      console.log("this is tag response", response);
-      if(response?.data?.checkout){
-        storage.setCheckout(response?.data?.checkout);
-        setLocalCheckoutInCache(client, response?.data?.checkout, true);
-      }
     }
   };
 
