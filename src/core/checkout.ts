@@ -18,9 +18,9 @@ import {
 } from "../apollo/mutations";
 import {
   ADD_TAGS,
-  CHECKOUT_DETAILS,
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
+  USER_CHECKOUT_DETAILS,
 } from "../apollo/queries";
 import {
   AddCheckoutPromoCodeMutation,
@@ -895,10 +895,10 @@ export const checkout = ({
         variables,
       });
       const response = await client.query({
-        query: CHECKOUT_DETAILS,
+        query: USER_CHECKOUT_DETAILS,
       });
+      console.log("this is tag response", response);
       if(response?.data?.checkout){
-        console.log("this is tag response", response);
         storage.setCheckout(response?.data?.checkout);
         setLocalCheckoutInCache(client, response?.data?.checkout, true);
       }
