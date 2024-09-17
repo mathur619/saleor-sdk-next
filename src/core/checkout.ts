@@ -22,7 +22,6 @@ import {
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
   REMOVE_TAGS,
-  USER_CHECKOUT_DETAILS,
 } from "../apollo/queries";
 import {
   AddCheckoutPromoCodeMutation,
