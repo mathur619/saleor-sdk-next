@@ -87,6 +87,15 @@ export const USER_CHECKOUT_DETAILS = gql`
   }
 `;
 
+export const CHECKOUT_DETAILS_NEW = gql`
+  ${checkoutFragment}
+  query CheckoutDetailsNew($token: UUID) {
+    checkout(token: $token) {
+        ...Checkout
+    }
+  }
+`;
+
 export const GET_CITY_STATE_FROM_PINCODE = gql`
   query Pincode($pin: String) {
     pincode(pin: $pin) {

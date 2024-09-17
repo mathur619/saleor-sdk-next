@@ -18,6 +18,7 @@ import {
 } from "../apollo/mutations";
 import {
   ADD_TAGS,
+  CHECKOUT_DETAILS_NEW,
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
   REMOVE_TAGS,
@@ -902,11 +903,15 @@ export const checkout = ({
         UserCheckoutDetailsQuery,
         UserCheckoutDetailsQueryVariables
       >({
-        mutation: USER_CHECKOUT_DETAILS,
+        mutation: CHECKOUT_DETAILS_NEW,
+        variables: {
+          token: checkout?.token,
+        },
         update: (_, { data }) => {
-          setLocalCheckoutInCache(client, data?.me?.checkout, true);
+          console.log("addTagsInCheckout", data);
+          setLocalCheckoutInCache(client, data?.checkout, true);
           if (data?.me?.checkout?.id) {
-            storage.setCheckout(data?.me?.checkout);
+            storage.setCheckout(data?.checkout);
           }
         },
       });
@@ -934,11 +939,15 @@ export const checkout = ({
           UserCheckoutDetailsQuery,
           UserCheckoutDetailsQueryVariables
         >({
-          mutation: USER_CHECKOUT_DETAILS,
+          mutation: CHECKOUT_DETAILS_NEW,
+          variables: {
+            token: checkout?.token,
+          },
           update: (_, { data }) => {
-            setLocalCheckoutInCache(client, data?.me?.checkout, true);
-            if (data?.me?.checkout?.id) {
-              storage.setCheckout(data?.me?.checkout);
+            console.log("removeTagsInCheckout", data);
+            setLocalCheckoutInCache(client, data?.checkout, true);
+            if (data?.checkout?.id) {
+              storage.setCheckout(data?.checkout);
             }
           },
         });
