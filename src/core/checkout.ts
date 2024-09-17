@@ -62,8 +62,6 @@ import {
   UpdateCheckoutShippingMethodMutation,
   UpdateCheckoutShippingMethodMutationVariables,
   useOrdersByUserQuery,
-  UserCheckoutDetailsQuery,
-  UserCheckoutDetailsQueryVariables,
 } from "../apollo/types";
 
 import {
@@ -899,8 +897,8 @@ export const checkout = ({
         variables,
       });
       await client.mutate<
-        UserCheckoutDetailsQuery,
-        UserCheckoutDetailsQueryVariables
+        any,
+        any
       >({
         mutation: CHECKOUT_DETAILS_NEW,
         variables: {
@@ -935,8 +933,8 @@ export const checkout = ({
           variables,
         });
         await client.mutate<
-          UserCheckoutDetailsQuery,
-          UserCheckoutDetailsQueryVariables
+          any,
+          any
         >({
           mutation: CHECKOUT_DETAILS_NEW,
           variables: {
