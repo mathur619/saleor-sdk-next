@@ -87,6 +87,15 @@ export const USER_CHECKOUT_DETAILS = gql`
   }
 `;
 
+export const CHECKOUT_DETAILS_NEW = gql`
+  ${checkoutFragment}
+  query CheckoutDetailsNew($token: UUID) {
+    checkout(token: $token) {
+        ...Checkout
+    }
+  }
+`;
+
 export const GET_CITY_STATE_FROM_PINCODE = gql`
   query Pincode($pin: String) {
     pincode(pin: $pin) {
@@ -283,6 +292,22 @@ export const GET_WISHLIST = gql`
           }
         }
       }
+    }
+  }
+`;
+
+export const ADD_TAGS = gql`
+  mutation AddTags($id: ID!, $tags: [String!]!) {
+    addTags(id: $id, tags: $tags) {
+      message
+    }
+  }
+`;
+
+export const REMOVE_TAGS = gql`
+  mutation RemoveTags($id: ID!, $tags: [String!]!) {
+    removeTags(id: $id, tags: $tags) {
+      message
     }
   }
 `;
