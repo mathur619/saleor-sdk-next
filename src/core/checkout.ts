@@ -17,8 +17,11 @@ import {
   UPDATE_CHECKOUT_SHIPPING_METHOD_MUTATION,
 } from "../apollo/mutations";
 import {
+  ADD_TAGS,
+  CHECKOUT_DETAILS_NEW,
   GET_CITY_STATE_FROM_PINCODE,
   GET_LOCAL_CHECKOUT,
+  REMOVE_TAGS,
 } from "../apollo/queries";
 import {
   AddCheckoutPromoCodeMutation,
@@ -146,6 +149,8 @@ export interface CheckoutSDK {
     attachUser: boolean,
     skipLines: boolean
   ) => ReOrderResult;
+  addTagsInCheckout?: (tag: string[]) => void;
+  removeTagsInCheckout?: (tag: string[]) => void;
 }
 
 export const checkout = ({
@@ -875,7 +880,77 @@ export const checkout = ({
     return res;
   };
 
+  const addTagsInCheckout = async (tags: string[]) => {
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables = {
+        id: checkout?.id,
+        tags: tags,
+      };
+      await client.mutate({
+        mutation: ADD_TAGS,
+        variables,
+      });
+      await client.mutate<
+        any,
+        any
+      >({
+        mutation: CHECKOUT_DETAILS_NEW,
+        variables: {
+          token: checkout?.token,
+        },
+        update: (_, { data }) => {
+          setLocalCheckoutInCache(client, data?.checkout, true);
+          if (data?.me?.checkout?.id) {
+            storage.setCheckout(data?.checkout);
+          }
+        },
+      });
+    }
+  };
+
+  const removeTagsInCheckout = async (tags: string[]) => {
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null | undefined =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables = {
+        id: checkout?.id,
+        tags: tags,
+      };
+      await client.mutate({
+        mutation: REMOVE_TAGS,
+        variables,
+      });
+      await client.mutate<
+        any,
+        any
+      >({
+        mutation: CHECKOUT_DETAILS_NEW,
+        variables: {
+          token: checkout?.token,
+        },
+        update: (_, { data }) => {
+          setLocalCheckoutInCache(client, data?.checkout, true);
+          if (data?.checkout?.id) {
+            storage.setCheckout(data?.checkout);
+          }
+        },
+      });
+    }
+  };
+
   return {
+    addTagsInCheckout,
+    removeTagsInCheckout,
     createCheckout,
     setShippingAddress,
     setBillingAddress,
