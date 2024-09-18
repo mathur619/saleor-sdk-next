@@ -27,7 +27,7 @@ import {
   UpdateCheckoutLineMutation,
   UpdateCheckoutLineMutationVariables,
 } from "../apollo/types";
-import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
+import { CHECKOUT_VERIFY_FOR_WAREHOUSE, GET_LOCAL_CHECKOUT } from "../apollo/queries";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -66,7 +66,8 @@ export interface CartSDK {
   ) => UpdateItemResult;
 
   updateItemWithLines: (
-    updatedLines: Array<Maybe<CheckoutLineInput>>
+    warehouseId?: string,
+    updatedLines?: Array<Maybe<CheckoutLineInput>>
   ) => UpdateItemResult;
 
   clearCart?: () => UpdateItemResult;
@@ -281,7 +282,7 @@ export const cart = ({
       if (
         res.data?.checkoutLineDelete?.errors &&
         res.data?.checkoutLineDelete?.errors[0]?.code ===
-          "PRODUCT_NOT_PUBLISHED" &&
+        "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
         await clearCart();
@@ -289,7 +290,7 @@ export const cart = ({
       if (
         res.data?.checkoutLineDelete?.errors &&
         res.data?.checkoutLineDelete?.errors[0]?.code ===
-          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
+        "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
         await clearCart();
@@ -371,7 +372,8 @@ export const cart = ({
   };
 
   const updateItemWithLines: CartSDK["updateItemWithLines"] = async (
-    updatedLines: Array<Maybe<CheckoutLineInput>>
+    warehouseId?: string,
+    updatedLines?: Array<Maybe<CheckoutLineInput>>
   ) => {
     const checkoutString = storage.getCheckout();
 
@@ -380,7 +382,24 @@ export const cart = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
-    if (checkout && checkout?.token) {
+    if (checkout && checkout?.token && checkout?.id && warehouseId) {
+      const res1 = await client.mutate<any, any>({
+        mutation: CHECKOUT_VERIFY_FOR_WAREHOUSE,
+        variables: {
+          checkoutId: checkout?.id,
+          warehouseId: warehouseId,
+        },
+      });
+      const updatedLines: Array<CheckoutLineInput> =
+        res1?.data?.checkoutVerifyForWarehouse?.checkout?.lines?.length
+          ? res1?.data?.checkoutVerifyForWarehouse?.checkout?.lines?.map((item: any) => ({
+            quantity: item?.quantity,
+            variantId: item?.variant?.id,
+          }))
+          : items.map(item => ({
+            quantity: 0,
+            variantId: item?.variant?.id,
+          }));
       const res = await client.mutate<
         UpdateCheckoutLineMutation,
         UpdateCheckoutLineMutationVariables

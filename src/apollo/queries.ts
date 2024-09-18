@@ -286,3 +286,26 @@ export const GET_WISHLIST = gql`
     }
   }
 `;
+
+export const CHECKOUT_VERIFY_FOR_WAREHOUSE = gql`
+  mutation CheckoutVerifyForWarehouse($checkoutId: ID!, $warehouseId: String!){
+    checkoutVerifyForWarehouse(checkoutId: $checkoutId, warehouseId: $warehouseId) {
+      checkoutErrors {
+        field
+        message
+        code
+        __typename
+      }
+      checkout {
+        lines {
+          id
+          quantity
+          variant {
+            id
+            sku
+          }
+      }
+    }
+  }
+}
+`
