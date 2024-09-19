@@ -68,7 +68,7 @@ export interface CartSDK {
     updatedLines: Array<Maybe<CheckoutLineInput>>
   ) => UpdateItemResult;
   clearCart?: () => UpdateItemResult;
-  updateCartAccordingLocation: (warehouseId: string) => UpdateItemResult;
+  updateCartAccordingLocation: (warehouseId: string) => any;
 }
 
 export const cart = ({
