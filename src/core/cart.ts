@@ -27,7 +27,7 @@ import {
   UpdateCheckoutLineMutation,
   UpdateCheckoutLineMutationVariables,
 } from "../apollo/types";
-import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
+import { CHECKOUT_VERIFY_FOR_WAREHOUSE, GET_LOCAL_CHECKOUT } from "../apollo/queries";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -64,12 +64,11 @@ export interface CartSDK {
     quantity: number,
     prevQuantity: number
   ) => UpdateItemResult;
-
   updateItemWithLines: (
     updatedLines: Array<Maybe<CheckoutLineInput>>
   ) => UpdateItemResult;
-
   clearCart?: () => UpdateItemResult;
+  updateCartAccordingLocation: (warehouseId: string) => UpdateItemResult;
 }
 
 export const cart = ({
@@ -281,7 +280,7 @@ export const cart = ({
       if (
         res.data?.checkoutLineDelete?.errors &&
         res.data?.checkoutLineDelete?.errors[0]?.code ===
-          "PRODUCT_NOT_PUBLISHED" &&
+        "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
         await clearCart();
@@ -289,7 +288,7 @@ export const cart = ({
       if (
         res.data?.checkoutLineDelete?.errors &&
         res.data?.checkoutLineDelete?.errors[0]?.code ===
-          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
+        "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
         await clearCart();
@@ -444,6 +443,27 @@ export const cart = ({
     }
   };
 
+  const updateCartAccordingLocation: CartSDK["updateCartAccordingLocation"] = async (warehouseId: string) => {
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    if(checkout?.id && warehouseId){
+      const res = await client.mutate<any, any>({
+        mutation: CHECKOUT_VERIFY_FOR_WAREHOUSE,
+        variables: {
+          checkoutId: checkout?.id,
+          warehouseId: warehouseId,
+        },
+      });
+      return {
+        data: res?.data?.checkoutVerifyForWarehouse?.checkout,
+        errors: res?.data?.checkoutLinesUpdate?.errors,
+      }
+    }
+  };
+
   return {
     items,
     clearCart,
@@ -451,5 +471,6 @@ export const cart = ({
     removeItem,
     updateItem,
     updateItemWithLines,
+    updateCartAccordingLocation,
   };
 };

@@ -42,7 +42,6 @@ export const GET_LOCAL_CHECKOUT = gql`
     localCheckout @client {
       ...Checkout
     }
-
     localCheckoutDiscounts @client {
       prepaidDiscount
       couponDiscount
@@ -147,7 +146,6 @@ export const USER_ORDER_DETAILS = gql`
             }
             lines {
               id
-
               productName
               quantity
               variant {
@@ -285,4 +283,27 @@ export const GET_WISHLIST = gql`
       }
     }
   }
+`;
+
+export const CHECKOUT_VERIFY_FOR_WAREHOUSE = gql`
+  mutation CheckoutVerifyForWarehouse($checkoutId: ID!, $warehouseId: String!){
+    checkoutVerifyForWarehouse(checkoutId: $checkoutId, warehouseId: $warehouseId) {
+      checkoutErrors {
+        field
+        message
+        code
+        __typename
+      }
+      checkout {
+        lines {
+          id
+          quantity
+          variant {
+            id
+            sku
+          }
+      }
+    }
+  }
+}
 `;
