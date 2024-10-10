@@ -42,7 +42,6 @@ export const GET_LOCAL_CHECKOUT = gql`
     localCheckout @client {
       ...Checkout
     }
-
     localCheckoutDiscounts @client {
       prepaidDiscount
       couponDiscount
@@ -156,7 +155,6 @@ export const USER_ORDER_DETAILS = gql`
             }
             lines {
               id
-
               productName
               quantity
               variant {

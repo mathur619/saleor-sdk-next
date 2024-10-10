@@ -1265,3 +1265,17 @@ export const WISHLIST_REMOVE_VARIANT = gql`
   }
 `;
 
+export const CHECKOUT_VERIFY_FOR_WAREHOUSE = gql`
+  ${checkoutFragment}
+  ${checkoutErrorFragment}
+  mutation CheckoutVerifyForWarehouse($checkoutId: ID!, $warehouseId: String!){
+    checkoutVerifyForWarehouse(checkoutId: $checkoutId, warehouseId: $warehouseId) {
+      checkout {
+        ...Checkout
+      }
+      errors: checkoutErrors {
+        ...CheckoutError
+      }
+  }
+}
+`;

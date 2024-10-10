@@ -9,6 +9,7 @@ import { cartItemsVar } from "../apollo/client";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   ADD_CHECKOUT_LINE_MUTATION,
+  CHECKOUT_VERIFY_FOR_WAREHOUSE,
   CREATE_CHECKOUT_MUTATION,
   REMOVE_CHECKOUT_LINE_MUTATION,
   UPDATE_CHECKOUT_LINE_MUTATION,
@@ -64,12 +65,11 @@ export interface CartSDK {
     quantity: number,
     prevQuantity: number
   ) => UpdateItemResult;
-
   updateItemWithLines: (
     updatedLines: Array<Maybe<CheckoutLineInput>>
   ) => UpdateItemResult;
-
   clearCart?: () => UpdateItemResult;
+  updateCartAccordingLocation: (warehouseId: string) => any;
 }
 
 export const cart = ({
@@ -281,7 +281,7 @@ export const cart = ({
       if (
         res.data?.checkoutLineDelete?.errors &&
         res.data?.checkoutLineDelete?.errors[0]?.code ===
-          "PRODUCT_NOT_PUBLISHED" &&
+        "PRODUCT_NOT_PUBLISHED" &&
         typeof window !== "undefined"
       ) {
         await clearCart();
@@ -289,7 +289,7 @@ export const cart = ({
       if (
         res.data?.checkoutLineDelete?.errors &&
         res.data?.checkoutLineDelete?.errors[0]?.code ===
-          "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
+        "PRODUCT_UNAVAILABLE_FOR_PURCHASE" &&
         typeof window !== "undefined"
       ) {
         await clearCart();
@@ -444,6 +444,37 @@ export const cart = ({
     }
   };
 
+  const updateCartAccordingLocation: CartSDK["updateCartAccordingLocation"] = async (warehouseId: string) => {
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    if(checkout?.id && warehouseId){
+      const res = await client.mutate<any, any>({
+        mutation: CHECKOUT_VERIFY_FOR_WAREHOUSE,
+        variables: {
+          checkoutId: checkout?.id,
+          warehouseId: warehouseId,
+        },
+        update: async (_, { data }) => {
+          if (data?.checkoutVerifyForWarehouse?.checkout?.id) {
+            storage.setCheckout(data?.checkoutVerifyForWarehouse?.checkout);
+          }
+          await setLocalCheckoutInCache(
+            client,
+            data?.checkoutVerifyForWarehouse?.checkout,
+            true
+          );
+        },
+      });
+      return {
+        data: res?.data?.checkoutVerifyForWarehouse?.checkout,
+        errors: res?.data?.checkoutVerifyForWarehouse?.errors,
+      }
+    }
+  };
+
   return {
     items,
     clearCart,
@@ -451,5 +482,6 @@ export const cart = ({
     removeItem,
     updateItem,
     updateItemWithLines,
+    updateCartAccordingLocation,
   };
 };
