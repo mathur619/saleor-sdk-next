@@ -9,6 +9,7 @@ import { cartItemsVar } from "../apollo/client";
 import { setLocalCheckoutInCache } from "../apollo/helpers";
 import {
   ADD_CHECKOUT_LINE_MUTATION,
+  CHECKOUT_VERIFY_FOR_WAREHOUSE,
   CREATE_CHECKOUT_MUTATION,
   REMOVE_CHECKOUT_LINE_MUTATION,
   UPDATE_CHECKOUT_LINE_MUTATION,
@@ -27,7 +28,7 @@ import {
   UpdateCheckoutLineMutation,
   UpdateCheckoutLineMutationVariables,
 } from "../apollo/types";
-import { CHECKOUT_VERIFY_FOR_WAREHOUSE, GET_LOCAL_CHECKOUT } from "../apollo/queries";
+import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
 
 export interface CartSDK {
   loaded?: boolean;
@@ -456,10 +457,20 @@ export const cart = ({
           checkoutId: checkout?.id,
           warehouseId: warehouseId,
         },
+        update: async (_, { data }) => {
+          if (data?.checkoutVerifyForWarehouse?.checkout?.id) {
+            storage.setCheckout(data?.checkoutVerifyForWarehouse?.checkout);
+          }
+          await setLocalCheckoutInCache(
+            client,
+            data?.checkoutVerifyForWarehouse?.checkout,
+            true
+          );
+        },
       });
       return {
         data: res?.data?.checkoutVerifyForWarehouse?.checkout,
-        errors: res?.data?.checkoutLinesUpdate?.errors,
+        errors: res?.data?.checkoutVerifyForWarehouse?.errors,
       }
     }
   };
