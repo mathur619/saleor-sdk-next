@@ -1892,6 +1892,7 @@ export const cart = ({
         checkoutInput: {
           lines: linesToAdd,
           email: "dummy@dummy.com",
+          isRecalculate: isRecalculate,
           ...(checkoutMetadataInput
             ? { checkoutMetadataInput: checkoutMetadataInput }
             : {}),
