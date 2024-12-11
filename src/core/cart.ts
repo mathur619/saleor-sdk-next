@@ -225,7 +225,7 @@ export const cart = ({
 
         const quantityAvailableValue = line?.variant?.quantityAvailable
           ? line?.variant?.quantityAvailable
-          : 50;
+          : 7;
 
         const updatedLineVariantAttributes = line?.variant?.attributes?.map(
           (item: any) => {
