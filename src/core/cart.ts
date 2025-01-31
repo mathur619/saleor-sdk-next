@@ -294,7 +294,9 @@ export const cart = ({
         data:resData,
         errors: resData?.message ? [{message:resData?.message}] : null
       }
+      console.log('response json for remove cart',resJson, res);
       if(resJson?.ok){
+        console.log('response json for remove cart if success',resJson);
         if (resData?.checkout?.id) {
           storage.setCheckout(resData?.checkout);
         }
