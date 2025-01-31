@@ -58,6 +58,7 @@ export interface CartSDK {
   cashbackRecieve?: any;
 
   addItem: (variantId: string, quantity: number) => AddItemResult;
+  addItemRest: (variantId: string, quantity: number) => AddItemResult;
   removeItem: (variantId: string) => RemoveItemResult;
   removeItemRest: (variantId: string) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   subtractItem?: (variantId: string, quantity: number) => {};
@@ -125,6 +126,99 @@ export const cart = ({
     }
 
     return null;
+  };
+
+  const addItemRest: CartSDK["addItemRest"] = async (
+    variantId: string,
+    quantity: number
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.token) {
+      const obj = {
+        checkoutId: checkout?.id,
+        lines: [
+          {
+            quantity: quantity,
+            variantId: variantId
+          },
+        ],
+        isRecalculate: true
+      };
+      const resJson = await fetch(`${restApiUrl}/rest/update_cart/`,{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(obj),
+      }
+      );
+      const resData = await resJson.json();
+      
+      const res={
+        data:resData,
+        errors: resData?.message ? [{message:resData?.message}] : null
+      }
+      console.log('response json for add to cart',resJson, res);
+      if(resJson?.ok){
+        if (resData?.checkout?.id) {
+          storage.setCheckout(resData);
+        }
+        await setLocalCheckoutInCache(
+          client,
+          resData,
+          true
+        );
+      }
+      return res;
+    } else {
+      const res = await client.mutate<
+        CreateCheckoutMutation,
+        CreateCheckoutMutationVariables
+      >({
+        mutation: CREATE_CHECKOUT_MUTATION,
+        variables: {
+          checkoutInput: {
+            lines: [{ quantity: quantity, variantId: variantId }],
+            email: "dummy@dummy.com",
+            shippingAddress: {
+              city: "delhi",
+              companyName: "dummy",
+              country: "IN",
+              countryArea: "Delhi",
+              firstName: "dummy",
+              lastName: "dummy",
+              phone: "7894561230",
+              postalCode: "110006",
+              streetAddress1: "dummy",
+              streetAddress2: "dummy",
+            },
+          },
+        },
+        update: (_, { data }) => {
+          setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout, true);
+          if (data?.checkoutCreate?.checkout?.id) {
+            storage.setCheckout(data?.checkoutCreate?.checkout);
+          }
+        },
+      });
+      const returnObject = {
+        data: res.data?.checkoutCreate?.checkout,
+        errors: res.data?.checkoutCreate?.errors,
+      };
+      return returnObject;
+    }
   };
 
   const addItem: CartSDK["addItem"] = async (
@@ -298,11 +392,11 @@ export const cart = ({
       if(resJson?.ok){
         console.log('response json for remove cart if success',resJson);
         if (resData?.checkout?.id) {
-          storage.setCheckout(resData?.checkout);
+          storage.setCheckout(resData);
         }
         await setLocalCheckoutInCache(
           client,
-          resData?.checkout,
+          resData,
           true
         );
       }
@@ -432,13 +526,14 @@ export const cart = ({
           data:resData,
           errors: resData?.message ? [{message:resData?.message}] : null
         }
+        console.log("response json for update cart",res,resJson);
         if(resJson?.ok){
           if (resData?.checkout?.id) {
-            storage.setCheckout(resData?.checkout);
+            storage.setCheckout(resData);
           }
           await setLocalCheckoutInCache(
             client,
-            resData?.checkout,
+            resData,
             true
           );
         }
