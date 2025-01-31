@@ -58,13 +58,19 @@ export interface CartSDK {
   cashbackRecieve?: any;
 
   addItem: (variantId: string, quantity: number) => AddItemResult;
+  addItemRest: (variantId: string, quantity: number) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   removeItem: (variantId: string) => RemoveItemResult;
+  removeItemRest: (variantId: string) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem: (
     variantId: string,
     quantity: number,
     prevQuantity: number
   ) => UpdateItemResult;
+  updateItemRest: (
+    variantId: string,
+    quantity: number
+  ) => any;
   updateItemWithLines: (
     updatedLines: Array<Maybe<CheckoutLineInput>>
   ) => UpdateItemResult;
@@ -74,6 +80,7 @@ export interface CartSDK {
 
 export const cart = ({
   apolloClient: client,
+  restApiUrl
 }: SaleorClientMethodsProps): CartSDK => {
   let items = cartItemsVar();
 
@@ -118,6 +125,64 @@ export const cart = ({
       };
     }
 
+    return null;
+  };
+
+  const addItemRest: CartSDK["addItemRest"] = async (
+    variantId: string,
+    quantity: number
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.token) {
+      const obj = {
+        checkoutId: checkout?.id,
+        lines: [
+          {
+            quantity: quantity,
+            variantId: variantId
+          },
+        ],
+        isRecalculate: true
+      };
+      const resJson = await fetch(`${restApiUrl}/rest/update_cart/`,{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(obj),
+      }
+      );
+      const resData = await resJson.json();
+      
+      const res={
+        data:resData,
+        errors: resData?.message ? [{message:resData?.message}] : null
+      }
+      console.log('response json for add to cart',resJson, res);
+      if(resJson?.ok){
+        if (resData?.checkout?.id) {
+          storage.setCheckout(resData);
+        }
+        await setLocalCheckoutInCache(
+          client,
+          resData,
+          true
+        );
+      }
+      return res;
+    } 
     return null;
   };
 
@@ -237,6 +302,74 @@ export const cart = ({
     }
   };
 
+  const removeItemRest: CartSDK["removeItemRest"] = async (variantId: string) => {
+    const checkoutString = storage.getCheckout();
+    const checkout: Checkout | null =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.token) {
+      // const res = await client.mutate<
+      //   RemoveCheckoutLineMutation,
+      //   RemoveCheckoutLineMutationVariables
+      // >({
+      //   mutation: REMOVE_CHECKOUT_LINE_MUTATION,
+      //   variables: {
+      //     checkoutId: checkout?.id,
+      //     lineId: lineToRemoveId,
+      //   },
+      //   update: async (_, { data }) => {
+      //     if (data?.checkoutLineDelete?.checkout?.id) {
+      //       storage.setCheckout(data?.checkoutLineDelete?.checkout);
+      //     }
+      //     await setLocalCheckoutInCache(
+      //       client,
+      //       data?.checkoutLineDelete?.checkout,
+      //       true
+      //     );
+      //   },
+      // });
+      const obj = {
+        checkoutId: checkout?.id,
+        lines: [
+          {
+            quantity: 0,
+            variantId: variantId
+          },
+        ],
+        isRecalculate: true,
+      }  
+      const resJson = await fetch(`${restApiUrl}/rest/update_cart/`,{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(obj),
+      }
+      );
+      const resData = await resJson.json();
+      const res={
+        data:resData,
+        errors: resData?.message ? [{message:resData?.message}] : null
+      }
+      console.log('response json for remove cart',resJson, res);
+      if(resJson?.ok){
+        console.log('response json for remove cart if success',resJson);
+        if (resData?.checkout?.id) {
+          storage.setCheckout(resData);
+        }
+        await setLocalCheckoutInCache(
+          client,
+          resData,
+          true
+        );
+      }
+      return res;
+    }
+    return null;
+  };
+
   const removeItem: CartSDK["removeItem"] = async (variantId: string) => {
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null =
@@ -309,6 +442,68 @@ export const cart = ({
         errors: res.data?.checkoutLineDelete?.errors,
       };
     }
+    return null;
+  };
+
+  const updateItemRest: CartSDK["updateItemRest"] = async (
+    variantId: string,
+    quantity: number
+  ) => {
+    
+      const checkoutString = storage.getCheckout();
+
+      const checkout =
+        checkoutString && typeof checkoutString === "string"
+          ? JSON.parse(checkoutString)
+          : checkoutString;
+      const alteredLines =
+        checkout &&
+        checkout?.lines
+          .filter((line: any) => line.variant.id !== variantId)
+          .map((line: any) => ({
+            quantity: line.quantity,
+            variantId: line.variant.id,
+          }));
+
+      alteredLines.push({ quantity: quantity, variantId: variantId });
+
+      if (checkout && checkout?.token) {
+        const obj = {
+          checkoutId: checkout?.id,
+          lines: [
+            {
+              quantity: quantity,
+              variantId: variantId
+            },
+          ],
+          isRecalculate: true,
+        }  
+        const resJson = await fetch(`${restApiUrl}/rest/update_cart/`,{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(obj),
+        }
+        );
+        const resData = await resJson.json();
+        const res={
+          data:resData,
+          errors: resData?.message ? [{message:resData?.message}] : null
+        }
+        console.log("response json for update cart",res,resJson);
+        if(resJson?.ok){
+          if (resData?.checkout?.id) {
+            storage.setCheckout(resData);
+          }
+          await setLocalCheckoutInCache(
+            client,
+            resData,
+            true
+          );
+        }
+        return res;
+      }
     return null;
   };
 
@@ -479,8 +674,11 @@ export const cart = ({
     items,
     clearCart,
     addItem,
+    addItemRest,
     removeItem,
+    removeItemRest,
     updateItem,
+    updateItemRest,
     updateItemWithLines,
     updateCartAccordingLocation,
   };

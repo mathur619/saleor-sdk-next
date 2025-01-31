@@ -86,6 +86,7 @@ import { WalletSDK } from "./wallet";
 import { RestApiFunctionSDK } from "./utils";
 export interface SaleorClientInternals {
   apolloClient: ApolloClient<NormalizedCacheObject>;
+  restApiUrl?: any;
 }
 export interface SaleorClientConfig {
   channel: string;

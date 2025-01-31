@@ -93,6 +93,13 @@ import {
   SetShippingMethodResult,
 } from "./types";
 
+interface CheckoutInput {
+  lines?: Array<{variantId:string,quantity:number}>;
+  email: string;
+  isRecalculate: Boolean;
+  checkoutMetadataInput: Array<{key:string,value:string}>;
+  shipping_address: any;
+}
 export interface CheckoutSDK {
   loaded?: any;
 
@@ -117,6 +124,7 @@ export interface CheckoutSDK {
     type: AddressTypes
   ) => SetAddressTypeResult;
   createCheckout?: () => CreateCheckoutResult;
+  createCheckoutRest?: (checkoutInput: CheckoutInput) => CreateCheckoutResult;
   setShippingAddress?: (
     shippingAddress: IAddress,
     email: string
@@ -155,7 +163,51 @@ export interface CheckoutSDK {
 
 export const checkout = ({
   apolloClient: client,
+  restApiUrl
 }: SaleorClientMethodsProps): CheckoutSDK => {
+  const createCheckoutRest: CheckoutSDK["createCheckoutRest"] = async (checkoutInput) => {
+    try {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: true,
+        },
+      });
+  
+      const checkoutString = storage.getCheckout();
+      const checkout =
+        checkoutString && typeof checkoutString === "string"
+          ? JSON.parse(checkoutString)
+          : checkoutString;
+      if (!(checkout && checkout?.id)) {
+        const dataJson = await fetch(`${restApiUrl}/rest/create_checkout`,{
+          method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              checkoutInput:checkoutInput
+            }),
+        });
+        if(!dataJson?.ok){
+          console.log("Create checkout api error",dataJson);
+          return null;
+        }
+        const data = await dataJson?.json();
+        
+        setLocalCheckoutInCache(client, data?.checkout);
+        if (data?.checkout?.id) {
+          storage.setCheckout(data?.checkout);
+        }
+        return data;
+      }
+      return null;
+    } catch (error) {
+      console.log('create checkout error',error);
+      return null;
+    }
+  };
+
   const createCheckout: CheckoutSDK["createCheckout"] = async () => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -952,6 +1004,7 @@ export const checkout = ({
     addTagsInCheckout,
     removeTagsInCheckout,
     createCheckout,
+    createCheckoutRest,
     setShippingAddress,
     setBillingAddress,
     setShippingAndBillingAddress,
