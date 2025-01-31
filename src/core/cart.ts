@@ -58,7 +58,7 @@ export interface CartSDK {
   cashbackRecieve?: any;
 
   addItem: (variantId: string, quantity: number) => AddItemResult;
-  addItemRest: (variantId: string, quantity: number) => AddItemResult;
+  addItemRest: (variantId: string, quantity: number) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   removeItem: (variantId: string) => RemoveItemResult;
   removeItemRest: (variantId: string) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   subtractItem?: (variantId: string, quantity: number) => {};
@@ -182,43 +182,8 @@ export const cart = ({
         );
       }
       return res;
-    } else {
-      const res = await client.mutate<
-        CreateCheckoutMutation,
-        CreateCheckoutMutationVariables
-      >({
-        mutation: CREATE_CHECKOUT_MUTATION,
-        variables: {
-          checkoutInput: {
-            lines: [{ quantity: quantity, variantId: variantId }],
-            email: "dummy@dummy.com",
-            shippingAddress: {
-              city: "delhi",
-              companyName: "dummy",
-              country: "IN",
-              countryArea: "Delhi",
-              firstName: "dummy",
-              lastName: "dummy",
-              phone: "7894561230",
-              postalCode: "110006",
-              streetAddress1: "dummy",
-              streetAddress2: "dummy",
-            },
-          },
-        },
-        update: (_, { data }) => {
-          setLocalCheckoutInCache(client, data?.checkoutCreate?.checkout, true);
-          if (data?.checkoutCreate?.checkout?.id) {
-            storage.setCheckout(data?.checkoutCreate?.checkout);
-          }
-        },
-      });
-      const returnObject = {
-        data: res.data?.checkoutCreate?.checkout,
-        errors: res.data?.checkoutCreate?.errors,
-      };
-      return returnObject;
-    }
+    } 
+    return null;
   };
 
   const addItem: CartSDK["addItem"] = async (
@@ -709,6 +674,7 @@ export const cart = ({
     items,
     clearCart,
     addItem,
+    addItemRest,
     removeItem,
     removeItemRest,
     updateItem,
