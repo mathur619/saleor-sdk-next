@@ -165,9 +165,7 @@ export const cart = ({
       }
       );
       const resData = await resJson.json();
-      if(resData?.lines){
-        cartItemsVar(resData?.lines);
-      }
+
       const res={
         data:resData,
         errors: resData?.message ? [{message:resData?.message}] : null
