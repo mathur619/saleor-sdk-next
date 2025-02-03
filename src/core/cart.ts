@@ -172,7 +172,7 @@ export const cart = ({
       }
       console.log('response json for add to cart',resJson, res);
       if(resJson?.ok){
-        if (resData?.checkout?.id) {
+        if (resData?.id) {
           storage.setCheckout(resData);
         }
         await setLocalCheckoutInCache(
@@ -356,7 +356,7 @@ export const cart = ({
       console.log('response json for remove cart',resJson, res);
       if(resJson?.ok){
         console.log('response json for remove cart if success',resJson);
-        if (resData?.checkout?.id) {
+        if (resData?.id) {
           storage.setCheckout(resData);
         }
         await setLocalCheckoutInCache(
@@ -493,7 +493,7 @@ export const cart = ({
         }
         console.log("response json for update cart",res,resJson);
         if(resJson?.ok){
-          if (resData?.checkout?.id) {
+          if (resData?.id) {
             storage.setCheckout(resData);
           }
           await setLocalCheckoutInCache(

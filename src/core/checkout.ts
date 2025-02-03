@@ -195,9 +195,9 @@ export const checkout = ({
         }
         const data = await dataJson?.json();
         
-        setLocalCheckoutInCache(client, data?.checkout);
-        if (data?.checkout?.id) {
-          storage.setCheckout(data?.checkout);
+        await setLocalCheckoutInCache(client, data);
+        if (data?.id) {
+          storage.setCheckout(data);
         }
         return data;
       }
