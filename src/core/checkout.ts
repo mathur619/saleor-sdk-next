@@ -180,7 +180,7 @@ export const checkout = ({
           ? JSON.parse(checkoutString)
           : checkoutString;
       if (!(checkout && checkout?.id)) {
-        const dataJson = await fetch(`${restApiUrl}/rest/create_checkout`,{
+        const dataJson = await fetch(`${restApiUrl}/rest/create_checkout/`,{
           method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -195,9 +195,9 @@ export const checkout = ({
         }
         const data = await dataJson?.json();
         
-        setLocalCheckoutInCache(client, data?.checkout);
-        if (data?.checkout?.id) {
-          storage.setCheckout(data?.checkout);
+        await setLocalCheckoutInCache(client, data);
+        if (data?.id) {
+          storage.setCheckout(data);
         }
         return data;
       }
