@@ -156,7 +156,7 @@ export const cart = ({
         ],
         isRecalculate: true
       };
-      const resJson = await fetch(`${restApiUrl}/rest/update_cart/`,{
+      const resJson = await fetch(`${restApiUrl}/rest/add_to_cart/`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json",

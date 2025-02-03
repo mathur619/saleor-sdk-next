@@ -180,7 +180,7 @@ export const checkout = ({
           ? JSON.parse(checkoutString)
           : checkoutString;
       if (!(checkout && checkout?.id)) {
-        const dataJson = await fetch(`${restApiUrl}/rest/create_checkout`,{
+        const dataJson = await fetch(`${restApiUrl}/rest/create_checkout/`,{
           method: "POST",
             headers: {
               "Content-Type": "application/json",
