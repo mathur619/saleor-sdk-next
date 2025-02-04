@@ -86,7 +86,7 @@ export const cart = ({
 }: SaleorClientMethodsProps): CartSDK => {
   let items = cartItemsVar();
 
-  const getItems = () => {
+  const getItems: CartSDK["getItems"] = () => {
     const checkoutString = storage.getCheckout();
     const checkout =
       checkoutString && typeof checkoutString === "string"
