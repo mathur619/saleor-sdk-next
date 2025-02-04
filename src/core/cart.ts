@@ -173,11 +173,11 @@ export const cart = ({
       console.log('response json for add to cart',resJson, res);
       if(resJson?.ok){
         if (resData?.id) {
-          storage.setCheckout(resData);
+          storage.setCheckout({...checkout,...resData});
         }
         await setLocalCheckoutInCache(
           client,
-          resData,
+          {...checkout,...resData},
           true
         );
       }
