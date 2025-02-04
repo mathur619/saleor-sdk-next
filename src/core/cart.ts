@@ -57,12 +57,12 @@ export interface CartSDK {
   cashbackDiscount?: any;
 
   cashbackRecieve?: any;
-  getItems?:() => CheckoutLine[];
+  getItems:() => CheckoutLine[];
 
   addItem: (variantId: string, quantity: number) => AddItemResult;
   addItemRest: (variantId: string, quantity: number) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   removeItem: (variantId: string) => RemoveItemResult;
-  removeItemRest: (variantId: string) => Promise<{data:any,errors:{message:any}[] | null} | null>;
+  removeItemRest: (variantId: string,checkoutMetadataInput: Array<{key:string,value:string}>) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   subtractItem?: (variantId: string, quantity: number) => {};
   updateItem: (
     variantId: string,
@@ -314,7 +314,7 @@ export const cart = ({
     }
   };
 
-  const removeItemRest: CartSDK["removeItemRest"] = async (variantId: string) => {
+  const removeItemRest: CartSDK["removeItemRest"] = async (variantId: string, checkoutMetadataInput: Array<{key:string,value:string}>) => {
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null =
       checkoutString && typeof checkoutString === "string"
@@ -350,6 +350,7 @@ export const cart = ({
             variantId: variantId
           },
         ],
+        checkoutMetadataInput,
         isRecalculate: true,
       }  
       const resJson = await fetch(`${restApiUrl}/rest/update_cart/`,{
