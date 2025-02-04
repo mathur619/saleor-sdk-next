@@ -19,6 +19,7 @@ import {
   AddCheckoutLineMutation,
   AddCheckoutLineMutationVariables,
   Checkout,
+  CheckoutLine,
   CheckoutLineInput,
   CreateCheckoutMutation,
   CreateCheckoutMutationVariables,
@@ -56,6 +57,7 @@ export interface CartSDK {
   cashbackDiscount?: any;
 
   cashbackRecieve?: any;
+  getItems?:() => CheckoutLine[];
 
   addItem: (variantId: string, quantity: number) => AddItemResult;
   addItemRest: (variantId: string, quantity: number) => Promise<{data:any,errors:{message:any}[] | null} | null>;
@@ -83,6 +85,16 @@ export const cart = ({
   restApiUrl
 }: SaleorClientMethodsProps): CartSDK => {
   let items = cartItemsVar();
+
+  const getItems: CartSDK["getItems"] = () => {
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+    const checkoutlines = checkout?.lines;
+    return checkoutlines;
+  }
 
   const clearCart: CartSDK["clearCart"] = async () => {
     const checkoutString = storage.getCheckout();
@@ -173,11 +185,11 @@ export const cart = ({
       console.log('response json for add to cart',resJson, res);
       if(resJson?.ok){
         if (resData?.id) {
-          storage.setCheckout(resData);
+          storage.setCheckout({...checkout,...resData});
         }
         await setLocalCheckoutInCache(
           client,
-          resData,
+          {...checkout,...resData},
           true
         );
       }
@@ -672,6 +684,7 @@ export const cart = ({
 
   return {
     items,
+    getItems,
     clearCart,
     addItem,
     addItemRest,
