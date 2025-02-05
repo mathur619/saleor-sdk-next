@@ -267,6 +267,13 @@ export const checkoutFragment = gql`
       amount
       willAddOn
     }
+    user{
+      wallet{
+        amount
+        created
+        expiryDate
+      }
+    }
     paymentMethod {
       cashbackDiscountAmount
       couponDiscount
