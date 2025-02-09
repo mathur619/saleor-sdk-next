@@ -31,6 +31,12 @@ import {
 } from "../apollo/types";
 import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
 
+interface AtcPayload {
+  checkoutId: string;
+  isRecalculate: boolean;
+  lines: Array<{variantId:string,quantity:number}>;
+  checkoutMetadataInput: Array<{key:string,value:string}>;
+}
 export interface CartSDK {
   loaded?: boolean;
 
@@ -60,7 +66,7 @@ export interface CartSDK {
   getItems:() => CheckoutLine[];
 
   addItem: (variantId: string, quantity: number) => AddItemResult;
-  addItemRest: (variantId: string, quantity: number) => Promise<{data:any,errors:{message:any}[] | null} | null>;
+  addItemRest: (atcPayload: AtcPayload) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   removeItem: (variantId: string) => RemoveItemResult;
   removeItemRest: (variantId: string,checkoutMetadataInput: Array<{key:string,value:string}>) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   subtractItem?: (variantId: string, quantity: number) => {};
@@ -70,8 +76,7 @@ export interface CartSDK {
     prevQuantity: number
   ) => UpdateItemResult;
   updateItemRest: (
-    variantId: string,
-    quantity: number
+    updatePayload: AtcPayload
   ) => any;
   updateItemWithLines: (
     updatedLines: Array<Maybe<CheckoutLineInput>>
@@ -141,8 +146,7 @@ export const cart = ({
   };
 
   const addItemRest: CartSDK["addItemRest"] = async (
-    variantId: string,
-    quantity: number
+    atcPayload
   ) => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -158,22 +162,12 @@ export const cart = ({
         : checkoutString;
 
     if (checkout && checkout?.token) {
-      const obj = {
-        checkoutId: checkout?.id,
-        lines: [
-          {
-            quantity: quantity,
-            variantId: variantId
-          },
-        ],
-        isRecalculate: true
-      };
       const resJson = await fetch(`${restApiUrl}/rest/add_to_cart/`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(obj),
+        body: JSON.stringify(atcPayload),
       }
       );
       const resData = await resJson.json();
@@ -459,8 +453,7 @@ export const cart = ({
   };
 
   const updateItemRest: CartSDK["updateItemRest"] = async (
-    variantId: string,
-    quantity: number
+    updatePayload
   ) => {
     
       const checkoutString = storage.getCheckout();
@@ -469,34 +462,14 @@ export const cart = ({
         checkoutString && typeof checkoutString === "string"
           ? JSON.parse(checkoutString)
           : checkoutString;
-      const alteredLines =
-        checkout &&
-        checkout?.lines
-          .filter((line: any) => line.variant.id !== variantId)
-          .map((line: any) => ({
-            quantity: line.quantity,
-            variantId: line.variant.id,
-          }));
-
-      alteredLines.push({ quantity: quantity, variantId: variantId });
 
       if (checkout && checkout?.token) {
-        const obj = {
-          checkoutId: checkout?.id,
-          lines: [
-            {
-              quantity: quantity,
-              variantId: variantId
-            },
-          ],
-          isRecalculate: true,
-        }  
         const resJson = await fetch(`${restApiUrl}/rest/update_cart/`,{
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(obj),
+          body: JSON.stringify(updatePayload),
         }
         );
         const resData = await resJson.json();
