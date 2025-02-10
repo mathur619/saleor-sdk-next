@@ -125,7 +125,7 @@ export interface CheckoutSDK {
     type: AddressTypes
   ) => SetAddressTypeResult;
   createCheckout?: () => CreateCheckoutResult;
-  createCheckoutRest?: (checkoutInput: CheckoutInput) => CreateCheckoutResult;
+  createCheckoutRest?: (checkoutInput: CheckoutInput) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   setShippingAddress?: (
     shippingAddress: IAddress,
     email: string
