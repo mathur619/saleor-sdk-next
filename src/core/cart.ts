@@ -35,7 +35,7 @@ interface AtcPayload {
   checkoutId: string;
   isRecalculate: boolean;
   lines: Array<{variantId:string,quantity:number}>;
-  checkoutMetadataInput: Array<{key:string,value:string}>;
+  checkoutMetadataInput?: Array<{key:string,value:string}>;
 }
 export interface CartSDK {
   loaded?: boolean;
