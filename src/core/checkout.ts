@@ -212,7 +212,7 @@ export const checkout = ({
           storage.setCheckout(updatedCheckout);
         }
         return {
-          res: data,
+          data,
           errors: data?.message ? [{"message":data?.message}] : null
         };
       }
