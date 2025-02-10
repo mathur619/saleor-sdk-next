@@ -70,6 +70,7 @@ import {
   IAddress,
   PaymentMethodUpdateInput,
 } from "../apollo/types/checkout";
+import { dummyCheckoutFields } from "../constants";
 import { storage } from "./storage";
 import {
   AddPromoCodeResult,
@@ -191,19 +192,39 @@ export const checkout = ({
         });
         if(!dataJson?.ok){
           console.log("Create checkout api error",dataJson);
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
           return null;
         }
         const data = await dataJson?.json();
-        
-        await setLocalCheckoutInCache(client, data);
-        if (data?.id) {
-          storage.setCheckout(data);
+
+        const updatedCheckout = {
+          ...dummyCheckoutFields,
+          ...data
         }
-        return data;
+        console.log('checkout create updatedCheckout',data,updatedCheckout);
+        await setLocalCheckoutInCache(client, updatedCheckout);
+        if (data?.id) {
+          storage.setCheckout(updatedCheckout);
+        }
+        return {
+          res: data,
+          errors: data?.message ? [{"message":data?.message}] : null
+        };
       }
       return null;
     } catch (error) {
       console.log('create checkout error',error);
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
       return null;
     }
   };
