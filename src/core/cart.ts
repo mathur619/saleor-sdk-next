@@ -30,6 +30,7 @@ import {
   UpdateCheckoutLineMutationVariables,
 } from "../apollo/types";
 import { GET_LOCAL_CHECKOUT } from "../apollo/queries";
+import { dummyCheckoutFields } from "../constants";
 
 interface AtcPayload {
   checkoutId: string;
@@ -177,18 +178,36 @@ export const cart = ({
         errors: resData?.message ? [{message:resData?.message}] : null
       }
       console.log('response json for add to cart',resJson, res);
+      const updatedMetadata = {
+        ...dummyCheckoutFields,
+        ...checkout,
+        ...resData
+      }
+
       if(resJson?.ok){
         if (resData?.id) {
-          storage.setCheckout({...checkout,...resData});
+          storage.setCheckout(updatedMetadata);
         }
         await setLocalCheckoutInCache(
           client,
-          {...checkout,...resData},
+          updatedMetadata,
           true
         );
       }
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
       return res;
     } 
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: false,
+      },
+    });
     return null;
   };
 
@@ -309,6 +328,13 @@ export const cart = ({
   };
 
   const removeItemRest: CartSDK["removeItemRest"] = async (variantId: string, checkoutMetadataInput: Array<{key:string,value:string}>) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    
     const checkoutString = storage.getCheckout();
     const checkout: Checkout | null =
       checkoutString && typeof checkoutString === "string"
@@ -361,19 +387,37 @@ export const cart = ({
         errors: resData?.message ? [{message:resData?.message}] : null
       }
       console.log('response json for remove cart',resJson, res);
+      const updatedMetadata = {
+        ...dummyCheckoutFields,
+        ...checkout,
+        ...resData
+      };
+
       if(resJson?.ok){
         console.log('response json for remove cart if success',resJson);
         if (resData?.id) {
-          storage.setCheckout(resData);
+          storage.setCheckout(updatedMetadata);
         }
         await setLocalCheckoutInCache(
           client,
-          resData,
+          updatedMetadata,
           true
         );
       }
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
       return res;
     }
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: false,
+      },
+    });
     return null;
   };
 
@@ -455,7 +499,12 @@ export const cart = ({
   const updateItemRest: CartSDK["updateItemRest"] = async (
     updatePayload
   ) => {
-    
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
       const checkoutString = storage.getCheckout();
 
       const checkout =
@@ -478,18 +527,36 @@ export const cart = ({
           errors: resData?.message ? [{message:resData?.message}] : null
         }
         console.log("response json for update cart",res,resJson);
+        const updatedMetadata = {
+          ...dummyCheckoutFields,
+          ...checkout,
+          ...resData
+        }
+
         if(resJson?.ok){
           if (resData?.id) {
-            storage.setCheckout(resData);
+            storage.setCheckout(updatedMetadata);
           }
           await setLocalCheckoutInCache(
             client,
-            resData,
+            updatedMetadata,
             true
           );
         }
+        client.writeQuery({
+          query: GET_LOCAL_CHECKOUT,
+          data: {
+            checkoutLoading: false,
+          },
+        });
         return res;
       }
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
     return null;
   };
 
