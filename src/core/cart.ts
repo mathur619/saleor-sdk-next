@@ -162,6 +162,20 @@ export const cart = ({
         ? JSON.parse(checkoutString)
         : checkoutString;
 
+    if (!atcPayload?.checkoutId) {
+      const localWarehouse = checkout?.metadata?.find(item => item?.key === 'warehouse_id')?.value;
+      const currentWarehouse = atcPayload?.checkoutMetadataInput?.find(item => item?.key === 'warehouse_id')?.value;
+      const payload = {
+        checkoutId: checkout?.id,
+        lines: atcPayload?.lines,
+        isRecalculate: atcPayload?.isRecalculate
+      };
+      if (localWarehouse !== currentWarehouse) {
+        payload.checkoutMetadataInput = atcPayload?.checkoutMetadataInput;
+      }
+      atcPayload = payload;
+    }
+
     if (checkout && checkout?.token) {
       const resJson = await fetch(`${restApiUrl}/rest/add_to_cart/`,{
         method: "POST",
@@ -511,6 +525,20 @@ export const cart = ({
         checkoutString && typeof checkoutString === "string"
           ? JSON.parse(checkoutString)
           : checkoutString;
+
+      if (!updatePayload?.checkoutId) {
+        const localWarehouse = checkout?.metadata?.find(item => item?.key === 'warehouse_id')?.value;
+        const currentWarehouse = updatePayload?.checkoutMetadataInput?.find(item => item?.key === 'warehouse_id')?.value;
+        const payload = {
+          checkoutId: checkout?.id,
+          lines: updatePayload?.lines,
+          isRecalculate: updatePayload?.isRecalculate
+        };
+        if (localWarehouse !== currentWarehouse) {
+          payload.checkoutMetadataInput = updatePayload?.checkoutMetadataInput;
+        }
+        updatePayload = payload;
+      }
 
       if (checkout && checkout?.token) {
         const resJson = await fetch(`${restApiUrl}/rest/update_cart/`,{
