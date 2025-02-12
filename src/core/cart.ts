@@ -165,7 +165,7 @@ export const cart = ({
     if (!atcPayload?.checkoutId) {
       const localWarehouse = checkout?.metadata?.find(item => item?.key === 'warehouse_id')?.value;
       const currentWarehouse = atcPayload?.checkoutMetadataInput?.find(item => item?.key === 'warehouse_id')?.value;
-      const payload = {
+      const payload:AtcPayload = {
         checkoutId: checkout?.id,
         lines: atcPayload?.lines,
         isRecalculate: atcPayload?.isRecalculate
@@ -529,7 +529,7 @@ export const cart = ({
       if (!updatePayload?.checkoutId) {
         const localWarehouse = checkout?.metadata?.find(item => item?.key === 'warehouse_id')?.value;
         const currentWarehouse = updatePayload?.checkoutMetadataInput?.find(item => item?.key === 'warehouse_id')?.value;
-        const payload = {
+        const payload:AtcPayload = {
           checkoutId: checkout?.id,
           lines: updatePayload?.lines,
           isRecalculate: updatePayload?.isRecalculate
