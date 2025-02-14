@@ -30,7 +30,6 @@ export const useCheckoutState = () => {
     //   "Cache query result is undefined. Invalid cache configuration."
     // );
   }
-  if(!data?.localCheckout) refetch(GET_LOCAL_CHECKOUT);
 
   return {
     checkout: data?.localCheckout,
