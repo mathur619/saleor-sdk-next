@@ -37,7 +37,9 @@ export const useCartState = () => {
     networkStatus,
     previousData,
     loading,
-  });
+  },
+'cache state',res?.client?.cache?.extract());
+console.log("useCartState query->",GET_LOCAL_CHECKOUT )
 
   if (!data) {
     // throw new Error(
