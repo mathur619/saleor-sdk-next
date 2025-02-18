@@ -59,7 +59,7 @@ console.log('useCartState',checkout,'discount',discounts);
   // }
 
   const mrp =
-    checkout?.lines?.reduce((total, curr) => {
+    checkout?.lines?.reduce((total:any, curr:any) => {
       const variantMetadata = curr?.variant.metadata;
 
       const listPrice = getMetadataValue(variantMetadata, "listPrice");
@@ -83,7 +83,7 @@ console.log('useCartState',checkout,'discount',discounts);
     }, 0) || 0;
 
   const netPrice =
-    checkout?.lines?.reduce((total, curr) => {
+    checkout?.lines?.reduce((total:any, curr:any) => {
       if (curr?.quantity) {
         const netPriceAmount =
           (curr?.variant.pricing?.priceUndiscounted?.gross.amount ||
