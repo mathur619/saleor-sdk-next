@@ -110,17 +110,17 @@ console.log('useCartState',checkout,'discount',discounts);
     offerDiscount: checkout?.totalPrice || defaultPrice,
     prepaidDiscount:
       createTaxedPriceFromAmount(
-        discounts?.prepaidDiscount
+        discounts?.checkoutDiscounts?.prepaidDiscount
       ) || defaultPrice,
     cashbackDiscount:
       createTaxedPriceFromAmount(
-        discounts?.cashbackDiscount
+        discounts?.checkoutDiscounts?.cashbackDiscount
       ) || defaultPrice,
     couponDiscount:
       createTaxedPriceFromAmount(
-        discounts?.couponDiscount
+        discounts?.checkoutDiscounts?.couponDiscount
       ) || defaultPrice,
-    cashbackRecieve: discounts || { amount: 0, willAddOn: null },
+    cashbackRecieve: discounts?.cashback || { amount: 0, willAddOn: null },
   };
 
   return cartState;
