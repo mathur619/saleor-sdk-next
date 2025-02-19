@@ -73,4 +73,5 @@ export const dummyCheckoutFields = {
   },
   translatedDiscountName: null,
   voucherCode: null,
+  __typename: "Checkout"
 };
