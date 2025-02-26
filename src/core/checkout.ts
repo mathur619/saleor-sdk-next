@@ -137,6 +137,7 @@ export interface CheckoutSDK {
 
   setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
+  addPromoCodeRest?: (promoCode: string) => AddPromoCodeResult;
   addPromoCode?: (promoCode: string) => AddPromoCodeResult;
   removePromoCode?: (promoCode: string) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
@@ -479,6 +480,59 @@ export const checkout = ({
       });
 
       return res;
+    }
+
+    return null;
+  };
+
+  const addPromoCodeRest: CheckoutSDK["addPromoCodeRest"] = async (
+    promoCode: string
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: AddCheckoutPromoCodeMutationVariables = {
+        checkoutId: checkout?.id,
+        promoCode,
+      };
+
+      const resData = await fetch(`${restApiUrl}/rest/add_promo_code/`,{
+        method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(variables)
+      });
+      const res = await resData.json();
+      const updatedCheckout = {
+        ...dummyCheckoutFields,
+        ...checkout,
+        ...res
+      }
+
+      if (res?.checkout?.id) {
+        storage.setCheckout(updatedCheckout);
+      }
+      setLocalCheckoutInCache(
+        client,
+        updatedCheckout,
+        true
+      );
+
+      return {
+        data: res?.checkout,
+        errors: res?.message ? [{"message":res?.message}] : null
+      };
     }
 
     return null;
@@ -1031,6 +1085,7 @@ export const checkout = ({
     setShippingAndBillingAddress,
     setAddressType,
     setShippingMethod,
+    addPromoCodeRest,
     addPromoCode,
     removePromoCode,
     checkoutPaymentMethodUpdate,
