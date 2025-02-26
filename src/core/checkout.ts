@@ -137,7 +137,7 @@ export interface CheckoutSDK {
 
   setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
-  addPromoCodeRest?: (promoCode: string) => AddPromoCodeResult;
+  addPromoCodeRest?: (promoCode: string) => Promise<{ data: any; errors: { message: any,field: any }[] | null; } | null>;
   addPromoCode?: (promoCode: string) => AddPromoCodeResult;
   removePromoCode?: (promoCode: string) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
@@ -519,8 +519,8 @@ export const checkout = ({
         ...checkout,
         ...res
       }
-
-      if (res?.checkout?.id) {
+      console.log('promo code updatedCheckout',res,updatedCheckout);
+      if (res?.id) {
         storage.setCheckout(updatedCheckout);
       }
       setLocalCheckoutInCache(
@@ -530,8 +530,8 @@ export const checkout = ({
       );
 
       return {
-        data: res?.checkout,
-        errors: res?.message ? [{"message":res?.message}] : null
+        data: res,
+        errors: res?.message ? [{"message":res?.message,"field": "promoCode"}] : null
       };
     }
 
