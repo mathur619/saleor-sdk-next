@@ -110,15 +110,15 @@ export const useCartState = () => {
     offerDiscount: data?.localCheckout?.totalPrice || defaultPrice,
     prepaidDiscount:
       createTaxedPriceFromAmount(
-        data?.localCheckoutDiscounts?.checkoutDiscounts?.prepaidDiscount
+        data?.localCheckoutDiscounts?.prepaidDiscount
       ) || defaultPrice,
     cashbackDiscount:
       createTaxedPriceFromAmount(
-        data?.localCheckoutDiscounts?.checkoutDiscounts?.cashbackDiscount
+        data?.localCheckoutDiscounts?.cashbackDiscount
       ) || defaultPrice,
     couponDiscount:
       createTaxedPriceFromAmount(
-        data?.localCheckoutDiscounts?.checkoutDiscounts?.couponDiscount
+        data?.localCheckoutDiscounts?.couponDiscount
       ) || defaultPrice,
     cashbackRecieve: data?.localCashback || { amount: 0, willAddOn: null },
   };
