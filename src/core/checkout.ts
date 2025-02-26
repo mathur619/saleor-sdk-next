@@ -138,6 +138,7 @@ export interface CheckoutSDK {
   setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
   addPromoCodeRest?: (promoCode: string) => Promise<{ data: any; errors: { message: any,field: any }[] | null; } | null>;
+  removePromoCodeRest?: (promoCode: string) => Promise<{ data: any; errors: { message: any,field: any }[] | null; } | null>;
   addPromoCode?: (promoCode: string) => AddPromoCodeResult;
   removePromoCode?: (promoCode: string) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
@@ -520,6 +521,59 @@ export const checkout = ({
         ...res
       }
       console.log('promo code updatedCheckout',res,updatedCheckout);
+      if (res?.id) {
+        storage.setCheckout(updatedCheckout);
+      }
+      setLocalCheckoutInCache(
+        client,
+        updatedCheckout,
+        true
+      );
+
+      return {
+        data: res,
+        errors: res?.message ? [{"message":res?.message,"field": "promoCode"}] : null
+      };
+    }
+
+    return null;
+  };
+
+  const removePromoCodeRest: CheckoutSDK["removePromoCodeRest"] = async (
+    promoCode: string
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: AddCheckoutPromoCodeMutationVariables = {
+        checkoutId: checkout?.id,
+        promoCode,
+      };
+
+      const resData = await fetch(`${restApiUrl}/rest/remove_promo_code/`,{
+        method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(variables)
+      });
+      const res = await resData.json();
+      const updatedCheckout = {
+        ...dummyCheckoutFields,
+        ...checkout,
+        ...res
+      }
+      console.log('remove promo code updatedCheckout',res,updatedCheckout);
       if (res?.id) {
         storage.setCheckout(updatedCheckout);
       }
@@ -1088,6 +1142,7 @@ export const checkout = ({
     addPromoCodeRest,
     addPromoCode,
     removePromoCode,
+    removePromoCodeRest,
     checkoutPaymentMethodUpdate,
     createPayment,
     completeCheckout,
