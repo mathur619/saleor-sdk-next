@@ -23,6 +23,7 @@ export const wishlist = ({
     if(variantId) {
       const res = await client.mutate<any,any>({
         mutation: WISHLIST_ADD_VARIANT,
+        fetchPolicy: 'no-cache',
         variables: {
           variantId,
         },
@@ -43,6 +44,7 @@ export const wishlist = ({
     if(variantId) {
       const res = await client.mutate<any,any>({
         mutation: WISHLIST_REMOVE_VARIANT,
+        fetchPolicy: 'no-cache',
         variables: {
           variantId,
         },
@@ -62,6 +64,7 @@ export const wishlist = ({
   const getWishlistItems: WishlistSDK["getWishlistItems"] = async (first:number, warehouseId:string) => {
     const res = await client.mutate<any,any>({
       mutation: GET_WISHLIST,
+      fetchPolicy: 'no-cache',
       variables: {
         first,
         warehouseId,
