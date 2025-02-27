@@ -52,11 +52,11 @@ console.log('useCartState',checkout,'discount',discounts);
 // 'cache state',res?.client?.cache?.extract());
 // console.log("useCartState query->",GET_LOCAL_CHECKOUT )
 
-  if (!data) {
+  // if (!data) {
     // throw new Error(
     //   "Cache query result is undefined. Invalid cache configuration."
     // );
-  }
+  // }
 
   const mrp =
     checkout?.lines?.reduce((total:any, curr:any) => {

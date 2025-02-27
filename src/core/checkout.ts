@@ -70,6 +70,7 @@ import {
   IAddress,
   PaymentMethodUpdateInput,
 } from "../apollo/types/checkout";
+import { dummyCheckoutFields } from "../constants";
 import { storage } from "./storage";
 import {
   AddPromoCodeResult,
@@ -93,6 +94,13 @@ import {
   SetShippingMethodResult,
 } from "./types";
 
+interface CheckoutInput {
+  lines?: Array<{variantId:string,quantity:number}>;
+  email: string;
+  isRecalculate: Boolean;
+  checkoutMetadataInput: Array<{key:string,value:string}>;
+  shipping_address: any;
+}
 export interface CheckoutSDK {
   loaded?: any;
 
@@ -117,6 +125,7 @@ export interface CheckoutSDK {
     type: AddressTypes
   ) => SetAddressTypeResult;
   createCheckout?: () => CreateCheckoutResult;
+  createCheckoutRest?: (checkoutInput: CheckoutInput) => Promise<{data:any,errors:{message:any}[] | null} | null>;
   setShippingAddress?: (
     shippingAddress: IAddress,
     email: string
@@ -128,6 +137,8 @@ export interface CheckoutSDK {
 
   setBillingAddress?: (billingAddress: IAddress) => SetBillingAddressResult;
   setShippingMethod?: (shippingMethodId: string) => SetShippingMethodResult;
+  addPromoCodeRest?: (promoCode: string) => Promise<{ data: any; errors: { message: any,field: any }[] | null; } | null>;
+  removePromoCodeRest?: (promoCode: string) => Promise<{ data: any; errors: { message: any,field: any }[] | null; } | null>;
   addPromoCode?: (promoCode: string) => AddPromoCodeResult;
   removePromoCode?: (promoCode: string) => RemovePromoCodeResult;
   checkoutPaymentMethodUpdate?: (
@@ -155,7 +166,71 @@ export interface CheckoutSDK {
 
 export const checkout = ({
   apolloClient: client,
+  restApiUrl
 }: SaleorClientMethodsProps): CheckoutSDK => {
+  const createCheckoutRest: CheckoutSDK["createCheckoutRest"] = async (checkoutInput) => {
+    try {
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: true,
+        },
+      });
+  
+      const checkoutString = storage.getCheckout();
+      const checkout =
+        checkoutString && typeof checkoutString === "string"
+          ? JSON.parse(checkoutString)
+          : checkoutString;
+      if (!(checkout && checkout?.id)) {
+        const dataJson = await fetch(`${restApiUrl}/rest/create_checkout/`,{
+          method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              checkoutInput:checkoutInput
+            }),
+        });
+        if(!dataJson?.ok){
+          console.log("Create checkout api error",dataJson);
+          client.writeQuery({
+            query: GET_LOCAL_CHECKOUT,
+            data: {
+              checkoutLoading: false,
+            },
+          });
+          return null;
+        }
+        const data = await dataJson?.json();
+
+        const updatedCheckout = {
+          ...dummyCheckoutFields,
+          ...data
+        }
+        console.log('checkout create updatedCheckout',data,updatedCheckout);
+        await setLocalCheckoutInCache(client, updatedCheckout);
+        if (data?.id) {
+          storage.setCheckout(updatedCheckout);
+        }
+        return {
+          data,
+          errors: data?.message ? [{"message":data?.message}] : null
+        };
+      }
+      return null;
+    } catch (error) {
+      console.log('create checkout error',error);
+      client.writeQuery({
+        query: GET_LOCAL_CHECKOUT,
+        data: {
+          checkoutLoading: false,
+        },
+      });
+      return null;
+    }
+  };
+
   const createCheckout: CheckoutSDK["createCheckout"] = async () => {
     client.writeQuery({
       query: GET_LOCAL_CHECKOUT,
@@ -406,6 +481,112 @@ export const checkout = ({
       });
 
       return res;
+    }
+
+    return null;
+  };
+
+  const addPromoCodeRest: CheckoutSDK["addPromoCodeRest"] = async (
+    promoCode: string
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: AddCheckoutPromoCodeMutationVariables = {
+        checkoutId: checkout?.id,
+        promoCode,
+      };
+
+      const resData = await fetch(`${restApiUrl}/rest/add_promo_code/`,{
+        method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(variables)
+      });
+      const res = await resData.json();
+      const updatedCheckout = {
+        ...dummyCheckoutFields,
+        ...checkout,
+        ...res
+      }
+      console.log('promo code updatedCheckout',res,updatedCheckout);
+      if (res?.id) {
+        storage.setCheckout(updatedCheckout);
+      }
+      setLocalCheckoutInCache(
+        client,
+        updatedCheckout,
+        true
+      );
+
+      return {
+        data: res,
+        errors: res?.message ? [{"message":res?.message,"field": "promoCode"}] : null
+      };
+    }
+
+    return null;
+  };
+
+  const removePromoCodeRest: CheckoutSDK["removePromoCodeRest"] = async (
+    promoCode: string
+  ) => {
+    client.writeQuery({
+      query: GET_LOCAL_CHECKOUT,
+      data: {
+        checkoutLoading: true,
+      },
+    });
+    const checkoutString = storage.getCheckout();
+    const checkout =
+      checkoutString && typeof checkoutString === "string"
+        ? JSON.parse(checkoutString)
+        : checkoutString;
+
+    if (checkout && checkout?.id) {
+      const variables: AddCheckoutPromoCodeMutationVariables = {
+        checkoutId: checkout?.id,
+        promoCode,
+      };
+
+      const resData = await fetch(`${restApiUrl}/rest/remove_promo_code/`,{
+        method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(variables)
+      });
+      const res = await resData.json();
+      const updatedCheckout = {
+        ...dummyCheckoutFields,
+        ...checkout,
+        ...res
+      }
+      console.log('remove promo code updatedCheckout',res,updatedCheckout);
+      if (res?.id) {
+        storage.setCheckout(updatedCheckout);
+      }
+      setLocalCheckoutInCache(
+        client,
+        updatedCheckout,
+        true
+      );
+
+      return {
+        data: res,
+        errors: res?.message ? [{"message":res?.message,"field": "promoCode"}] : null
+      };
     }
 
     return null;
@@ -952,13 +1133,16 @@ export const checkout = ({
     addTagsInCheckout,
     removeTagsInCheckout,
     createCheckout,
+    createCheckoutRest,
     setShippingAddress,
     setBillingAddress,
     setShippingAndBillingAddress,
     setAddressType,
     setShippingMethod,
+    addPromoCodeRest,
     addPromoCode,
     removePromoCode,
+    removePromoCodeRest,
     checkoutPaymentMethodUpdate,
     createPayment,
     completeCheckout,
